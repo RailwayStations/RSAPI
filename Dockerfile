@@ -1,19 +1,22 @@
-FROM maven:3-openjdk-15 AS build
-COPY src /usr/src/app/src
-COPY pom.xml /usr/src/app
-RUN mvn -f /usr/src/app/pom.xml clean package
+FROM openjdk:11 AS build
+ENV APP_HOME=/root/dev/rsapi/
+RUN mkdir -p $APP_HOME/src/main/java
+WORKDIR $APP_HOME
+COPY build.gradle settings.gradle gradlew $APP_HOME
+COPY gradle $APP_HOME/gradle
+# Dependencies
+RUN ./gradlew build -x bootJar -x test --continue
+COPY . .
+RUN ./gradlew build -x pmdMain -x pmdTest -x spotbugsMain -x spotbugsTest
 
-FROM openjdk:15
-
-ENV RSAPI_HOME=/opt/services
+FROM openjdk:11
+ENV RSAPI_HOME=/opt/services/
 ENV RSAPI_WORK=/var/rsapi
+ENV ARTIFACT_NAME=rsapi-0.0.1-SNAPSHOT.jar
+WORKDIR $RSAPI_HOME
 
-COPY --from=build /usr/src/app/target/rsapi-1.0.0-SNAPSHOT.jar $RSAPI_HOME/rsapi.jar
-COPY config.yml $RSAPI_WORK/
-# Add Maven dependencies (not shaded into the artifact; Docker-cached)
-COPY --from=build /usr/src/app/target/lib           $RSAPI_HOME/lib
+COPY --from=build /root/dev/rsapi/build/libs/$ARTIFACT_NAME .
 
 EXPOSE 8080
 EXPOSE 8081
-WORKDIR $RSAPI_HOME
-CMD [ "sh", "-c", "java -jar rsapi.jar db migrate -i $RSAPI_LB_CONTEXT $RSAPI_WORK/config.yml && java -jar rsapi.jar server $RSAPI_WORK/config.yml"]
+CMD [ "java", "-jar", $ARTIFACT_NAME]
