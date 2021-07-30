@@ -39,6 +39,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
 import java.util.zip.CRC32;
@@ -551,7 +553,8 @@ public class InboxResource {
             inboxDao.updateCrc32(id, crc32);
 
             // additionally write the file to the input directory for Vsion.AI
-            FileUtils.copyFileToDirectory(file, inboxToProcessDir, true);
+            inboxToProcessDir.mkdirs();
+            Files.copy(file.toPath(), new File(inboxToProcessDir, file.getName()).toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
 
             String duplicateInfo = "";
             if (conflict) {

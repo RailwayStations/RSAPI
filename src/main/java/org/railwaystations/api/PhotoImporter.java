@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -195,17 +196,21 @@ public class PhotoImporter {
 
     public static void moveFile(final File importFile, final File countryDir, final String stationId, final String extension) throws IOException {
         final File destFile = getCleanDestFile(countryDir, stationId, extension);
-        FileUtils.moveFile(importFile, destFile);
+        Files.move(importFile.toPath(), destFile.toPath());
     }
 
     public static void copyFile(final File importFile, final File countryDir, final String stationId, final String extension) throws IOException {
         final File destFile = getCleanDestFile(countryDir, stationId, extension);
-        FileUtils.copyFile(importFile, destFile);
+        Files.copy(importFile.toPath(), destFile.toPath());
     }
 
     private static File getCleanDestFile(final File countryDir, final String stationId, final String extension) {
         final File destFile = new File(countryDir, stationId + "." + extension);
-        FileUtils.deleteQuietly(destFile);
+        try {
+            Files.deleteIfExists(destFile.toPath());
+        } catch (IOException e) {
+            LOG.warn("Couldn't delete file: " + destFile);
+        }
         return destFile;
     }
 
