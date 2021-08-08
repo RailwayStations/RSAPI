@@ -28,7 +28,9 @@ public class SmtpMailer implements Mailer {
         properties.setProperty("mail.smtp.host", host);
         properties.setProperty("mail.smtp.auth", "true");
         properties.setProperty("mail.smtp.port", port);
-        properties.setProperty("mail.smtp.starttls.enable", "true");
+        properties.setProperty("mail.smtp.ssl.enable", "true");
+        properties.setProperty("mail.smtp.timeout", "10000");
+        properties.setProperty("mail.smtp.connectiontimeout", "10000");
 
         session = Session.getInstance(properties, new UsernamePasswordAuthenticator(user, passwd));
         this.from = from;
@@ -51,7 +53,8 @@ public class SmtpMailer implements Mailer {
 
             message.setContent(multipart);
             Transport.send(message);
-        } catch (final MessagingException e) {
+            LOG.info("Mail sent");
+        } catch (final Exception e) {
             throw new RuntimeException("Unable to send mail", e);
         }
     }
