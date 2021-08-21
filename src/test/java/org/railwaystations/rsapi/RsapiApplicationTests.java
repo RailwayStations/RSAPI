@@ -2,6 +2,8 @@ package org.railwaystations.rsapi;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.railwaystations.rsapi.mail.Mailer;
@@ -450,8 +452,9 @@ class RsapiApplicationTests {
 
 	@Test
 	public void updateMyProfileAndChangePassword() throws IOException {
+		final String firstPassword = "0ae7d6de822259da274581d9932052222b874016";
 		final HttpHeaders headers = new HttpHeaders();
-		headers.add("Upload-Token", "0ae7d6de822259da274581d9932052222b874016");
+		headers.add("Upload-Token", firstPassword);
 		headers.add("Email", "storchp@example.com");
 		final ResponseEntity<String> responseGetBefore = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
 		assertThat(responseGetBefore.getStatusCodeValue(), is(200));
@@ -476,13 +479,38 @@ class RsapiApplicationTests {
 		assertThat(responseGetAfter.getBody(), notNullValue());
 		assertProfile(responseGetAfter, "storchp", "", "CC0 1.0 Universell (CC0 1.0)", true, "storchp@example.com");
 
-		headers.add("New-Password", "!\"$%&/()=?-1234567890");
+
+		final String secondPassword = "!\"$%&/()=?-1234567890";
+		changePassword(firstPassword, secondPassword, true, true);
+		changePassword(secondPassword, "\\=oF`)X77__U}G", false, false);
+	}
+
+	public void changePassword(final String oldPassword, final String newPassword, final boolean authUploadToken, final boolean changePasswordViaHeader) throws IOException {
+		final HttpHeaders headers = new HttpHeaders();
+		if (authUploadToken) {
+			headers.add("Upload-Token", oldPassword);
+			headers.add("Email", "storchp@example.com");
+		} else {
+			headers.setBasicAuth("storchp@example.com", oldPassword);
+		}
+
+		final HttpEntity<Object> changePasswordRequest;
+		if (changePasswordViaHeader) {
+			headers.add("New-Password", newPassword);
+			changePasswordRequest = new HttpEntity<>(headers);
+		} else {
+			headers.setContentType(MediaType.APPLICATION_JSON);
+			final ObjectNode changePassword = MAPPER.createObjectNode();
+			changePassword.set("newPassword", new TextNode(newPassword));
+			changePasswordRequest = new HttpEntity<>(changePassword, headers);
+		}
+
 		final ResponseEntity<String> responseChangePassword = restTemplate.postForEntity(
-				String.format("http://localhost:%d%s", port, "/changePassword"), new HttpEntity<>(headers), String.class);
+				String.format("http://localhost:%d%s", port, "/changePassword"), changePasswordRequest, String.class);
 		assertThat(responseChangePassword.getStatusCodeValue(), is(200));
 
 		final ResponseEntity<String> responseAfterChangedPassword = restTemplate
-				.withBasicAuth("storchp@example.com", "!\"$%&/()=?-1234567890")
+				.withBasicAuth("storchp@example.com", newPassword)
 				.getForEntity(String.format("http://localhost:%d%s", port, "/myProfile"), String.class);
 		assertThat(responseAfterChangedPassword.getStatusCodeValue(), is(200));
 

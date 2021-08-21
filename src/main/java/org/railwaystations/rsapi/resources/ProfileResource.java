@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.railwaystations.rsapi.auth.AuthUser;
 import org.railwaystations.rsapi.db.UserDao;
 import org.railwaystations.rsapi.mail.Mailer;
+import org.railwaystations.rsapi.model.ChangePassword;
 import org.railwaystations.rsapi.model.User;
 import org.railwaystations.rsapi.monitoring.Monitor;
 import org.slf4j.Logger;
@@ -46,10 +47,15 @@ public class ProfileResource {
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,value = "/changePassword")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> changePassword(@AuthenticationPrincipal final AuthUser authUser, @NotNull @RequestHeader("New-Password") final String newPassword) {
+    public ResponseEntity<String> changePassword(@AuthenticationPrincipal final AuthUser authUser, @RequestHeader(value = "New-Password", required = false) final String newPassword, @RequestBody(required = false) final ChangePassword changePassword) {
         final User user = authUser.getUser();
         LOG.info("Password change for '{}'", user.getEmail());
-        final String trimmedPassword = StringUtils.trimToEmpty(newPassword);
+        final String trimmedPassword;
+        if (changePassword != null) {
+            trimmedPassword = StringUtils.trimToEmpty(changePassword.getNewPassword());
+        } else {
+            trimmedPassword = StringUtils.trimToEmpty(newPassword);
+        }
         if (trimmedPassword.length() < 8 ) {
             LOG.warn("Password too short");
             return new ResponseEntity<>("Password too short", HttpStatus.BAD_REQUEST);

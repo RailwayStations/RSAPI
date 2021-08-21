@@ -8,6 +8,7 @@ import org.railwaystations.rsapi.auth.AuthUser;
 import org.railwaystations.rsapi.auth.LazySodiumPasswordEncoder;
 import org.railwaystations.rsapi.db.UserDao;
 import org.railwaystations.rsapi.mail.Mailer;
+import org.railwaystations.rsapi.model.ChangePassword;
 import org.railwaystations.rsapi.model.User;
 import org.railwaystations.rsapi.monitoring.MockMonitor;
 import org.springframework.http.ResponseEntity;
@@ -165,26 +166,63 @@ public class ProfileResourceTest {
     }
 
     @Test
-    public void testChangePasswordTooShort() {
+    public void testChangePasswordTooShortHeader() {
         final User user = new User("existing", "existing@example.com", null, true, null, false, null, true);
-        final ResponseEntity response = resource.changePassword(new AuthUser(user, Collections.EMPTY_LIST), "secret");
+        final ResponseEntity response = resource.changePassword(new AuthUser(user, Collections.EMPTY_LIST), "secret", null);
         verify(userDao, never()).updateCredentials(anyInt(), anyString());
 
         assertThat(response.getStatusCodeValue(), equalTo(400));
     }
 
     @Test
-    public void testChangePassword() {
+    public void testChangePasswordTooShortBody() {
+        final User user = new User("existing", "existing@example.com", null, true, null, false, null, true);
+        final ResponseEntity response = resource.changePassword(new AuthUser(user, Collections.EMPTY_LIST), null, new ChangePassword("secret"));
+        verify(userDao, never()).updateCredentials(anyInt(), anyString());
+
+        assertThat(response.getStatusCodeValue(), equalTo(400));
+    }
+
+    @Test
+    public void testChangePasswordHeader() {
         final User user = new User("existing", "existing@example.com", null, true, null, false, null, true);
         user.setId(4711);
         final ArgumentCaptor<Integer> idCaptor = ArgumentCaptor.forClass(Integer.class);
         final ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
-        final ResponseEntity response = resource.changePassword(new AuthUser(user, Collections.EMPTY_LIST), "secretlong");
+        final ResponseEntity response = resource.changePassword(new AuthUser(user, Collections.EMPTY_LIST), "secretlong", null);
         verify(userDao).updateCredentials(idCaptor.capture(), keyCaptor.capture());
 
         assertThat(response.getStatusCodeValue(), equalTo(200));
         assertThat(idCaptor.getValue(), equalTo(4711));
         assertThat(new LazySodiumPasswordEncoder().matches("secretlong", keyCaptor.getValue()), is(true));
+    }
+
+    @Test
+    public void testChangePasswordBody() {
+        final User user = new User("existing", "existing@example.com", null, true, null, false, null, true);
+        user.setId(4711);
+        final ArgumentCaptor<Integer> idCaptor = ArgumentCaptor.forClass(Integer.class);
+        final ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
+        final ResponseEntity response = resource.changePassword(new AuthUser(user, Collections.EMPTY_LIST), null, new ChangePassword("secretlong"));
+        verify(userDao).updateCredentials(idCaptor.capture(), keyCaptor.capture());
+
+        assertThat(response.getStatusCodeValue(), equalTo(200));
+        assertThat(idCaptor.getValue(), equalTo(4711));
+        assertThat(new LazySodiumPasswordEncoder().matches("secretlong", keyCaptor.getValue()), is(true));
+    }
+
+    @Test
+    public void testChangePasswordHeaderAndBody() {
+        final User user = new User("existing", "existing@example.com", null, true, null, false, null, true);
+        user.setId(4711);
+        final ArgumentCaptor<Integer> idCaptor = ArgumentCaptor.forClass(Integer.class);
+        final ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
+        final ResponseEntity response = resource.changePassword(new AuthUser(user, Collections.EMPTY_LIST), "secretheader", new ChangePassword("secretbody"));
+        verify(userDao).updateCredentials(idCaptor.capture(), keyCaptor.capture());
+
+        assertThat(response.getStatusCodeValue(), equalTo(200));
+        assertThat(idCaptor.getValue(), equalTo(4711));
+        assertThat(new LazySodiumPasswordEncoder().matches("secretbody", keyCaptor.getValue()), is(true));
     }
 
     @Test
