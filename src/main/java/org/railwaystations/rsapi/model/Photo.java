@@ -1,5 +1,7 @@
 package org.railwaystations.rsapi.model;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +33,11 @@ public class Photo {
         this.licenseUrl = LICENSES.get(license);
     }
 
+    public Photo(final String countryCode, final Country country, final String stationId, final User user, final String extension) {
+        this(new Station.Key(countryCode, stationId), "/" + countryCode + "/" + stationId + "." + extension, user, System.currentTimeMillis(), getLicense(user.getLicense(), country));
+    }
+
+
     public String getUrl() {
         return url;
     }
@@ -53,6 +60,17 @@ public class Photo {
 
     public Long getCreatedAt() {
         return createdAt;
+    }
+
+    /**
+     * Gets the applicable license for the given country.
+     * We need to override the license for some countries, because of limitations of the "Freedom of panorama".
+     */
+    protected static String getLicense(final String photographerLicense, final Country country) {
+        if (country != null && StringUtils.isNotBlank(country.getOverrideLicense())) {
+            return country.getOverrideLicense();
+        }
+        return photographerLicense;
     }
 
 }

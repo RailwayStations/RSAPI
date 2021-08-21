@@ -2,12 +2,10 @@ package org.railwaystations.rsapi.resources;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.railwaystations.rsapi.MastodonBot;
-import org.railwaystations.rsapi.PhotoImporter;
 import org.railwaystations.rsapi.StationsRepository;
 import org.railwaystations.rsapi.WorkDir;
 import org.railwaystations.rsapi.auth.AuthUser;
@@ -18,6 +16,7 @@ import org.railwaystations.rsapi.db.InboxDao;
 import org.railwaystations.rsapi.db.PhotoDao;
 import org.railwaystations.rsapi.model.*;
 import org.railwaystations.rsapi.monitoring.Monitor;
+import org.railwaystations.rsapi.utils.FileUtils;
 import org.railwaystations.rsapi.utils.ImageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -432,21 +431,21 @@ public class InboxResource {
 
         try {
             final File countryDir = new File(workDir.getPhotosDir(), station.getKey().getCountry());
-            final Photo photo = PhotoImporter.createPhoto(station.getKey().getCountry(), country.orElse(null), station.getKey().getId(), user.get(), inboxEntry.getExtension());
+            final Photo photo = new Photo(station.getKey().getCountry(), country.orElse(null), station.getKey().getId(), user.get(), inboxEntry.getExtension());
             if (station.hasPhoto()) {
                 photoDao.update(photo);
-                FileUtils.deleteQuietly(new File(countryDir, station.getKey().getId() + "." + inboxEntry.getExtension()));
+                org.apache.commons.io.FileUtils.deleteQuietly(new File(countryDir, station.getKey().getId() + "." + inboxEntry.getExtension()));
             } else {
                 photoDao.insert(photo);
             }
             station.setPhoto(photo);
 
             if (processedFile.exists()) {
-                PhotoImporter.moveFile(processedFile, countryDir, station.getKey().getId(), inboxEntry.getExtension());
+                FileUtils.moveFile(processedFile, countryDir, station.getKey().getId(), inboxEntry.getExtension());
             } else {
-                PhotoImporter.copyFile(originalFile, countryDir, station.getKey().getId(), inboxEntry.getExtension());
+                FileUtils.copyFile(originalFile, countryDir, station.getKey().getId(), inboxEntry.getExtension());
             }
-            FileUtils.moveFileToDirectory(originalFile, new File(workDir.getInboxDir(), "done"), true);
+            org.apache.commons.io.FileUtils.moveFileToDirectory(originalFile, new File(workDir.getInboxDir(), "done"), true);
             inboxDao.done(inboxEntry.getId());
             LOG.info("Upload {} accepted: {}", inboxEntry.getId(), fileToImport);
             mastodonBot.tootNewPhoto(repository.findByKey(station.getKey()), inboxEntry);
@@ -468,9 +467,9 @@ public class InboxResource {
 
         try {
             final File rejectDir = new File(workDir.getInboxDir(), "rejected");
-            FileUtils.moveFileToDirectory(file, rejectDir, true);
-            FileUtils.deleteQuietly(new File(workDir.getInboxToProcessDir(), inboxEntry.getFilename()));
-            FileUtils.deleteQuietly(new File(workDir.getInboxProcessedDir(), inboxEntry.getFilename()));
+            org.apache.commons.io.FileUtils.moveFileToDirectory(file, rejectDir, true);
+            org.apache.commons.io.FileUtils.deleteQuietly(new File(workDir.getInboxToProcessDir(), inboxEntry.getFilename()));
+            org.apache.commons.io.FileUtils.deleteQuietly(new File(workDir.getInboxProcessedDir(), inboxEntry.getFilename()));
         } catch (final IOException e) {
             LOG.warn("Unable to move rejected file {}", file, e);
         }
@@ -520,11 +519,11 @@ public class InboxResource {
             LOG.info("Writing photo to {}", file);
 
             // write the file to the inbox directory
-            FileUtils.forceMkdir(workDir.getInboxDir());
+            org.apache.commons.io.FileUtils.forceMkdir(workDir.getInboxDir());
             final CheckedOutputStream cos = new CheckedOutputStream(new FileOutputStream(file), new CRC32());
             final long bytesRead = IOUtils.copyLarge(body, cos, 0L, MAX_SIZE);
             if (bytesRead == MAX_SIZE) {
-                FileUtils.deleteQuietly(file);
+                org.apache.commons.io.FileUtils.deleteQuietly(file);
                 return consumeBodyAndReturn(body, new InboxResponse(InboxResponse.InboxResponseState.PHOTO_TOO_LARGE, "Photo too large, max " + MAX_SIZE + " bytes allowed"));
             }
             cos.close();

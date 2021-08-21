@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -35,6 +37,16 @@ public class PhotoTest {
     public void license2LicenseUrlMappingUnknownLicense() {
         final Photo photo = new Photo(TEST_KEY, "url", createTestPhotographer(null), null, "unknown license name");
         assertNull(photo.getLicenseUrl());
+    }
+
+    @Test
+    public void getLicenseNoOverride() {
+        assertThat(Photo.getLicense("CCO", new Country("de")), equalTo("CCO"));
+    }
+
+    @Test
+    public void getLicenseOverride() {
+        assertThat(Photo.getLicense("CCO", new Country("fr", "France", null, null, null, "CC1", true)), equalTo("CC1"));
     }
 
 }
