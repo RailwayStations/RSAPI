@@ -13,15 +13,15 @@ This API is hosted at https://api.railway-stations.org or at the Deutsche Bahn d
 To build the project, you need Java 11.
 
 Run on Unix like systems:
-```./mvnw clean install```
+```./gradlew build bootJar```
 
 Run on Windows:
 
-```./mvnw.cmd clean install```
+```./gradlew.bat build bootJar```
 
 ## Working Directory
 
-The API uses `/var/rsapi` as working directory. This can be changed in the `config.yml` or via Docker volume, see below.
+The API uses `/var/rsapi` as working directory. This can be changed in the `application.yaml` or via Docker volume, see below.
 
 The following subdirectories are being used:
 
@@ -39,29 +39,14 @@ This project can be run as a Docker container. The docker image is automatically
 - build:
   ```docker build . -t railwaystations/rsapi:latest```
 
-- Configure the ```config.yml``` file from current directory and put it into the rsapi work directory.
+- Configure the ```application.yaml``` file from current directory and put it into the rsapi work directory.
     
 - Run interactively:
-  ```docker run -it --net=host --rm -p 8080:8080 -v <work-dir>:/var/rsapi -e RSAPI_LB_CONTEXT=test --name rsapi railwaystations/rsapi```
+  ```docker run -it --net=host --rm -p 8080:8080 -v <work-dir>:/var/rsapi --name rsapi railwaystations/rsapi```
 
 - Run as background service:
-  ```docker run -d -p 8080:8080 --net=host --restart always --name rsapi -v <work-dir>:/var/rsapi -e RSAPI_LB_CONTEXT=test railwaystations/rsapi:latest```
-
-- Remove the (running) container:
-  ```docker rm -f rsapi```
-  
-- Check if it is running:
-  ```docker ps```
-  
-- Read the logs:
-  ```docker logs -f rsapi```
-  
-- Attach to container:
-  ```docker attach --sig-proxy=false rsapi```
-
-- Restart (e.g. after config change):
-  ```docker restart rsapi```
-  
+  ```docker run -d -p 8080:8080 --net=host --restart always --name rsapi -v <work-dir>:/var/rsapi railwaystations/rsapi:latest```
+ 
 Ready to use images are published at https://hub.docker.com/repository/docker/railwaystations/rsapi
 
 ## Maria DB
@@ -75,7 +60,7 @@ Enter mysql CLI:
 
 Before using the DB it needs to be populated with schema and data, also updates might be necessary from time to time.
 
-When the project is build, you can start the DB migrations with: `java -jar target/rsapi-1.0.0-SNAPSHOT.jar db migrate -i test config.yml
+When the project is build, you can start the DB migrations with: `java -jar target/rsapi-1.0.0-SNAPSHOT.jar db migrate -i test application.yaml
 `.
 
 The context (`-i` parameter) can take the following values:
