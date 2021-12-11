@@ -1,0 +1,24 @@
+---
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  liquibase:
+    contexts: junit
+
+# application
+workDir: /var/rsapi
+salt: dummy
+photoBaseUrl: https://api.railway-stations.org/photos
+inboxBaseUrl: https://api.railway-stations.org/inbox
+
+# Mastodon Bot
+mastodonBot:
+  instanceUrl: https://botsin.space
+  token:
+  stationUrl: https://map.railway-stations.org/station.php
+
+# Matrix Monitor
+matrix:
+  uploadUrl: https://matrix.org/_matrix/media/r0/upload
+  roomUrl:
+  accessToken:

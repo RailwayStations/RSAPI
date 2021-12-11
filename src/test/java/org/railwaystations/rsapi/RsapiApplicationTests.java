@@ -19,6 +19,13 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.MariaDBContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -37,6 +44,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Base64;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,6 +68,20 @@ class RsapiApplicationTests {
 
 	@MockBean
 	private Mailer mailer;
+
+	private static final MariaDBContainer<?> mariadb;
+
+	static {
+		mariadb = new MariaDBContainer<>(DockerImageName.parse("mariadb:10.1"));
+		mariadb.start();
+	}
+
+	@DynamicPropertySource
+	static void properties(final DynamicPropertyRegistry registry) {
+		registry.add("spring.datasource.url", mariadb::getJdbcUrl);
+		registry.add("spring.datasource.username", mariadb::getUsername);
+		registry.add("spring.datasource.password", mariadb::getPassword);
+	}
 
 	@Test
 	void contextLoads() {
@@ -220,7 +242,7 @@ class RsapiApplicationTests {
 		final ResponseEntity<String> response = loadRaw("/de/photographers.txt", 200, String.class);
 		int count = 0;
 		final Pattern pattern = Pattern.compile("\\d[\\d]*\t[^\t]*");
-		for (final String line : response.getBody().split("\n")) {
+		for (final String line : Objects.requireNonNull(response.getBody()).split("\n")) {
 			if (count == 0) {
 				assertThat(line, is("count\tphotographer"));
 			} else {
@@ -246,11 +268,11 @@ class RsapiApplicationTests {
 	}
 
 	@Test
-	public void statisticTxt() throws IOException {
+	public void statisticTxt() {
 		final ResponseEntity<String> response = loadRaw("/de/stats.txt", 200, String.class);
 		final Pattern pattern = Pattern.compile("[^\t]*\t\\d[\\d]*");
 		int count = 0;
-		for (final String line : response.getBody().split("\n")) {
+		for (final String line : Objects.requireNonNull(response.getBody()).split("\n")) {
 			if (count == 0) {
 				assertThat(line, is("name\tvalue"));
 			} else {
@@ -350,7 +372,7 @@ class RsapiApplicationTests {
 		// download uploaded photo from inbox
 		final ResponseEntity<byte[]> photoResponse = restTemplate.getForEntity(
 				String.format("http://localhost:%d%s%s", port, "/inbox/", inboxResponse.get("filename").asText()), byte[].class);
-		final BufferedImage inputImage = ImageIO.read(new ByteArrayInputStream(photoResponse.getBody()));
+		final BufferedImage inputImage = ImageIO.read(new ByteArrayInputStream(Objects.requireNonNull(photoResponse.getBody())));
 		assertThat(inputImage, notNullValue());
 		// we cannot binary compare the result anymore, the photos are re-encoded
 		// assertThat(IOUtils.readFully((InputStream)photoResponse.getEntity(), IMAGE.length), is(IMAGE));
@@ -485,7 +507,7 @@ class RsapiApplicationTests {
 		changePassword(secondPassword, "\\=oF`)X77__U}G", false, false);
 	}
 
-	public void changePassword(final String oldPassword, final String newPassword, final boolean authUploadToken, final boolean changePasswordViaHeader) throws IOException {
+	public void changePassword(final String oldPassword, final String newPassword, final boolean authUploadToken, final boolean changePasswordViaHeader) {
 		final HttpHeaders headers = new HttpHeaders();
 		if (authUploadToken) {
 			headers.add("Upload-Token", oldPassword);
