@@ -4,8 +4,6 @@ on: [pull_request]
 
 jobs:
   build:
-    branches:
-      - main
     runs-on: ubuntu-latest
 
     steps:

@@ -1,11 +1,12 @@
 name: Java CI
 
-on: [push]
+on: 
+  push:
+    branches:
+      - 'main'
 
 jobs:
   build:
-    branches:
-      - main
     runs-on: ubuntu-latest
 
     steps:
