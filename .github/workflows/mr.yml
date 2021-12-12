@@ -1,0 +1,9 @@
+name: Pull Request
+on: [pull_request]
+jobs:
+  build-php:
+    runs-on: openjdk:11
+    steps:
+    - uses: actions/checkout@v1
+    - name: Run build
+      run: ./gradlew bootJar

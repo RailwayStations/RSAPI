@@ -1,0 +1,12 @@
+on: 
+  push:
+    branches:
+      - main
+name: Publish Website over SFTP
+jobs:
+  build-and-deploy:
+    runs-on: openjdk:11
+    steps:
+      - uses: actions/checkout@v1
+    - name: Run build
+      run: ./gradlew bootJar
