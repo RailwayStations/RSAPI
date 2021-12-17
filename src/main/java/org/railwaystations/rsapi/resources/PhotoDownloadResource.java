@@ -1,6 +1,7 @@
 package org.railwaystations.rsapi.resources;
 
 import org.railwaystations.rsapi.WorkDir;
+import org.railwaystations.rsapi.utils.FileUtils;
 import org.railwaystations.rsapi.utils.ImageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,7 @@ public class PhotoDownloadResource {
                                   @PathVariable("filename") final String filename,
                                   @RequestParam(value = "width", required = false) final Integer width) throws IOException {
         LOG.info("Download photo country={}, file={}", countryCode, filename);
-        return downloadPhoto(new File(new File(workDir.getPhotosDir(), countryCode), filename), width);
+        return downloadPhoto(new File(new File(workDir.getPhotosDir(), countryCode), FileUtils.sanitizeFileName(filename)), width);
     }
 
     private static ResponseEntity<byte[]> downloadPhoto(final File photo, final Integer width) throws IOException {
@@ -54,14 +55,14 @@ public class PhotoDownloadResource {
     public ResponseEntity<byte[]> inbox(@PathVariable("filename") final String filename,
                                  @RequestParam(value = "width", required = false) final Integer width) throws IOException {
         LOG.info("Download inbox file={}", filename);
-        return downloadPhoto(new File(workDir.getInboxDir(), filename), width);
+        return downloadPhoto(new File(workDir.getInboxDir(), FileUtils.sanitizeFileName(filename)), width);
     }
 
     @GetMapping(value = "/inbox/processed/{filename}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
     public ResponseEntity<byte[]> inboxProcessed(@PathVariable("filename") final String filename,
                                           @RequestParam(value = "width", required = false) final Integer width) throws IOException {
         LOG.info("Download inbox file={}", filename);
-        return downloadPhoto(new File(workDir.getInboxProcessedDir(), filename), width);
+        return downloadPhoto(new File(workDir.getInboxProcessedDir(), FileUtils.sanitizeFileName(filename)), width);
     }
 
 }

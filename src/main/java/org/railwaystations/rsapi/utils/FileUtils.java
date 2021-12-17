@@ -34,4 +34,31 @@ public class FileUtils {
         return destFile;
     }
 
+    public static String sanitizeFileName(String fileName) {
+        if (fileName == null) {
+            return null;
+        }
+
+        fileName = fileName.replaceAll(" ", "_")
+                .replaceAll("/", "_")
+                .replaceAll(":", "_")
+                .replaceAll("\"", "_")
+                .replaceAll("\\|", "_")
+                .replaceAll("\\*", "_")
+                .replaceAll("\\?", "_")
+                .replaceAll("<", "_")
+                .replaceAll(">", "_");
+
+        boolean done = false;
+        while (!done) {
+            final String replacedString = fileName.replace('\\', '_');
+            done = (fileName.equals(replacedString));
+            if (!done) {
+                fileName = replacedString;
+                break;
+            }
+        }
+        return fileName;
+    }
+
 }
