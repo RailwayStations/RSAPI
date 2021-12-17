@@ -3,6 +3,7 @@ package org.railwaystations.rsapi.resources;
 import org.railwaystations.rsapi.StationsRepository;
 import org.railwaystations.rsapi.model.Statistic;
 import org.springframework.http.MediaType;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,17 +21,17 @@ public class StatisticResource {
     }
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE}, value = "/stats")
-    public Statistic get(@RequestParam(StatisticResource.COUNTRY) final String country) {
+    public Statistic get(@Nullable @RequestParam(StatisticResource.COUNTRY) final String country) {
         return getWithCountry(country);
     }
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE}, value = "/stats.json")
-    public Statistic getAsJson(@RequestParam(StatisticResource.COUNTRY) final String country) {
+    public Statistic getAsJson(@Nullable @RequestParam(StatisticResource.COUNTRY) final String country) {
         return getWithCountry(country);
     }
 
     @GetMapping(produces = {MediaType.TEXT_PLAIN_VALUE}, value = "/stats.txt")
-    public Statistic getAsText(@RequestParam(StatisticResource.COUNTRY) final String country) {
+    public Statistic getAsText(@Nullable @RequestParam(StatisticResource.COUNTRY) final String country) {
         return getWithCountry(country);
     }
 

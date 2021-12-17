@@ -31,6 +31,9 @@ public class ProfileResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProfileResource.class);
 
+    @Autowired
+    private UserDetailsService userDetailsService;
+
     private final Monitor monitor;
     private final Mailer mailer;
     private final UserDao userDao;
@@ -160,9 +163,6 @@ public class ProfileResource {
         user.setUploadTokenSalt(null);
         user.setUploadToken(null);
     }
-
-    @Autowired
-    private UserDetailsService userDetailsService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/myProfile")
     @PreAuthorize("isAuthenticated()")

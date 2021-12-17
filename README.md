@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/RailwayStations/RSAPI.svg?branch=master)](https://travis-ci.org/RailwayStations/RSAPI) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b9882fcf1221409680f36afe2c85fcba)](https://www.codacy.com/gh/RailwayStations/RSAPI?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=RailwayStations/RSAPI&amp;utm_campaign=Badge_Grade) [![Coverage Status](https://coveralls.io/repos/github/RailwayStations/RSAPI/badge.svg?branch=master)](https://coveralls.io/github/RailwayStations/RSAPI?branch=master) 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b9882fcf1221409680f36afe2c85fcba)](https://www.codacy.com/gh/RailwayStations/RSAPI?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=RailwayStations/RSAPI&amp;utm_campaign=Badge_Grade) [![Coverage Status](https://coveralls.io/repos/github/RailwayStations/RSAPI/badge.svg?branch=master)](https://coveralls.io/github/RailwayStations/RSAPI?branch=master) 
 
 # Railway Stations API
 Backend Service for the https://map.railway-stations.org and the Mobile Apps for [Android](https://github.com/RailwayStations/RSAndroidApp) and [iOS](https://github.com/RailwayStations/Bahnhofsfotos) of the [Bahnhofsfotos opendata Project](https://github.com/RailwayStations).
@@ -7,7 +7,7 @@ Later it was enhanced to export a plaintext list of the Waypoints for the online
 Then it returned the Waypoints as json for the Android and iOS Apps as well as the Website.
 Over time more and more countries have been added, see [Use](#use).
 
-This API is hosted at https://api.railway-stations.org or at the Deutsche Bahn developer site: https://developer.deutschebahn.com/store/apis/list where you can also find an online and executable version of the swagger documentation.
+This API is hosted at https://api.railway-stations.org or at the Deutsche Bahn developer site: https://developer.deutschebahn.com/store/apis/list where you can also find an online and executable version of the OpenAPI documentation.
 
 ## build
 To build the project, you need Java 11.
@@ -77,7 +77,7 @@ With the following query parameter:
 - `maxDistance`, `lat`, `lon`: select trainstations within a max distance of km of the given reference point
 - `country`: select trainstations from a given country, this parameter is an alternative to the `{country}` path
 
-A more detailed API documentation can be found in the [OpenAPI](openapi.yaml) file or online at [developer.deutschebahn.com](https://developer.deutschebahn.com/store/apis/list).
+A more detailed API documentation can be found in the [OpenAPI](src/main/resources/static/openapi.yaml) file or online at [developer.deutschebahn.com](https://developer.deutschebahn.com/store/apis/list).
 
 ### Examples
 - all supported countries: https://api.railway-stations.org/countries

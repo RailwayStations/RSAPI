@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.StringUtils;
-import org.railwaystations.rsapi.MastodonBot;
+import org.railwaystations.rsapi.mastodon.MastodonBot;
 import org.railwaystations.rsapi.StationsRepository;
 import org.railwaystations.rsapi.WorkDir;
 import org.railwaystations.rsapi.auth.AuthUser;
@@ -431,7 +431,7 @@ public class InboxResource {
 
         try {
             final File countryDir = new File(workDir.getPhotosDir(), station.getKey().getCountry());
-            final Photo photo = new Photo(station.getKey().getCountry(), country.orElse(null), station.getKey().getId(), user.get(), inboxEntry.getExtension());
+            final Photo photo = new Photo(station.getKey().getCountry(), country.orElse(null), station.getKey().getId(), user.orElseThrow(), inboxEntry.getExtension());
             if (station.hasPhoto()) {
                 photoDao.update(photo);
                 org.apache.commons.io.FileUtils.deleteQuietly(new File(countryDir, station.getKey().getId() + "." + inboxEntry.getExtension()));
@@ -531,7 +531,7 @@ public class InboxResource {
             inboxDao.updateCrc32(id, crc32);
 
             // additionally write the file to the input directory for Vsion.AI
-            workDir.getInboxToProcessDir().mkdirs();
+            org.apache.commons.io.FileUtils.forceMkdir(workDir.getInboxToProcessDir());
             Files.copy(file.toPath(), new File(workDir.getInboxToProcessDir(), file.getName()).toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
 
             String duplicateInfo = "";

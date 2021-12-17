@@ -14,7 +14,7 @@ spring:
 server:
     error:
       whitelabel:
-        enabled: false
+        enabled: true
 
 logging:
   level:
@@ -33,11 +33,11 @@ mailer:
   port:
   user:
   passwd:
-  from:
+  from: info@railway-stations.org
 
 
 # Mastodon Bot
-mastodonBot:
+mastodon-bot:
   instanceUrl: https://botsin.space
   token:
   stationUrl: https://map.railway-stations.org/station.php

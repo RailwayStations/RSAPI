@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi;
+package org.railwaystations.rsapi.mastodon;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -27,19 +27,13 @@ public class MastodonBot {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    private final String token;
-
-    private final String stationUrl;
-
-    private final String instanceUrl;
+    private final MastodonBotConfig config;
 
     private final CloseableHttpClient httpclient;
 
-    public MastodonBot(@Value("${mastodonBot.token}") final String token, @Value("${mastodonBot.stationUrl}") final String stationUrl, @Value("${mastodonBot.instanceUrl}") final String instanceUrl) {
+    public MastodonBot(final MastodonBotConfig config) {
         super();
-        this.token = token;
-        this.stationUrl = stationUrl;
-        this.instanceUrl = instanceUrl;
+        this.config = config;
         this.httpclient = HttpClients.custom().setDefaultRequestConfig(
                 RequestConfig.custom()
                         .setSocketTimeout(5000)
@@ -49,7 +43,7 @@ public class MastodonBot {
     }
 
     public void tootNewPhoto(final Station station, final InboxEntry inboxEntry) {
-        if (StringUtils.isBlank(instanceUrl) || StringUtils.isBlank(token) || StringUtils.isBlank(stationUrl)) {
+        if (StringUtils.isBlank(config.getInstanceUrl()) || StringUtils.isBlank(config.getToken()) || StringUtils.isBlank(config.getStationUrl())) {
             LOG.info("New photo for Station {} not tooted, {}", station.getKey(), this);
             return;
         }
@@ -57,15 +51,15 @@ public class MastodonBot {
         new Thread(() -> {
             try {
                 String status = String.format("%s%nby %s%n%s?countryCode=%s&stationId=%s",
-                        station.getTitle(), station.getPhotographer(), stationUrl,
+                        station.getTitle(), station.getPhotographer(), config.getStationUrl(),
                         station.getKey().getCountry(), station.getKey().getId());
                 if (StringUtils.isNotBlank(inboxEntry.getComment())) {
                     status += String.format("%n%s", inboxEntry.getComment());
                 }
                 final String json = MAPPER.writeValueAsString(new Toot(status));
-                final HttpPost httpPost = new HttpPost(instanceUrl + "/api/v1/statuses");
+                final HttpPost httpPost = new HttpPost(config.getInstanceUrl() + "/api/v1/statuses");
                 httpPost.setEntity(new StringEntity(json, ContentType.APPLICATION_JSON.withCharset("UTF-8")));
-                httpPost.setHeader("Authorization", "Bearer " + token);
+                httpPost.setHeader("Authorization", "Bearer " + config.getToken());
                 final CloseableHttpResponse response = httpclient.execute(httpPost);
                 final int statusCode = response.getStatusLine().getStatusCode();
                 final String content = EntityUtils.toString(response.getEntity());
@@ -83,9 +77,8 @@ public class MastodonBot {
     @Override
     public String toString() {
         return "MastodonBot{" +
-                "token='" + token + '\'' +
-                ", stationUrl='" + stationUrl + '\'' +
-                ", instanceUrl='" + instanceUrl + '\'' +
+                "stationUrl='" + config.getStationUrl() + '\'' +
+                ", instanceUrl='" + config.getInstanceUrl() + '\'' +
                 '}';
     }
 
