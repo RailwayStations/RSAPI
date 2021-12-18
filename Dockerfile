@@ -1,22 +1,14 @@
-FROM openjdk:17 AS build
-ENV APP_HOME=/root/dev/rsapi/
-RUN mkdir -p $APP_HOME/src/main/java
-WORKDIR $APP_HOME
-COPY build.gradle settings.gradle gradlew $APP_HOME
-COPY gradle $APP_HOME/gradle
-# Dependencies
-RUN ./gradlew build -x bootJar -x test --continue
-COPY . .
-RUN ./gradlew build -x pmdMain -x pmdTest -x spotbugsMain -x spotbugsTest
-
-FROM openjdk:17
-ENV RSAPI_HOME=/opt/services/
+FROM openjdk:17-alpine
+ENV RSAPI_HOME=/opt/services
 ENV RSAPI_WORK=/var/rsapi
 ENV ARTIFACT_NAME=rsapi-0.0.1-SNAPSHOT.jar
-WORKDIR $RSAPI_HOME
+ENV SPRING_PROFILE=prod
+WORKDIR $RSAPI_WORK
 
-COPY --from=build /root/dev/rsapi/build/libs/$ARTIFACT_NAME .
+COPY ./build/libs/${ARTIFACT_NAME} ${RSAPI_HOME}/
+
+RUN apk add --no-cache libsodium
 
 EXPOSE 8080
 EXPOSE 8081
-CMD [ "java", "-jar", "$ARTIFACT_NAME"]
+CMD [ "sh", "-c", "java -Dspring.profiles.active=${SPRING_PROFILE} -jar ${RSAPI_HOME}/${ARTIFACT_NAME}"]

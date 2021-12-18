@@ -2,6 +2,7 @@ package org.railwaystations.rsapi.monitoring;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -29,19 +30,12 @@ public class MatrixMonitor implements Monitor {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final Logger LOG = LoggerFactory.getLogger(MatrixMonitor.class);
 
-    @Value("${matrix.roomUrl}")
-    private String roomUrl;
-
-    @Value("${matrix.uploadUrl}")
-    private String uploadUrl;
-
-    @Value("${matrix.accessToken}")
-    private String accessToken;
-
     private final CloseableHttpClient httpclient;
+    private final MatrixMonitorConfig config;
 
-    public MatrixMonitor() {
+    public MatrixMonitor(final MatrixMonitorConfig config) {
         super();
+        this.config = config;
         this.httpclient = HttpClients.custom().setDefaultRequestConfig(
                 RequestConfig.custom()
                         .setSocketTimeout(5000)
@@ -61,6 +55,10 @@ public class MatrixMonitor implements Monitor {
 
     protected void sendMessageInternal(final String message, final File photo) {
         LOG.info("Sending message: {}", message);
+        if (StringUtils.isBlank(config.getRoomUrl())) {
+            LOG.warn("Skipping message, missing Matrix Room URL config");
+            return;
+        }
         try {
             final CloseableHttpResponse response = sendRoomMessage(new MatrixTextMessage(message));
             final int status = response.getStatusLine().getStatusCode();
@@ -81,13 +79,13 @@ public class MatrixMonitor implements Monitor {
 
     private CloseableHttpResponse sendRoomMessage(final Object message) throws IOException {
         final String json = MAPPER.writeValueAsString(message);
-        final HttpPost httpPost = new HttpPost(roomUrl + "?access_token=" + accessToken);
+        final HttpPost httpPost = new HttpPost(config.getRoomUrl() + "?access_token=" + config.getAccessToken());
         httpPost.setEntity(new StringEntity(json, ContentType.APPLICATION_JSON.withCharset("UTF-8")));
         return httpclient.execute(httpPost);
     }
 
     private void sendPhoto(final File photo) throws IOException {
-        final HttpPost httpPost = new HttpPost(uploadUrl + "?filename" + photo.getName() + "&access_token=" + accessToken);
+        final HttpPost httpPost = new HttpPost(config.getUploadUrl() + "?filename" + photo.getName() + "&access_token=" + config.getAccessToken());
         httpPost.setEntity(new ByteArrayEntity(ImageUtil.scalePhoto(photo, 300), ContentType.getByMimeType(ImageUtil.extensionToMimeType(ImageUtil.getExtension(photo.getName())))));
         final CloseableHttpResponse responseUpload = httpclient.execute(httpPost);
         final int statusUpload = responseUpload.getStatusLine().getStatusCode();

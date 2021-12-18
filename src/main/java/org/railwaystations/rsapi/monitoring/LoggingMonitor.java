@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 
 @Service
-@Profile("dev")
+@Profile("!prod")
 public class LoggingMonitor implements Monitor {
 
     private static final Logger LOG = LoggerFactory.getLogger(LoggingMonitor.class);
