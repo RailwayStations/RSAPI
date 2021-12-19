@@ -12,13 +12,22 @@ spring:
     contexts: test
 
 server:
-    error:
-      whitelabel:
-        enabled: true
+  error:
+    whitelabel:
+      enabled: true
 
 logging:
   level:
     root: DEBUG
+
+management:
+  server:
+    port: 8081
+    address: 127.0.0.1
+  endpoints:
+    web:
+      exposure:
+        include: "*"
 
 # application
 workDir: /var/rsapi
@@ -34,7 +43,6 @@ mailer:
   user:
   passwd:
   from: info@railway-stations.org
-
 
 # Mastodon Bot
 mastodon-bot:

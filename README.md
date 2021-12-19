@@ -39,13 +39,13 @@ This project can be run as a Docker container. The docker image is automatically
 - build:
   ```docker build . -t railwaystations/rsapi:latest```
 
-- Configure the ```application.yaml``` file from current directory and put it into the rsapi work directory.
+- Configure the ```application-prod.yaml``` file from current directory and put it into the rsapi work directory.
     
 - Run interactively:
-  ```docker run -it --net=host --rm -p 8080:8080 -v <work-dir>:/var/rsapi --name rsapi railwaystations/rsapi```
+  ```docker run -it -e SPRING_PROFILES_ACTIVE=prod --net=host --rm -v <work-dir>:/var/rsapi --name rsapi railwaystations/rsapi```
 
 - Run as background service:
-  ```docker run -d -p 8080:8080 --net=host --restart always --name rsapi -v <work-dir>:/var/rsapi railwaystations/rsapi:latest```
+  ```docker run -d -e SPRING_PROFILES_ACTIVE=prod --net=host --restart always --name rsapi -v <work-dir>:/var/rsapi railwaystations/rsapi:latest```
  
 Ready to use images are published at https://hub.docker.com/repository/docker/railwaystations/rsapi
 
@@ -58,15 +58,7 @@ Enter mysql CLI:
 
 ### Migrations
 
-Before using the DB it needs to be populated with schema and data, also updates might be necessary from time to time.
-
-When the project is build, you can start the DB migrations with: `java -jar target/rsapi-1.0.0-SNAPSHOT.jar db migrate -i test application.yaml
-`.
-
-The context (`-i` parameter) can take the following values:
-- prod: for production
-- test: for local testing
-- junit: for automated unit testing during maven build
+RSAPI used Liquibase for database schema migration. This schema is updated automatically on start.
 
 ## Use
 Point your browser to `http://localhost:8080/{country}/stations`, where `country` can be "de", "ch", "fi", "uk", ...
