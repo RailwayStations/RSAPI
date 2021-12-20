@@ -40,6 +40,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -103,21 +104,22 @@ public class InboxResource {
                               @RequestPart("file") final MultipartFile file,
                               @RequestHeader("Referer") final String referer) throws JsonProcessingException {
         LOG.info("MultipartFormData: email={}, station={}, country={}, file={}", email, stationId, countryCode, file.getName());
+        final URI refererUri = URI.create(referer);
 
         try {
             final Authentication authentication = authenticator.authenticate(new UsernamePasswordAuthenticationToken(email, uploadToken));
-            if (authentication != null && authentication.isAuthenticated()) {
+            if (authentication == null || !authentication.isAuthenticated()) {
                 final InboxResponse response = consumeBodyAndReturn(file.getInputStream(), new InboxResponse(InboxResponse.InboxResponseState.UNAUTHORIZED));
-                return createIFrameAnswer(response, referer);
+                return createIFrameAnswer(response, refererUri);
             }
 
             final String contentType = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(file.getName());
             final InboxResponse response = uploadPhoto(userAgent, file.getInputStream(), StringUtils.trimToNull(stationId),
                     StringUtils.trimToNull(countryCode), contentType, stationTitle, latitude, longitude, comment, active, userDetailsService.loadUserByUsername(email));
-            return createIFrameAnswer(response, referer);
+            return createIFrameAnswer(response, refererUri);
         } catch (final Exception e) {
             LOG.error("FormUpload error", e);
-            return createIFrameAnswer(new InboxResponse(InboxResponse.InboxResponseState.ERROR), referer);
+            return createIFrameAnswer(new InboxResponse(InboxResponse.InboxResponseState.ERROR), refererUri);
         }
     }
 
@@ -560,7 +562,7 @@ public class InboxResource {
         return new File(workDir.getInboxDir(), filename);
     }
 
-    private String createIFrameAnswer(final InboxResponse response, final String referer) throws JsonProcessingException {
+    private String createIFrameAnswer(final InboxResponse response, final URI referer) throws JsonProcessingException {
         return "<script language=\"javascript\" type=\"text/javascript\">" +
                 " window.top.window.postMessage('" + MAPPER.writeValueAsString(response) + "', '" + referer + "');" +
                 "</script>";

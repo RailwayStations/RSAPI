@@ -6,24 +6,28 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
-import org.railwaystations.rsapi.mastodon.MastodonBot;
 import org.railwaystations.rsapi.StationsRepository;
 import org.railwaystations.rsapi.WorkDir;
 import org.railwaystations.rsapi.auth.AuthUser;
+import org.railwaystations.rsapi.auth.RSAuthenticationProvider;
 import org.railwaystations.rsapi.auth.RSUserDetailsService;
 import org.railwaystations.rsapi.db.CountryDao;
 import org.railwaystations.rsapi.db.InboxDao;
 import org.railwaystations.rsapi.db.PhotoDao;
 import org.railwaystations.rsapi.db.UserDao;
+import org.railwaystations.rsapi.mastodon.MastodonBot;
 import org.railwaystations.rsapi.mastodon.MastodonBotConfig;
 import org.railwaystations.rsapi.model.*;
 import org.railwaystations.rsapi.monitoring.MockMonitor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -33,6 +37,7 @@ import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
 
@@ -43,6 +48,7 @@ public class PhotoInboxEntryResourceTest {
     private InboxResource resource;
     private InboxDao inboxDao = null;
     private final MockMonitor monitor = new MockMonitor();
+    private RSAuthenticationProvider authenticator;
 
     @BeforeEach
     public void setUp() throws IOException {
@@ -58,7 +64,7 @@ public class PhotoInboxEntryResourceTest {
         final Station station9876 = new Station(key9876, "Station 9876", new Coordinates(52.0, 8.0), "EFF", new Photo(key9876, "URL", createUser("nickname", 42), null, "CC0"), true);
 
         final UserDao userDao = mock(UserDao.class);
-        final User userNickname = new User("nickname", "nickname@example.com", "CC0", true, null, true, null, true);
+        final User userNickname = new User("nickname", null, "CC0", 42, "nickname@example.com", true, true, null, null, false, null, false);
         when(userDao.findByEmail("nickname@example.com")).thenReturn(Optional.of(userNickname));
         final User userSomeuser = new User("someuser", "someuser@example.com", "CC0", true, null, true, null, true);
         userSomeuser.setUploadTokenSalt(123456L);
@@ -75,7 +81,9 @@ public class PhotoInboxEntryResourceTest {
         when(repository.findByCountryAndId(key0815.getCountry(), key0815.getId())).thenReturn(station0815);
         when(repository.findByCountryAndId(key9876.getCountry(), key9876.getId())).thenReturn(station9876);
 
-        resource = new InboxResource(repository, workDir, monitor, null,
+        authenticator = mock(RSAuthenticationProvider.class);
+
+        resource = new InboxResource(repository, workDir, monitor, authenticator,
                 inboxDao, new RSUserDetailsService(userDao), countryDao, photoDao, "http://inbox.railway-stations.org", new MastodonBot(new MastodonBotConfig()));
     }
 
@@ -93,6 +101,52 @@ public class PhotoInboxEntryResourceTest {
                 stationTitle, latitude, longitude, comment, null,
                 new AuthUser(new User(nickname, null, "CC0", userId, email, true, false, null, null, false, emailVerification, true), Collections.emptyList()));
         return response.getBody();
+    }
+
+    @Test
+    public void testPostIframeUnauthorized() throws IOException {
+        when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("unknown@example.com", "secretUploadToken"))).thenReturn(null);
+        when(inboxDao.insert(any())).thenReturn(1);
+        final String response = whenPostImageIframe("unknown@example.com", "http://localhost/uploadPage.php");
+
+        assertThat(response, containsString("UNAUTHORIZED"));
+        verify(inboxDao, never()).insert(any());
+        assertThat(monitor.getMessages().size(), is(0));
+    }
+
+    @Test
+    public void testPostIframeMaliciousReferer() throws IOException {
+        when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("nickname@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("","", Collections.emptyList()));
+        when(inboxDao.insert(any())).thenReturn(1);
+        try {
+            final String response = whenPostImageIframe("nickname@example.com", "http://localhost/uploadPage.php<script>alert('FooBar!');</script>");
+            fail("IllegalArgumentException expected, but got: " + response);
+        } catch (final IllegalArgumentException e) {
+            assertThat(e.getCause(), instanceOf(URISyntaxException.class));
+        }
+        verify(inboxDao, never()).insert(any());
+        assertThat(monitor.getMessages().size(), is(0));
+    }
+
+    @Test
+    public void testPostIframe() throws IOException {
+        final ArgumentCaptor<InboxEntry> uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
+        when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("nickname@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("","", Collections.emptyList()));
+        when(inboxDao.insert(any())).thenReturn(1);
+        final String response = whenPostImageIframe("nickname@example.com", "http://localhost/uploadPage.php");
+
+        assertThat(response, containsString("REVIEW"));
+        assertFileWithContentExistsInInbox("image-content", "1.jpg");
+        verify(inboxDao).insert(uploadCaptor.capture());
+        assertUpload(uploadCaptor.getValue(), "de","4711", null, null);
+
+        assertThat(monitor.getMessages().get(0), equalTo("New photo upload for Lummerland - de:4711\nSome Comment\nhttp://inbox.railway-stations.org/1.jpg\nby nickname\nvia UserAgent"));
+    }
+
+    private String whenPostImageIframe(final String email,
+                                       final String referer) throws IOException {
+        return resource.photoUpload("UserAgent", email, "secretUploadToken", "4711", "de", null, null, null, "Some Comment", null,
+                new MockMultipartFile("1.jpg", "image-content".getBytes(Charset.defaultCharset())), referer);
     }
 
     @Test
