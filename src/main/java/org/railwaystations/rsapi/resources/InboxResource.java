@@ -137,11 +137,6 @@ public class InboxResource {
                                                      @RequestHeader(value = "Active", required = false) final Boolean active,
                                                      @AuthenticationPrincipal final AuthUser user) throws IOException {
         final InputStream is = request.getInputStream();
-        if (!user.getUser().isEmailVerified()) {
-            LOG.info("Photo upload failed for user {}, email not verified", user.getUsername());
-            final InboxResponse response = consumeBodyAndReturn(is, new InboxResponse(InboxResponse.InboxResponseState.UNAUTHORIZED,"Email not verified"));
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-        }
         final String stationTitle = encStationTitle != null ? URLDecoder.decode(encStationTitle, StandardCharsets.UTF_8) : null;
         final String comment = encComment != null ? URLDecoder.decode(encComment, StandardCharsets.UTF_8) : null;
         LOG.info("Photo upload from Nickname: {}; Country: {}; Station-Id: {}; Coords: {},{}; Title: {}; Content-Type: {}",
@@ -481,6 +476,11 @@ public class InboxResource {
                                       final String country, final String contentType, final String stationTitle,
                                       final Double latitude, final Double longitude, final String comment,
                                       final Boolean active, final AuthUser user) {
+        if (!user.getUser().isEmailVerified()) {
+            LOG.info("Photo upload failed for user {}, email not verified", user.getUsername());
+            return consumeBodyAndReturn(body, new InboxResponse(InboxResponse.InboxResponseState.UNAUTHORIZED,"Email not verified"));
+        }
+
         final Station station = repository.findByCountryAndId(country, stationId);
         Coordinates coordinates = null;
         if (station == null) {

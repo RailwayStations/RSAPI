@@ -64,7 +64,7 @@ public class PhotoInboxEntryResourceTest {
         final Station station9876 = new Station(key9876, "Station 9876", new Coordinates(52.0, 8.0), "EFF", new Photo(key9876, "URL", createUser("nickname", 42), null, "CC0"), true);
 
         final UserDao userDao = mock(UserDao.class);
-        final User userNickname = new User("nickname", null, "CC0", 42, "nickname@example.com", true, true, null, null, false, null, false);
+        final User userNickname = new User("nickname", null, "CC0", 42, "nickname@example.com", true, true, null, null, false, User.EMAIL_VERIFIED, false);
         when(userDao.findByEmail("nickname@example.com")).thenReturn(Optional.of(userNickname));
         final User userSomeuser = new User("someuser", "someuser@example.com", "CC0", true, null, true, null, true);
         userSomeuser.setUploadTokenSalt(123456L);
@@ -110,6 +110,18 @@ public class PhotoInboxEntryResourceTest {
         final String response = whenPostImageIframe("unknown@example.com", "http://localhost/uploadPage.php");
 
         assertThat(response, containsString("UNAUTHORIZED"));
+        verify(inboxDao, never()).insert(any());
+        assertThat(monitor.getMessages().size(), is(0));
+    }
+
+    @Test
+    public void testPostIframeEmailNotVerified() throws IOException {
+        when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("someuser@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("","", Collections.emptyList()));
+        when(inboxDao.insert(any())).thenReturn(1);
+        final String response = whenPostImageIframe("someuser@example.com", "http://localhost/uploadPage.php");
+
+        assertThat(response, containsString("UNAUTHORIZED"));
+        assertThat(response, containsString("Email not verified"));
         verify(inboxDao, never()).insert(any());
         assertThat(monitor.getMessages().size(), is(0));
     }
