@@ -42,3 +42,4 @@ pom.xml.versionsBackup
 dependency-reduced-pom.xml
 target
 
+/src/main/resources/application-peter.yaml

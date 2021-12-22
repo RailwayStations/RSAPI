@@ -21,6 +21,7 @@ import java.util.List;
 @ComponentScan("org.railwaystations.rsapi")
 public class WebConfig implements WebMvcConfigurer {
 
+
     @Override
     public void configureMessageConverters(final List<HttpMessageConverter<?>> converters) {
         converters.add(new PhotographersTxtWriter());

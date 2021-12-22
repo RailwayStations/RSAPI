@@ -157,8 +157,8 @@ public class PhotoInboxEntryResourceTest {
 
     private String whenPostImageIframe(final String email,
                                        final String referer) throws IOException {
-        return resource.photoUpload("UserAgent", email, "secretUploadToken", "4711", "de", null, null, null, "Some Comment", null,
-                new MockMultipartFile("1.jpg", "image-content".getBytes(Charset.defaultCharset())), referer);
+        return (String) resource.photoUploadIframe("UserAgent", email, "secretUploadToken", "4711", "de", null, null, null, "Some Comment", null,
+                new MockMultipartFile("1.jpg", "1.jpg", "image/jpeg", "image-content".getBytes(Charset.defaultCharset())), referer).getModel().get("response");
     }
 
     @Test

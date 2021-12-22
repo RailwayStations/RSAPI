@@ -200,6 +200,7 @@ public class InboxEntry extends PublicInboxEntry {
         this.processed = processed;
     }
 
+    @JsonProperty(value = "DS100")
     public String getDs100() {
         return ds100;
     }
@@ -313,10 +314,6 @@ public class InboxEntry extends PublicInboxEntry {
 
     public boolean isProblemReport() {
         return problemReportType != null;
-    }
-
-    public String getDS100() {
-        return ds100;
     }
 
     public Boolean getActive() {

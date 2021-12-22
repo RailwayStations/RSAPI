@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.StringUtils;
-import org.railwaystations.rsapi.mastodon.MastodonBot;
 import org.railwaystations.rsapi.StationsRepository;
 import org.railwaystations.rsapi.WorkDir;
 import org.railwaystations.rsapi.auth.AuthUser;
@@ -14,6 +13,7 @@ import org.railwaystations.rsapi.auth.RSUserDetailsService;
 import org.railwaystations.rsapi.db.CountryDao;
 import org.railwaystations.rsapi.db.InboxDao;
 import org.railwaystations.rsapi.db.PhotoDao;
+import org.railwaystations.rsapi.mastodon.MastodonBot;
 import org.railwaystations.rsapi.model.*;
 import org.railwaystations.rsapi.monitoring.Monitor;
 import org.railwaystations.rsapi.utils.FileUtils;
@@ -31,9 +31,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UriUtils;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.io.File;
@@ -90,19 +90,20 @@ public class InboxResource {
      * Not part of the "official" API.
      * Supports upload of photos via the website.
      */
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/photoUpload")
-    public String photoUpload(@RequestHeader("User-Agent") final String userAgent,
-                              @RequestPart("email") final String email,
-                              @RequestPart("uploadToken") final String uploadToken,
-                              @RequestPart("stationId") final String stationId,
-                              @RequestPart("countryCode") final String countryCode,
-                              @RequestPart("stationTitle") final String stationTitle,
-                              @RequestPart("latitude") final Double latitude,
-                              @RequestPart("longitude") final Double longitude,
-                              @RequestPart("comment") final String comment,
-                              @RequestPart("active") final Boolean active,
-                              @RequestPart("file") final MultipartFile file,
-                              @RequestHeader("Referer") final String referer) throws JsonProcessingException {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/photoUpload", produces = MediaType.TEXT_HTML_VALUE)
+    @ResponseBody
+    public ModelAndView photoUploadIframe(@RequestHeader(value = "User-Agent", required = false) final String userAgent,
+                                          @RequestParam("email") final String email,
+                                          @RequestParam("uploadToken") final String uploadToken,
+                                          @RequestParam(value = "stationId", required = false) final String stationId,
+                                          @RequestParam(value = "countryCode", required = false) final String countryCode,
+                                          @RequestParam(value = "stationTitle", required = false) final String stationTitle,
+                                          @RequestParam(value = "latitude", required = false) final Double latitude,
+                                          @RequestParam(value = "longitude", required = false) final Double longitude,
+                                          @RequestParam(value = "comment", required = false) final String comment,
+                                          @RequestParam(value = "active", required = false) final Boolean active,
+                                          @RequestParam(value = "file") final MultipartFile file,
+                                          @RequestHeader(value = "Referer") final String referer) throws JsonProcessingException {
         LOG.info("MultipartFormData: email={}, station={}, country={}, file={}", email, stationId, countryCode, file.getName());
         final URI refererUri = URI.create(referer);
 
@@ -113,7 +114,7 @@ public class InboxResource {
                 return createIFrameAnswer(response, refererUri);
             }
 
-            final String contentType = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(file.getName());
+            final String contentType = file.getContentType();
             final InboxResponse response = uploadPhoto(userAgent, file.getInputStream(), StringUtils.trimToNull(stationId),
                     StringUtils.trimToNull(countryCode), contentType, stationTitle, latitude, longitude, comment, active, userDetailsService.loadUserByUsername(email));
             return createIFrameAnswer(response, refererUri);
@@ -409,7 +410,7 @@ public class InboxResource {
 
             final String title = command.getTitle() != null ? command.getTitle() : inboxEntry.getTitle();
 
-            station = new Station(new Station.Key(command.getCountryCode(), command.getStationId()), title, coordinates, command.getDS100(), null, command.getActive());
+            station = new Station(new Station.Key(command.getCountryCode(), command.getStationId()), title, coordinates, command.getDs100(), null, command.getActive());
             repository.insert(station);
         }
 
@@ -562,10 +563,12 @@ public class InboxResource {
         return new File(workDir.getInboxDir(), filename);
     }
 
-    private String createIFrameAnswer(final InboxResponse response, final URI referer) throws JsonProcessingException {
-        return "<script language=\"javascript\" type=\"text/javascript\">" +
-                " window.top.window.postMessage('" + MAPPER.writeValueAsString(response) + "', '" + referer + "');" +
-                "</script>";
+    private ModelAndView createIFrameAnswer(final InboxResponse response, final URI referer) throws JsonProcessingException {
+        final ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("iframe");
+        modelAndView.getModel().put("response", MAPPER.writeValueAsString(response));
+        modelAndView.getModel().put("referer", referer);
+        return modelAndView;
     }
 
     private boolean hasConflict(final Integer id, final Station station) {
