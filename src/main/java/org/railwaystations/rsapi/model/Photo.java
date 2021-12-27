@@ -33,8 +33,8 @@ public class Photo {
         this.licenseUrl = LICENSES.get(license);
     }
 
-    public Photo(final String countryCode, final Country country, final String stationId, final User user, final String extension) {
-        this(new Station.Key(countryCode, stationId), "/" + countryCode + "/" + stationId + "." + extension, user, System.currentTimeMillis(), getLicense(user.getLicense(), country));
+    public Photo(final Country country, final String stationId, final User user, final String extension) {
+        this(new Station.Key(country.getCode(), stationId), "/" + country.getCode() + "/" + stationId + "." + extension, user, System.currentTimeMillis(), getLicense(user.getLicense(), country));
     }
 
 

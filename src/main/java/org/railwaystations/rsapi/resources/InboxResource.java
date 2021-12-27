@@ -422,17 +422,15 @@ public class InboxResource {
         }
 
         final Optional<User> user = userDetailsService.findById(inboxEntry.getPhotographerId());
-        final Optional<Country> country = countryDao.findById(StringUtils.lowerCase(station.getKey().getCountry()));
-        if (country.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Country not found");
-        }
+        final Country country = countryDao.findById(StringUtils.lowerCase(station.getKey().getCountry()))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Country not found"));
 
         try {
-            final File countryDir = new File(workDir.getPhotosDir(), station.getKey().getCountry());
-            final Photo photo = new Photo(station.getKey().getCountry(), country.orElse(null), station.getKey().getId(), user.orElseThrow(), inboxEntry.getExtension());
+            final File countryDir = new File(workDir.getPhotosDir(), country.getCode());
+            final Photo photo = new Photo(country, station.getKey().getId(), user.orElseThrow(), inboxEntry.getExtension());
             if (station.hasPhoto()) {
                 photoDao.update(photo);
-                org.apache.commons.io.FileUtils.deleteQuietly(new File(countryDir, station.getKey().getId() + "." + inboxEntry.getExtension()));
+                FileUtils.deleteFile(countryDir, station.getKey().getId(), inboxEntry.getExtension());
             } else {
                 photoDao.insert(photo);
             }

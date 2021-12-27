@@ -14,27 +14,31 @@ public class FileUtils {
     public FileUtils() {
     }
 
-    public static void moveFile(final File importFile, final File countryDir, final String stationId, final String extension) throws IOException {
-        final File destFile = getCleanDestFile(countryDir, stationId, extension);
+    public static void deleteFile(final File dir, final String stationId, final String extension) {
+        getCleanFile(dir, stationId, extension);
+    }
+
+    public static void moveFile(final File importFile, final File dir, final String stationId, final String extension) throws IOException {
+        final File destFile = getCleanFile(dir, stationId, extension);
         Files.move(importFile.toPath(), destFile.toPath());
     }
 
-    public static void copyFile(final File importFile, final File countryDir, final String stationId, final String extension) throws IOException {
-        final File destFile = getCleanDestFile(countryDir, stationId, extension);
+    public static void copyFile(final File importFile, final File dir, final String stationId, final String extension) throws IOException {
+        final File destFile = getCleanFile(dir, stationId, extension);
         Files.copy(importFile.toPath(), destFile.toPath());
     }
 
-    private static File getCleanDestFile(final File countryDir, final String stationId, final String extension) {
-        final File destFile = new File(countryDir, stationId + "." + extension);
+    private static File getCleanFile(final File dir, final String stationId, final String extension) {
+        final File file = new File(dir, sanitizeFilename(stationId + "." + extension));
         try {
-            Files.deleteIfExists(destFile.toPath());
+            Files.deleteIfExists(file.toPath());
         } catch (final IOException e) {
-            LOG.warn("Couldn't delete file: " + destFile);
+            LOG.warn("Couldn't delete file: " + file);
         }
-        return destFile;
+        return file;
     }
 
-    public static String sanitizeFileName(String fileName) {
+    public static String sanitizeFilename(String fileName) {
         if (fileName == null) {
             return null;
         }
