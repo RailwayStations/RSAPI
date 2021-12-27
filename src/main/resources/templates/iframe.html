@@ -1,0 +1,14 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var response = /*[[${response}]]*/ 'TEST';
+        var referer = /*[[${referer}]]*/ 'REFERER';
+	    window.top.window.postMessage(response, referer);
+
+        /*]]>*/
+
+    </script>
+</html>

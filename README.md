@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/RailwayStations/RSAPI.svg?branch=master)](https://travis-ci.org/RailwayStations/RSAPI) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b9882fcf1221409680f36afe2c85fcba)](https://www.codacy.com/gh/RailwayStations/RSAPI?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=RailwayStations/RSAPI&amp;utm_campaign=Badge_Grade) [![Coverage Status](https://coveralls.io/repos/github/RailwayStations/RSAPI/badge.svg?branch=master)](https://coveralls.io/github/RailwayStations/RSAPI?branch=master) 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b9882fcf1221409680f36afe2c85fcba)](https://www.codacy.com/gh/RailwayStations/RSAPI?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=RailwayStations/RSAPI&amp;utm_campaign=Badge_Grade) [![Coverage Status](https://coveralls.io/repos/github/RailwayStations/RSAPI/badge.svg?branch=master)](https://coveralls.io/github/RailwayStations/RSAPI?branch=master) 
 
 # Railway Stations API
 Backend Service for the https://map.railway-stations.org and the Mobile Apps for [Android](https://github.com/RailwayStations/RSAndroidApp) and [iOS](https://github.com/RailwayStations/Bahnhofsfotos) of the [Bahnhofsfotos opendata Project](https://github.com/RailwayStations).
@@ -7,21 +7,21 @@ Later it was enhanced to export a plaintext list of the Waypoints for the online
 Then it returned the Waypoints as json for the Android and iOS Apps as well as the Website.
 Over time more and more countries have been added, see [Use](#use).
 
-This API is hosted at https://api.railway-stations.org or at the Deutsche Bahn developer site: https://developer.deutschebahn.com/store/apis/list where you can also find an online and executable version of the swagger documentation.
+This API is hosted at https://api.railway-stations.org or at the Deutsche Bahn developer site: https://developer.deutschebahn.com/store/apis/list where you can also find an online and executable version of the OpenAPI documentation.
 
 ## build
 To build the project, you need Java 11.
 
 Run on Unix like systems:
-```./mvnw clean install```
+```./gradlew build bootJar```
 
 Run on Windows:
 
-```./mvnw.cmd clean install```
+```./gradlew.bat build bootJar```
 
 ## Working Directory
 
-The API uses `/var/rsapi` as working directory. This can be changed in the `config.yml` or via Docker volume, see below.
+The API uses `/var/rsapi` as working directory. This can be changed in the `application.yaml` or via Docker volume, see below.
 
 The following subdirectories are being used:
 
@@ -39,29 +39,14 @@ This project can be run as a Docker container. The docker image is automatically
 - build:
   ```docker build . -t railwaystations/rsapi:latest```
 
-- Configure the ```config.yml``` file from current directory and put it into the rsapi work directory.
+- Configure the ```application-prod.yaml``` file from current directory and put it into the rsapi work directory.
     
 - Run interactively:
-  ```docker run -it --net=host --rm -p 8080:8080 -v <work-dir>:/var/rsapi -e RSAPI_LB_CONTEXT=test --name rsapi railwaystations/rsapi```
+  ```docker run -it -e SPRING_PROFILES_ACTIVE=prod --net=host --rm -v <work-dir>:/var/rsapi --name rsapi railwaystations/rsapi```
 
 - Run as background service:
-  ```docker run -d -p 8080:8080 --net=host --restart always --name rsapi -v <work-dir>:/var/rsapi -e RSAPI_LB_CONTEXT=test railwaystations/rsapi:latest```
-
-- Remove the (running) container:
-  ```docker rm -f rsapi```
-  
-- Check if it is running:
-  ```docker ps```
-  
-- Read the logs:
-  ```docker logs -f rsapi```
-  
-- Attach to container:
-  ```docker attach --sig-proxy=false rsapi```
-
-- Restart (e.g. after config change):
-  ```docker restart rsapi```
-  
+  ```docker run -d -e SPRING_PROFILES_ACTIVE=prod --net=host --restart always --name rsapi -v <work-dir>:/var/rsapi railwaystations/rsapi:latest```
+ 
 Ready to use images are published at https://hub.docker.com/repository/docker/railwaystations/rsapi
 
 ## Maria DB
@@ -73,15 +58,7 @@ Enter mysql CLI:
 
 ### Migrations
 
-Before using the DB it needs to be populated with schema and data, also updates might be necessary from time to time.
-
-When the project is build, you can start the DB migrations with: `java -jar target/rsapi-1.0.0-SNAPSHOT.jar db migrate -i test config.yml
-`.
-
-The context (`-i` parameter) can take the following values:
-- prod: for production
-- test: for local testing
-- junit: for automated unit testing during maven build
+RSAPI used Liquibase for database schema migration. This schema is updated automatically on start.
 
 ## Use
 Point your browser to `http://localhost:8080/{country}/stations`, where `country` can be "de", "ch", "fi", "uk", ...
@@ -92,7 +69,7 @@ With the following query parameter:
 - `maxDistance`, `lat`, `lon`: select trainstations within a max distance of km of the given reference point
 - `country`: select trainstations from a given country, this parameter is an alternative to the `{country}` path
 
-A more detailed API documentation can be found in the [swagger](swagger.yaml) file or online at [developer.deutschebahn.com](https://developer.deutschebahn.com/store/apis/list).
+A more detailed API documentation can be found in the [OpenAPI](src/main/resources/static/openapi.yaml) file or online at [developer.deutschebahn.com](https://developer.deutschebahn.com/store/apis/list).
 
 ### Examples
 - all supported countries: https://api.railway-stations.org/countries

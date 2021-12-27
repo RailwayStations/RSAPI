@@ -1,0 +1,34 @@
+---
+version: '2.1'
+
+services:
+
+  rsapi:
+    image: railwaystations/rsapi:latest
+    container_name: rsapi
+    volumes:
+      - /var/rsapi:/var/rsapi
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=test
+    network_mode: "host"
+    depends_on:
+      - mariadb
+    labels:
+      org.label-schema.group: "rsapi"
+
+  mariadb:
+    image: mariadb:10.1
+    container_name: mariadb
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=rsapi
+      - MYSQL_USER=rsapi
+      - MYSQL_PASSWORD=rsapi
+    network_mode: "host"
+    command:
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_unicode_ci"
+    labels:
+      org.label-schema.group: "rsapi"

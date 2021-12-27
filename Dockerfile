@@ -1,19 +1,14 @@
-FROM maven:3-openjdk-15 AS build
-COPY src /usr/src/app/src
-COPY pom.xml /usr/src/app
-RUN mvn -f /usr/src/app/pom.xml clean package
-
-FROM openjdk:15
-
+FROM openjdk:17-alpine
 ENV RSAPI_HOME=/opt/services
 ENV RSAPI_WORK=/var/rsapi
+ENV ARTIFACT_NAME=rsapi-0.0.1-SNAPSHOT.jar
+ENV SPRING_PROFILES_ACTIVE=""
+WORKDIR $RSAPI_WORK
 
-COPY --from=build /usr/src/app/target/rsapi-1.0.0-SNAPSHOT.jar $RSAPI_HOME/rsapi.jar
-COPY config.yml $RSAPI_WORK/
-# Add Maven dependencies (not shaded into the artifact; Docker-cached)
-COPY --from=build /usr/src/app/target/lib           $RSAPI_HOME/lib
+COPY ./build/libs/${ARTIFACT_NAME} ${RSAPI_HOME}/
+
+RUN apk add --no-cache libsodium
 
 EXPOSE 8080
 EXPOSE 8081
-WORKDIR $RSAPI_HOME
-CMD [ "sh", "-c", "java -jar rsapi.jar db migrate -i $RSAPI_LB_CONTEXT $RSAPI_WORK/config.yml && java -jar rsapi.jar server $RSAPI_WORK/config.yml"]
+CMD [ "sh", "-c", "java -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE} -jar ${RSAPI_HOME}/${ARTIFACT_NAME}"]
