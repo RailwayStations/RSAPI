@@ -23,7 +23,7 @@ jobs:
         uses: gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b
 
       - name: Build with Gradle
-        run: ./gradlew build bootJar
+        run: ./gradlew --no-daemon build bootJar
 
       - name: Login to DockerHub
         uses: docker/login-action@v1
