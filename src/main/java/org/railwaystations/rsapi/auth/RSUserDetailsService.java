@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @SuppressWarnings("PMD.BeanMembersShouldSerialize")
@@ -29,11 +32,7 @@ public class RSUserDetailsService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException(String.format("User '%s' not found", username));
         }
-        final List<GrantedAuthority> authorities = new ArrayList<>();
-        for (final String role : user.getRoles()) {
-            authorities.add(new SimpleGrantedAuthority(role));
-        }
-        return new AuthUser(user, authorities);
+        return new AuthUser(user, user.getRoles().stream().map(SimpleGrantedAuthority::new).collect(toList()));
     }
 
     public Optional<User> findById(final int id) {

@@ -162,13 +162,11 @@ public class User {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof final User other)) {
             return false;
         }
 
-        final User that = (User) o;
-
-        return Objects.equals(name, that.name);
+        return Objects.equals(name, other.getName());
     }
 
     @Override

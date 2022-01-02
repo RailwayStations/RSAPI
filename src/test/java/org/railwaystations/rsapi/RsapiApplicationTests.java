@@ -290,29 +290,36 @@ class RsapiApplicationTests {
 		headers.setContentType(MediaType.APPLICATION_JSON);
 
 		final ResponseEntity<String> response = restTemplate.postForEntity(
-				String.format("http://localhost:%d%s", port, "/registration"), new HttpEntity<>("{\n" +
-						"\t\"nickname\": \"nickname \", \n" +
-						"\t\"email\": \"nick.name@example.com\", \n" +
-						"\t\"license\": \"CC0\",\n" +
-						"\t\"photoOwner\": true, \n" +
-						"\t\"linking\": \"linking\", \n" +
-						"\t\"link\": \"\"\n" +
-						"}", headers), String.class);
+				String.format("http://localhost:%d%s", port, "/registration"), new HttpEntity<>("""
+						{
+						\t"nickname": "nickname ",\s
+						\t"email": "nick.name@example.com",\s
+						\t"license": "CC0",
+						\t"photoOwner": true,\s
+						\t"linking": "linking",\s
+						\t"link": ""
+						}""", headers), String.class);
 
 		assertThat(response.getStatusCodeValue(), is(202));
 
 		Mockito.verify(mailer, Mockito.times(1))
 				.send(eq("nick.name@example.com"),
 						eq("Railway-Stations.org new password"),
-						matches("Hello,\n\n" +
-				"your new password is: .*\n\n" +
-				"Cheers\n" +
-				"Your Railway-Stations-Team\n" +
-				"\n---\n" +
-				"Hallo,\n\n" +
-				"Dein neues Passwort lautet: .*\n\n" +
-				"Viele Grüße\n" +
-				"Dein Bahnhofsfoto-Team"));
+						matches("""
+								Hello,
+
+								your new password is: .*
+
+								Cheers
+								Your Railway-Stations-Team
+
+								---
+								Hallo,
+
+								Dein neues Passwort lautet: .*
+
+								Viele Grüße
+								Dein Bahnhofsfoto-Team"""));
 	}
 
 	@Test
@@ -320,14 +327,15 @@ class RsapiApplicationTests {
 		final HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		final ResponseEntity<String> response = restTemplate.postForEntity(
-				String.format("http://localhost:%d%s", port, "/registration"),new HttpEntity<>("{\n" +
-						"\t\"nickname\": \"storchp\", \n" +
-						"\t\"email\": \"other@example.com\", \n" +
-						"\t\"license\": \"CC0\",\n" +
-						"\t\"photoOwner\": true, \n" +
-						"\t\"linking\": \"linking\", \n" +
-						"\t\"link\": \"link\"\n" +
-						"}", headers), String.class);
+				String.format("http://localhost:%d%s", port, "/registration"),new HttpEntity<>("""
+						{
+						\t"nickname": "storchp",\s
+						\t"email": "other@example.com",\s
+						\t"license": "CC0",
+						\t"photoOwner": true,\s
+						\t"linking": "linking",\s
+						\t"link": "link"
+						}""", headers), String.class);
 
 		assertThat(response.getStatusCodeValue(), is(409));
 	}
@@ -485,14 +493,15 @@ class RsapiApplicationTests {
 
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		final ResponseEntity<String> responsePostUpdate = restTemplate.postForEntity(
-				String.format("http://localhost:%d%s", port, "/myProfile"), new HttpEntity<>("{\n" +
-						"\t\"nickname\": \"storchp\", \n" +
-						"\t\"email\": \"storchp@example.com\", \n" +
-						"\t\"license\": \"CC0\",\n" +
-						"\t\"photoOwner\": true, \n" +
-						"\t\"link\": null,\n" +
-						"\t\"anonymous\": true\n" +
-						"}", headers), String.class);
+				String.format("http://localhost:%d%s", port, "/myProfile"), new HttpEntity<>("""
+						{
+						\t"nickname": "storchp",\s
+						\t"email": "storchp@example.com",\s
+						\t"license": "CC0",
+						\t"photoOwner": true,\s
+						\t"link": null,
+						\t"anonymous": true
+						}""", headers), String.class);
 		assertThat(responsePostUpdate.getStatusCodeValue(), is(200));
 		assertThat(responsePostUpdate.getBody(), notNullValue());
 
@@ -552,7 +561,7 @@ class RsapiApplicationTests {
 		jsonNode.forEach(node->{
 			final String country = node.get("code").asText();
 			switch (country) {
-				case "de" :
+				case "de" -> {
 					assertThat(node.get("code").asText(), is("de"));
 					assertThat(node.get("name").asText(), is("Deutschland"));
 					assertThat(node.get("providerApps").size(), is(3));
@@ -560,14 +569,14 @@ class RsapiApplicationTests {
 					assertProviderApp(node, 1, "android", "FlixTrain", "https://play.google.com/store/apps/details?id=de.meinfernbus");
 					assertProviderApp(node, 2, "ios", "DB Navigator", "https://apps.apple.com/app/db-navigator/id343555245");
 					foundCountries.getAndIncrement();
-					break;
-				case "ch" :
+				}
+				case "ch" -> {
 					assertThat(node.get("name").asText(), is("Schweiz"));
 					assertThat(node.get("providerApps").size(), is(2));
 					assertProviderApp(node, 0, "android", "SBB Mobile", "https://play.google.com/store/apps/details?id=ch.sbb.mobile.android.b2c");
 					assertProviderApp(node, 1, "ios", "SBB Mobile", "https://apps.apple.com/app/sbb-mobile/id294855237");
 					foundCountries.getAndIncrement();
-					break;
+				}
 			}
 		});
 

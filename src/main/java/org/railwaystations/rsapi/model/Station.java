@@ -230,10 +230,9 @@ public class Station {
             if (this == o) {
                 return true;
             }
-            if (!(o instanceof  Key)) {
+            if (!(o instanceof final Key key)) {
                 return false;
             }
-            final Key key = (Key) o;
             return Objects.equals(country, key.country) &&
                     Objects.equals(id, key.id);
         }
@@ -257,10 +256,9 @@ public class Station {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof  Station)) {
+        if (!(o instanceof final Station other)) {
             return false;
         }
-        final Station other = (Station) o;
         return Objects.equals(key, other.getKey());
     }
 

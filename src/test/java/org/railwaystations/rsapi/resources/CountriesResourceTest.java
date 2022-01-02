@@ -50,10 +50,10 @@ public class CountriesResourceTest {
         assertThat(country.getProviderApps().size(), equalTo(3));
         for (final ProviderApp app : country.getProviderApps()) {
             switch (app.getType()) {
-                case "android" : assertThat(app.getUrl(), equalTo("providerAndroidApp" + country.getCode().toUpperCase())); break;
-                case "ios" : assertThat(app.getUrl(), equalTo("providerIosApp" + country.getCode().toUpperCase())); break;
-                case "web" : assertThat(app.getUrl(), equalTo("providerWebApp" + country.getCode().toUpperCase())); break;
-                default: fail("unknown app type");
+                case "android" -> assertThat(app.getUrl(), equalTo("providerAndroidApp" + country.getCode().toUpperCase()));
+                case "ios" -> assertThat(app.getUrl(), equalTo("providerIosApp" + country.getCode().toUpperCase()));
+                case "web" -> assertThat(app.getUrl(), equalTo("providerWebApp" + country.getCode().toUpperCase()));
+                default -> fail("unknown app type");
             }
         }
     }

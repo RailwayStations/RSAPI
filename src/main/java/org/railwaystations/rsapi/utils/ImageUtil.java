@@ -23,6 +23,7 @@ public class ImageUtil {
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
         final BufferedImage inputImage = ImageIO.read(photo);
         final String extension = getExtension(photo.getName());
+        assert extension != null;
         if (width != null && width > 0 && width < inputImage.getWidth()) {
             final double scale = (double) width / (double) inputImage.getWidth();
             final int height = (int) (inputImage.getHeight() * scale);
@@ -59,29 +60,22 @@ public class ImageUtil {
         if (StringUtils.isBlank(contentType)) {
             return null;
         }
-        switch (contentType) {
-            case IMAGE_PNG:
-                return PNG;
-            case IMAGE_JPEG:
-                return JPG;
-            default:
-                return null;
-        }
+        return switch (contentType) {
+            case IMAGE_PNG -> PNG;
+            case IMAGE_JPEG -> JPG;
+            default -> null;
+        };
     }
 
     public static String extensionToMimeType(final String extension) {
         if (StringUtils.isBlank(extension)) {
             throw new IllegalArgumentException("Unsupported null extension");
         }
-        switch (extension) {
-            case PNG:
-                return IMAGE_PNG;
-            case JPEG:
-            case JPG:
-                return IMAGE_JPEG;
-            default:
-                throw new IllegalArgumentException("Unsupported extension: " + extension);
-        }
+        return switch (extension) {
+            case PNG -> IMAGE_PNG;
+            case JPEG, JPG -> IMAGE_JPEG;
+            default -> throw new IllegalArgumentException("Unsupported extension: " + extension);
+        };
     }
 
 }

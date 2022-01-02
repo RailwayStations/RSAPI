@@ -49,11 +49,7 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     private List<MediaType> getSupportedMediaTypes() {
-        final List<MediaType> list = new ArrayList<>();
-        list.add(MediaType.IMAGE_JPEG);
-        list.add(MediaType.IMAGE_PNG);
-        list.add(MediaType.APPLICATION_OCTET_STREAM);
-        return list;
+        return List.of(MediaType.IMAGE_JPEG, MediaType.IMAGE_PNG, MediaType.APPLICATION_OCTET_STREAM);
     }
 
     @Override

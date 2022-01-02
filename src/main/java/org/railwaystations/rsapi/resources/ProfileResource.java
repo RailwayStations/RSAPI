@@ -69,12 +69,12 @@ public class ProfileResource {
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,value = "/newUploadToken")
-    public ResponseEntity<?> newUploadToken(@RequestHeader("User-Agent") final String userAgent, @NotNull @RequestHeader("Email") final String email) {
+    public ResponseEntity<String> newUploadToken(@RequestHeader("User-Agent") final String userAgent, @NotNull @RequestHeader("Email") final String email) {
         return resetPassword(userAgent, email);
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,value = "/resetPassword")
-    public ResponseEntity<?> resetPassword(@RequestHeader("User-Agent") final String userAgent, @NotNull @RequestHeader("NameOrEmail") final String nameOrEmail) {
+    public ResponseEntity<String> resetPassword(@RequestHeader("User-Agent") final String userAgent, @NotNull @RequestHeader("NameOrEmail") final String nameOrEmail) {
         LOG.info("Password reset requested for '{}'", nameOrEmail);
 
         final User user = userDao.findByEmail(User.normalizeEmail(nameOrEmail))
@@ -166,7 +166,7 @@ public class ProfileResource {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/myProfile")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getMyProfile(@AuthenticationPrincipal final AuthUser authUser) {
+    public ResponseEntity<User> getMyProfile(@AuthenticationPrincipal final AuthUser authUser) {
         final User user = authUser.getUser();
         LOG.info("Get profile for '{}'", user.getEmail());
         return new ResponseEntity<>(user, HttpStatus.OK);
@@ -215,7 +215,7 @@ public class ProfileResource {
 
     @PostMapping("/resendEmailVerification")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> resendEmailVerification(@AuthenticationPrincipal final AuthUser authUser) {
+    public ResponseEntity<String> resendEmailVerification(@AuthenticationPrincipal final AuthUser authUser) {
         final User user = authUser.getUser();
         LOG.info("Resend EmailVerification for '{}'", user.getEmail());
 
@@ -226,7 +226,7 @@ public class ProfileResource {
     }
 
     @GetMapping("/emailVerification/{token}")
-    public ResponseEntity<?> emailVerification(@RequestHeader("User-Agent") final String userAgent, @PathVariable("token") final String token) {
+    public ResponseEntity<String> emailVerification(@RequestHeader("User-Agent") final String userAgent, @PathVariable("token") final String token) {
         final Optional<User> userByToken = userDao.findByEmailVerification(User.EMAIL_VERIFICATION_TOKEN + token);
         if (userByToken.isPresent()) {
             final User user = userByToken.get();
