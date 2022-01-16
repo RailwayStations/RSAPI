@@ -255,49 +255,32 @@ public class InboxResource {
         return filename != null && new File(workDir.getInboxProcessedDir(), filename).exists();
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, value = "/adminInbox")
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, value = "/adminInbox", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> adminInbox(@AuthenticationPrincipal final AuthUser user, @RequestBody final InboxEntry command) {
+    public ResponseEntity<String> adminInbox(@AuthenticationPrincipal final AuthUser user, @RequestBody final InboxEntry command) {
         final InboxEntry inboxEntry = inboxDao.findById(command.getId());
         if (inboxEntry == null || inboxEntry.isDone()) {
-            return new ResponseEntity<>("No pending inbox entry found", HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No pending inbox entry found");
         }
         switch (command.getCommand()) {
-            case REJECT :
-                rejectInboxEntry(inboxEntry, command.getRejectReason());
-                break;
-            case IMPORT :
-                importUpload(inboxEntry, command);
-                break;
-            case ACTIVATE_STATION:
-                updateStationActiveState(inboxEntry, true);
-                break;
-            case DEACTIVATE_STATION:
-                updateStationActiveState(inboxEntry, false);
-                break;
-            case DELETE_STATION:
-                deleteStation(inboxEntry);
-                break;
-            case DELETE_PHOTO:
-                deletePhoto(inboxEntry);
-                break;
-            case MARK_SOLVED:
-                markProblemReportSolved(inboxEntry);
-                break;
-            case CHANGE_NAME:
+            case REJECT -> rejectInboxEntry(inboxEntry, command.getRejectReason());
+            case IMPORT -> importUpload(inboxEntry, command);
+            case ACTIVATE_STATION -> updateStationActiveState(inboxEntry, true);
+            case DEACTIVATE_STATION -> updateStationActiveState(inboxEntry, false);
+            case DELETE_STATION -> deleteStation(inboxEntry);
+            case DELETE_PHOTO -> deletePhoto(inboxEntry);
+            case MARK_SOLVED -> markProblemReportSolved(inboxEntry);
+            case CHANGE_NAME -> {
                 if (StringUtils.isBlank(command.getTitle())) {
-                    return new ResponseEntity<>("Empty new title: " + command.getTitle(), HttpStatus.BAD_REQUEST);
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Empty new title: " + command.getTitle());
                 }
                 changeStationTitle(inboxEntry, command.getTitle());
-                break;
-            case UPDATE_LOCATION:
-                updateLocation(inboxEntry, command);
-                break;
-            default:
-                return new ResponseEntity<>("Unexpected command value: " + command.getCommand(), HttpStatus.BAD_REQUEST);
+            }
+            case UPDATE_LOCATION -> updateLocation(inboxEntry, command);
+            default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unexpected command value: " + command.getCommand());
         }
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>("", HttpStatus.OK);
     }
 
     private void updateLocation(final InboxEntry inboxEntry, final InboxEntry command) {

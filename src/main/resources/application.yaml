@@ -10,11 +10,19 @@ spring:
   liquibase:
     change-log: classpath:migrations.xml
     contexts: test
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
 
 server:
   error:
+    include-message: ALWAYS
+    include-stacktrace: NEVER
     whitelabel:
       enabled: true
+  tomcat:
+    max-swallow-size: 100MB
 
 logging:
   level:
