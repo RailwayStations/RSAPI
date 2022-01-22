@@ -22,7 +22,7 @@ ext {
 	springVersion = '2.6.2'
 	testContainersVersion = '1.16.2'
 	jacksonVersion = '2.13.1'
-	jdbiVersion = '3.25.0'
+	jdbiVersion = '3.27.0'
 }
 
 dependencies {
