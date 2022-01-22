@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.railwaystations.rsapi.mail.Mailer;
 import org.railwaystations.rsapi.model.Station;
@@ -549,9 +551,10 @@ class RsapiApplicationTests {
 		assertThat(responseWithOldPassword.getStatusCodeValue(), is(401));
 	}
 
-	@Test
-	public void countries() throws IOException {
-		final ResponseEntity<String> response = loadRaw("/countries", 200, String.class);
+	@ParameterizedTest
+	@ValueSource(strings = {"/countries", "/countries.json"})
+	public void countries(final String path) throws IOException {
+		final ResponseEntity<String> response = loadRaw(path, 200, String.class);
 		final JsonNode jsonNode = MAPPER.readTree(response.getBody());
 		assertThat(jsonNode, notNullValue());
 		assertThat(jsonNode.isArray(), is(true));
@@ -583,9 +586,10 @@ class RsapiApplicationTests {
 		assertThat(foundCountries.get(), is(2));
 	}
 
-	@Test
-	public void countriesAll() throws IOException {
-		final ResponseEntity<String> response = loadRaw("/countries?onlyActive=false", 200, String.class);
+	@ParameterizedTest
+	@ValueSource(strings = {"/countries", "/countries.json"})
+	public void countriesAll(final String path) throws IOException {
+		final ResponseEntity<String> response = loadRaw(path + "?onlyActive=false", 200, String.class);
 		final JsonNode jsonNode = MAPPER.readTree(response.getBody());
 		assertThat(jsonNode, notNullValue());
 		assertThat(jsonNode.isArray(), is(true));

@@ -23,4 +23,9 @@ public class CountriesResource {
         return countryDao.list(onlyActive == null || onlyActive);
     }
 
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/countries.json")
+    public Collection<Country> listJson(@RequestParam(value = "onlyActive", required = false) final Boolean onlyActive) {
+        return list(onlyActive);
+    }
+
 }
