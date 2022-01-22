@@ -23,10 +23,7 @@ import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MariaDBContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -91,7 +88,7 @@ class RsapiApplicationTests {
 
 	@Test
 	public void stationsAllCountries() {
-		final Station[] stations = assertLoadStations("/stations", 200);
+		final Station[] stations = assertLoadStationsOk("/stations");
 		assertThat(stations.length, is(954));
 		assertThat(findByKey(stations, new Station.Key("de", "6721")), notNullValue());
 		assertThat(findByKey(stations, new Station.Key("ch", "8500126")), notNullValue());
@@ -99,7 +96,7 @@ class RsapiApplicationTests {
 
 	@Test
 	public void stationById() {
-		final Station station = getStation("/de/stations/6932");
+		final Station station = getStationDe6932();
 		assertThat(station.getKey().getId(), is("6932"));
 		assertThat(station.getTitle(), is( "Wuppertal-Ronsdorf"));
 		assertThat(station.getPhotoUrl(), is("https://api.railway-stations.org/photos/de/6932.jpg"));
@@ -115,34 +112,34 @@ class RsapiApplicationTests {
 
 	@Test
 	public void stationsDe() {
-		final Station[] stations = assertLoadStations(String.format("/de/%s", "stations"), 200);
+		final Station[] stations = assertLoadStationsOk(String.format("/de/%s", "stations"));
 		assertThat(findByKey(stations, new Station.Key("de", "6721")), notNullValue());
 		assertThat(findByKey(stations, new Station.Key("ch", "8500126")), nullValue());
 	}
 
 	@Test
 	public void stationsDeQueryParam() {
-		final Station[] stations = assertLoadStations(String.format("/%s?country=de", "stations"), 200);
+		final Station[] stations = assertLoadStationsOk(String.format("/%s?country=de", "stations"));
 		assertThat(findByKey(stations, new Station.Key("de", "6721")), notNullValue());
 		assertThat(findByKey(stations, new Station.Key("ch", "8500126")), nullValue());
 	}
 
 	@Test
 	public void stationsDeChQueryParam() {
-		final Station[] stations = assertLoadStations(String.format("/%s?country=de&country=ch", "stations"), 200);
+		final Station[] stations = assertLoadStationsOk(String.format("/%s?country=de&country=ch", "stations"));
 		assertThat(findByKey(stations, new Station.Key("de", "6721")), notNullValue());
 		assertThat(findByKey(stations, new Station.Key("ch", "8500126")), notNullValue());
 	}
 
 	@Test
 	public void stationsDePhotograph() {
-		final Station[] stations = assertLoadStations(String.format("/de/%s?photographer=@khgdrn", "stations"), 200);
+		final Station[] stations = assertLoadStationsOk(String.format("/de/%s?photographer=@khgdrn", "stations"));
 		assertThat(findByKey(stations, new Station.Key("de", "6966")), notNullValue());
 	}
 
 	@Test
 	public void stationsCh() {
-		final Station[] stations = assertLoadStations(String.format("/ch/%s", "stations"), 200);
+		final Station[] stations = assertLoadStationsOk(String.format("/ch/%s", "stations"));
 		assertThat(findByKey(stations, new Station.Key("ch", "8500126")), notNullValue());
 		assertThat(findByKey(stations, new Station.Key("de", "6721")), nullValue());
 	}
@@ -156,13 +153,13 @@ class RsapiApplicationTests {
 
 	@Test
 	public void stationsDeFromAnonym() {
-		final Station[] stations = assertLoadStations("/de/stations?photographer=Anonym", 200);
+		final Station[] stations = assertLoadStationsOk("/de/stations?photographer=Anonym");
 		assertThat(stations.length, is(9));
 	}
 
 	@Test
 	public void stationsDeFromDgerkrathWithinMax5km() {
-		final Station[] stations = assertLoadStations("/de/stations?maxDistance=5&lat=49.0065325041363&lon=13.2770955562592&photographer=@stefanopitz", 200);
+		final Station[] stations = assertLoadStationsOk("/de/stations?maxDistance=5&lat=49.0065325041363&lon=13.2770955562592&photographer=@stefanopitz");
 		assertThat(stations.length, is(2));
 	}
 
@@ -195,8 +192,8 @@ class RsapiApplicationTests {
 		return response.getBody();
 	}
 
-	private Station[] assertLoadStations(final String path, final int expectedStatus) {
-		final ResponseEntity<Station[]> response = loadRaw(path, expectedStatus, Station[].class);
+	private Station[] assertLoadStationsOk(final String path) {
+		final ResponseEntity<Station[]> response = loadRaw(path, 200, Station[].class);
 
 		if (response.getStatusCodeValue() != 200) {
 			return new Station[0];
@@ -256,8 +253,8 @@ class RsapiApplicationTests {
 		assertThat(count, is(5));
 	}
 
-	private Station getStation(final String url) {
-		return loadRaw(url, 200, Station.class).getBody();
+	private Station getStationDe6932() {
+		return loadRaw("/de/stations/6932", 200, Station.class).getBody();
 	}
 
 	@Test
@@ -406,7 +403,7 @@ class RsapiApplicationTests {
 		final ResponseEntity<String> response = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
 
 		assertThat(response.getStatusCodeValue(), is(200));
-		assertProfile(response, "@khgdrn", "https://www.twitter.com/khgdrn", "CC0 1.0 Universell (CC0 1.0)", false, "khgdrn@example.com");
+		assertProfile(response, "@khgdrn", "https://www.twitter.com/khgdrn", false, "khgdrn@example.com");
 	}
 
 	@Test
@@ -417,7 +414,7 @@ class RsapiApplicationTests {
 		final ResponseEntity<String> response = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
 
 		assertThat(response.getStatusCodeValue(), is(200));
-		assertProfile(response, "@khgdrn", "https://www.twitter.com/khgdrn", "CC0 1.0 Universell (CC0 1.0)", false, "khgdrn@example.com");
+		assertProfile(response, "@khgdrn", "https://www.twitter.com/khgdrn", false, "khgdrn@example.com");
 	}
 
 	@Test
@@ -426,7 +423,7 @@ class RsapiApplicationTests {
 				.getForEntity(String.format("http://localhost:%d%s", port, "/myProfile"), String.class);
 
 		assertThat(response.getStatusCodeValue(), is(200));
-		assertProfile(response, "@khgdrn", "https://www.twitter.com/khgdrn", "CC0 1.0 Universell (CC0 1.0)", false, "khgdrn@example.com");
+		assertProfile(response, "@khgdrn", "https://www.twitter.com/khgdrn", false, "khgdrn@example.com");
 	}
 
 	@Test
@@ -435,7 +432,7 @@ class RsapiApplicationTests {
 				.getForEntity(String.format("http://localhost:%d%s", port, "/myProfile"), String.class);
 
 		assertThat(response.getStatusCodeValue(), is(200));
-		assertProfile(response, "@stefanopitz", "https://twitter.com/stefanopitz", "CC0 1.0 Universell (CC0 1.0)", false, "");
+		assertProfile(response, "@stefanopitz", "https://twitter.com/stefanopitz", false, "");
 	}
 
 	@Test
@@ -471,12 +468,12 @@ class RsapiApplicationTests {
 		// TODO: assert response body
 	}
 
-	private void assertProfile(final ResponseEntity<String> response, final String name, final String link, final String license, final boolean anonymous, final String email) throws IOException {
+	private void assertProfile(final ResponseEntity<String> response, final String name, final String link, final boolean anonymous, final String email) throws IOException {
 		final JsonNode jsonNode = MAPPER.readTree(response.getBody());
 		assertThat(jsonNode.get("nickname").asText(), is(name));
 		assertThat(jsonNode.get("email").asText(), is(email));
 		assertThat(jsonNode.get("link").asText(), is(link));
-		assertThat(jsonNode.get("license").asText(), is(license));
+		assertThat(jsonNode.get("license").asText(), is("CC0 1.0 Universell (CC0 1.0)"));
 		assertThat(jsonNode.get("photoOwner").asBoolean(), is(true));
 		assertThat(jsonNode.get("anonymous").asBoolean(), is(anonymous));
 		assertThat(jsonNode.has("uploadToken"), is(false));
@@ -491,7 +488,7 @@ class RsapiApplicationTests {
 		final ResponseEntity<String> responseGetBefore = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
 		assertThat(responseGetBefore.getStatusCodeValue(), is(200));
 		assertThat(responseGetBefore.getBody(), notNullValue());
-		assertProfile(responseGetBefore, "@storchp", "https://www.twitter.com/storchp", "CC0 1.0 Universell (CC0 1.0)", false, "storchp@example.com");
+		assertProfile(responseGetBefore, "@storchp", "https://www.twitter.com/storchp", false, "storchp@example.com");
 
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		final ResponseEntity<String> responsePostUpdate = restTemplate.postForEntity(
@@ -510,7 +507,7 @@ class RsapiApplicationTests {
 		final ResponseEntity<String> responseGetAfter = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
 		assertThat(responseGetAfter.getStatusCodeValue(), is(200));
 		assertThat(responseGetAfter.getBody(), notNullValue());
-		assertProfile(responseGetAfter, "storchp", "", "CC0 1.0 Universell (CC0 1.0)", true, "storchp@example.com");
+		assertProfile(responseGetAfter, "storchp", "", true, "storchp@example.com");
 
 
 		final String secondPassword = "!\"$%&/()=?-1234567890";
@@ -605,7 +602,7 @@ class RsapiApplicationTests {
 
 	@TestConfiguration
 	static class SpringConfig {
-		private final String TMP_WORK_DIR = createTempDir("workDir");
+		private final String TMP_WORK_DIR = createTempWorkDir();
 
 		@Bean
 		public WorkDir workDir() {
@@ -617,9 +614,9 @@ class RsapiApplicationTests {
 			return new LoggingMonitor();
 		}
 
-		private String createTempDir(final String name) {
+		private String createTempWorkDir() {
 			try {
-				return Files.createTempDirectory(name + "-" + System.currentTimeMillis()).toFile().getAbsolutePath();
+				return Files.createTempDirectory("workDir-" + System.currentTimeMillis()).toFile().getAbsolutePath();
 			} catch (final IOException e) {
 				throw new IllegalStateException(e);
 			}
