@@ -3,14 +3,14 @@
 # Railway Stations API
 Backend Service for the https://map.railway-stations.org and the Mobile Apps for [Android](https://github.com/RailwayStations/RSAndroidApp) and [iOS](https://github.com/RailwayStations/Bahnhofsfotos) of the [Bahnhofsfotos opendata Project](https://github.com/RailwayStations).
 It started as a simple GPX Exporter to use the Waypoints in your favorite Map App or GPS Device.
-Later it was enhanced to export a plaintext list of the Waypoints for the online Map at: http://www.alsgefahn.de/bfmap/bhfueb.html.
+Later it was enhanced to export a plaintext list of the Waypoints for the first static online map, which doesn't exist anymore.
 Then it returned the Waypoints as json for the Android and iOS Apps as well as the Website.
 Over time more and more countries have been added, see [Use](#use).
 
 This API is hosted at https://api.railway-stations.org or at the Deutsche Bahn developer site: https://developer.deutschebahn.com/store/apis/list where you can also find an online and executable version of the OpenAPI documentation.
 
 ## build
-To build the project, you need Java 11.
+To build the project, you need Java 17.
 
 Run on Unix like systems:
 ```./gradlew build bootJar```
