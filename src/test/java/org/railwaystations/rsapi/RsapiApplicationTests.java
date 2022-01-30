@@ -100,7 +100,7 @@ class RsapiApplicationTests {
 		assertThat(station.getKey().getId(), is("6932"));
 		assertThat(station.getTitle(), is( "Wuppertal-Ronsdorf"));
 		assertThat(station.getPhotoUrl(), is("https://api.railway-stations.org/photos/de/6932.jpg"));
-		assertThat(station.getPhotographer(), is("@khgdrn"));
+		assertThat(station.getPhotographer(), is("@user10"));
 		assertThat(station.getLicense(), is("CC0 1.0 Universell (CC0 1.0)"));
 		assertThat(station.isActive(), is(true));
 	}
@@ -133,7 +133,7 @@ class RsapiApplicationTests {
 
 	@Test
 	public void stationsDePhotograph() {
-		final Station[] stations = assertLoadStationsOk(String.format("/de/%s?photographer=@khgdrn", "stations"));
+		final Station[] stations = assertLoadStationsOk(String.format("/de/%s?photographer=@user10", "stations"));
 		assertThat(findByKey(stations, new Station.Key("de", "6966")), notNullValue());
 	}
 
@@ -159,7 +159,7 @@ class RsapiApplicationTests {
 
 	@Test
 	public void stationsDeFromDgerkrathWithinMax5km() {
-		final Station[] stations = assertLoadStationsOk("/de/stations?maxDistance=5&lat=49.0065325041363&lon=13.2770955562592&photographer=@stefanopitz");
+		final Station[] stations = assertLoadStationsOk("/de/stations?maxDistance=5&lat=49.0065325041363&lon=13.2770955562592&photographer=@user27");
 		assertThat(stations.length, is(2));
 	}
 
@@ -328,7 +328,7 @@ class RsapiApplicationTests {
 		final ResponseEntity<String> response = restTemplate.postForEntity(
 				String.format("http://localhost:%d%s", port, "/registration"),new HttpEntity<>("""
 						{
-						\t"nickname": "storchp",\s
+						\t"nickname": "user14",\s
 						\t"email": "other@example.com",\s
 						\t"license": "CC0",
 						\t"photoOwner": true,\s
@@ -360,7 +360,7 @@ class RsapiApplicationTests {
 	@Test
 	public void photoUploadUnknownStation() throws IOException {
 		final HttpHeaders headers = new HttpHeaders();
-		headers.setBasicAuth("@khgdrn", "154a0dc31376d7620249fe089fb3ad417363f2f8");
+		headers.setBasicAuth("@user10", "dca1fbdb8ef7a946182f20798a8d72d8939322f2");
 		headers.add("Station-Title", URLEncoder.encode("Achères-Grand-Cormier", StandardCharsets.UTF_8.toString()));
 		headers.add("Latitude", "50.123");
 		headers.add("Longitude", "10.123");
@@ -398,46 +398,46 @@ class RsapiApplicationTests {
 	@Test
 	public void getMyProfileWithEmail() throws IOException {
 		final HttpHeaders headers = new HttpHeaders();
-		headers.add("Upload-Token", "154a0dc31376d7620249fe089fb3ad417363f2f8");
-		headers.add("Email", "khgdrn@example.com");
+		headers.add("Upload-Token", "dca1fbdb8ef7a946182f20798a8d72d8939322f2");
+		headers.add("Email", "user10@example.com");
 		final ResponseEntity<String> response = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
 
 		assertThat(response.getStatusCodeValue(), is(200));
-		assertProfile(response, "@khgdrn", "https://www.twitter.com/khgdrn", false, "khgdrn@example.com");
+		assertProfile(response, "@user10", "https://www.example.com/user10", false, "user10@example.com");
 	}
 
 	@Test
 	public void getMyProfileWithName() throws IOException {
 		final HttpHeaders headers = new HttpHeaders();
-		headers.add("Upload-Token", "154a0dc31376d7620249fe089fb3ad417363f2f8");
-		headers.add("Email", "@khgdrn");
+		headers.add("Upload-Token", "dca1fbdb8ef7a946182f20798a8d72d8939322f2");
+		headers.add("Email", "@user10");
 		final ResponseEntity<String> response = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
 
 		assertThat(response.getStatusCodeValue(), is(200));
-		assertProfile(response, "@khgdrn", "https://www.twitter.com/khgdrn", false, "khgdrn@example.com");
+		assertProfile(response, "@user10", "https://www.example.com/user10", false, "user10@example.com");
 	}
 
 	@Test
 	public void getMyProfileWithBasicAuthUploadToken() throws IOException {
-		final ResponseEntity<String> response = restTemplate.withBasicAuth("@khgdrn", "154a0dc31376d7620249fe089fb3ad417363f2f8")
+		final ResponseEntity<String> response = restTemplate.withBasicAuth("@user10", "dca1fbdb8ef7a946182f20798a8d72d8939322f2")
 				.getForEntity(String.format("http://localhost:%d%s", port, "/myProfile"), String.class);
 
 		assertThat(response.getStatusCodeValue(), is(200));
-		assertProfile(response, "@khgdrn", "https://www.twitter.com/khgdrn", false, "khgdrn@example.com");
+		assertProfile(response, "@user10", "https://www.example.com/user10", false, "user10@example.com");
 	}
 
 	@Test
 	public void getMyProfileWithBasicAuthPassword() throws IOException {
-		final ResponseEntity<String> response = restTemplate.withBasicAuth("@stefanopitz", "y89zFqkL6hro")
+		final ResponseEntity<String> response = restTemplate.withBasicAuth("@user27", "y89zFqkL6hro")
 				.getForEntity(String.format("http://localhost:%d%s", port, "/myProfile"), String.class);
 
 		assertThat(response.getStatusCodeValue(), is(200));
-		assertProfile(response, "@stefanopitz", "https://twitter.com/stefanopitz", false, "");
+		assertProfile(response, "@user27", "https://www.example.com/user27", false, "");
 	}
 
 	@Test
 	public void getMyProfileWithBasicAuthPasswordFail() {
-		final ResponseEntity<String> response = restTemplate.withBasicAuth("@stefanopitz", "blahblubb")
+		final ResponseEntity<String> response = restTemplate.withBasicAuth("@user27", "blahblubb")
 				.getForEntity(String.format("http://localhost:%d%s", port, "/myProfile"), String.class);
 
 		assertThat(response.getStatusCodeValue(), is(401));
@@ -445,7 +445,7 @@ class RsapiApplicationTests {
 
 	@Test
 	public void getInboxWithBasicAuthPasswordFail() {
-		final ResponseEntity<String> response = restTemplate.withBasicAuth("@stefanopitz", "blahblubb")
+		final ResponseEntity<String> response = restTemplate.withBasicAuth("@user27", "blahblubb")
 				.getForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), String.class);
 
 		assertThat(response.getStatusCodeValue(), is(401));
@@ -453,7 +453,7 @@ class RsapiApplicationTests {
 
 	@Test
 	public void getInboxWithBasicAuthNotAuthorized() {
-		final ResponseEntity<String> response = restTemplate.withBasicAuth("@stefanopitz", "y89zFqkL6hro")
+		final ResponseEntity<String> response = restTemplate.withBasicAuth("@user27", "y89zFqkL6hro")
 				.getForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), String.class);
 
 		assertThat(response.getStatusCodeValue(), is(403));
@@ -461,7 +461,7 @@ class RsapiApplicationTests {
 
 	@Test
 	public void getInboxWithBasicAuth() {
-		final ResponseEntity<String> response = restTemplate.withBasicAuth("@khgdrn", "154a0dc31376d7620249fe089fb3ad417363f2f8")
+		final ResponseEntity<String> response = restTemplate.withBasicAuth("@user10", "dca1fbdb8ef7a946182f20798a8d72d8939322f2")
 				.getForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), String.class);
 
 		assertThat(response.getStatusCodeValue(), is(200));
@@ -481,21 +481,21 @@ class RsapiApplicationTests {
 
 	@Test
 	public void updateMyProfileAndChangePassword() throws IOException {
-		final String firstPassword = "0ae7d6de822259da274581d9932052222b874016";
+		final String firstPassword = "9efc34501926f6372b15ca6c0026bd096e087dd1";
 		final HttpHeaders headers = new HttpHeaders();
 		headers.add("Upload-Token", firstPassword);
-		headers.add("Email", "storchp@example.com");
+		headers.add("Email", "user14@example.com");
 		final ResponseEntity<String> responseGetBefore = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
 		assertThat(responseGetBefore.getStatusCodeValue(), is(200));
 		assertThat(responseGetBefore.getBody(), notNullValue());
-		assertProfile(responseGetBefore, "@storchp", "https://www.twitter.com/storchp", false, "storchp@example.com");
+		assertProfile(responseGetBefore, "@user14", "https://www.example.com/user14", false, "user14@example.com");
 
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		final ResponseEntity<String> responsePostUpdate = restTemplate.postForEntity(
 				String.format("http://localhost:%d%s", port, "/myProfile"), new HttpEntity<>("""
 						{
-						\t"nickname": "storchp",\s
-						\t"email": "storchp@example.com",\s
+						\t"nickname": "user14",\s
+						\t"email": "user14@example.com",\s
 						\t"license": "CC0",
 						\t"photoOwner": true,\s
 						\t"link": null,
@@ -507,7 +507,7 @@ class RsapiApplicationTests {
 		final ResponseEntity<String> responseGetAfter = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
 		assertThat(responseGetAfter.getStatusCodeValue(), is(200));
 		assertThat(responseGetAfter.getBody(), notNullValue());
-		assertProfile(responseGetAfter, "storchp", "", true, "storchp@example.com");
+		assertProfile(responseGetAfter, "user14", "", true, "user14@example.com");
 
 
 		final String secondPassword = "!\"$%&/()=?-1234567890";
@@ -519,9 +519,9 @@ class RsapiApplicationTests {
 		final HttpHeaders headers = new HttpHeaders();
 		if (authUploadToken) {
 			headers.add("Upload-Token", oldPassword);
-			headers.add("Email", "storchp@example.com");
+			headers.add("Email", "user14@example.com");
 		} else {
-			headers.setBasicAuth("storchp@example.com", oldPassword);
+			headers.setBasicAuth("user14@example.com", oldPassword);
 		}
 
 		final HttpEntity<Object> changePasswordRequest;
@@ -540,7 +540,7 @@ class RsapiApplicationTests {
 		assertThat(responseChangePassword.getStatusCodeValue(), is(200));
 
 		final ResponseEntity<String> responseAfterChangedPassword = restTemplate
-				.withBasicAuth("storchp@example.com", newPassword)
+				.withBasicAuth("user14@example.com", newPassword)
 				.getForEntity(String.format("http://localhost:%d%s", port, "/myProfile"), String.class);
 		assertThat(responseAfterChangedPassword.getStatusCodeValue(), is(200));
 
