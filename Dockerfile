@@ -1,4 +1,4 @@
-FROM openjdk:17-alpine
+FROM openjdk:19-alpine
 ENV RSAPI_HOME=/opt/services
 ENV RSAPI_WORK=/var/rsapi
 ENV ARTIFACT_NAME=rsapi-0.0.1-SNAPSHOT.jar
