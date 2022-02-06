@@ -1,5 +1,6 @@
 package org.railwaystations.rsapi;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -9,6 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.railwaystations.rsapi.mail.Mailer;
+import org.railwaystations.rsapi.model.InboxEntry;
 import org.railwaystations.rsapi.model.Station;
 import org.railwaystations.rsapi.monitoring.LoggingMonitor;
 import org.railwaystations.rsapi.monitoring.Monitor;
@@ -23,6 +25,8 @@ import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.testcontainers.containers.MariaDBContainer;
 import org.testcontainers.utility.DockerImageName;
 import org.w3c.dom.Document;
@@ -43,6 +47,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Base64;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
@@ -50,8 +55,7 @@ import java.util.regex.Pattern;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.matches;
+import static org.mockito.ArgumentMatchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -460,12 +464,29 @@ class RsapiApplicationTests {
 	}
 
 	@Test
-	public void getInboxWithBasicAuth() {
+	public void getInboxWithBasicAuth() throws JsonProcessingException {
 		final ResponseEntity<String> response = restTemplate.withBasicAuth("@user10", "dca1fbdb8ef7a946182f20798a8d72d8939322f2")
 				.getForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), String.class);
 
 		assertThat(response.getStatusCodeValue(), is(200));
-		// TODO: assert response body
+		final JsonNode jsonNode = MAPPER.readTree(response.getBody());
+		assertThat(jsonNode, notNullValue());
+		assertThat(jsonNode.isArray(), is(true));
+	}
+
+	@Test
+	public void postAdminInboxCommandWithUnknownInboxExntry() throws JsonProcessingException {
+		final InboxEntry inboxEntry = new InboxEntry();
+		inboxEntry.setId(-1);
+		final HttpHeaders headers = new HttpHeaders();
+		headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+		final ResponseEntity<String> response = restTemplate.withBasicAuth("@user10", "dca1fbdb8ef7a946182f20798a8d72d8939322f2")
+				.postForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), new HttpEntity<>(inboxEntry, headers), String.class);
+
+		assertThat(response.getStatusCodeValue(), is(400));
+		final JsonNode jsonNode = MAPPER.readTree(response.getBody());
+		assertThat(jsonNode.get("status").asInt(), is(400));
+		assertThat(jsonNode.get("message").asText(), is("No pending inbox entry found"));
 	}
 
 	private void assertProfile(final ResponseEntity<String> response, final String name, final String link, final boolean anonymous, final String email) throws IOException {
