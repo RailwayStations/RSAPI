@@ -585,24 +585,14 @@ public class InboxResource {
         return response;
     }
 
-    private static class InboxCountResponse {
-        private final int pendingInboxEntries;
-
-        public InboxCountResponse(final int pendingInboxEntries) {
-            this.pendingInboxEntries = pendingInboxEntries;
-        }
+    private record InboxCountResponse(int pendingInboxEntries) {
 
         public int getPendingInboxEntries() {
             return pendingInboxEntries;
         }
     }
 
-    private static class NextZResponse {
-        private final String nextZ;
-
-        public NextZResponse(final String nextZ) {
-            this.nextZ = nextZ;
-        }
+    private record NextZResponse(String nextZ) {
 
         public String getNextZ() {
             return nextZ;
@@ -610,15 +600,7 @@ public class InboxResource {
 
     }
 
-    private static class AdminInboxCommandResponse {
-        private final int status;
-
-        private final String message;
-
-        public AdminInboxCommandResponse(final int status, final String message) {
-            this.status = status;
-            this.message = message;
-        }
+    private record AdminInboxCommandResponse(int status, String message) {
 
         public int getStatus() {
             return status;
