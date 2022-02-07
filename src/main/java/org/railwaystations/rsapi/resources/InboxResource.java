@@ -257,30 +257,35 @@ public class InboxResource {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, value = "/adminInbox", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> adminInbox(@AuthenticationPrincipal final AuthUser user, @RequestBody final InboxEntry command) {
-        final InboxEntry inboxEntry = inboxDao.findById(command.getId());
-        if (inboxEntry == null || inboxEntry.isDone()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No pending inbox entry found");
-        }
-        switch (command.getCommand()) {
-            case REJECT -> rejectInboxEntry(inboxEntry, command.getRejectReason());
-            case IMPORT -> importUpload(inboxEntry, command);
-            case ACTIVATE_STATION -> updateStationActiveState(inboxEntry, true);
-            case DEACTIVATE_STATION -> updateStationActiveState(inboxEntry, false);
-            case DELETE_STATION -> deleteStation(inboxEntry);
-            case DELETE_PHOTO -> deletePhoto(inboxEntry);
-            case MARK_SOLVED -> markProblemReportSolved(inboxEntry);
-            case CHANGE_NAME -> {
-                if (StringUtils.isBlank(command.getTitle())) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Empty new title: " + command.getTitle());
-                }
-                changeStationTitle(inboxEntry, command.getTitle());
+    public ResponseEntity<AdminInboxCommandResponse> adminInbox(@AuthenticationPrincipal final AuthUser user, @RequestBody final InboxEntry command) {
+        try {
+            final InboxEntry inboxEntry = inboxDao.findById(command.getId());
+            if (inboxEntry == null || inboxEntry.isDone()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No pending inbox entry found");
             }
-            case UPDATE_LOCATION -> updateLocation(inboxEntry, command);
-            default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unexpected command value: " + command.getCommand());
+            switch (command.getCommand()) {
+                case REJECT -> rejectInboxEntry(inboxEntry, command.getRejectReason());
+                case IMPORT -> importUpload(inboxEntry, command);
+                case ACTIVATE_STATION -> updateStationActiveState(inboxEntry, true);
+                case DEACTIVATE_STATION -> updateStationActiveState(inboxEntry, false);
+                case DELETE_STATION -> deleteStation(inboxEntry);
+                case DELETE_PHOTO -> deletePhoto(inboxEntry);
+                case MARK_SOLVED -> markProblemReportSolved(inboxEntry);
+                case CHANGE_NAME -> {
+                    if (StringUtils.isBlank(command.getTitle())) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Empty new title: " + command.getTitle());
+                    }
+                    changeStationTitle(inboxEntry, command.getTitle());
+                }
+                case UPDATE_LOCATION -> updateLocation(inboxEntry, command);
+                default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unexpected command value: " + command.getCommand());
+            }
+        } catch (final ResponseStatusException e) {
+            LOG.warn("adminInbox command {} failed", command, e);
+            return new ResponseEntity<>(new AdminInboxCommandResponse(e.getRawStatusCode(), e.getReason()), e.getStatus());
         }
 
-        return new ResponseEntity<>("", HttpStatus.OK);
+        return new ResponseEntity<>(new AdminInboxCommandResponse(HttpStatus.OK.value(), "ok"), HttpStatus.OK);
     }
 
     private void updateLocation(final InboxEntry inboxEntry, final InboxEntry command) {
@@ -603,6 +608,25 @@ public class InboxResource {
             return nextZ;
         }
 
+    }
+
+    private static class AdminInboxCommandResponse {
+        private final int status;
+
+        private final String message;
+
+        public AdminInboxCommandResponse(final int status, final String message) {
+            this.status = status;
+            this.message = message;
+        }
+
+        public int getStatus() {
+            return status;
+        }
+
+        public String getMessage() {
+            return message;
+        }
     }
 
 }

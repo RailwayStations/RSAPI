@@ -17,7 +17,7 @@ spring:
 
 server:
   error:
-    include-message: ALWAYS
+    include-message: NEVER
     include-stacktrace: NEVER
     whitelabel:
       enabled: true

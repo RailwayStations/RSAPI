@@ -526,10 +526,16 @@ paths:
       responses:
         200:
           description: command successfully
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminInboxCommandResponse'
         400:
           description: bad request, something wrong with the data
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminInboxCommandResponse'
         401:
           description: not authorized
           content: {}
@@ -1168,6 +1174,14 @@ components:
           type: number
           format: integer
       description: counts the pending inbox entries
+    AdminInboxCommandResponse:
+      type: object
+      properties:
+        status:
+          type: number
+          format: integer
+        message:
+          type: string
     ProblemReport:
       type: object
       properties:
