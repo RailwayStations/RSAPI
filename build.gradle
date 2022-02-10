@@ -15,7 +15,7 @@ repositories {
 }
 
 bootJar {
-	mainClass.set('org.railwaystations.rsapi.RsapiApplication')
+	mainClass.set('org.railwaystations.rsapi.app.RsapiApplication')
 }
 
 ext {
