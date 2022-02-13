@@ -56,12 +56,6 @@ public class User {
     @JsonProperty("anonymous")
     private boolean anonymous;
 
-    @JsonProperty(value = "uploadToken", access = JsonProperty.Access.READ_ONLY)
-    private String uploadToken;
-
-    @JsonIgnore
-    private Long uploadTokenSalt;
-
     @JsonIgnore
     private String key;
 
@@ -81,7 +75,7 @@ public class User {
     private boolean sendNotifications;
 
     public User(final String name, final String url, final String license, final int id, final String email,
-                final boolean ownPhotos, final boolean anonymous, final Long uploadTokenSalt,
+                final boolean ownPhotos, final boolean anonymous,
                 final String key, final boolean admin, final String emailVerification, final boolean sendNotifications) {
         this.name = name;
         this.url = url;
@@ -91,7 +85,6 @@ public class User {
         this.normalizedName = normalizeName(name);
         this.ownPhotos = ownPhotos;
         this.anonymous = anonymous;
-        this.uploadTokenSalt = uploadTokenSalt;
         this.key = key;
         this.admin = admin;
         this.emailVerification = emailVerification;
@@ -195,25 +188,9 @@ public class User {
         return anonymous;
     }
 
-    public Long getUploadTokenSalt() {
-        return uploadTokenSalt;
-    }
-
     @JsonIgnore
     public String getDisplayName() {
         return anonymous ? "Anonym" : getName();
-    }
-
-    public void setUploadTokenSalt(final Long uploadTokenSalt) {
-        this.uploadTokenSalt = uploadTokenSalt;
-    }
-
-    public String getUploadToken() {
-        return uploadToken;
-    }
-
-    public void setUploadToken(final String uploadToken) {
-        this.uploadToken = uploadToken;
     }
 
     public void setId(final int id) {

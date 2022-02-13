@@ -55,8 +55,6 @@ public class UserTest {
         assertThat(user.isOwnPhotos(), is(true));
         assertThat(user.getUrl(), is("https://example.com"));
         assertThat(user.isAnonymous(), is(false));
-        assertThat(user.getUploadToken(), nullValue());
-        assertThat(user.getUploadTokenSalt(), nullValue());
         assertThat(user.getKey(), nullValue());
         assertThat(user.isAdmin(), is(false));
     }
@@ -64,14 +62,14 @@ public class UserTest {
     @Test
     public void testJsonSerialization() throws IOException {
         final ObjectMapper mapper = new ObjectMapper();
-        final User user = new User("@Nick Name", "https://example.com", "CC0 1.0 Universell (CC0 1.0)", 1, "nick@example.com", true, true, 1234L, "key", true, null, true);
+        final User user = new User("@Nick Name", "https://example.com", "CC0 1.0 Universell (CC0 1.0)", 1, "nick@example.com", true, true, "key", true, null, true);
         final String json = mapper.writerFor(User.class).writeValueAsString(user);
         assertThat(json, is("{\"nickname\":\"@Nick Name\",\"email\":\"nick@example.com\",\"license\":\"CC0 1.0 Universell (CC0 1.0)\",\"photoOwner\":true,\"link\":\"https://example.com\",\"anonymous\":true,\"sendNotifications\":true,\"admin\":true,\"emailVerified\":false}"));
     }
 
     @Test
     public void testRoleUser() {
-        final User user = new User("@Nick Name", "https://example.com", "CC0 1.0 Universell (CC0 1.0)", 1, "nick@example.com", true, true, 1234L, "key", false, null, true);
+        final User user = new User("@Nick Name", "https://example.com", "CC0 1.0 Universell (CC0 1.0)", 1, "nick@example.com", true, true, "key", false, null, true);
         final Set<String> roles = user.getRoles();
         assertThat(roles.size(), is(1));
         assertThat(roles.contains(User.ROLE_USER), is(true));
@@ -80,7 +78,7 @@ public class UserTest {
 
     @Test
     public void testRolesAdmin() {
-        final User admin = new User("@Nick Name", "https://example.com", "CC0 1.0 Universell (CC0 1.0)", 1, "nick@example.com", true, true, 1234L, "key", true, null, true);
+        final User admin = new User("@Nick Name", "https://example.com", "CC0 1.0 Universell (CC0 1.0)", 1, "nick@example.com", true, true, "key", true, null, true);
         final Set<String> roles = admin.getRoles();
         assertThat(roles.size(), is(2));
         assertThat(roles.contains(User.ROLE_USER), is(true));

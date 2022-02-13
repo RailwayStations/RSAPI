@@ -19,9 +19,6 @@ public class RSAuthenticationProvider implements AuthenticationProvider {
     private LazySodiumPasswordEncoder passwordEncoder;
 
     @Autowired
-    private TokenGenerator tokenGenerator;
-
-    @Autowired
     private RSUserDetailsService userDetailsService;
 
     @Override
@@ -45,15 +42,6 @@ public class RSAuthenticationProvider implements AuthenticationProvider {
             LOG.info("User verified by password '{}'", user.getUsername());
             userDetailsService.updateEmailVerification(user.getUser());
 
-            return new UsernamePasswordAuthenticationToken(user, token.getCredentials(), user.getAuthorities());
-        }
-
-        // fallback to token
-        final Long tokenSalt = user.getUser().getUploadTokenSalt();
-        if (tokenSalt != null && tokenSalt > 0 &&
-                tokenGenerator.buildFor(String.valueOf(user.getUser().getEmail()), tokenSalt).equals(token.getCredentials())) {
-            LOG.info("User verified by UploadToken '{}'", user.getUsername());
-            userDetailsService.updateEmailVerification(user.getUser());
             return new UsernamePasswordAuthenticationToken(user, token.getCredentials(), user.getAuthorities());
         }
 

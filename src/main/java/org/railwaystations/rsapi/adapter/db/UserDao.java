@@ -33,7 +33,7 @@ public interface UserDao {
     @RegisterRowMapper(UserMapper.class)
     Optional<User> findByEmail(@Bind("email") final String email);
 
-    @SqlUpdate("update users set uploadTokenSalt = null, `key` = :key where id = :id")
+    @SqlUpdate("update users set `key` = :key where id = :id")
     void updateCredentials(@Bind("id") final int id, @Bind("key") final String key);
 
     @SqlUpdate("insert into users (id, name, url, license, email, normalizedName, ownPhotos, anonymous, `key`, emailVerification, sendNotifications) values (:id, :name, :url, :license, :email, :normalizedName, :ownPhotos, :anonymous, :key, :emailVerification, :sendNotifications)")
@@ -59,7 +59,6 @@ public interface UserDao {
                     rs.getString("email"),
                     rs.getBoolean("ownPhotos"),
                     rs.getBoolean("anonymous"),
-                    rs.getLong("uploadTokenSalt"),
                     rs.getString("key"),
                     rs.getBoolean("admin"),
                     rs.getString("emailVerification"),

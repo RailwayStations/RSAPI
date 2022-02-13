@@ -57,6 +57,6 @@ public class StationTest {
     }
 
     private User createTestPhotographer() {
-        return new User("test", "photographerUrl", "CC0", 0, null, true, false, null, null, false, null, true);
+        return new User("test", "photographerUrl", "CC0", 0, null, true, false, null, false, null, true);
     }
 }

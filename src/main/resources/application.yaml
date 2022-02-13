@@ -39,7 +39,6 @@ management:
 
 # application
 workDir: /var/rsapi
-salt: dummy
 photoBaseUrl: http://localhost:8080/photos
 inboxBaseUrl: http://localhost:8080/inbox
 mailVerificationUrl: http://localhost:8088/emailVerification.php?token=

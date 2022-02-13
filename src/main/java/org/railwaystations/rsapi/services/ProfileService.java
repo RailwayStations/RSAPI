@@ -124,8 +124,6 @@ public class ProfileService {
 
     private void encryptPassword(@NotNull final User user) {
         user.setKey(passwordEncoder.encode(user.getNewPassword()));
-        user.setUploadTokenSalt(null);
-        user.setUploadToken(null);
     }
 
     public void updateProfile(final User user, final User newProfile, final String clientInfo) throws ProfileConflictException {

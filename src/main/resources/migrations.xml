@@ -554,4 +554,20 @@
                                  referencedTableName="stations"
                                  onUpdate="CASCADE"/>
     </changeSet>
+
+    <changeSet id="31" author="pstorch">
+        <dropColumn tableName="users" columnName="uploadTokenSalt"/>
+    </changeSet>
+
+    <changeSet id="32" author="pstorch" context="junit or test">
+        <update tableName="users">
+            <column name="key" value="246172676F6E32696424763D3139246D3D36353533362C743D322C703D312432634C6B4C6949415958584E52742B6C7A3062614541242B706C7463365A4371386D534551772B4139374B304E37544B386A7072582F774141614B525933456D783400000000000000000000000000000000000000000000000000000000000000"/>
+            <where>id = 11</where>
+        </update>
+        <update tableName="users">
+            <column name="key" value="246172676F6E32696424763D3139246D3D36353533362C743D322C703D3124674B6B4C4644564D566E75436B4A64526F547838437724396E4E5A763970415750532F41456549456F59702F7A377635796B3270787357395057705053444633723400000000000000000000000000000000000000000000000000000000000000"/>
+            <where>id = 15</where>
+        </update>
+    </changeSet>
+
 </databaseChangeLog>

@@ -315,7 +315,7 @@ public class ProfileResourceTest {
     public void testVerifyEmailSuccess() {
         final String token = "verification";
         final String emailVerification = User.EMAIL_VERIFICATION_TOKEN + token;
-        final User user = new User("existing","https://link@example.com", "CC0", 42, "existing@example.com", true, false, null, null, false, emailVerification, true);
+        final User user = new User("existing","https://link@example.com", "CC0", 42, "existing@example.com", true, false, null, false, emailVerification, true);
         when(userDao.findByEmailVerification(emailVerification)).thenReturn(Optional.of(user));
         final ResponseEntity<String> response = resource.emailVerification(token);
 
@@ -328,7 +328,7 @@ public class ProfileResourceTest {
     public void testVerifyEmailFailed() {
         final String token = "verification";
         final String emailVerification = User.EMAIL_VERIFICATION_TOKEN + token;
-        final User user = new User("existing","https://link@example.com", "CC0", 42, "existing@example.com", true, false, null, null, false, emailVerification, true);
+        final User user = new User("existing","https://link@example.com", "CC0", 42, "existing@example.com", true, false, null, false, emailVerification, true);
         when(userDao.findByEmailVerification(emailVerification)).thenReturn(Optional.of(user));
         final ResponseEntity<String> response = resource.emailVerification("wrong_token");
 
@@ -340,7 +340,7 @@ public class ProfileResourceTest {
     @Test
     public void testResendEmailVerification() {
         when(userDao.findByEmail("newname@example.com")).thenReturn(Optional.empty());
-        final User user = new User("existing","https://link@example.com", "CC0", 42, "existing@example.com", true, false, null, null, false, User.EMAIL_VERIFIED_AT_NEXT_LOGIN, true);
+        final User user = new User("existing","https://link@example.com", "CC0", 42, "existing@example.com", true, false, null, false, User.EMAIL_VERIFIED_AT_NEXT_LOGIN, true);
         final ResponseEntity<String> response = resource.resendEmailVerification(new AuthUser(user, Collections.emptyList()));
 
         assertThat(response.getStatusCodeValue(), equalTo(200));

@@ -363,7 +363,7 @@ class RsapiApplicationTests {
 	@Test
 	public void photoUploadUnknownStation() throws IOException {
 		final HttpHeaders headers = new HttpHeaders();
-		headers.setBasicAuth("@user10", "dca1fbdb8ef7a946182f20798a8d72d8939322f2");
+		headers.setBasicAuth("@user10", "uON60I7XWTIN");
 		headers.add("Station-Title", URLEncoder.encode("Achères-Grand-Cormier", StandardCharsets.UTF_8.toString()));
 		headers.add("Latitude", "50.123");
 		headers.add("Longitude", "10.123");
@@ -401,7 +401,7 @@ class RsapiApplicationTests {
 	@Test
 	public void getMyProfileWithEmail() throws IOException {
 		final HttpHeaders headers = new HttpHeaders();
-		headers.add("Upload-Token", "dca1fbdb8ef7a946182f20798a8d72d8939322f2");
+		headers.add("Upload-Token", "uON60I7XWTIN");
 		headers.add("Email", "user10@example.com");
 		final ResponseEntity<String> response = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
 
@@ -412,7 +412,7 @@ class RsapiApplicationTests {
 	@Test
 	public void getMyProfileWithName() throws IOException {
 		final HttpHeaders headers = new HttpHeaders();
-		headers.add("Upload-Token", "dca1fbdb8ef7a946182f20798a8d72d8939322f2");
+		headers.add("Upload-Token", "uON60I7XWTIN");
 		headers.add("Email", "@user10");
 		final ResponseEntity<String> response = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
 
@@ -422,7 +422,7 @@ class RsapiApplicationTests {
 
 	@Test
 	public void getMyProfileWithBasicAuthUploadToken() throws IOException {
-		final ResponseEntity<String> response = restTemplate.withBasicAuth("@user10", "dca1fbdb8ef7a946182f20798a8d72d8939322f2")
+		final ResponseEntity<String> response = restTemplate.withBasicAuth("@user10", "uON60I7XWTIN")
 				.getForEntity(String.format("http://localhost:%d%s", port, "/myProfile"), String.class);
 
 		assertThat(response.getStatusCodeValue(), is(200));
@@ -464,7 +464,7 @@ class RsapiApplicationTests {
 
 	@Test
 	public void getInboxWithBasicAuth() throws JsonProcessingException {
-		final ResponseEntity<String> response = restTemplate.withBasicAuth("@user10", "dca1fbdb8ef7a946182f20798a8d72d8939322f2")
+		final ResponseEntity<String> response = restTemplate.withBasicAuth("@user10", "uON60I7XWTIN")
 				.getForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), String.class);
 
 		assertThat(response.getStatusCodeValue(), is(200));
@@ -479,7 +479,7 @@ class RsapiApplicationTests {
 		inboxEntry.setId(-1);
 		final HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-		final ResponseEntity<String> response = restTemplate.withBasicAuth("@user10", "dca1fbdb8ef7a946182f20798a8d72d8939322f2")
+		final ResponseEntity<String> response = restTemplate.withBasicAuth("@user10", "uON60I7XWTIN")
 				.postForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), new HttpEntity<>(inboxEntry, headers), String.class);
 
 		assertThat(response.getStatusCodeValue(), is(400));
@@ -501,7 +501,7 @@ class RsapiApplicationTests {
 
 	@Test
 	public void updateMyProfileAndChangePassword() throws IOException {
-		final String firstPassword = "9efc34501926f6372b15ca6c0026bd096e087dd1";
+		final String firstPassword = "GDAkhaeU2vrK";
 		final HttpHeaders headers = new HttpHeaders();
 		headers.add("Upload-Token", firstPassword);
 		headers.add("Email", "user14@example.com");
