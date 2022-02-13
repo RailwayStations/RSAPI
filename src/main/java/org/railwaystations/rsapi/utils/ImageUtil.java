@@ -6,8 +6,8 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Locale;
 
 public class ImageUtil {
@@ -19,10 +19,10 @@ public class ImageUtil {
     public static final String JPEG = "jpeg";
     public static final String PNG = "png";
 
-    public static byte[] scalePhoto(final File photo, final Integer width) throws IOException {
+    public static byte[] scalePhoto(final Path photo, final Integer width) throws IOException {
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
-        final BufferedImage inputImage = ImageIO.read(photo);
-        final String extension = getExtension(photo.getName());
+        final BufferedImage inputImage = ImageIO.read(photo.toFile());
+        final String extension = getExtension(photo.getFileName().toString());
         assert extension != null;
         if (width != null && width > 0 && width < inputImage.getWidth()) {
             final double scale = (double) width / (double) inputImage.getWidth();

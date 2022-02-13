@@ -7,8 +7,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -71,7 +71,7 @@ public class ImageUtilTest {
             "test.jpg,, 200",
             "test.png,, 200"})
     public void testScaleImage(final String filename, final Integer newWidth, final int expectedWidth) throws IOException {
-        final File photo = new File("src/test/resources/" + filename);
+        final Path photo = Path.of("src/test/resources", filename);
         final byte[] scaledBytes = ImageUtil.scalePhoto(photo, newWidth);
         final BufferedImage scaledImage = ImageIO.read(new ByteArrayInputStream(scaledBytes));
         assertEquals(expectedWidth, scaledImage.getWidth());

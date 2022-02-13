@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @RestController
 public class PhotoDownloadResource {
@@ -45,12 +46,12 @@ public class PhotoDownloadResource {
         return downloadPhoto(photoStorage.getPhotoFile(countryCode, filename), width);
     }
 
-    private static ResponseEntity<byte[]> downloadPhoto(final File photo, final Integer width) throws IOException {
-        if (!photo.exists() || !photo.canRead()) {
+    private static ResponseEntity<byte[]> downloadPhoto(final Path photo, final Integer width) throws IOException {
+        if (!Files.exists(photo) || !Files.isReadable(photo)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
-        return ResponseEntity.ok().contentType(MediaType.valueOf(ImageUtil.extensionToMimeType(ImageUtil.getExtension(photo.getName())))).body(ImageUtil.scalePhoto(photo, width));
+        return ResponseEntity.ok().contentType(MediaType.valueOf(ImageUtil.extensionToMimeType(ImageUtil.getExtension(photo.toString())))).body(ImageUtil.scalePhoto(photo, width));
     }
 
     @GetMapping(value = "/inbox/{filename}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})

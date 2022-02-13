@@ -2,7 +2,6 @@ package org.railwaystations.rsapi.adapter.monitoring;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import liquibase.pro.packaged.A;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -21,9 +20,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.Executors;
+import java.nio.file.Path;
 
 @Service
 @Profile("prod")
@@ -54,7 +52,7 @@ public class MatrixMonitor implements Monitor {
 
     @Override
     @Async
-    public void sendMessage(final String message, final File photo) {
+    public void sendMessage(final String message, final Path photo) {
         LOG.info("Sending message: {}", message);
         if (StringUtils.isBlank(config.getRoomUrl())) {
             LOG.warn("Skipping message, missing Matrix Room URL config");
@@ -85,9 +83,9 @@ public class MatrixMonitor implements Monitor {
         return httpclient.execute(httpPost);
     }
 
-    private void sendPhoto(final File photo) throws IOException {
-        final HttpPost httpPost = new HttpPost(config.getUploadUrl() + "?filename" + photo.getName() + "&access_token=" + config.getAccessToken());
-        httpPost.setEntity(new ByteArrayEntity(ImageUtil.scalePhoto(photo, 300), ContentType.getByMimeType(ImageUtil.extensionToMimeType(ImageUtil.getExtension(photo.getName())))));
+    private void sendPhoto(final Path photo) throws IOException {
+        final HttpPost httpPost = new HttpPost(config.getUploadUrl() + "?filename" + photo.getFileName() + "&access_token=" + config.getAccessToken());
+        httpPost.setEntity(new ByteArrayEntity(ImageUtil.scalePhoto(photo, 300), ContentType.getByMimeType(ImageUtil.extensionToMimeType(ImageUtil.getExtension(photo.getFileName().toString())))));
         final CloseableHttpResponse responseUpload = httpclient.execute(httpPost);
         final int statusUpload = responseUpload.getStatusLine().getStatusCode();
         final String contentUpload = EntityUtils.toString(responseUpload.getEntity());
@@ -100,7 +98,7 @@ public class MatrixMonitor implements Monitor {
 
         final MatrixUploadResponse matrixUploadResponse = MAPPER.readValue(contentUpload, MatrixUploadResponse.class);
 
-        final CloseableHttpResponse responseImage = sendRoomMessage(new MatrixImageMessage(photo.getName(), matrixUploadResponse.contentUri));
+        final CloseableHttpResponse responseImage = sendRoomMessage(new MatrixImageMessage(photo.getFileName().toString(), matrixUploadResponse.contentUri));
         final int statusImage = responseImage.getStatusLine().getStatusCode();
         final String contentImage = EntityUtils.toString(responseImage.getEntity());
         if (statusImage >= 200 && statusImage < 300) {

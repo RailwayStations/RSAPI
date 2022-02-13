@@ -4,9 +4,9 @@ import org.railwaystations.rsapi.domain.model.Country;
 import org.railwaystations.rsapi.domain.model.InboxEntry;
 import org.railwaystations.rsapi.domain.model.Station;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 
 public interface PhotoStorage {
 
@@ -16,15 +16,15 @@ public interface PhotoStorage {
 
     void reject(InboxEntry inboxEntry) throws IOException;
 
-    File getUploadFile(String filename);
+    Path getUploadFile(String filename);
 
     Long storeUpload(InputStream body, String filename) throws IOException, PhotoTooLargeException;
 
-    File getPhotoFile(String countryCode, String filename);
+    Path getPhotoFile(String countryCode, String filename);
 
-    File getInboxFile(String filename);
+    Path getInboxFile(String filename);
 
-    File getInboxProcessedFile(String filename);
+    Path getInboxProcessedFile(String filename);
 
     class PhotoTooLargeException extends Exception {
         private final long maxSize;

@@ -1,8 +1,8 @@
 package org.railwaystations.rsapi.domain.port.out;
 
-import java.io.File;
+import java.nio.file.Path;
 
 public interface Monitor {
-    void sendMessage(final String message);
-    void sendMessage(final String message, File file);
+    void sendMessage(String message);
+    void sendMessage(String message, Path file);
 }

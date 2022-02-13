@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.nio.file.Path;
 
 @Service
 @Profile("!prod")
@@ -20,7 +21,7 @@ public class LoggingMonitor implements Monitor {
     }
 
     @Override
-    public void sendMessage(final String message, final File file) {
+    public void sendMessage(final String message, final Path file) {
         LOG.info(message + " - " + file);
     }
 

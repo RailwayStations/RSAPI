@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -277,12 +278,12 @@ public class PhotoInboxEntryResourceTest {
     }
 
     private void assertFileWithContentExistsInInbox(final String content, final String filename) throws IOException {
-        final File image = new File(workDir.getInboxDir(), filename);
-        assertThat(image.exists(), equalTo(true));
+        final Path image = workDir.getInboxDir().resolve(filename);
+        assertThat(Files.exists(image), equalTo(true));
 
         final byte[] inputBytes = content.getBytes(Charset.defaultCharset());
         final byte[] outputBytes = new byte[inputBytes.length];
-        IOUtils.readFully(new FileInputStream(image), outputBytes);
+        IOUtils.readFully(Files.newInputStream(image), outputBytes);
         assertThat(outputBytes, equalTo(inputBytes));
     }
 
