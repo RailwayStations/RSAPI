@@ -1,4 +1,4 @@
-FROM openjdk:17-slim
+FROM openjdk:19-slim
 ENV RSAPI_HOME=/opt/services
 ENV RSAPI_WORK=/var/rsapi
 ENV ARTIFACT_NAME=rsapi-0.0.1-SNAPSHOT.jar
