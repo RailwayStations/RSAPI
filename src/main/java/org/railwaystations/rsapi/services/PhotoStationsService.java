@@ -43,18 +43,10 @@ public class PhotoStationsService {
     }
 
     public String getCountryStatisticMessage() {
-        final StringBuilder message = new StringBuilder("Countries statistic: \n");
-        for (final Country aCountry : getCountries()) {
-            final Statistic stat = getStatistic(aCountry.getCode());
-            message.append("- ")
-                    .append(stat.getCountryCode())
-                    .append(": ")
-                    .append(stat.getWithPhoto())
-                    .append(" of ")
-                    .append(stat.getTotal())
-                    .append("\n");
-        }
-        return message.toString();
+        return "Countries statistic: \n" + getCountries().stream()
+                .map(country -> getStatistic(country.getCode()))
+                .map(statistic -> "- " + statistic.getCountryCode() + ": " + statistic.getWithPhoto() + " of " + statistic.getTotal())
+                .collect(Collectors.joining("\n"));
     }
 
     public Statistic getStatistic(final String country) {
