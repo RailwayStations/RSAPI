@@ -86,61 +86,65 @@ public class InboxService {
     public List<InboxStateQuery> userInbox(@NotNull final User user, @NotNull final List<InboxStateQuery> queries) {
         LOG.info("Query uploadStatus for Nickname: {}", user.getName());
 
-        for (final InboxStateQuery query : queries) {
-            query.setState(InboxStateQuery.InboxState.UNKNOWN);
-            InboxEntry inboxEntry = null;
-            if (query.getId() != null) {
-                inboxEntry = inboxDao.findById(query.getId());
-            } else if (query.getCountryCode() != null && query.getStationId() != null) {
-                inboxEntry = inboxDao.findNewestPendingByCountryAndStationIdAndPhotographerId(query.getCountryCode(), query.getStationId(), user.getId());
-            }
+        queries.forEach(inboxStateQuery -> updateInboxStateQuery(user, inboxStateQuery));
 
-            if (inboxEntry != null && inboxEntry.getPhotographerId() == user.getId()) {
-                query.setId(inboxEntry.getId());
-                query.setRejectedReason(inboxEntry.getRejectReason());
-                query.setCountryCode(inboxEntry.getCountryCode());
-                query.setStationId(inboxEntry.getStationId());
-                query.setCoordinates(inboxEntry.getCoordinates());
-                query.setFilename(inboxEntry.getFilename());
-                query.setInboxUrl(getInboxUrl(inboxEntry.getFilename(), photoStorage.isProcessed(inboxEntry.getFilename())));
-                query.setCrc32(inboxEntry.getCrc32());
+        return queries;
+    }
+
+    private void updateInboxStateQuery(final User user, final InboxStateQuery query) {
+        query.setState(InboxStateQuery.InboxState.UNKNOWN);
+        InboxEntry inboxEntry = null;
+        if (query.getId() != null) {
+            inboxEntry = inboxDao.findById(query.getId());
+        } else if (query.getCountryCode() != null && query.getStationId() != null) {
+            inboxEntry = inboxDao.findNewestPendingByCountryAndStationIdAndPhotographerId(query.getCountryCode(), query.getStationId(), user.getId());
+        }
+
+        if (inboxEntry != null && inboxEntry.getPhotographerId() == user.getId()) {
+            query.setId(inboxEntry.getId());
+            query.setRejectedReason(inboxEntry.getRejectReason());
+            query.setCountryCode(inboxEntry.getCountryCode());
+            query.setStationId(inboxEntry.getStationId());
+            query.setCoordinates(inboxEntry.getCoordinates());
+            query.setFilename(inboxEntry.getFilename());
+            query.setInboxUrl(getInboxUrl(inboxEntry.getFilename(), photoStorage.isProcessed(inboxEntry.getFilename())));
+            query.setCrc32(inboxEntry.getCrc32());
 
 
-                if (inboxEntry.isDone()) {
-                    if (inboxEntry.getRejectReason() == null) {
-                        query.setState(InboxStateQuery.InboxState.ACCEPTED);
-                    } else {
-                        query.setState(InboxStateQuery.InboxState.REJECTED);
-                    }
+            if (inboxEntry.isDone()) {
+                if (inboxEntry.getRejectReason() == null) {
+                    query.setState(InboxStateQuery.InboxState.ACCEPTED);
                 } else {
-                    if (hasConflict(inboxEntry.getId(),
-                            photoStationsService.findByCountryAndId(query.getCountryCode(), query.getStationId()).orElse(null))
-                            || (inboxEntry.getStationId() == null && hasConflict(inboxEntry.getId(), inboxEntry.getCoordinates()))) {
-                        query.setState(InboxStateQuery.InboxState.CONFLICT);
-                    } else {
-                        query.setState(InboxStateQuery.InboxState.REVIEW);
-                    }
+                    query.setState(InboxStateQuery.InboxState.REJECTED);
+                }
+            } else {
+                if (hasConflict(inboxEntry.getId(),
+                        photoStationsService.findByCountryAndId(query.getCountryCode(), query.getStationId()).orElse(null))
+                        || (inboxEntry.getStationId() == null && hasConflict(inboxEntry.getId(), inboxEntry.getCoordinates()))) {
+                    query.setState(InboxStateQuery.InboxState.CONFLICT);
+                } else {
+                    query.setState(InboxStateQuery.InboxState.REVIEW);
                 }
             }
         }
-
-        return queries;
     }
 
     public List<InboxEntry> listAdminInbox(@NotNull final User user) {
         LOG.info("Load adminInbox for Nickname: {}", user.getName());
         final List<InboxEntry> pendingInboxEntries = inboxDao.findPendingInboxEntries();
-        for (final InboxEntry inboxEntry : pendingInboxEntries) {
-            final String filename = inboxEntry.getFilename();
-            inboxEntry.isProcessed(photoStorage.isProcessed(filename));
-            if (!inboxEntry.isProblemReport()) {
-                inboxEntry.setInboxUrl(getInboxUrl(filename, inboxEntry.isProcessed()));
-            }
-            if (inboxEntry.getStationId() == null && !inboxEntry.getCoordinates().hasZeroCoords()) {
-                inboxEntry.setConflict(hasConflict(inboxEntry.getId(), inboxEntry.getCoordinates()));
-            }
-        }
+        pendingInboxEntries.forEach(this::updateInboxEntry);
         return pendingInboxEntries;
+    }
+
+    private void updateInboxEntry(final InboxEntry inboxEntry) {
+        final String filename = inboxEntry.getFilename();
+        inboxEntry.isProcessed(photoStorage.isProcessed(filename));
+        if (!inboxEntry.isProblemReport()) {
+            inboxEntry.setInboxUrl(getInboxUrl(filename, inboxEntry.isProcessed()));
+        }
+        if (inboxEntry.getStationId() == null && !inboxEntry.getCoordinates().hasZeroCoords()) {
+            inboxEntry.setConflict(hasConflict(inboxEntry.getId(), inboxEntry.getCoordinates()));
+        }
     }
 
     private String getInboxUrl(final String filename, final boolean processed) {
