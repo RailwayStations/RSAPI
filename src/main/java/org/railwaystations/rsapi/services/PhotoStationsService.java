@@ -9,6 +9,7 @@ import org.railwaystations.rsapi.domain.model.Station;
 import org.railwaystations.rsapi.domain.model.Statistic;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -88,8 +89,8 @@ public class PhotoStationsService {
         stationDao.updateActive(station);
     }
 
-    public List<Station> findRecentImports(final long fromTimestampMillis) {
-        return stationDao.findRecentImports(fromTimestampMillis);
+    public List<Station> findRecentImports(final Instant since) {
+        return stationDao.findRecentImports(since);
     }
 
     public int countNearbyCoordinates(final Coordinates coordinates) {

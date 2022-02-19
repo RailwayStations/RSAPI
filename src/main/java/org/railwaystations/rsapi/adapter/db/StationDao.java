@@ -16,6 +16,7 @@ import org.railwaystations.rsapi.domain.model.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -64,9 +65,9 @@ public interface StationDao {
     @SqlUpdate("update stations set active = :active where countryCode = :key.country and id = :key.id")
     void updateActive(@BindBean final Station station);
 
-    @SqlQuery(JOIN_QUERY + " where createdAt > :fromTimestampMillis order by createdAt desc")
+    @SqlQuery(JOIN_QUERY + " where createdAt > :since order by createdAt desc")
     @RegisterRowMapper(StationMapper.class)
-    List<Station> findRecentImports(@Bind("fromTimestampMillis") final long fromTimestampMillis);
+    List<Station> findRecentImports(@Bind("since") final Instant since);
 
     /**
      * Count nearby stations using simple pythagoras (only valid for a few km)

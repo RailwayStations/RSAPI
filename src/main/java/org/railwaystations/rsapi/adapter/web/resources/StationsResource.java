@@ -3,7 +3,6 @@ package org.railwaystations.rsapi.adapter.web.resources;
 import org.railwaystations.rsapi.adapter.web.writer.StationsGpxWriter;
 import org.railwaystations.rsapi.domain.model.Station;
 import org.railwaystations.rsapi.services.PhotoStationsService;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -134,8 +135,8 @@ public class StationsResource {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8", value = "/recentPhotoImports")
-    public List<Station> recentPhotoImports(@RequestParam(value = SINCE_HOURS, required = false) @DefaultValue("10") final long sinceHours) {
-        return photoStationsService.findRecentImports(System.currentTimeMillis() - (HOURS_IN_MILLIS * sinceHours));
+    public List<Station> recentPhotoImports(@RequestParam(value = SINCE_HOURS, required = false, defaultValue = "10") final long sinceHours) {
+        return photoStationsService.findRecentImports(Instant.now().minus(sinceHours, ChronoUnit.HOURS));
     }
 
 }
