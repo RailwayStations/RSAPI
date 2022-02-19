@@ -49,14 +49,14 @@ public class CountriesResourceTest {
         assertThat(country.getTimetableUrlTemplate(), equalTo("timetable" + country.getCode().toUpperCase()));
         assertThat(country.getOverrideLicense(), equalTo("overrideLicense" + country.getCode().toUpperCase()));
         assertThat(country.getProviderApps().size(), equalTo(3));
-        for (final ProviderApp app : country.getProviderApps()) {
+        country.getProviderApps().forEach(app -> {
             switch (app.getType()) {
                 case "android" -> assertThat(app.getUrl(), equalTo("providerAndroidApp" + country.getCode().toUpperCase()));
                 case "ios" -> assertThat(app.getUrl(), equalTo("providerIosApp" + country.getCode().toUpperCase()));
                 case "web" -> assertThat(app.getUrl(), equalTo("providerWebApp" + country.getCode().toUpperCase()));
                 default -> fail("unknown app type");
             }
-        }
+        });
     }
 
 }

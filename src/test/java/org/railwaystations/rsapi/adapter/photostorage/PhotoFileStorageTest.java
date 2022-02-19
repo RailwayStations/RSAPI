@@ -9,7 +9,7 @@ class PhotoFileStorageTest {
 
     @Test
     void sanitizeFilename() {
-        assertThat(PhotoFileStorage.sanitizeFilename("../../../some<evil>*/file:name?"), is(".._.._.._some_evil___file_name_"));
+        assertThat(PhotoFileStorage.sanitizeFilename("../../../s*me\\\\very\\<evil>*/file:name?"), is(".._.._.._s_me__very__evil___file_name_"));
     }
 
 }

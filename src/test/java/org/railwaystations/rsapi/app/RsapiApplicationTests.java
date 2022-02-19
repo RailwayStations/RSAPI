@@ -45,16 +45,16 @@ import java.io.StringReader;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.matches;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -212,21 +212,20 @@ class RsapiApplicationTests {
 	}
 
 	private Station findByKey(final Station[] stations, final Station.Key key) {
-		for (final Station station : stations) {
-			if (station.getKey().equals(key)) {
-				return station;
-			}
-		}
-		return null;
+		return Arrays.stream(stations).filter(station -> station.getKey().equals(key)).findAny().orElse(null);
 	}
 
 	@Test
-	public void photographersJson() throws IOException {
+	public void photographersDeJson() throws IOException {
 		final ResponseEntity<String> response = loadRaw(String.format("/de/%s.json", "photographers"), 200, String.class);
 		final JsonNode jsonNode = MAPPER.readTree(response.getBody());
 		assertThat(jsonNode, notNullValue());
 		assertThat(jsonNode.isObject(), is(true));
 		assertThat(jsonNode.size(), is(4));
+		assertThat(jsonNode.get("@user27").asInt(), is(31));
+		assertThat(jsonNode.get("@user8").asInt(), is(29));
+		assertThat(jsonNode.get("@user10").asInt(), is(15));
+		assertThat(jsonNode.get("@user0").asInt(), is(9));
 	}
 
 	@Test
@@ -234,25 +233,25 @@ class RsapiApplicationTests {
 		final ResponseEntity<String> response = loadRaw("/photographers.json", 200, String.class);
 		final JsonNode jsonNode = MAPPER.readTree(response.getBody());
 		assertThat(jsonNode, notNullValue());
-		assertThat(jsonNode.isObject(), is(true));
 		assertThat(jsonNode.size(), is(6));
+		assertThat(jsonNode.get("@user27").asInt(), is(31));
+		assertThat(jsonNode.get("@user8").asInt(), is(29));
+		assertThat(jsonNode.get("@user10").asInt(), is(15));
+		assertThat(jsonNode.get("@user0").asInt(), is(9));
+		assertThat(jsonNode.get("@user2").asInt(), is(6));
+		assertThat(jsonNode.get("@user4").asInt(), is(1));
 	}
 
 	@Test
 	public void photographersTxt() {
 		final ResponseEntity<String> response = loadRaw("/de/photographers.txt", 200, String.class);
-		int count = 0;
-		final Pattern pattern = Pattern.compile("\\d[\\d]*\t[^\t]*");
-		for (final String line : Objects.requireNonNull(response.getBody()).split("\n")) {
-			if (count == 0) {
-				assertThat(line, is("count\tphotographer"));
-			} else {
-				final Matcher matcher = pattern.matcher(line);
-				assertThat(matcher.matches(), is(true));
-			}
-			count++;
-		}
-		assertThat(count, is(5));
+		assertThat(response.getBody(), is("""
+					count	photographer
+					31	@user27
+					29	@user8
+					15	@user10
+					9	@user0
+					"""));
 	}
 
 	private Station getStationDe6932() {

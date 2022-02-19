@@ -97,31 +97,21 @@ public class PhotoFileStorage implements PhotoStorage {
         return workDir.getInboxProcessedDir().resolve(sanitizeFilename(filename));
     }
 
-    static String sanitizeFilename(String fileName) {
+    static String sanitizeFilename(final String fileName) {
         if (fileName == null) {
             return null;
         }
 
-        fileName = fileName.replaceAll(" ", "_")
-                .replaceAll("/", "_")
-                .replaceAll(":", "_")
-                .replaceAll("\"", "_")
-                .replaceAll("\\|", "_")
-                .replaceAll("\\*", "_")
-                .replaceAll("\\?", "_")
-                .replaceAll("<", "_")
-                .replaceAll(">", "_");
-
-        boolean done = false;
-        while (!done) {
-            final String replacedString = fileName.replace('\\', '_');
-            done = (fileName.equals(replacedString));
-            if (!done) {
-                fileName = replacedString;
-                break;
-            }
-        }
-        return fileName;
+        return fileName.replace(" ", "_")
+                .replace("/", "_")
+                .replace(":", "_")
+                .replace("\"", "_")
+                .replace("|", "_")
+                .replace("*", "_")
+                .replace("?", "_")
+                .replace("<", "_")
+                .replace(">", "_")
+                .replace('\\', '_');
     }
 
 }
