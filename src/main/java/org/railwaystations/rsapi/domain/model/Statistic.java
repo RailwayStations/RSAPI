@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Statistic {
 
     @JsonProperty
+    private final String countryCode;
+
+    @JsonProperty
     private final int total;
 
     @JsonProperty
@@ -16,7 +19,8 @@ public class Statistic {
     @JsonProperty
     private final int photographers;
 
-    public Statistic(final int total, final int withPhoto, final int photographers) {
+    public Statistic(final String countryCode, final int total, final int withPhoto, final int photographers) {
+        this.countryCode = countryCode;
         this.total = total;
         this.withPhoto = withPhoto;
         this.withoutPhoto = total - withPhoto;
@@ -37,6 +41,10 @@ public class Statistic {
 
     public int getPhotographers() {
         return photographers;
+    }
+
+    public String getCountryCode() {
+        return countryCode;
     }
 
 }

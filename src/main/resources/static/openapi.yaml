@@ -6,7 +6,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20210821.1415"
+  version: "20220219.1815"
 servers:
 - url: https://api.railway-stations.org/
 tags:
@@ -914,6 +914,8 @@ components:
         photographers:
           type: integer
           format: int64
+        countryCode:
+          type: string
       description: Statistic of number of stations with and without photos
     Country:
       type: object

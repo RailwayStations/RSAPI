@@ -47,7 +47,7 @@ public class PhotoStationsService {
         for (final Country aCountry : getCountries()) {
             final Statistic stat = getStatistic(aCountry.getCode());
             message.append("- ")
-                    .append(aCountry.getCode())
+                    .append(stat.getCountryCode())
                     .append(": ")
                     .append(stat.getWithPhoto())
                     .append(" of ")

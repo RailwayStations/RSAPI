@@ -54,8 +54,7 @@ import java.util.regex.Pattern;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.matches;
+import static org.mockito.ArgumentMatchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -261,29 +260,41 @@ class RsapiApplicationTests {
 	}
 
 	@Test
-	public void statisticJson() throws IOException {
-		final ResponseEntity<String> response = loadRaw("/de/stats.json", 200, String.class);
+	public void statisticAllJson() throws IOException {
+		final ResponseEntity<String> response = loadRaw("/stats.json", 200, String.class);
 		final JsonNode jsonNode = MAPPER.readTree(response.getBody());
 		assertThat(jsonNode, notNullValue());
-		assertThat(jsonNode.isObject(), is(true));
-		assertThat(jsonNode.size(), is(4));
+		assertThat(jsonNode.get("total").asInt(), is(954));
+		assertThat(jsonNode.get("withPhoto").asInt(), is(91));
+		assertThat(jsonNode.get("withoutPhoto").asInt(), is(863));
+		assertThat(jsonNode.get("photographers").asInt(), is(6));
+		assertThat(jsonNode.get("countryCode").isNull(), is(true));
 	}
 
 	@Test
-	public void statisticTxt() {
+	public void statisticDeJson() throws IOException {
+		final ResponseEntity<String> response = loadRaw("/de/stats.json", 200, String.class);
+		final JsonNode jsonNode = MAPPER.readTree(response.getBody());
+		assertThat(jsonNode, notNullValue());
+		assertThat(jsonNode.get("total").asInt(), is(729));
+		assertThat(jsonNode.get("withPhoto").asInt(), is(84));
+		assertThat(jsonNode.get("withoutPhoto").asInt(), is(645));
+		assertThat(jsonNode.get("photographers").asInt(), is(4));
+		assertThat(jsonNode.get("countryCode").asText(), is("de"));
+	}
+
+	@Test
+	public void statisticDeTxt() {
 		final ResponseEntity<String> response = loadRaw("/de/stats.txt", 200, String.class);
-		final Pattern pattern = Pattern.compile("[^\t]*\t\\d[\\d]*");
-		int count = 0;
-		for (final String line : Objects.requireNonNull(response.getBody()).split("\n")) {
-			if (count == 0) {
-				assertThat(line, is("name\tvalue"));
-			} else {
-				final Matcher matcher = pattern.matcher(line);
-				assertThat(matcher.matches(), is(true));
-			}
-			count++;
-		}
-		assertThat(count, is(5));
+		assertThat(response.getBody(), is(
+      				"""
+						name	value
+						total	729
+						withPhoto	84
+						withoutPhoto	645
+						photographers	4
+						countryCode	de
+							"""));
 	}
 
 	@Test

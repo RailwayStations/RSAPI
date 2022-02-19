@@ -14,7 +14,7 @@ public class StatisticTxtWriterTest {
 
     @Test
     public void test() throws IOException {
-        final Statistic stat = new Statistic(1500, 500, 20);
+        final Statistic stat = new Statistic("de", 1500, 500, 20);
 
 
         final MockHttpOutputMessage outputMessage = new MockHttpOutputMessage();
@@ -27,6 +27,7 @@ public class StatisticTxtWriterTest {
         assertThat(lines[2], is("withPhoto\t500"));
         assertThat(lines[3], is("withoutPhoto\t1000"));
         assertThat(lines[4], is("photographers\t20"));
+        assertThat(lines[5], is("countryCode\tde"));
     }
 
 }

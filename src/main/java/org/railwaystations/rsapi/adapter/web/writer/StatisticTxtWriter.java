@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.lang.NonNull;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -20,13 +21,14 @@ public class StatisticTxtWriter extends AbstractHttpMessageConverter<Statistic> 
     }
 
     @Override
-    protected boolean supports(final Class<?> clazz) {
+    protected boolean supports(@NonNull final Class<?> clazz) {
         return Statistic.class.isAssignableFrom(clazz);
     }
 
     @Override
-    protected Statistic readInternal(final Class<? extends Statistic> clazz, final HttpInputMessage inputMessage) throws HttpMessageNotReadableException {
-        return null;
+    @NonNull
+    protected Statistic readInternal(@NonNull final Class<? extends Statistic> clazz, @NonNull final HttpInputMessage inputMessage) throws HttpMessageNotReadableException {
+        throw new HttpMessageNotReadableException("read not supported", inputMessage);
     }
 
     @Override
@@ -37,6 +39,7 @@ public class StatisticTxtWriter extends AbstractHttpMessageConverter<Statistic> 
             statisticToCsv(pw, "withPhoto", statistic.getWithPhoto());
             statisticToCsv(pw, "withoutPhoto", statistic.getWithoutPhoto());
             statisticToCsv(pw, "photographers", statistic.getPhotographers());
+            pw.println(String.format("countryCode\t%s", statistic.getCountryCode()));
             pw.flush();
         }
     }
