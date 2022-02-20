@@ -1,8 +1,7 @@
 package org.railwaystations.rsapi.adapter.monitoring;
 
-import org.railwaystations.rsapi.domain.port.out.Monitor;
+import org.railwaystations.rsapi.core.ports.Monitor;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;

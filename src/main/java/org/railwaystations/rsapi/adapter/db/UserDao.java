@@ -8,7 +8,7 @@ import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
-import org.railwaystations.rsapi.domain.model.User;
+import org.railwaystations.rsapi.core.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

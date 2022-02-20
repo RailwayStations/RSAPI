@@ -12,7 +12,7 @@ import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
-import org.railwaystations.rsapi.domain.model.*;
+import org.railwaystations.rsapi.core.model.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

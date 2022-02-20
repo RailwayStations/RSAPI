@@ -8,8 +8,8 @@ import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.UseRowReducer;
-import org.railwaystations.rsapi.domain.model.Country;
-import org.railwaystations.rsapi.domain.model.ProviderApp;
+import org.railwaystations.rsapi.core.model.Country;
+import org.railwaystations.rsapi.core.model.ProviderApp;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

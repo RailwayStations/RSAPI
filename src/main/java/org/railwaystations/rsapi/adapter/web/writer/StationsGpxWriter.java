@@ -1,12 +1,13 @@
 package org.railwaystations.rsapi.adapter.web.writer;
 
-import org.railwaystations.rsapi.domain.model.Station;
+import org.railwaystations.rsapi.core.model.Station;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.lang.NonNull;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -35,13 +36,13 @@ public class StationsGpxWriter extends AbstractHttpMessageConverter<List<Station
     }
 
     @Override
-    protected boolean supports(final Class<?> clazz) {
+    protected boolean supports(@NonNull final Class<?> clazz) {
         return List.class.isAssignableFrom(clazz);
     }
 
     @Override
-    protected List<Station> readInternal(final Class<? extends List<Station>> clazz, final HttpInputMessage inputMessage) throws HttpMessageNotReadableException {
-        return null;
+    protected @NonNull List<Station> readInternal(@NonNull final Class<? extends List<Station>> clazz, @NonNull final HttpInputMessage inputMessage) throws HttpMessageNotReadableException {
+        throw new HttpMessageNotReadableException("read not supported", inputMessage);
     }
 
     @Override

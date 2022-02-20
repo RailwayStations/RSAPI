@@ -1,7 +1,7 @@
 package org.railwaystations.rsapi.adapter.mail;
 
 import org.apache.commons.lang3.StringUtils;
-import org.railwaystations.rsapi.domain.port.out.Mailer;
+import org.railwaystations.rsapi.core.ports.Mailer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

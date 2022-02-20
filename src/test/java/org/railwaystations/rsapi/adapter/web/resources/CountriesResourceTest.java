@@ -3,9 +3,9 @@ package org.railwaystations.rsapi.adapter.web.resources;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.railwaystations.rsapi.adapter.db.CountryDao;
-import org.railwaystations.rsapi.domain.model.Country;
-import org.railwaystations.rsapi.domain.model.ProviderApp;
-import org.railwaystations.rsapi.services.CountryService;
+import org.railwaystations.rsapi.core.model.Country;
+import org.railwaystations.rsapi.core.model.ProviderApp;
+import org.railwaystations.rsapi.core.services.CountryService;
 
 import java.util.Collection;
 import java.util.HashSet;

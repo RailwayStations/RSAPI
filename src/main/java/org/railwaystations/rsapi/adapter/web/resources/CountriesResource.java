@@ -1,7 +1,7 @@
 package org.railwaystations.rsapi.adapter.web.resources;
 
-import org.railwaystations.rsapi.domain.model.Country;
-import org.railwaystations.rsapi.services.CountryService;
+import org.railwaystations.rsapi.core.model.Country;
+import org.railwaystations.rsapi.core.services.CountryService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;

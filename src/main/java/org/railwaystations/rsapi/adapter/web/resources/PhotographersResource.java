@@ -1,6 +1,6 @@
 package org.railwaystations.rsapi.adapter.web.resources;
 
-import org.railwaystations.rsapi.services.PhotoStationsService;
+import org.railwaystations.rsapi.core.services.PhotoStationsService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

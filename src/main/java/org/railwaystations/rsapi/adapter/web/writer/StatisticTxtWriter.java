@@ -1,6 +1,6 @@
 package org.railwaystations.rsapi.adapter.web.writer;
 
-import org.railwaystations.rsapi.domain.model.Statistic;
+import org.railwaystations.rsapi.core.model.Statistic;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;

@@ -1,9 +1,9 @@
 package org.railwaystations.rsapi.adapter.web.resources;
 
-import org.railwaystations.rsapi.adapter.web.auth.AuthUser;
-import org.railwaystations.rsapi.domain.model.ChangePassword;
-import org.railwaystations.rsapi.domain.model.User;
-import org.railwaystations.rsapi.services.ProfileService;
+import org.railwaystations.rsapi.app.auth.AuthUser;
+import org.railwaystations.rsapi.core.model.ChangePassword;
+import org.railwaystations.rsapi.core.model.User;
+import org.railwaystations.rsapi.core.services.ProfileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;

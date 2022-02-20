@@ -1,10 +1,10 @@
 package org.railwaystations.rsapi.adapter.photostorage;
 
 import org.apache.commons.io.IOUtils;
-import org.railwaystations.rsapi.domain.model.Country;
-import org.railwaystations.rsapi.domain.model.InboxEntry;
-import org.railwaystations.rsapi.domain.model.Station;
-import org.railwaystations.rsapi.domain.port.out.PhotoStorage;
+import org.railwaystations.rsapi.core.model.Country;
+import org.railwaystations.rsapi.core.model.InboxEntry;
+import org.railwaystations.rsapi.core.model.Station;
+import org.railwaystations.rsapi.core.ports.PhotoStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;

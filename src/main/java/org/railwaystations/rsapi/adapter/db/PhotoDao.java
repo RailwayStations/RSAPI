@@ -2,8 +2,8 @@ package org.railwaystations.rsapi.adapter.db;
 
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
-import org.railwaystations.rsapi.domain.model.Photo;
-import org.railwaystations.rsapi.domain.model.Station;
+import org.railwaystations.rsapi.core.model.Photo;
+import org.railwaystations.rsapi.core.model.Station;
 
 public interface PhotoDao {
 

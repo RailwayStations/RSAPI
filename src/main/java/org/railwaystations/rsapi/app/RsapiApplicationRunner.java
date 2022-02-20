@@ -1,7 +1,7 @@
 package org.railwaystations.rsapi.app;
 
-import org.railwaystations.rsapi.domain.port.out.Monitor;
-import org.railwaystations.rsapi.services.PhotoStationsService;
+import org.railwaystations.rsapi.core.ports.Monitor;
+import org.railwaystations.rsapi.core.services.PhotoStationsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

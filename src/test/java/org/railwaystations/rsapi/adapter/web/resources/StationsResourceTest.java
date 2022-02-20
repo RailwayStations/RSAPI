@@ -3,11 +3,11 @@ package org.railwaystations.rsapi.adapter.web.resources;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.railwaystations.rsapi.domain.model.Coordinates;
-import org.railwaystations.rsapi.domain.model.Photo;
-import org.railwaystations.rsapi.domain.model.Station;
-import org.railwaystations.rsapi.domain.model.User;
-import org.railwaystations.rsapi.services.PhotoStationsService;
+import org.railwaystations.rsapi.core.model.Coordinates;
+import org.railwaystations.rsapi.core.model.Photo;
+import org.railwaystations.rsapi.core.model.Station;
+import org.railwaystations.rsapi.core.model.User;
+import org.railwaystations.rsapi.core.services.PhotoStationsService;
 
 import java.util.Collections;
 import java.util.List;

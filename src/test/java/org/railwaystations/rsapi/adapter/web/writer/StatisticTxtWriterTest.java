@@ -1,7 +1,7 @@
 package org.railwaystations.rsapi.adapter.web.writer;
 
 import org.junit.jupiter.api.Test;
-import org.railwaystations.rsapi.domain.model.Statistic;
+import org.railwaystations.rsapi.core.model.Statistic;
 import org.springframework.mock.http.MockHttpOutputMessage;
 
 import java.io.IOException;

@@ -1,10 +1,10 @@
 package org.railwaystations.rsapi.adapter.web.writer;
 
 import org.junit.jupiter.api.Test;
-import org.railwaystations.rsapi.domain.model.Coordinates;
-import org.railwaystations.rsapi.domain.model.Photo;
-import org.railwaystations.rsapi.domain.model.Station;
-import org.railwaystations.rsapi.domain.model.User;
+import org.railwaystations.rsapi.core.model.Coordinates;
+import org.railwaystations.rsapi.core.model.Photo;
+import org.railwaystations.rsapi.core.model.Station;
+import org.railwaystations.rsapi.core.model.User;
 import org.springframework.mock.http.MockHttpOutputMessage;
 
 import java.io.IOException;

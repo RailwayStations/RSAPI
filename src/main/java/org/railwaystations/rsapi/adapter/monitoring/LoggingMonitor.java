@@ -1,12 +1,11 @@
 package org.railwaystations.rsapi.adapter.monitoring;
 
-import org.railwaystations.rsapi.domain.port.out.Monitor;
+import org.railwaystations.rsapi.core.ports.Monitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.nio.file.Path;
 
 @Service

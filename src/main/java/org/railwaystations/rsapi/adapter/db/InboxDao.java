@@ -10,10 +10,10 @@ import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
-import org.railwaystations.rsapi.domain.model.Coordinates;
-import org.railwaystations.rsapi.domain.model.InboxEntry;
-import org.railwaystations.rsapi.domain.model.ProblemReportType;
-import org.railwaystations.rsapi.domain.model.PublicInboxEntry;
+import org.railwaystations.rsapi.core.model.Coordinates;
+import org.railwaystations.rsapi.core.model.InboxEntry;
+import org.railwaystations.rsapi.core.model.ProblemReportType;
+import org.railwaystations.rsapi.core.model.PublicInboxEntry;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

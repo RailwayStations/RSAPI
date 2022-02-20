@@ -6,12 +6,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.railwaystations.rsapi.adapter.db.UserDao;
 import org.railwaystations.rsapi.adapter.monitoring.MockMonitor;
-import org.railwaystations.rsapi.adapter.web.auth.AuthUser;
-import org.railwaystations.rsapi.adapter.web.auth.LazySodiumPasswordEncoder;
-import org.railwaystations.rsapi.domain.model.ChangePassword;
-import org.railwaystations.rsapi.domain.model.User;
-import org.railwaystations.rsapi.domain.port.out.Mailer;
-import org.railwaystations.rsapi.services.ProfileService;
+import org.railwaystations.rsapi.app.auth.AuthUser;
+import org.railwaystations.rsapi.app.auth.LazySodiumPasswordEncoder;
+import org.railwaystations.rsapi.core.model.ChangePassword;
+import org.railwaystations.rsapi.core.model.User;
+import org.railwaystations.rsapi.core.ports.Mailer;
+import org.railwaystations.rsapi.core.services.ProfileService;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Collections;

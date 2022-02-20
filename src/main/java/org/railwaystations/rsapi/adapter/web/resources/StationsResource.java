@@ -1,8 +1,8 @@
 package org.railwaystations.rsapi.adapter.web.resources;
 
 import org.railwaystations.rsapi.adapter.web.writer.StationsGpxWriter;
-import org.railwaystations.rsapi.domain.model.Station;
-import org.railwaystations.rsapi.services.PhotoStationsService;
+import org.railwaystations.rsapi.core.model.Station;
+import org.railwaystations.rsapi.core.services.PhotoStationsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;

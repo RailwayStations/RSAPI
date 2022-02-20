@@ -1,6 +1,6 @@
 package org.railwaystations.rsapi.adapter.web.resources;
 
-import org.railwaystations.rsapi.domain.port.out.PhotoStorage;
+import org.railwaystations.rsapi.core.ports.PhotoStorage;
 import org.railwaystations.rsapi.utils.ImageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
