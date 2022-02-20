@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.lang.NonNull;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -25,13 +26,13 @@ public class PhotographersTxtWriter extends AbstractHttpMessageConverter<Map<Str
     }
 
     @Override
-    protected boolean supports(final Class<?> clazz) {
+    protected boolean supports(@NonNull final Class<?> clazz) {
         return Map.class.isAssignableFrom(clazz);
     }
 
     @Override
-    protected Map<String, Long> readInternal(final Class<? extends Map<String, Long>> clazz, final HttpInputMessage inputMessage) throws HttpMessageNotReadableException {
-        return null;
+    protected Map<String, Long> readInternal(@NonNull final Class<? extends Map<String, Long>> clazz, @NonNull final HttpInputMessage inputMessage) throws HttpMessageNotReadableException {
+        throw new HttpMessageNotReadableException("read not supported", inputMessage);
     }
 
     @Override
