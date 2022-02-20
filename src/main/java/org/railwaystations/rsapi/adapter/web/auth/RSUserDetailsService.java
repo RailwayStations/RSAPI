@@ -31,10 +31,6 @@ public class RSUserDetailsService implements UserDetailsService {
         return new AuthUser(user, user.getRoles().stream().map(SimpleGrantedAuthority::new).collect(toList()));
     }
 
-    public Optional<User> findById(final int id) {
-        return userDao.findById(id);
-    }
-
     public void updateEmailVerification(final User user) {
         if (user.isEmailVerifiedWithNextLogin()) {
             userDao.updateEmailVerification(user.getId(), User.EMAIL_VERIFIED);

@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.railwaystations.rsapi.adapter.db.CountryDao;
 import org.railwaystations.rsapi.adapter.db.InboxDao;
 import org.railwaystations.rsapi.adapter.db.PhotoDao;
-import org.railwaystations.rsapi.adapter.web.auth.RSUserDetailsService;
+import org.railwaystations.rsapi.adapter.db.UserDao;
 import org.railwaystations.rsapi.domain.model.*;
 import org.railwaystations.rsapi.domain.port.out.MastodonBot;
 import org.railwaystations.rsapi.domain.port.out.Monitor;
@@ -31,7 +31,7 @@ public class InboxService {
     private final PhotoStationsService photoStationsService;
     private final PhotoStorage photoStorage;
     private final InboxDao inboxDao;
-    private final RSUserDetailsService userDetailsService;
+    private final UserDao userDao;
     private final CountryDao countryDao;
     private final PhotoDao photoDao;
     private final String inboxBaseUrl;
@@ -39,13 +39,13 @@ public class InboxService {
     private final Monitor monitor;
 
     public InboxService(final PhotoStationsService photoStationsService, final PhotoStorage photoStorage, final Monitor monitor,
-                        final InboxDao inboxDao, final RSUserDetailsService userDetailsService, final CountryDao countryDao,
+                        final InboxDao inboxDao, final UserDao userDao, final CountryDao countryDao,
                         final PhotoDao photoDao, @Value("${inboxBaseUrl}") final String inboxBaseUrl, final MastodonBot mastodonBot) {
         this.photoStationsService = photoStationsService;
         this.photoStorage = photoStorage;
         this.monitor = monitor;
         this.inboxDao = inboxDao;
-        this.userDetailsService = userDetailsService;
+        this.userDao = userDao;
         this.countryDao = countryDao;
         this.photoDao = photoDao;
         this.inboxBaseUrl = inboxBaseUrl;
@@ -285,7 +285,7 @@ public class InboxService {
             throw new IllegalArgumentException("There is a conflict with another upload");
         }
 
-        final Optional<User> user = userDetailsService.findById(inboxEntry.getPhotographerId());
+        final Optional<User> user = userDao.findById(inboxEntry.getPhotographerId());
         final Country country = countryDao.findById(StringUtils.lowerCase(station.get().getKey().getCountry()))
                 .orElseThrow(() -> new IllegalArgumentException("Country not found"));
 

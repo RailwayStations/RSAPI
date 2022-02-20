@@ -87,7 +87,7 @@ public class PhotoInboxEntryResourceTest {
         authenticator = mock(RSAuthenticationProvider.class);
 
         resource = new InboxResource(new InboxService(repository, new PhotoFileStorage(workDir), monitor,
-                inboxDao, new RSUserDetailsService(userDao), countryDao, photoDao, "http://inbox.railway-stations.org", new MastodonBotHttpClient(new MastodonBotConfig())),
+                inboxDao, userDao, countryDao, photoDao, "http://inbox.railway-stations.org", new MastodonBotHttpClient(new MastodonBotConfig())),
                 authenticator, new RSUserDetailsService(userDao));
     }
 
