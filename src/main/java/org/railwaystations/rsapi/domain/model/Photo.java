@@ -18,15 +18,15 @@ public class Photo {
     }
 
     private final Station.Key stationKey;
-    private final String url;
+    private final String urlPath;
     private final User photographer;
     private final Long createdAt;
     private final String license;
     private final String licenseUrl;
 
-    public Photo(final Station.Key stationKey, final String url, final User photographer, final Long createdAt, final String license) {
+    public Photo(final Station.Key stationKey, final String urlPath, final User photographer, final Long createdAt, final String license) {
         this.stationKey = stationKey;
-        this.url = url;
+        this.urlPath = urlPath;
         this.photographer = photographer;
         this.createdAt = createdAt;
         this.license = license;
@@ -38,8 +38,8 @@ public class Photo {
     }
 
 
-    public String getUrl() {
-        return url;
+    public String getUrlPath() {
+        return urlPath;
     }
 
     public User getPhotographer() {

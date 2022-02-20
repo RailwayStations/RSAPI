@@ -7,6 +7,7 @@ import org.railwaystations.rsapi.domain.model.Coordinates;
 import org.railwaystations.rsapi.domain.model.Country;
 import org.railwaystations.rsapi.domain.model.Station;
 import org.railwaystations.rsapi.domain.model.Statistic;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -22,11 +23,13 @@ public class PhotoStationsService {
 
     private final CountryDao countryDao;
     private final StationDao stationDao;
+    private final String photoBaseUrl;
 
-    public PhotoStationsService(final CountryDao countryDao, final StationDao stationDao) {
+    public PhotoStationsService(final CountryDao countryDao, final StationDao stationDao, @Value("${photoBaseUrl}") final String photoBaseUrl) {
         super();
         this.countryDao = countryDao;
         this.stationDao = stationDao;
+        this.photoBaseUrl = photoBaseUrl;
     }
 
     public Map<Station.Key, Station> getStationsByCountry(final Set<String> countryCodes) {
@@ -36,7 +39,12 @@ public class PhotoStationsService {
         } else {
             stations = stationDao.findByCountryCodes(countryCodes);
         }
-        return stations.stream().collect(toMap(Station::getKey, Function.identity()));
+        return stations.stream().map(this::injectPhotoBaseUrl).collect(toMap(Station::getKey, Function.identity()));
+    }
+
+    private Station injectPhotoBaseUrl(final Station station) {
+        station.prependPhotoBaseUrl(photoBaseUrl);
+        return station;
     }
 
     public Set<Country> getCountries() {
@@ -66,11 +74,11 @@ public class PhotoStationsService {
         if (stations.size() > 1) {
             return Optional.empty(); // id is not unique
         }
-        return stations.stream().findFirst();
+        return stations.stream().findFirst().map(this::injectPhotoBaseUrl);
     }
 
     public Optional<Station> findByKey(final Station.Key key) {
-        return stationDao.findByKey(key.getCountry(), key.getId()).stream().findFirst();
+        return stationDao.findByKey(key.getCountry(), key.getId()).stream().findFirst().map(this::injectPhotoBaseUrl);
     }
 
     public Map<String, Long> getPhotographerMap(final String country) {
@@ -90,7 +98,7 @@ public class PhotoStationsService {
     }
 
     public List<Station> findRecentImports(final Instant since) {
-        return stationDao.findRecentImports(since);
+        return stationDao.findRecentImports(since).stream().map(this::injectPhotoBaseUrl).toList();
     }
 
     public int countNearbyCoordinates(final Coordinates coordinates) {

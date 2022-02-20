@@ -79,7 +79,7 @@ public class Station {
                 this.photographerUrl = "";
             }
 
-            this.photoUrl = photo.getUrl();
+            this.photoUrl = photo.getUrlPath();
             this.license = photo.getLicense();
             this.licenseUrl = photo.getLicenseUrl();
             this.photographerUrl = photo.getPhotographer().getDisplayUrl();
@@ -188,6 +188,12 @@ public class Station {
 
     public void setCoordinates(final Coordinates coordinates) {
         this.coordinates = coordinates;
+    }
+
+    public void prependPhotoBaseUrl(final String photoBaseUrl) {
+        if (photoUrl != null) {
+            photoUrl = photoBaseUrl + photoUrl;
+        }
     }
 
     @SuppressWarnings("PMD.ShortClassName")

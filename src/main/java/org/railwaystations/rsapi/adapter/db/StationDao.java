@@ -23,7 +23,7 @@ import java.util.Set;
 
 public interface StationDao {
 
-    String JOIN_QUERY = "select s.countryCode, s.id, s.DS100, s.title, s.lat, s.lon, s.active, p.url, p.license, p.createdAt, u.id as photographerId, u.name, u.url as photographerUrl, u.license as photographerLicense, u.anonymous from countries c left join stations s on c.id = s.countryCode left join photos p on p.countryCode = s.countryCode and p.id = s.id left join users u on u.id = p.photographerId";
+    String JOIN_QUERY = "select s.countryCode, s.id, s.DS100, s.title, s.lat, s.lon, s.active, p.urlPath, p.license, p.createdAt, u.id as photographerId, u.name, u.url as photographerUrl, u.license as photographerLicense, u.anonymous from countries c left join stations s on c.id = s.countryCode left join photos p on p.countryCode = s.countryCode and p.id = s.id left join users u on u.id = p.photographerId";
 
     @SqlQuery(JOIN_QUERY + " where c.active = true and s.countryCode in (<countryCodes>)")
     @RegisterRowMapper(StationMapper.class)
@@ -41,7 +41,7 @@ public interface StationDao {
     @RegisterRowMapper(StationMapper.class)
     Set<Station> findById(@Bind("id") final String id);
 
-    @SqlQuery("select :countryCode countryCode, count(*) stations, count(p.url) photos, count(distinct p.photographerId) photographers from stations s left join photos p on p.countryCode = s.countryCode and p.id = s.id where s.countryCode = :countryCode or :countryCode is null")
+    @SqlQuery("select :countryCode countryCode, count(*) stations, count(p.urlPath) photos, count(distinct p.photographerId) photographers from stations s left join photos p on p.countryCode = s.countryCode and p.id = s.id where s.countryCode = :countryCode or :countryCode is null")
     @RegisterRowMapper(StatisticMapper.class)
     @SingleValue
     Statistic getStatistic(@Bind("countryCode") final String countryCode);
@@ -86,19 +86,13 @@ public interface StationDao {
 
     class StationMapper implements RowMapper<Station> {
 
-        private static String photoBaseUrl = "";
-
-        public static void setPhotoBaseUrl(final String url) {
-            photoBaseUrl = url;
-        }
-
         public Station map(final ResultSet rs, final StatementContext ctx) throws SQLException {
             final Station.Key key = new Station.Key(rs.getString("countryCode"), rs.getString("id"));
-            final String photoUrl = rs.getString("url");
+            final String photoUrlPath = rs.getString("urlPath");
             Photo photo = null;
-            if (photoUrl != null) {
+            if (photoUrlPath != null) {
                 final User photographer = new User(rs.getString("name"), rs.getString("photographerUrl"), rs.getString("photographerLicense"), rs.getInt("photographerId"), null, true, rs.getBoolean("anonymous"), null, false, null, false);
-                photo = new Photo(key, photoBaseUrl + photoUrl, photographer, rs.getLong("createdAt"), rs.getString("license"));
+                photo = new Photo(key, photoUrlPath, photographer, rs.getLong("createdAt"), rs.getString("license"));
             }
             return new Station(key, rs.getString("title"),
                     new Coordinates(rs.getDouble("lat"), rs.getDouble("lon")),
