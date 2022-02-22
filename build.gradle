@@ -33,7 +33,7 @@ dependencies {
 	implementation "org.springframework.boot:spring-boot-starter-jdbc:$springVersion"
 	implementation "org.springframework.boot:spring-boot-starter-actuator:$springVersion"
 	implementation "org.springframework.boot:spring-boot-starter-thymeleaf:$springVersion"
-	implementation 'org.liquibase:liquibase-core:4.7.1'
+	implementation 'org.liquibase:liquibase-core:4.8.0'
 	implementation "org.jdbi:jdbi3-spring5:$jdbiVersion"
 	implementation "org.jdbi:jdbi3-sqlobject:$jdbiVersion"
 	implementation "com.goterl:lazysodium-java:5.1.1"
