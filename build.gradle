@@ -19,7 +19,7 @@ bootJar {
 }
 
 ext {
-	springVersion = '2.6.3'
+	springVersion = '2.6.4'
 	testContainersVersion = '1.16.3'
 	jacksonVersion = '2.13.1'
 	jdbiVersion = '3.27.2'
