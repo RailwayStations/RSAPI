@@ -191,8 +191,8 @@ paths:
         description: defines the timeframe since when to look for recent photo uploads,
           default is 10h
         schema:
-          type: number
-          format: integer
+          type: integer
+          format: int32
       responses:
         200:
           description: successful operation
@@ -761,8 +761,8 @@ paths:
         in: query
         description: scale the image to the given width
         schema:
-          type: number
-          format: integer
+          type: integer
+          format: int32
       responses:
         200:
           description: ok
@@ -790,8 +790,8 @@ paths:
         in: query
         description: scale the image to the given width
         schema:
-          type: number
-          format: integer
+          type: integer
+          format: int32
       responses:
         200:
           description: ok
@@ -813,8 +813,8 @@ paths:
         in: query
         description: scale the image to the given width
         schema:
-          type: number
-          format: integer
+          type: integer
+          format: int32
       responses:
         200:
           description: ok
@@ -836,8 +836,8 @@ paths:
         in: query
         description: scale the image to the given width
         schema:
-          type: number
-          format: integer
+          type: integer
+          format: int32
       responses:
         200:
           description: ok
@@ -889,7 +889,7 @@ components:
           description: Longitute of the station
           format: double
         createdAt:
-          type: number
+          type: integer
           description: Timestamp when the photo was created in the railway-stations
             database (Milliseconds since 1.1.1970)
           format: int64
@@ -1007,8 +1007,8 @@ components:
         message:
           type: string
         id:
-          type: number
-          format: integer
+          type: integer
+          format: int64
         filename:
           type: string
           description: filename in inbox
@@ -1016,20 +1016,21 @@ components:
           type: string
           description: url of the photo in the inbox
         crc32:
-          type: number
           description: CRC32 checksum of the uploaded photo
-          format: long
+          type: integer
+          format: int64
       description: Response status of photo uploads and problem reports
     InboxStateQuery:
       type: object
       properties:
         id:
           type: integer
+          format: int64
         countryCode:
           type: string
         stationId:
-          type: number
-          format: integer
+          type: integer
+          format: int64
         lat:
           type: number
           format: double
@@ -1045,9 +1046,9 @@ components:
           type: string
           description: url of the photo in the inbox
         crc32:
-          type: number
           description: CRC32 checksum of the uploaded photo
-          format: long
+          type: integer
+          format: int64
         state:
           type: string
           enum:
@@ -1077,8 +1078,8 @@ components:
       type: object
       properties:
         id:
-          type: number
-          format: integer
+          type: integer
+          format: int64
         countryCode:
           type: string
         stationId:
@@ -1098,8 +1099,8 @@ components:
         comment:
           type: string
         createdAt:
-          type: number
-          format: long
+          type: integer
+          format: int64
         done:
           type: boolean
           description: true if this photo was already imported or rejected
@@ -1134,8 +1135,8 @@ components:
       type: object
       properties:
         id:
-          type: number
-          format: integer
+          type: integer
+          format: int64
         countryCode:
           type: string
           description: country of a new station
@@ -1174,15 +1175,15 @@ components:
       type: object
       properties:
         pendingInboxEntries:
-          type: number
-          format: integer
+          type: integer
+          format: inte64
       description: counts the pending inbox entries
     AdminInboxCommandResponse:
       type: object
       properties:
         status:
-          type: number
-          format: integer
+          type: integer
+          format: int32
         message:
           type: string
     ProblemReport:
