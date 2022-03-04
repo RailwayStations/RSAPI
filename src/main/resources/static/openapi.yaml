@@ -1,4 +1,5 @@
-openapi: 3.1.0
+---
+openapi: 3.0.1
 info:
   title: RSAPI
   description: 'Backend Service for https://www.railway-stations.org/. Sourcecode
