@@ -4,6 +4,7 @@ plugins {
 	id 'java'
 	id 'pmd'
 	id "com.github.spotbugs" version "5.0.6"
+	id "org.openapi.generator" version "5.4.0"
 }
 
 group = 'org.railwaystations'
@@ -16,6 +17,11 @@ repositories {
 
 bootJar {
 	mainClass.set('org.railwaystations.rsapi.app.RsapiApplication')
+}
+
+openApiValidate {
+	inputSpec = "$rootDir/src/main/resources/static/openapi.yaml"
+	recommend = true
 }
 
 ext {
