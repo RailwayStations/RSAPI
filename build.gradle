@@ -29,6 +29,7 @@ ext {
 	testContainersVersion = '1.16.3'
 	jacksonVersion = '2.13.1'
 	jdbiVersion = '3.27.2'
+	swaggerRequestValidatorVersion = '2.26.2'
 }
 
 dependencies {
@@ -59,6 +60,8 @@ dependencies {
 	testImplementation "org.testcontainers:testcontainers:$testContainersVersion"
 	testImplementation "org.testcontainers:junit-jupiter:$testContainersVersion"
 	testImplementation "org.testcontainers:mariadb:$testContainersVersion"
+	testImplementation "com.atlassian.oai:swagger-request-validator-core:$swaggerRequestValidatorVersion"
+	testImplementation "com.atlassian.oai:swagger-request-validator-springmvc:$swaggerRequestValidatorVersion"
 }
 
 test {

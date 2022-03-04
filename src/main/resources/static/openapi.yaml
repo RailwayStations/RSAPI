@@ -97,8 +97,6 @@ paths:
       - name: country
         in: query
         description: filter by country code
-        style: form
-        explode: false
         schema:
           type: array
           items:
@@ -301,18 +299,19 @@ paths:
       - name: Authorization
         in: header
         description: basic authorization
+        required: false
         schema:
           type: string
       - name: Upload-Token
         in: header
         description: DEPRECATED, use basic authorization! Upload Token
-        required: true
+        required: false
         schema:
           type: string
       - name: Email
         in: header
         description: DEPRECATED, use basic authorization! Email or name of the user
-        required: true
+        required: false
         schema:
           type: string
       - name: Country
@@ -648,7 +647,7 @@ paths:
       - name: New-Password
         in: header
         description: new password, deprecated use body message for proper encoding
-        required: true
+        required: false
         schema:
           type: string
       requestBody:
@@ -657,7 +656,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ChangePassword'
-        required: true
+        required: false
       responses:
         200:
           description: password changed
@@ -677,16 +676,17 @@ paths:
         description: basic authorization
         schema:
           type: string
+        required: false
       - name: Upload-Token
         in: header
         description: DEPRECATED, use basic authorization! Upload Token
-        required: true
+        required: false
         schema:
           type: string
       - name: Email
         in: header
         description: DEPRECATED, use basic authorization! Email or name of the user
-        required: true
+        required: false
         schema:
           type: string
       responses:
@@ -706,18 +706,19 @@ paths:
       - name: Authorization
         in: header
         description: basic authorization
+        required: false
         schema:
           type: string
       - name: Upload-Token
         in: header
         description: DEPRECATED, use basic authorization! Upload Token
-        required: true
+        required: false
         schema:
           type: string
       - name: Email
         in: header
         description: DEPRECATED, use basic authorization! Email or name of the user
-        required: true
+        required: false
         schema:
           type: string
       requestBody:
@@ -896,6 +897,8 @@ components:
         DS100:
           type: string
           description: A short code of the station, depending on the country
+        active:
+          type: boolean
     Photographers:
       type: object
       description: JSON Object with photographers nickname as parameter and number
@@ -924,6 +927,9 @@ components:
         code:
           type: string
           description: Two letter country code
+        name:
+          type: string
+          description: Name of the country
         email:
           type: string
           description: Email Address to send photos to
@@ -990,6 +996,10 @@ components:
         sendNotifications:
           type: boolean
       description: User profile information
+      required:
+        - nickname
+        - license
+        - photoOwner
     InboxResponse:
       type: object
       properties:

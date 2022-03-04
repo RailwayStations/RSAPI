@@ -128,7 +128,8 @@ public class User {
     }
 
     public static String normalizeEmail(final String email) {
-        return StringUtils.trimToEmpty(email).toLowerCase(Locale.ENGLISH);
+        final String trimmedEmail = StringUtils.trimToNull(email);
+        return trimmedEmail != null ? trimmedEmail.toLowerCase(Locale.ENGLISH) : null;
     }
 
     @JsonProperty("nickname")

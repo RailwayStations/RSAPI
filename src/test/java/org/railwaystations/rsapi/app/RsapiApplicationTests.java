@@ -56,7 +56,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.matches;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+		properties = {"server.error.include-message=always"})
 @ActiveProfiles("test")
 class RsapiApplicationTests {
 
@@ -308,7 +309,6 @@ class RsapiApplicationTests {
 						\t"email": "nick.name@example.com",\s
 						\t"license": "CC0",
 						\t"photoOwner": true,\s
-						\t"linking": "linking",\s
 						\t"link": ""
 						}""", headers), String.class);
 
@@ -345,7 +345,6 @@ class RsapiApplicationTests {
 						\t"email": "other@example.com",\s
 						\t"license": "CC0",
 						\t"photoOwner": true,\s
-						\t"linking": "linking",\s
 						\t"link": "link"
 						}""", headers), String.class);
 
@@ -445,7 +444,7 @@ class RsapiApplicationTests {
 				.getForEntity(String.format("http://localhost:%d%s", port, "/myProfile"), String.class);
 
 		assertThat(response.getStatusCodeValue(), is(200));
-		assertProfile(response, "@user27", "https://www.example.com/user27", false, "");
+		assertProfile(response, "@user27", "https://www.example.com/user27", false, null);
 	}
 
 	@Test
@@ -485,12 +484,11 @@ class RsapiApplicationTests {
 
 	@Test
 	public void postAdminInboxCommandWithUnknownInboxExntry() throws JsonProcessingException {
-		final InboxEntry inboxEntry = new InboxEntry();
-		inboxEntry.setId(-1);
 		final HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
 		headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 		final ResponseEntity<String> response = restTemplate.withBasicAuth("@user10", "uON60I7XWTIN")
-				.postForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), new HttpEntity<>(inboxEntry, headers), String.class);
+				.postForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), new HttpEntity<>("{\"id\": -1, \"command\": \"IMPORT\"}", headers), String.class);
 
 		assertThat(response.getStatusCodeValue(), is(400));
 		final JsonNode jsonNode = MAPPER.readTree(response.getBody());
@@ -501,7 +499,11 @@ class RsapiApplicationTests {
 	private void assertProfile(final ResponseEntity<String> response, final String name, final String link, final boolean anonymous, final String email) throws IOException {
 		final JsonNode jsonNode = MAPPER.readTree(response.getBody());
 		assertThat(jsonNode.get("nickname").asText(), is(name));
-		assertThat(jsonNode.get("email").asText(), is(email));
+		if (email != null) {
+			assertThat(jsonNode.get("email").asText(), is(email));
+		} else {
+			assertThat(jsonNode.get("email"), nullValue());
+		}
 		assertThat(jsonNode.get("link").asText(), is(link));
 		assertThat(jsonNode.get("license").asText(), is("CC0 1.0 Universell (CC0 1.0)"));
 		assertThat(jsonNode.get("photoOwner").asBoolean(), is(true));
@@ -528,7 +530,6 @@ class RsapiApplicationTests {
 						\t"email": "user14@example.com",\s
 						\t"license": "CC0",
 						\t"photoOwner": true,\s
-						\t"link": null,
 						\t"anonymous": true
 						}""", headers), String.class);
 		assertThat(responsePostUpdate.getStatusCodeValue(), is(200));

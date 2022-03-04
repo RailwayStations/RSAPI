@@ -1,5 +1,7 @@
 package org.railwaystations.rsapi.core.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Coordinates {
 
     public static final double ZERO = 0.0;
@@ -28,6 +30,7 @@ public class Coordinates {
         return lat == ZERO && lon == ZERO;
     }
 
+    @JsonIgnore
     public boolean isValid() {
         return Math.abs(lat) < 90 && Math.abs(lon) < 180 && !hasZeroCoords();
     }
