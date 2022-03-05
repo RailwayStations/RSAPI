@@ -34,10 +34,6 @@ public class WorkDir {
         this.keepFileCopiesInDays = Objects.requireNonNullElse(keepFileCopiesInDays, KEEP_FILE_COPIES_IN_DAYS_DEFAULT);
     }
 
-    public WorkDir(@Value("${workDir}") final String workDir) {
-        this(workDir, null);
-    }
-
     public Path getPhotosDir() {
         return photosDir;
     }

@@ -636,7 +636,7 @@ class RsapiApplicationTests {
 
 		@Bean
 		public WorkDir workDir() {
-            return new WorkDir(TMP_WORK_DIR);
+            return new WorkDir(TMP_WORK_DIR, null);
 		}
 
 		@Bean

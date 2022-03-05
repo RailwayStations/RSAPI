@@ -74,7 +74,7 @@ public class PhotoInboxEntryResourceTest {
         final CountryDao countryDao = mock(CountryDao.class);
         final PhotoDao photoDao = mock(PhotoDao.class);
 
-        workDir = new WorkDir(Files.createTempDirectory("rsapi").toString());
+        workDir = new WorkDir(Files.createTempDirectory("rsapi").toString(), null);
         final PhotoStationsService repository = mock(PhotoStationsService.class);
         when(repository.findByCountryAndId(key4711.getCountry(), key4711.getId())).thenReturn(Optional.of(station4711));
         when(repository.findByCountryAndId(key1234.getCountry(), key1234.getId())).thenReturn(Optional.of(station1234));

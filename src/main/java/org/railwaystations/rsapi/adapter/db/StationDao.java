@@ -67,7 +67,7 @@ public interface StationDao {
 
     @SqlQuery(JOIN_QUERY + " where createdAt > :since order by createdAt desc")
     @RegisterRowMapper(StationMapper.class)
-    List<Station> findRecentImports(@Bind("since") final Instant since);
+    List<Station> findRecentImports(@Bind("since") final long datetimeMillis);
 
     /**
      * Count nearby stations using simple pythagoras (only valid for a few km)
