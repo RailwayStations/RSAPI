@@ -1,5 +1,6 @@
 package org.railwaystations.rsapi.adapter.photostorage;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -25,19 +26,24 @@ class PhotoFileStorageTest {
     @ValueSource(strings = {"done", "rejected"})
     void cleanupOldCopies(final String subdirName) throws IOException {
         final Path tempdir = Files.createTempDirectory("rsapi");
-        final PhotoFileStorage storage = new PhotoFileStorage(new WorkDir(tempdir.toString(), 90));
+        final int keepFileCopiesInDays = 90;
+        final PhotoFileStorage storage = new PhotoFileStorage(new WorkDir(tempdir.toString(), keepFileCopiesInDays));
         final Path subdir = tempdir.resolve("inbox").resolve(subdirName);
-        Files.createDirectories(subdir);
-        final Path newFile = subdir.resolve("newFile.txt");
-        Files.writeString(newFile, "newFile");
-        Files.setLastModifiedTime(newFile, FileTime.from(Instant.now().minus(89, ChronoUnit.DAYS)));
-        final Path oldFile = subdir.resolve("oldFile.txt");
-        Files.writeString(oldFile, "oldFile");
-        Files.setLastModifiedTime(oldFile, FileTime.from(Instant.now().minus(91, ChronoUnit.DAYS)));
+        final Path newFile = createFileWithLastModifiedInPast(subdir, "newFile.txt", keepFileCopiesInDays - 1);
+        final Path oldFile = createFileWithLastModifiedInPast(subdir, "oldFile.txt", keepFileCopiesInDays + 1);
 
         storage.cleanupOldCopies();
 
         assertThat(Files.exists(newFile), is(true));
         assertThat(Files.exists(oldFile), is(false));
     }
+
+    @NotNull
+    private Path createFileWithLastModifiedInPast(final Path subdir, final String filename, final int lastModifiedDaysInPast) throws IOException {
+        final Path path = subdir.resolve(filename);
+        Files.writeString(path, filename);
+        Files.setLastModifiedTime(path, FileTime.from(Instant.now().minus(lastModifiedDaysInPast, ChronoUnit.DAYS)));
+        return path;
+    }
+
 }
