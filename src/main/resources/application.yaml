@@ -39,6 +39,7 @@ management:
 
 # application
 workDir: /var/rsapi
+keepFileCopiesInDays: 30
 photoBaseUrl: http://localhost:8080/photos
 inboxBaseUrl: http://localhost:8080/inbox
 mailVerificationUrl: http://localhost:8088/emailVerification.php?token=

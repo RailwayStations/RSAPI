@@ -14,6 +14,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
 
@@ -95,6 +97,42 @@ public class PhotoFileStorage implements PhotoStorage {
     @Override
     public Path getInboxProcessedFile(final String filename) {
         return workDir.getInboxProcessedDir().resolve(sanitizeFilename(filename));
+    }
+
+    @Override
+    public void cleanupOldCopies() {
+        final Instant maxAge = Instant.now().minus(workDir.getKeepFileCopiesInDays(), ChronoUnit.DAYS);
+        cleanupOldCopiesFrom(workDir.getInboxDoneDir(), maxAge);
+        cleanupOldCopiesFrom(workDir.getInboxRejectedDir(), maxAge);
+    }
+
+    static void cleanupOldCopiesFrom(final Path dir, final Instant maxAge) {
+        try {
+            Files.list(dir)
+                    .filter(Files::isRegularFile)
+                    .filter(f -> isOlderThan(f, maxAge))
+                    .forEach(PhotoFileStorage::deleteSilently);
+        } catch (final Exception e) {
+            LOG.error("Failed to cleanup old copies from {}", dir, e);
+        }
+    }
+
+    static void deleteSilently(final Path path) {
+        try {
+            Files.delete(path);
+            LOG.info("Deleted {}", path);
+        } catch (final IOException e) {
+            LOG.warn("Unable to delete {}", path);
+        }
+    }
+
+    static boolean isOlderThan(final Path path, final Instant maxAge) {
+        try {
+            return Files.getLastModifiedTime(path).toInstant().isBefore(maxAge);
+        } catch (final IOException e) {
+            LOG.warn("Unable to getLastModifiedTime of {}", path.getFileName());
+        }
+        return false;
     }
 
     static String sanitizeFilename(final String fileName) {

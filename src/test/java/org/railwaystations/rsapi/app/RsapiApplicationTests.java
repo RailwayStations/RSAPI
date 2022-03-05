@@ -11,7 +11,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.railwaystations.rsapi.adapter.monitoring.LoggingMonitor;
 import org.railwaystations.rsapi.adapter.photostorage.WorkDir;
-import org.railwaystations.rsapi.core.model.InboxEntry;
 import org.railwaystations.rsapi.core.model.Station;
 import org.railwaystations.rsapi.core.ports.Mailer;
 import org.railwaystations.rsapi.core.ports.Monitor;

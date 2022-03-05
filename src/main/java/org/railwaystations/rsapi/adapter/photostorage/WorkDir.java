@@ -6,18 +6,21 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 @Component
 public class WorkDir {
 
+    public static final int KEEP_FILE_COPIES_IN_DAYS_DEFAULT = 60;
     private final Path photosDir;
     private final Path inboxDir;
     private final Path inboxProcessedDir;
     private final Path inboxToProcessDir;
     private final Path inboxDoneDir;
     private final Path inboxRejectedDir;
+    private final int keepFileCopiesInDays;
 
-    public WorkDir(@Value("${workDir}") final String workDir) {
+    public WorkDir(@Value("${workDir}") final String workDir, @Value("${keepFileCopiesInDays}") final Integer keepFileCopiesInDays) {
         try {
             this.photosDir = Files.createDirectories(Path.of(workDir, "photos"));
             this.inboxDir = Path.of(workDir, "inbox");
@@ -28,6 +31,11 @@ public class WorkDir {
         } catch (final IOException e) {
             throw new RuntimeException("Unable to create working directories", e);
         }
+        this.keepFileCopiesInDays = Objects.requireNonNullElse(keepFileCopiesInDays, KEEP_FILE_COPIES_IN_DAYS_DEFAULT);
+    }
+
+    public WorkDir(@Value("${workDir}") final String workDir) {
+        this(workDir, null);
     }
 
     public Path getPhotosDir() {
@@ -52,5 +60,9 @@ public class WorkDir {
 
     public Path getInboxRejectedDir() {
         return inboxRejectedDir;
+    }
+
+    public int getKeepFileCopiesInDays() {
+        return keepFileCopiesInDays;
     }
 }
