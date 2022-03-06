@@ -27,7 +27,7 @@ openApiValidate {
 ext {
 	springVersion = '2.6.4'
 	testContainersVersion = '1.16.3'
-	jacksonVersion = '2.13.1'
+	jacksonVersion = '2.13.2'
 	jdbiVersion = '3.27.2'
 	swaggerRequestValidatorVersion = '2.26.2'
 }
