@@ -2,6 +2,10 @@ package org.railwaystations.rsapi.core.model;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,11 +24,11 @@ public class Photo {
     private final Station.Key stationKey;
     private final String urlPath;
     private final User photographer;
-    private final Long createdAt;
+    private final Instant createdAt;
     private final String license;
     private final String licenseUrl;
 
-    public Photo(final Station.Key stationKey, final String urlPath, final User photographer, final Long createdAt, final String license) {
+    public Photo(final Station.Key stationKey, final String urlPath, final User photographer, final Instant createdAt, final String license) {
         this.stationKey = stationKey;
         this.urlPath = urlPath;
         this.photographer = photographer;
@@ -34,7 +38,7 @@ public class Photo {
     }
 
     public Photo(final Country country, final String stationId, final User user, final String extension) {
-        this(new Station.Key(country.getCode(), stationId), "/" + country.getCode() + "/" + stationId + "." + extension, user, System.currentTimeMillis(), getLicense(user.getLicense(), country));
+        this(new Station.Key(country.getCode(), stationId), "/" + country.getCode() + "/" + stationId + "." + extension, user, Instant.now(), getLicense(user.getLicense(), country));
     }
 
 
@@ -58,7 +62,7 @@ public class Photo {
         return licenseUrl;
     }
 
-    public Long getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 

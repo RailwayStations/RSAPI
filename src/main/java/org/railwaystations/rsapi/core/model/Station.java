@@ -3,6 +3,9 @@ package org.railwaystations.rsapi.core.model;
 import com.fasterxml.jackson.annotation.*;
 
 import java.beans.ConstructorProperties;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -40,8 +43,8 @@ public class Station {
     @JsonProperty
     private String licenseUrl;
 
-    @JsonProperty
-    private Long createdAt;
+    @JsonIgnore
+    private Instant createdAt;
 
     @JsonProperty
     private boolean active;
@@ -164,8 +167,19 @@ public class Station {
         return photographerUrl;
     }
 
-    public Long getCreatedAt() {
+    @JsonIgnore
+    public Instant getCreatedAt() {
         return createdAt;
+    }
+
+    @JsonGetter("createdAt")
+    private Long getCreatedAtEpochMilli() {
+        return createdAt != null ? createdAt.toEpochMilli() : null;
+    }
+
+    @JsonSetter("createdAt")
+    private void setCreatedAtEpochMilli(final Long time) {
+        this.createdAt = time != null ? Instant.ofEpochMilli(time) : null;
     }
 
     public boolean isActive() {

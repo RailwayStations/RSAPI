@@ -574,4 +574,18 @@
         <renameColumn tableName="photos" oldColumnName="url" newColumnName="urlPath" columnDataType="varchar(255)"/>
     </changeSet>
 
+    <changeSet id="34" author="pstorch">
+        <renameColumn tableName="photos" oldColumnName="createdAt" newColumnName="createdAtOld" columnDataType="long"/>
+        <addColumn tableName="photos">
+            <column name="createdAt" type="datetime" valueComputed="from_unixtime(createdAtOld/1000)"/>
+        </addColumn>
+        <dropColumn tableName="photos" columnName="createdAtOld"/>
+
+        <renameColumn tableName="inbox" oldColumnName="createdAt" newColumnName="createdAtOld" columnDataType="long"/>
+        <addColumn tableName="inbox">
+            <column name="createdAt" type="datetime" valueComputed="from_unixtime(createdAtOld/1000)"/>
+        </addColumn>
+        <dropColumn tableName="inbox" columnName="createdAtOld"/>
+    </changeSet>
+
 </databaseChangeLog>
