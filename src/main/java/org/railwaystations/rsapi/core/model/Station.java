@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.*;
 
 import java.beans.ConstructorProperties;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

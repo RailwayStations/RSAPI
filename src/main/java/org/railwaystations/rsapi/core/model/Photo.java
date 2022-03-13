@@ -3,9 +3,6 @@ package org.railwaystations.rsapi.core.model;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 
