@@ -1,9 +1,8 @@
 package org.railwaystations.rsapi.core.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
+
+import java.time.Instant;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -29,8 +28,7 @@ public class InboxEntry extends PublicInboxEntry {
     @JsonProperty
     private String rejectReason;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Long createdAt;
+    private Instant createdAt;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private boolean done;
@@ -77,7 +75,7 @@ public class InboxEntry extends PublicInboxEntry {
     public InboxEntry(final int id, final String countryCode, final String stationId, final String title,
                       final Coordinates coordinates, final int photographerId, final String photographerNickname, final String photographerEmail,
                       final String extension, final String comment, final String rejectReason,
-                      final Long createdAt, final boolean done, final Command command, final boolean hasPhoto,
+                      final Instant createdAt, final boolean done, final Command command, final boolean hasPhoto,
                       final boolean conflict, final ProblemReportType problemReportType, final Boolean active,
                       final Long crc32, final boolean notified) {
         super(countryCode, stationId, title, coordinates);
@@ -107,7 +105,7 @@ public class InboxEntry extends PublicInboxEntry {
                       final String extension, final String comment, final ProblemReportType problemReportType,
                       final Boolean active) {
         this(0, countryCode, stationId, title, coordinates, photographerId, null, null, extension,
-                comment, null, System.currentTimeMillis(), false, null, false,
+                comment, null, Instant.now(), false, null, false,
                 false, problemReportType, active, null, false);
     }
 
@@ -164,7 +162,7 @@ public class InboxEntry extends PublicInboxEntry {
         this.rejectReason = rejectReason;
     }
 
-    public void setCreatedAt(final Long createdAt) {
+    public void setCreatedAt(final Instant createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -257,8 +255,14 @@ public class InboxEntry extends PublicInboxEntry {
         return rejectReason;
     }
 
-    public Long getCreatedAt() {
+    @JsonIgnore
+    public Instant getCreatedAt() {
         return createdAt;
+    }
+
+    @JsonGetter("createdAt")
+    private Long getCreatedAtEpochMilli() {
+        return createdAt != null ? createdAt.toEpochMilli() : null;
     }
 
     public boolean isDone() {

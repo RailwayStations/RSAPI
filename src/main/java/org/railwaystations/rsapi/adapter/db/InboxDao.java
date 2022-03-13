@@ -105,7 +105,7 @@ public interface InboxDao {
             return new InboxEntry(id, rs.getString(COUNTRY_CODE), rs.getString(STATION_ID), title,
                     coordinates, rs.getInt(PHOTOGRAPHER_ID), rs.getString("photographerNickname"), rs.getString("photographerEmail"),
                     extension, rs.getString("comment"), rs.getString("rejectReason"),
-                    rs.getLong("createdAt"), done, null, rs.getString("urlPath") != null,
+                    rs.getTimestamp("createdAt").toInstant(), done, null, rs.getString("urlPath") != null,
                     rs.getInt("conflict") > 0,
                     problemReportType != null ? ProblemReportType.valueOf(problemReportType) : null, active,
                     crc32, rs.getBoolean("notified"));
