@@ -60,7 +60,8 @@ import static org.mockito.ArgumentMatchers.matches;
 @ActiveProfiles("test")
 class RsapiApplicationTests {
 
-	private static final ObjectMapper MAPPER = new ObjectMapper();
+	@Autowired
+	private ObjectMapper mapper;
 
 	@LocalServerPort
 	private int port;
@@ -168,7 +169,7 @@ class RsapiApplicationTests {
 	@Test
 	public void stationsJson() throws IOException {
 		final ResponseEntity<String> response = loadRaw("/de/stations.json", 200, String.class);
-		final JsonNode jsonNode = MAPPER.readTree(response.getBody());
+		final JsonNode jsonNode = mapper.readTree(response.getBody());
 		assertThat(jsonNode, notNullValue());
 		assertThat(jsonNode.isArray(), is(true));
 		assertThat(jsonNode.size(), is(729));
@@ -217,8 +218,8 @@ class RsapiApplicationTests {
 
 	@Test
 	public void photographersDeJson() throws IOException {
-		final ResponseEntity<String> response = loadRaw(String.format("/de/%s.json", "photographers"), 200, String.class);
-		final JsonNode jsonNode = MAPPER.readTree(response.getBody());
+		final ResponseEntity<String> response = loadRaw("/de/photographers.json", 200, String.class);
+		final JsonNode jsonNode = mapper.readTree(response.getBody());
 		assertThat(jsonNode, notNullValue());
 		assertThat(jsonNode.isObject(), is(true));
 		assertThat(jsonNode.size(), is(4));
@@ -228,32 +229,6 @@ class RsapiApplicationTests {
 		assertThat(jsonNode.get("@user0").asInt(), is(9));
 	}
 
-	@Test
-	public void photographersAllJson() throws IOException {
-		final ResponseEntity<String> response = loadRaw("/photographers.json", 200, String.class);
-		final JsonNode jsonNode = MAPPER.readTree(response.getBody());
-		assertThat(jsonNode, notNullValue());
-		assertThat(jsonNode.size(), is(6));
-		assertThat(jsonNode.get("@user27").asInt(), is(31));
-		assertThat(jsonNode.get("@user8").asInt(), is(29));
-		assertThat(jsonNode.get("@user10").asInt(), is(15));
-		assertThat(jsonNode.get("@user0").asInt(), is(9));
-		assertThat(jsonNode.get("@user2").asInt(), is(6));
-		assertThat(jsonNode.get("@user4").asInt(), is(1));
-	}
-
-	@Test
-	public void photographersTxt() {
-		final ResponseEntity<String> response = loadRaw("/de/photographers.txt", 200, String.class);
-		assertThat(response.getBody(), is("""
-					count	photographer
-					31	@user27
-					29	@user8
-					15	@user10
-					9	@user0
-					"""));
-	}
-
 	private Station getStationDe6932() {
 		return loadRaw("/de/stations/6932", 200, Station.class).getBody();
 	}
@@ -261,7 +236,7 @@ class RsapiApplicationTests {
 	@Test
 	public void statisticDeJson() throws IOException {
 		final ResponseEntity<String> response = loadRaw("/de/stats.json", 200, String.class);
-		final JsonNode jsonNode = MAPPER.readTree(response.getBody());
+		final JsonNode jsonNode = mapper.readTree(response.getBody());
 		assertThat(jsonNode, notNullValue());
 		assertThat(jsonNode.get("total").asInt(), is(729));
 		assertThat(jsonNode.get("withPhoto").asInt(), is(84));
@@ -278,12 +253,13 @@ class RsapiApplicationTests {
 		final ResponseEntity<String> response = restTemplate.postForEntity(
 				String.format("http://localhost:%d%s", port, "/registration"), new HttpEntity<>("""
 						{
-						\t"nickname": "nickname ",\s
-						\t"email": "nick.name@example.com",\s
-						\t"license": "CC0",
-						\t"photoOwner": true,\s
-						\t"link": ""
-						}""", headers), String.class);
+						"nickname": "nickname ",
+						"email": "nick.name@example.com",
+						"license": "CC0",
+						"photoOwner": true,
+						"link": ""
+						}
+						""", headers), String.class);
 
 		assertThat(response.getStatusCodeValue(), is(202));
 
@@ -356,7 +332,7 @@ class RsapiApplicationTests {
 				String.format("http://localhost:%d%s", port, "/photoUpload"), request, String.class);
 
 		assertThat(response.getStatusCodeValue(), is(202));
-		final JsonNode inboxResponse = MAPPER.readTree(response.getBody());
+		final JsonNode inboxResponse = mapper.readTree(response.getBody());
 		assertThat(inboxResponse.get("id"), notNullValue());
 		assertThat(inboxResponse.get("filename"), notNullValue());
 		assertThat(inboxResponse.get("crc32").asLong(), is(312729961L));
@@ -450,7 +426,7 @@ class RsapiApplicationTests {
 				.getForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), String.class);
 
 		assertThat(response.getStatusCodeValue(), is(200));
-		final JsonNode jsonNode = MAPPER.readTree(response.getBody());
+		final JsonNode jsonNode = mapper.readTree(response.getBody());
 		assertThat(jsonNode, notNullValue());
 		assertThat(jsonNode.isArray(), is(true));
 	}
@@ -464,13 +440,13 @@ class RsapiApplicationTests {
 				.postForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), new HttpEntity<>("{\"id\": -1, \"command\": \"IMPORT\"}", headers), String.class);
 
 		assertThat(response.getStatusCodeValue(), is(400));
-		final JsonNode jsonNode = MAPPER.readTree(response.getBody());
+		final JsonNode jsonNode = mapper.readTree(response.getBody());
 		assertThat(jsonNode.get("status").asInt(), is(400));
 		assertThat(jsonNode.get("message").asText(), is("No pending inbox entry found"));
 	}
 
 	private void assertProfile(final ResponseEntity<String> response, final String name, final String link, final boolean anonymous, final String email) throws IOException {
-		final JsonNode jsonNode = MAPPER.readTree(response.getBody());
+		final JsonNode jsonNode = mapper.readTree(response.getBody());
 		assertThat(jsonNode.get("nickname").asText(), is(name));
 		if (email != null) {
 			assertThat(jsonNode.get("email").asText(), is(email));
@@ -534,7 +510,7 @@ class RsapiApplicationTests {
 			changePasswordRequest = new HttpEntity<>(headers);
 		} else {
 			headers.setContentType(MediaType.APPLICATION_JSON);
-			final ObjectNode changePassword = MAPPER.createObjectNode();
+			final ObjectNode changePassword = mapper.createObjectNode();
 			changePassword.set("newPassword", new TextNode(newPassword));
 			changePasswordRequest = new HttpEntity<>(changePassword, headers);
 		}
@@ -556,7 +532,7 @@ class RsapiApplicationTests {
 	@ValueSource(strings = {"/countries", "/countries.json"})
 	public void countries(final String path) throws IOException {
 		final ResponseEntity<String> response = loadRaw(path, 200, String.class);
-		final JsonNode jsonNode = MAPPER.readTree(response.getBody());
+		final JsonNode jsonNode = mapper.readTree(response.getBody());
 		assertThat(jsonNode, notNullValue());
 		assertThat(jsonNode.isArray(), is(true));
 		assertThat(jsonNode.size(), is(2));
@@ -591,7 +567,7 @@ class RsapiApplicationTests {
 	@ValueSource(strings = {"/countries", "/countries.json"})
 	public void countriesAll(final String path) throws IOException {
 		final ResponseEntity<String> response = loadRaw(path + "?onlyActive=false", 200, String.class);
-		final JsonNode jsonNode = MAPPER.readTree(response.getBody());
+		final JsonNode jsonNode = mapper.readTree(response.getBody());
 		assertThat(jsonNode, notNullValue());
 		assertThat(jsonNode.isArray(), is(true));
 		assertThat(jsonNode.size(), is(4));

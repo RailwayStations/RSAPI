@@ -29,7 +29,7 @@ class StatisticResourceTest {
     private PhotoStationsService photoStationsService;
 
     @Test
-    void whenPathVariableIsInvalid_thenReturnsStatus400() throws Exception {
+    void whenCountryIsInvalidThenReturnsStatus400() throws Exception {
         mvc.perform(get("/x/stats"))
                 .andExpect(status().isBadRequest());
     }

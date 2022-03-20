@@ -31,7 +31,7 @@ public class PhotographersTxtWriter extends AbstractHttpMessageConverter<Map<Str
     }
 
     @Override
-    protected Map<String, Long> readInternal(@NonNull final Class<? extends Map<String, Long>> clazz, @NonNull final HttpInputMessage inputMessage) throws HttpMessageNotReadableException {
+    protected @NonNull Map<String, Long> readInternal(@NonNull final Class<? extends Map<String, Long>> clazz, @NonNull final HttpInputMessage inputMessage) throws HttpMessageNotReadableException {
         throw new HttpMessageNotReadableException("read not supported", inputMessage);
     }
 
@@ -40,7 +40,9 @@ public class PhotographersTxtWriter extends AbstractHttpMessageConverter<Map<Str
             throws IOException, HttpMessageNotWritableException {
         try (final PrintWriter pw = new PrintWriter(new OutputStreamWriter(outputMessage.getBody(), StandardCharsets.UTF_8))) {
             pw.println("count\tphotographer");
-            stringLongMap.entrySet().forEach(photographer -> photographerToCsv(pw, photographer));
+            stringLongMap.entrySet().stream()
+                    .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                    .forEach(photographer -> photographerToCsv(pw, photographer));
             pw.flush();
         }
     }
