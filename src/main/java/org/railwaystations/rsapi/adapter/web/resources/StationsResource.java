@@ -30,8 +30,6 @@ public class StationsResource {
     private static final String ACTIVE = "active";
     private static final String SINCE_HOURS = "sinceHours";
 
-    private static final int HOURS_IN_MILLIS = 1000 * 60 * 60;
-
     private final PhotoStationsService photoStationsService;
 
     public StationsResource(final PhotoStationsService photoStationsService) {

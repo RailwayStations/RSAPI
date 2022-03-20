@@ -1,59 +1,85 @@
 package org.railwaystations.rsapi.adapter.web.resources;
 
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.railwaystations.rsapi.adapter.db.CountryDao;
+import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice;
 import org.railwaystations.rsapi.core.model.Country;
 import org.railwaystations.rsapi.core.model.ProviderApp;
 import org.railwaystations.rsapi.core.services.CountryService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@WebMvcTest(controllers = CountriesResource.class)
+@ContextConfiguration(classes={WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class, CountryService.class})
+@AutoConfigureMockMvc(addFilters = false)
 public class CountriesResourceTest {
 
-    @Test
-    public void testList() {
-        final CountryDao countryDao = Mockito.mock(CountryDao.class);
-        final Set<Country> countryList = new HashSet<>();
+    @Autowired
+    private MockMvc mvc;
 
-        final Country xy = new Country("xy", "nameXY", "emailXY", "twitterXY", "timetableXY", "overrideLicenseXY", true);
-        xy.getProviderApps().add(new ProviderApp("android", "Provider XY", "providerAndroidAppXY"));
-        xy.getProviderApps().add(new ProviderApp("ios", "Provider XY", "providerIosAppXY"));
-        xy.getProviderApps().add(new ProviderApp("web", "Provider XY", "providerWebAppXY"));
-        countryList.add(xy);
+    @MockBean
+    private CountryDao countryDao;
 
-        final Country ab = new Country("ab", "nameAB", "emailAB", "twitterAB", "timetableAB", "overrideLicenseAB", true);
-        ab.getProviderApps().add(new ProviderApp("android", "Provider AB", "providerAndroidAppAB"));
-        ab.getProviderApps().add(new ProviderApp("ios", "Provider AB", "providerIosAppAB"));
-        ab.getProviderApps().add(new ProviderApp("web", "Provider AB", "providerWebAppAB"));
-        countryList.add(ab);
-        Mockito.when(countryDao.list(true)).thenReturn(countryList);
+    @Autowired
+    private ObjectMapper objectMapper;
 
-        final CountriesResource resource = new CountriesResource(new CountryService(countryDao));
+    @ParameterizedTest
+    @ValueSource(strings = {"/countries", "/countries.json"})
+    public void testList(final String urlTemplate) throws Exception {
+        when(countryDao.list(true)).thenReturn(createCountryList());
 
-        final Collection<Country> countries = resource.list(null);
+        final String contentAsString = mvc.perform(get(urlTemplate))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        final List<Country> countries = objectMapper.readerForListOf(Country.class).readValue(contentAsString);
         assertThat(countries.size(), equalTo(2));
         countries.forEach(this::assertCountry);
     }
 
+    @NotNull
+    private Set<Country> createCountryList() {
+        return Set.of(createCountry("xy"), createCountry("ab"));
+    }
+
+    @NotNull
+    private Country createCountry(final String code) {
+        final Country xy = new Country(code, "name-" + code, "email-" + code, "twitter-" + code, "timetable-" + code, "overrideLicense-" + code, true);
+        xy.getProviderApps().add(new ProviderApp("android", "Provider-" + code, "providerAndroidApp-" + code));
+        xy.getProviderApps().add(new ProviderApp("ios", "Provider-" + code, "providerIosApp-" + code));
+        xy.getProviderApps().add(new ProviderApp("web", "Provider-" + code, "providerWebApp-" + code));
+        return xy;
+    }
+
     private void assertCountry(final Country country) {
-        assertThat(country.getName(), equalTo("name" + country.getCode().toUpperCase()));
-        assertThat(country.getEmail(), equalTo("email" + country.getCode().toUpperCase()));
-        assertThat(country.getTwitterTags(), equalTo("twitter" + country.getCode().toUpperCase()));
-        assertThat(country.getTimetableUrlTemplate(), equalTo("timetable" + country.getCode().toUpperCase()));
-        assertThat(country.getOverrideLicense(), equalTo("overrideLicense" + country.getCode().toUpperCase()));
+        assertThat(country.getName(), equalTo("name-" + country.getCode()));
+        assertThat(country.getEmail(), equalTo("email-" + country.getCode()));
+        assertThat(country.getTwitterTags(), equalTo("twitter-" + country.getCode()));
+        assertThat(country.getTimetableUrlTemplate(), equalTo("timetable-" + country.getCode()));
+        assertThat(country.getOverrideLicense(), equalTo("overrideLicense-" + country.getCode()));
         assertThat(country.getProviderApps().size(), equalTo(3));
         country.getProviderApps().forEach(app -> {
             switch (app.getType()) {
-                case "android" -> assertThat(app.getUrl(), equalTo("providerAndroidApp" + country.getCode().toUpperCase()));
-                case "ios" -> assertThat(app.getUrl(), equalTo("providerIosApp" + country.getCode().toUpperCase()));
-                case "web" -> assertThat(app.getUrl(), equalTo("providerWebApp" + country.getCode().toUpperCase()));
+                case "android" -> assertThat(app.getUrl(), equalTo("providerAndroidApp-" + country.getCode()));
+                case "ios" -> assertThat(app.getUrl(), equalTo("providerIosApp-" + country.getCode()));
+                case "web" -> assertThat(app.getUrl(), equalTo("providerWebApp-" + country.getCode()));
                 default -> fail("unknown app type");
             }
         });

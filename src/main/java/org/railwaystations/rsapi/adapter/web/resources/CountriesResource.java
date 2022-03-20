@@ -19,14 +19,9 @@ public class CountriesResource {
         this.countryService = countryService;
     }
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/countries")
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = {"/countries", "/countries.json"})
     public Collection<Country> list(@RequestParam(value = ONLY_ACTIVE, required = false) final Boolean onlyActive) {
         return countryService.list(onlyActive);
-    }
-
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/countries.json")
-    public Collection<Country> listJson(@RequestParam(value = "onlyActive", required = false) final Boolean onlyActive) {
-        return list(onlyActive);
     }
 
 }

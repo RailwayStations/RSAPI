@@ -259,18 +259,6 @@ class RsapiApplicationTests {
 	}
 
 	@Test
-	public void statisticAllJson() throws IOException {
-		final ResponseEntity<String> response = loadRaw("/stats.json", 200, String.class);
-		final JsonNode jsonNode = MAPPER.readTree(response.getBody());
-		assertThat(jsonNode, notNullValue());
-		assertThat(jsonNode.get("total").asInt(), is(954));
-		assertThat(jsonNode.get("withPhoto").asInt(), is(91));
-		assertThat(jsonNode.get("withoutPhoto").asInt(), is(863));
-		assertThat(jsonNode.get("photographers").asInt(), is(6));
-		assertThat(jsonNode.get("countryCode").isNull(), is(true));
-	}
-
-	@Test
 	public void statisticDeJson() throws IOException {
 		final ResponseEntity<String> response = loadRaw("/de/stats.json", 200, String.class);
 		final JsonNode jsonNode = MAPPER.readTree(response.getBody());
@@ -280,20 +268,6 @@ class RsapiApplicationTests {
 		assertThat(jsonNode.get("withoutPhoto").asInt(), is(645));
 		assertThat(jsonNode.get("photographers").asInt(), is(4));
 		assertThat(jsonNode.get("countryCode").asText(), is("de"));
-	}
-
-	@Test
-	public void statisticDeTxt() {
-		final ResponseEntity<String> response = loadRaw("/de/stats.txt", 200, String.class);
-		assertThat(response.getBody(), is(
-      				"""
-						name	value
-						total	729
-						withPhoto	84
-						withoutPhoto	645
-						photographers	4
-						countryCode	de
-							"""));
 	}
 
 	@Test
