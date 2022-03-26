@@ -53,7 +53,7 @@ dependencies {
 	implementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
 	implementation "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
 	implementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
-	runtimeOnly "org.mariadb.jdbc:mariadb-java-client:2.7.5"
+	runtimeOnly "org.mariadb.jdbc:mariadb-java-client:3.0.4"
 	testImplementation "org.springframework.boot:spring-boot-starter-test:$springVersion"
 	testImplementation "org.springframework.security:spring-security-test:5.6.2"
 	testImplementation "org.awaitility:awaitility:4.2.0"
