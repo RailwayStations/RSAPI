@@ -25,17 +25,17 @@ public class StatisticResource {
     }
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE}, value = "/stats")
-    public Statistic get(@Nullable @RequestParam(StatisticResource.COUNTRY) @Size(min = 2, max = 2) final String country) {
+    public Statistic get(@Nullable @RequestParam(value = StatisticResource.COUNTRY, required = false) @Size(min = 2, max = 2) final String country) {
         return getWithCountry(country);
     }
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE}, value = "/stats.json")
-    public Statistic getAsJson(@Nullable @RequestParam(StatisticResource.COUNTRY) @Size(min = 2, max = 2) final String country) {
+    public Statistic getAsJson(@Nullable @RequestParam(value = StatisticResource.COUNTRY, required = false) @Size(min = 2, max = 2) final String country) {
         return getWithCountry(country);
     }
 
     @GetMapping(produces = {MediaType.TEXT_PLAIN_VALUE}, value = "/stats.txt")
-    public Statistic getAsText(@Nullable @RequestParam(StatisticResource.COUNTRY) @Size(min = 2, max = 2) final String country) {
+    public Statistic getAsText(@Nullable @RequestParam(value = StatisticResource.COUNTRY, required = false) @Size(min = 2, max = 2) final String country) {
         return getWithCountry(country);
     }
 

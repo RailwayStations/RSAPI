@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.Set;
 
+import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -47,6 +48,7 @@ public class CountriesResourceTest {
 
         final String contentAsString = mvc.perform(get(urlTemplate))
                 .andExpect(status().isOk())
+                .andExpect(openApi().isValid("static/openapi.yaml"))
                 .andReturn().getResponse().getContentAsString();
 
         final List<Country> countries = objectMapper.readerForListOf(Country.class).readValue(contentAsString);

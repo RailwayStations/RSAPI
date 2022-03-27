@@ -12,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -31,6 +32,7 @@ class StatisticResourceTest {
     @Test
     void whenCountryIsInvalidThenReturnsStatus400() throws Exception {
         mvc.perform(get("/x/stats"))
+                .andExpect(openApi().isValid("static/openapi.yaml"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -40,6 +42,7 @@ class StatisticResourceTest {
 
         mvc.perform(get("/stats.json"))
                 .andExpect(status().isOk())
+                .andExpect(openApi().isValid("static/openapi.yaml"))
                 .andExpect(jsonPath("$.total").value(954))
                 .andExpect(jsonPath("$.withPhoto").value(91))
                 .andExpect(jsonPath("$.withoutPhoto").value(863))
@@ -53,6 +56,7 @@ class StatisticResourceTest {
 
         mvc.perform(get("/de/stats.json"))
                 .andExpect(status().isOk())
+                .andExpect(openApi().isValid("static/openapi.yaml"))
                 .andExpect(jsonPath("$.total").value(729))
                 .andExpect(jsonPath("$.withPhoto").value(84))
                 .andExpect(jsonPath("$.withoutPhoto").value(645))
@@ -66,6 +70,7 @@ class StatisticResourceTest {
 
         mvc.perform(get("/de/stats.txt"))
                 .andExpect(status().isOk())
+                .andExpect(openApi().isValid("static/openapi.yaml"))
                 .andExpect(content().string(is("""
                       name	value
                       total	729

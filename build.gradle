@@ -62,6 +62,7 @@ dependencies {
 	testImplementation "org.testcontainers:mariadb:$testContainersVersion"
 	testImplementation "com.atlassian.oai:swagger-request-validator-core:$swaggerRequestValidatorVersion"
 	testImplementation "com.atlassian.oai:swagger-request-validator-springmvc:$swaggerRequestValidatorVersion"
+	testImplementation "com.atlassian.oai:swagger-request-validator-mockmvc:$swaggerRequestValidatorVersion"
 }
 
 test {

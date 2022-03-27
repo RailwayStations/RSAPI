@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Map;
 
+import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -37,6 +38,7 @@ class PhotographersResourceTest {
             "/x/photographers.txt", "/xyz/photographers.txt", "/photographers.txt?country=x", "/photographers.txt?country=xyz"})
     void whenCountryIsInvalidThenReturnsStatus400(final String urlTemplate) throws Exception {
         mvc.perform(get(urlTemplate))
+                .andExpect(openApi().isValid("static/openapi.yaml"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -50,7 +52,8 @@ class PhotographersResourceTest {
                 .andExpect(jsonPath("$.@user27").value(31))
                 .andExpect(jsonPath("$.@user8").value(29))
                 .andExpect(jsonPath("$.@user10").value(15))
-                .andExpect(jsonPath("$.@user0").value(9));
+                .andExpect(jsonPath("$.@user0").value(9))
+                .andExpect(openApi().isValid("static/openapi.yaml"));
     }
 
     @ParameterizedTest
@@ -63,7 +66,8 @@ class PhotographersResourceTest {
                 .andExpect(jsonPath("$.@user27").value(31))
                 .andExpect(jsonPath("$.@user8").value(29))
                 .andExpect(jsonPath("$.@user10").value(15))
-                .andExpect(jsonPath("$.@user0").value(9));
+                .andExpect(jsonPath("$.@user0").value(9))
+                .andExpect(openApi().isValid("static/openapi.yaml"));
     }
 
     @ParameterizedTest
@@ -73,6 +77,7 @@ class PhotographersResourceTest {
 
         mvc.perform(get(urlTemplate))
                 .andExpect(status().isOk())
+                .andExpect(openApi().isValid("static/openapi.yaml"))
                 .andExpect(content().string(is("""
 					count	photographer
 					31	@user27

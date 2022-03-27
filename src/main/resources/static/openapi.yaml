@@ -219,6 +219,57 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Photographers'
+        400:
+          description: Bad Request
+          content: {}
+        404:
+          description: Country not found
+          content: {}
+  /{country}/photographers.txt:
+    get:
+      summary: List of all photographers of a given country with their number of photos
+        taken
+      parameters:
+        - name: country
+          in: path
+          description: filter by country code
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Photographers'
+        400:
+          description: Bad Request
+          content: {}
+        404:
+          description: Country not found
+          content: {}
+  /{country}/photographers.json:
+    get:
+      summary: List of all photographers of a given country with their number of photos
+        taken
+      parameters:
+        - name: country
+          in: path
+          description: filter by country code
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Photographers'
+        400:
+          description: Bad Request
+          content: {}
         404:
           description: Country not found
           content: {}
@@ -235,6 +286,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Photographers'
+        400:
+          description: Bad Request
+          content: {}
+  /photographers.json:
+    get:
+      summary: List of all photographers with their number of photos taken
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Photographers'
+        400:
+          description: Bad Request
+          content: {}
+  /photographers.txt:
+    get:
+      summary: List of all photographers with their number of photos taken
+      responses:
+        200:
+          description: successful operation
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Photographers'
+        400:
+          description: Bad Request
+          content: {}
   /{country}/stats:
     get:
       summary: Statistic of photos with and without photos by country
@@ -255,12 +335,67 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Statistic'
+        400:
+          description: Bad Request
+          content: {}
+        404:
+          description: Country not found
+          content: {}
+  /{country}/stats.json:
+    get:
+      summary: Statistic of photos with and without photos by country
+      parameters:
+        - name: country
+          in: path
+          description: filter by country code
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Statistic'
+        400:
+          description: Bad Request
+          content: {}
+        404:
+          description: Country not found
+          content: {}
+  /{country}/stats.txt:
+    get:
+      summary: Statistic of photos with and without photos by country
+      parameters:
+        - name: country
+          in: path
+          description: filter by country code
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Statistic'
+        400:
+          description: Bad Request
+          content: {}
         404:
           description: Country not found
           content: {}
   /stats:
     get:
       summary: Overall statistic of photos with and without photos
+      parameters:
+        - name: country
+          in: query
+          description: filter by country code
+          schema:
+            type: string
       responses:
         200:
           description: successful operation
@@ -274,7 +409,63 @@ paths:
         404:
           description: Country not found
           content: {}
+  /stats.json:
+    get:
+      summary: Overall statistic of photos with and without photos
+      parameters:
+        - name: country
+          in: query
+          description: filter by country code
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Statistic'
+        404:
+          description: Country not found
+          content: {}
+  /stats.txt:
+    get:
+      summary: Overall statistic of photos with and without photos
+      parameters:
+        - name: country
+          in: query
+          description: filter by country code
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Statistic'
+        404:
+          description: Country not found
+          content: {}
   /countries:
+    get:
+      summary: List of all supported countries with their configuration
+      parameters:
+        - name: onlyActive
+          in: query
+          description: return only active countries? Defaults to true.
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Country'
+  /countries.json:
     get:
       summary: List of all supported countries with their configuration
       parameters:
@@ -920,6 +1111,7 @@ components:
           format: int64
         countryCode:
           type: string
+          nullable: true
       description: Statistic of number of stations with and without photos
     Country:
       type: object
