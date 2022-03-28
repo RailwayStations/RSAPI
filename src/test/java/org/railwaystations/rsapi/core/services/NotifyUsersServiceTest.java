@@ -5,11 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.railwaystations.rsapi.adapter.db.InboxDao;
-import org.railwaystations.rsapi.adapter.db.UserDao;
+import org.railwaystations.rsapi.adapter.out.db.InboxDao;
+import org.railwaystations.rsapi.adapter.out.db.UserDao;
 import org.railwaystations.rsapi.core.model.InboxEntry;
 import org.railwaystations.rsapi.core.model.User;
-import org.railwaystations.rsapi.core.ports.Mailer;
+import org.railwaystations.rsapi.core.ports.out.Mailer;
 
 import java.util.List;
 import java.util.Optional;

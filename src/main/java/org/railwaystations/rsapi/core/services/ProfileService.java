@@ -2,10 +2,11 @@ package org.railwaystations.rsapi.core.services;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.railwaystations.rsapi.adapter.db.UserDao;
+import org.railwaystations.rsapi.adapter.out.db.UserDao;
 import org.railwaystations.rsapi.core.model.User;
-import org.railwaystations.rsapi.core.ports.Mailer;
-import org.railwaystations.rsapi.core.ports.Monitor;
+import org.railwaystations.rsapi.core.ports.in.ManageProfileUseCase;
+import org.railwaystations.rsapi.core.ports.out.Mailer;
+import org.railwaystations.rsapi.core.ports.out.Monitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +18,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class ProfileService {
+public class ProfileService implements ManageProfileUseCase {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProfileService.class);
 
@@ -35,6 +36,7 @@ public class ProfileService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Override
     public void changePassword(final User user, final String newPassword) {
         LOG.info("Password change for '{}'", user.getEmail());
         final String trimmedPassword = StringUtils.trimToEmpty(newPassword);
@@ -44,6 +46,7 @@ public class ProfileService {
         userDao.updateCredentials(user.getId(), passwordEncoder.encode(trimmedPassword));
     }
 
+    @Override
     public User resetPassword(final String nameOrEmail, final String clientInfo) {
         LOG.info("Password reset requested for '{}'", nameOrEmail);
         final User user = userDao.findByEmail(User.normalizeEmail(nameOrEmail))
@@ -73,6 +76,7 @@ public class ProfileService {
         return user;
     }
 
+    @Override
     public void register(final User newUser, final String clientInfo) throws ProfileConflictException {
         LOG.info("New registration for '{}' with '{}'", newUser.getName(), newUser.getEmail());
 
@@ -126,6 +130,7 @@ public class ProfileService {
         user.setKey(passwordEncoder.encode(user.getNewPassword()));
     }
 
+    @Override
     public void updateProfile(final User user, final User newProfile, final String clientInfo) throws ProfileConflictException {
         LOG.info("Update profile for '{}'", user.getEmail());
 
@@ -163,6 +168,7 @@ public class ProfileService {
         userDao.update(newProfile);
     }
 
+    @Override
     public void resendEmailVerification(final User user) {
         LOG.info("Resend EmailVerification for '{}'", user.getEmail());
         user.setEmailVerificationToken(UUID.randomUUID().toString());
@@ -170,6 +176,7 @@ public class ProfileService {
         sendEmailVerification(user);
     }
 
+    @Override
     public Optional<User> emailVerification(final String token) {
         final Optional<User> userByToken = userDao.findByEmailVerification(User.EMAIL_VERIFICATION_TOKEN + token);
         if (userByToken.isPresent()) {
@@ -182,30 +189,42 @@ public class ProfileService {
     }
 
     private void sendPasswordMail(@NotNull final User user) {
-        final String text = String.format("Hello,%n%n" +
-                        "your new password is: %1$s%n%n" +
-                        "Cheers%n" +
-                        "Your Railway-Stations-Team%n" +
-                        "%n---%n" +
-                        "Hallo,%n%n" +
-                        "Dein neues Passwort lautet: %1$s%n%n" +
-                        "Viele Grüße%n" +
-                        "Dein Bahnhofsfoto-Team", user.getNewPassword());
+        final String text = String.format("""
+                        Hello,
+                        
+                        your new password is: %1$s
+                        
+                        Cheers
+                        Your Railway-Stations-Team
+                        
+                        ---
+                        Hallo,
+                        
+                        Dein neues Passwort lautet: %1$s
+                        
+                        Viele Grüße
+                        Dein Bahnhofsfoto-Team""", user.getNewPassword());
         mailer.send(user.getEmail(), "Railway-Stations.org new password", text);
         LOG.info("Password sent to {}", user.getEmail());
     }
 
     private void sendEmailVerification(@NotNull final User user) {
         final String url = eMailVerificationUrl + user.getEmailVerificationToken();
-        final String text = String.format("Hello,%n%n" +
-                        "please click on %1$s to verify your eMail-Address.%n%n" +
-                        "Cheers%n" +
-                        "Your Railway-Stations-Team%n" +
-                        "%n---%n" +
-                        "Hallo,%n%n" +
-                        "bitte klicke auf %1$s, um Deine eMail-Adresse zu verifizieren%n%n" +
-                        "Viele Grüße%n" +
-                        "Dein Bahnhofsfoto-Team", url);
+        final String text = String.format("""
+                        Hello,
+                        
+                        please click on %1$s to verify your eMail-Address.
+                        
+                        Cheers
+                        Your Railway-Stations-Team
+                        
+                        ---
+                        Hallo,
+                        
+                        bitte klicke auf %1$s, um Deine eMail-Adresse zu verifizieren.
+                        
+                        Viele Grüße
+                        Dein Bahnhofsfoto-Team""", url);
         mailer.send(user.getEmail(), "Railway-Stations.org eMail verification", text);
         LOG.info("Email verification sent to {}", user.getEmail());
     }
@@ -213,14 +232,6 @@ public class ProfileService {
     private void saveRegistration(final User registration) {
         final Integer id = userDao.insert(registration);
         LOG.info("User '{}' created with id {}", registration.getName(), id);
-    }
-
-    public static class ProfileConflictException extends Exception {
-
-        public ProfileConflictException(final String message) {
-            super(message);
-        }
-
     }
 
 }

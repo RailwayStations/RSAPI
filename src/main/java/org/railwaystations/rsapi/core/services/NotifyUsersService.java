@@ -1,10 +1,10 @@
 package org.railwaystations.rsapi.core.services;
 
-import org.railwaystations.rsapi.adapter.db.InboxDao;
-import org.railwaystations.rsapi.adapter.db.UserDao;
+import org.railwaystations.rsapi.adapter.out.db.InboxDao;
+import org.railwaystations.rsapi.adapter.out.db.UserDao;
 import org.railwaystations.rsapi.core.model.InboxEntry;
 import org.railwaystations.rsapi.core.model.User;
-import org.railwaystations.rsapi.core.ports.Mailer;
+import org.railwaystations.rsapi.core.ports.out.Mailer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -16,8 +16,7 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.groupingBy;
 
 @Service
-@SuppressWarnings("PMD.BeanMembersShouldSerialize")
-public class NotifyUsersService {
+public class NotifyUsersService implements org.railwaystations.rsapi.core.ports.in.NotifyUsersUseCase {
 
     private static final Logger LOG = LoggerFactory.getLogger(NotifyUsersService.class);
 
@@ -32,6 +31,7 @@ public class NotifyUsersService {
         this.mailer = mailer;
     }
 
+    @Override
     public void notifyUsers() {
         final List<InboxEntry> entries = inboxDao.findInboxEntriesToNotify();
         entries.stream()

@@ -1,6 +1,6 @@
 package org.railwaystations.rsapi.app.auth;
 
-import org.railwaystations.rsapi.adapter.db.UserDao;
+import org.railwaystations.rsapi.adapter.out.db.UserDao;
 import org.railwaystations.rsapi.core.model.User;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;

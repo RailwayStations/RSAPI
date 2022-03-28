@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.railwaystations.rsapi.core.ports.Mailer;
+import org.railwaystations.rsapi.core.ports.out.Mailer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;

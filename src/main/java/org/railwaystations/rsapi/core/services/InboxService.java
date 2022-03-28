@@ -1,14 +1,15 @@
 package org.railwaystations.rsapi.core.services;
 
 import org.apache.commons.lang3.StringUtils;
-import org.railwaystations.rsapi.adapter.db.CountryDao;
-import org.railwaystations.rsapi.adapter.db.InboxDao;
-import org.railwaystations.rsapi.adapter.db.PhotoDao;
-import org.railwaystations.rsapi.adapter.db.UserDao;
+import org.railwaystations.rsapi.adapter.out.db.CountryDao;
+import org.railwaystations.rsapi.adapter.out.db.InboxDao;
+import org.railwaystations.rsapi.adapter.out.db.PhotoDao;
+import org.railwaystations.rsapi.adapter.out.db.UserDao;
 import org.railwaystations.rsapi.core.model.*;
-import org.railwaystations.rsapi.core.ports.MastodonBot;
-import org.railwaystations.rsapi.core.ports.Monitor;
-import org.railwaystations.rsapi.core.ports.PhotoStorage;
+import org.railwaystations.rsapi.core.ports.in.ManageInboxUseCase;
+import org.railwaystations.rsapi.core.ports.out.MastodonBot;
+import org.railwaystations.rsapi.core.ports.out.Monitor;
+import org.railwaystations.rsapi.core.ports.out.PhotoStorage;
 import org.railwaystations.rsapi.utils.ImageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class InboxService {
+public class InboxService implements ManageInboxUseCase {
 
     private static final Logger LOG = LoggerFactory.getLogger(InboxService.class);
 
@@ -52,6 +53,7 @@ public class InboxService {
         this.mastodonBot = mastodonBot;
     }
 
+    @Override
     public InboxResponse reportProblem(final ProblemReport problemReport, final User user, final String clientInfo) {
         if (!user.isEmailVerified()) {
             LOG.info("New problem report failed for user {}, email {} not verified", user.getName(), user.getEmail());
@@ -60,7 +62,7 @@ public class InboxService {
 
         LOG.info("New problem report: Nickname: {}; Country: {}; Station-Id: {}",
                 user.getName(), problemReport.getCountryCode(), problemReport.getStationId());
-        final Optional<Station> station = photoStationsService.findByCountryAndId(problemReport.getCountryCode(), problemReport.getStationId());
+        final var station = photoStationsService.findByCountryAndId(problemReport.getCountryCode(), problemReport.getStationId());
         if (station.isEmpty()) {
             return new InboxResponse(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA, "Station not found");
         }
@@ -70,7 +72,7 @@ public class InboxService {
         if (problemReport.getType() == null) {
             return new InboxResponse(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA, "Problem type is mandatory");
         }
-        final InboxEntry inboxEntry = new InboxEntry(problemReport.getCountryCode(), problemReport.getStationId(),
+        final var inboxEntry = new InboxEntry(problemReport.getCountryCode(), problemReport.getStationId(),
                 null, problemReport.getCoordinates(), user.getId(), null, problemReport.getComment(),
                 problemReport.getType(), null);
         monitor.sendMessage(String.format("New problem report for %s - %s:%s%n%s: %s%nby %s%nvia %s",
@@ -79,10 +81,12 @@ public class InboxService {
         return new InboxResponse(InboxResponse.InboxResponseState.REVIEW, inboxDao.insert(inboxEntry));
     }
 
+    @Override
     public List<PublicInboxEntry> publicInbox() {
         return inboxDao.findPublicInboxEntries();
     }
 
+    @Override
     public List<InboxStateQuery> userInbox(@NotNull final User user, @NotNull final List<InboxStateQuery> queries) {
         LOG.info("Query uploadStatus for Nickname: {}", user.getName());
 
@@ -129,15 +133,16 @@ public class InboxService {
         }
     }
 
+    @Override
     public List<InboxEntry> listAdminInbox(@NotNull final User user) {
         LOG.info("Load adminInbox for Nickname: {}", user.getName());
-        final List<InboxEntry> pendingInboxEntries = inboxDao.findPendingInboxEntries();
+        final var pendingInboxEntries = inboxDao.findPendingInboxEntries();
         pendingInboxEntries.forEach(this::updateInboxEntry);
         return pendingInboxEntries;
     }
 
     private void updateInboxEntry(final InboxEntry inboxEntry) {
-        final String filename = inboxEntry.getFilename();
+        final var filename = inboxEntry.getFilename();
         inboxEntry.isProcessed(photoStorage.isProcessed(filename));
         if (!inboxEntry.isProblemReport()) {
             inboxEntry.setInboxUrl(getInboxUrl(filename, inboxEntry.isProcessed()));
@@ -151,9 +156,10 @@ public class InboxService {
         return inboxBaseUrl + (processed ? "/processed/" : "/") + filename;
     }
 
+    @Override
     public void processAdminInboxCommand(@NotNull final User user, @NotNull final InboxEntry command) {
         LOG.info("Executing adminInbox command {} for Nickname: {}", command.getCommand(), user.getName());
-        final InboxEntry inboxEntry = inboxDao.findById(command.getId());
+        final var inboxEntry = inboxDao.findById(command.getId());
         if (inboxEntry == null || inboxEntry.isDone()) {
             throw new IllegalArgumentException("No pending inbox entry found");
         }
@@ -190,10 +196,12 @@ public class InboxService {
         inboxDao.done(inboxEntry.getId());
     }
 
+    @Override
     public int countPendingInboxEntries() {
         return inboxDao.countPendingInboxEntries();
     }
 
+    @Override
     public String getNextZ() {
         return photoStationsService.getNextZ();
     }
@@ -324,10 +332,11 @@ public class InboxService {
         }
     }
 
+    @Override
     public InboxResponse uploadPhoto(final String clientInfo, final InputStream body, final String stationId,
-                                      final String country, final String contentType, final String stationTitle,
-                                      final Double latitude, final Double longitude, final String comment,
-                                      final Boolean active, final User user) {
+                                     final String country, final String contentType, final String stationTitle,
+                                     final Double latitude, final Double longitude, final String comment,
+                                     final Boolean active, final User user) {
         if (!user.isEmailVerified()) {
             LOG.info("Photo upload failed for user {}, email not verified", user.getName());
             return new InboxResponse(InboxResponse.InboxResponseState.UNAUTHORIZED,"Email not verified");

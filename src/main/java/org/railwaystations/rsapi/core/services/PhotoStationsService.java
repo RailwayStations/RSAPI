@@ -1,33 +1,31 @@
 package org.railwaystations.rsapi.core.services;
 
 import org.apache.commons.lang3.StringUtils;
-import org.railwaystations.rsapi.adapter.db.CountryDao;
-import org.railwaystations.rsapi.adapter.db.StationDao;
+import org.railwaystations.rsapi.adapter.out.db.StationDao;
 import org.railwaystations.rsapi.core.model.Coordinates;
-import org.railwaystations.rsapi.core.model.Country;
 import org.railwaystations.rsapi.core.model.Station;
-import org.railwaystations.rsapi.core.model.Statistic;
+import org.railwaystations.rsapi.core.ports.in.FindPhotoStationsUseCase;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 
 @Service
-@SuppressWarnings("PMD.BeanMembersShouldSerialize")
-public class PhotoStationsService {
+public class PhotoStationsService implements FindPhotoStationsUseCase {
 
-    private final CountryDao countryDao;
     private final StationDao stationDao;
     private final String photoBaseUrl;
 
-    public PhotoStationsService(final CountryDao countryDao, final StationDao stationDao, @Value("${photoBaseUrl}") final String photoBaseUrl) {
+    public PhotoStationsService(final StationDao stationDao, @Value("${photoBaseUrl}") final String photoBaseUrl) {
         super();
-        this.countryDao = countryDao;
         this.stationDao = stationDao;
         this.photoBaseUrl = photoBaseUrl;
     }
@@ -47,22 +45,6 @@ public class PhotoStationsService {
         return station;
     }
 
-    public Set<Country> getCountries() {
-        return Collections.unmodifiableSet(countryDao.list(true));
-    }
-
-    public String getCountryStatisticMessage() {
-        return "Countries statistic: \n" + getCountries().stream()
-                .map(country -> getStatistic(country.getCode()))
-                .map(statistic -> "- " + statistic.getCountryCode() + ": " + statistic.getWithPhoto() + " of " + statistic.getTotal())
-                .collect(Collectors.joining("\n"));
-    }
-
-    public Statistic getStatistic(final String country) {
-        return stationDao.getStatistic(country);
-    }
-
-    @SuppressWarnings("PMD.AvoidLiteralsInIfCondition")
     public Optional<Station> findByCountryAndId(final String country, final String stationId) {
         if (StringUtils.isBlank(stationId)) {
             return Optional.empty();
@@ -79,10 +61,6 @@ public class PhotoStationsService {
 
     public Optional<Station> findByKey(final Station.Key key) {
         return stationDao.findByKey(key.getCountry(), key.getId()).stream().findFirst().map(this::injectPhotoBaseUrl);
-    }
-
-    public Map<String, Long> getPhotographerMap(final String country) {
-        return stationDao.getPhotographerMap(country);
     }
 
     public void insert(final Station station) {

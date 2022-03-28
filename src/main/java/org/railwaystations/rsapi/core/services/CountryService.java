@@ -1,13 +1,14 @@
 package org.railwaystations.rsapi.core.services;
 
-import org.railwaystations.rsapi.adapter.db.CountryDao;
+import org.railwaystations.rsapi.adapter.out.db.CountryDao;
 import org.railwaystations.rsapi.core.model.Country;
+import org.railwaystations.rsapi.core.ports.in.ListCountriesUseCase;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 
 @Service
-public class CountryService {
+public class CountryService implements ListCountriesUseCase {
 
     private final CountryDao countryDao;
 
@@ -15,6 +16,7 @@ public class CountryService {
         this.countryDao = countryDao;
     }
 
+    @Override
     public Collection<Country> list(final Boolean onlyActive) {
         return countryDao.list(onlyActive == null || onlyActive);
     }
