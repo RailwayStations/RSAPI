@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.adapter.web.resources;
+package org.railwaystations.rsapi.adapter.web.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,9 +34,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
-public class InboxResource {
+public class InboxController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(InboxResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(InboxController.class);
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     public static final String EMAIL = "email";
@@ -54,8 +54,8 @@ public class InboxResource {
     private final RSAuthenticationProvider authenticator;
     private final RSUserDetailsService userDetailsService;
 
-    public InboxResource(final InboxService inboxService, final RSAuthenticationProvider authenticator,
-                         final RSUserDetailsService userDetailsService) {
+    public InboxController(final InboxService inboxService, final RSAuthenticationProvider authenticator,
+                           final RSUserDetailsService userDetailsService) {
         this.inboxService = inboxService;
         this.authenticator = authenticator;
         this.userDetailsService = userDetailsService;

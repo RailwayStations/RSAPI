@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.adapter.web.resources;
+package org.railwaystations.rsapi.adapter.web.controller;
 
 import org.railwaystations.rsapi.core.ports.PhotoStorage;
 import org.railwaystations.rsapi.utils.ImageUtil;
@@ -18,16 +18,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 @RestController
-public class PhotoDownloadResource {
+public class PhotoDownloadController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PhotoDownloadResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PhotoDownloadController.class);
     public static final String COUNTRY_CODE = "countryCode";
     public static final String FILENAME = "filename";
     public static final String WIDTH = "width";
 
     private final PhotoStorage photoStorage;
 
-    public PhotoDownloadResource(final PhotoStorage photoStorage) {
+    public PhotoDownloadController(final PhotoStorage photoStorage) {
         this.photoStorage = photoStorage;
     }
 

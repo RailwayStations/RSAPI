@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.adapter.web.resources;
+package org.railwaystations.rsapi.adapter.web.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,9 +19,9 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.when;
 
-public class StationsResourceTest {
+public class StationsControllerTest {
 
-    private StationsResource resource;
+    private StationsController resource;
 
     @BeforeEach
     public void setUp() {
@@ -40,7 +40,7 @@ public class StationsResourceTest {
         when(repository.findStationsBy(allCountries(), null, null, null, null, null, null)).thenReturn(stationsAll);
         when(repository.findByCountryAndId("ab", "3")).thenReturn(Optional.of(stationAB));
 
-        resource = new StationsResource(repository);
+        resource = new StationsController(repository);
     }
 
     private Set<String> allCountries() {

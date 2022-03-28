@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.adapter.web.resources;
+package org.railwaystations.rsapi.adapter.web.controller;
 
 import org.junit.jupiter.api.Test;
 import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice;
@@ -18,10 +18,10 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = StatisticResource.class)
+@WebMvcTest(controllers = StatisticController.class)
 @ContextConfiguration(classes={WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class, StatisticTxtWriter.class})
 @AutoConfigureMockMvc(addFilters = false)
-class StatisticResourceTest {
+class StatisticControllerTest {
 
     @Autowired
     private MockMvc mvc;

@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.adapter.web.resources;
+package org.railwaystations.rsapi.adapter.web.controller;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

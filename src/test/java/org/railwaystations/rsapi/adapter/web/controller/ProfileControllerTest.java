@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.adapter.web.resources;
+package org.railwaystations.rsapi.adapter.web.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,13 +23,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @SuppressWarnings("PMD.TooManyStaticImports")
-public class ProfileResourceTest {
+public class ProfileControllerTest {
 
     private static final String EMAIL_VERIFICATION_URL = "EMAIL_VERIFICATION_URL";
 
     private MockMonitor monitor;
     private Mailer mailer;
-    private ProfileResource resource;
+    private ProfileController resource;
     private UserDao userDao;
 
     @BeforeEach
@@ -38,7 +38,7 @@ public class ProfileResourceTest {
         mailer = mock(Mailer.class);
         userDao = mock(UserDao.class);
 
-        resource = new ProfileResource(new ProfileService(monitor, mailer, userDao, EMAIL_VERIFICATION_URL, new LazySodiumPasswordEncoder()));
+        resource = new ProfileController(new ProfileService(monitor, mailer, userDao, EMAIL_VERIFICATION_URL, new LazySodiumPasswordEncoder()));
     }
 
     @Test

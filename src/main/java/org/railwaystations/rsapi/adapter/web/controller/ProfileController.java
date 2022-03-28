@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.adapter.web.resources;
+package org.railwaystations.rsapi.adapter.web.controller;
 
 import org.railwaystations.rsapi.app.auth.AuthUser;
 import org.railwaystations.rsapi.core.model.ChangePassword;
@@ -18,13 +18,13 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.validation.constraints.NotNull;
 
 @RestController
-public class ProfileResource {
+public class ProfileController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ProfileResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ProfileController.class);
 
     private final ProfileService profileService;
 
-    public ProfileResource(final ProfileService profileService) {
+    public ProfileController(final ProfileService profileService) {
         this.profileService = profileService;
     }
 

@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.adapter.web.resources;
+package org.railwaystations.rsapi.adapter.web.controller;
 
 import org.railwaystations.rsapi.core.model.Country;
 import org.railwaystations.rsapi.core.services.CountryService;
@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Collection;
 
 @RestController
-public class CountriesResource {
+public class CountriesController {
 
     private static final String ONLY_ACTIVE = "onlyActive";
     private final CountryService countryService;
 
-    public CountriesResource(final CountryService countryService) {
+    public CountriesController(final CountryService countryService) {
         this.countryService = countryService;
     }
 

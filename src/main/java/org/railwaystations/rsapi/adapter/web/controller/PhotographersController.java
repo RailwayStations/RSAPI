@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.adapter.web.resources;
+package org.railwaystations.rsapi.adapter.web.controller;
 
 import org.railwaystations.rsapi.core.services.PhotoStationsService;
 import org.springframework.http.MediaType;
@@ -13,13 +13,13 @@ import java.util.Map;
 
 @RestController
 @Validated
-public class PhotographersResource {
+public class PhotographersController {
 
     private static final String COUNTRY = "country";
 
     private final PhotoStationsService photoStationsService;
 
-    public PhotographersResource(final PhotoStationsService photoStationsService) {
+    public PhotographersController(final PhotoStationsService photoStationsService) {
         this.photoStationsService = photoStationsService;
     }
 

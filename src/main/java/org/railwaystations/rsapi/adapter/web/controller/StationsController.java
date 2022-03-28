@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.adapter.web.resources;
+package org.railwaystations.rsapi.adapter.web.controller;
 
 import org.railwaystations.rsapi.adapter.web.writer.StationsGpxWriter;
 import org.railwaystations.rsapi.core.model.Station;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-public class StationsResource {
+public class StationsController {
 
     private static final String COUNTRY = "country";
     private static final String PHOTOGRAPHER = "photographer";
@@ -32,7 +32,7 @@ public class StationsResource {
 
     private final PhotoStationsService photoStationsService;
 
-    public StationsResource(final PhotoStationsService photoStationsService) {
+    public StationsController(final PhotoStationsService photoStationsService) {
         this.photoStationsService = photoStationsService;
     }
 
