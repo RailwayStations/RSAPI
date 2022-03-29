@@ -6,6 +6,9 @@ services:
   rsapi:
     image: railwaystations/rsapi:latest
     container_name: rsapi
+    read_only: true
+    tmpfs:
+      - /tmp
     volumes:
       - /var/rsapi:/var/rsapi
     restart: unless-stopped

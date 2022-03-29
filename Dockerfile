@@ -9,6 +9,8 @@ COPY ./build/libs/${ARTIFACT_NAME} ${RSAPI_HOME}/
 
 RUN apk add --no-cache libsodium
 
+USER 1000
+
 EXPOSE 8080
 EXPOSE 8081
 CMD [ "sh", "-c", "java -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE} -jar ${RSAPI_HOME}/${ARTIFACT_NAME}"]
