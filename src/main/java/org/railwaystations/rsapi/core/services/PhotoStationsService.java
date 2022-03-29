@@ -76,7 +76,7 @@ public class PhotoStationsService implements FindPhotoStationsUseCase {
     }
 
     public List<Station> findRecentImports(final Instant since) {
-        return stationDao.findRecentImports(since.toEpochMilli()).stream().map(this::injectPhotoBaseUrl).toList();
+        return stationDao.findRecentImports(since).stream().map(this::injectPhotoBaseUrl).toList();
     }
 
     public int countNearbyCoordinates(final Coordinates coordinates) {
