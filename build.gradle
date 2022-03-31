@@ -25,9 +25,8 @@ openApiValidate {
 }
 
 ext {
-	springVersion = '2.6.5'
+	springVersion = '2.6.6'
 	testContainersVersion = '1.16.3'
-	jacksonVersion = '2.13.2'
 	jdbiVersion = '3.28.0'
 	swaggerRequestValidatorVersion = '2.27.0'
 }
@@ -50,9 +49,6 @@ dependencies {
 	implementation "org.apache.commons:commons-lang3:3.12.0"
 	implementation "org.apache.httpcomponents:httpclient:4.5.13"
 	implementation "javax.validation:validation-api:2.0.1.Final"
-	implementation "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
-	implementation "com.fasterxml.jackson.core:jackson-databind:2.13.2.2"
-	implementation "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
 	runtimeOnly "org.mariadb.jdbc:mariadb-java-client:3.0.4"
 	testImplementation "org.springframework.boot:spring-boot-starter-test:$springVersion"
 	testImplementation "org.springframework.security:spring-security-test:5.6.2"
