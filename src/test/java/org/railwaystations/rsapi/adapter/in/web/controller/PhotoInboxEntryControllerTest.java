@@ -6,10 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
-import org.railwaystations.rsapi.adapter.out.db.CountryDao;
-import org.railwaystations.rsapi.adapter.out.db.InboxDao;
-import org.railwaystations.rsapi.adapter.out.db.PhotoDao;
-import org.railwaystations.rsapi.adapter.out.db.UserDao;
+import org.railwaystations.rsapi.adapter.out.db.*;
 import org.railwaystations.rsapi.adapter.out.mastodon.MastodonBotConfig;
 import org.railwaystations.rsapi.adapter.out.mastodon.MastodonBotHttpClient;
 import org.railwaystations.rsapi.adapter.out.monitoring.MockMonitor;
@@ -20,7 +17,6 @@ import org.railwaystations.rsapi.app.auth.RSAuthenticationProvider;
 import org.railwaystations.rsapi.app.auth.RSUserDetailsService;
 import org.railwaystations.rsapi.core.model.*;
 import org.railwaystations.rsapi.core.services.InboxService;
-import org.railwaystations.rsapi.core.services.PhotoStationsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
@@ -33,10 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -77,16 +70,16 @@ public class PhotoInboxEntryControllerTest {
         final PhotoDao photoDao = mock(PhotoDao.class);
 
         workDir = new WorkDir(Files.createTempDirectory("rsapi").toString(), null);
-        final PhotoStationsService repository = mock(PhotoStationsService.class);
-        when(repository.findByCountryAndId(key4711.getCountry(), key4711.getId())).thenReturn(Optional.of(station4711));
-        when(repository.findByCountryAndId(key1234.getCountry(), key1234.getId())).thenReturn(Optional.of(station1234));
-        when(repository.findByCountryAndId(key5678.getCountry(), key5678.getId())).thenReturn(Optional.of(station5678));
-        when(repository.findByCountryAndId(key0815.getCountry(), key0815.getId())).thenReturn(Optional.of(station0815));
-        when(repository.findByCountryAndId(key9876.getCountry(), key9876.getId())).thenReturn(Optional.of(station9876));
+        final StationDao stationDao = mock(StationDao.class);
+        when(stationDao.findByKey(key4711.getCountry(), key4711.getId())).thenReturn(Set.of(station4711));
+        when(stationDao.findByKey(key1234.getCountry(), key1234.getId())).thenReturn(Set.of(station1234));
+        when(stationDao.findByKey(key5678.getCountry(), key5678.getId())).thenReturn(Set.of(station5678));
+        when(stationDao.findByKey(key0815.getCountry(), key0815.getId())).thenReturn(Set.of(station0815));
+        when(stationDao.findByKey(key9876.getCountry(), key9876.getId())).thenReturn(Set.of(station9876));
 
         authenticator = mock(RSAuthenticationProvider.class);
 
-        inboxController = new InboxController(new InboxService(repository, new PhotoFileStorage(workDir), monitor,
+        inboxController = new InboxController(new InboxService(stationDao, new PhotoFileStorage(workDir), monitor,
                 inboxDao, userDao, countryDao, photoDao, "http://inbox.railway-stations.org", new MastodonBotHttpClient(new MastodonBotConfig())),
                 authenticator, new RSUserDetailsService(userDao));
     }

@@ -1,10 +1,7 @@
 package org.railwaystations.rsapi.core.services;
 
 import org.apache.commons.lang3.StringUtils;
-import org.railwaystations.rsapi.adapter.out.db.CountryDao;
-import org.railwaystations.rsapi.adapter.out.db.InboxDao;
-import org.railwaystations.rsapi.adapter.out.db.PhotoDao;
-import org.railwaystations.rsapi.adapter.out.db.UserDao;
+import org.railwaystations.rsapi.adapter.out.db.*;
 import org.railwaystations.rsapi.core.model.*;
 import org.railwaystations.rsapi.core.ports.in.ManageInboxUseCase;
 import org.railwaystations.rsapi.core.ports.out.MastodonBot;
@@ -29,9 +26,9 @@ public class InboxService implements ManageInboxUseCase {
 
     private static final Logger LOG = LoggerFactory.getLogger(InboxService.class);
 
-    private final PhotoStationsService photoStationsService;
     private final PhotoStorage photoStorage;
     private final InboxDao inboxDao;
+    private final StationDao stationDao;
     private final UserDao userDao;
     private final CountryDao countryDao;
     private final PhotoDao photoDao;
@@ -39,10 +36,10 @@ public class InboxService implements ManageInboxUseCase {
     private final MastodonBot mastodonBot;
     private final Monitor monitor;
 
-    public InboxService(final PhotoStationsService photoStationsService, final PhotoStorage photoStorage, final Monitor monitor,
+    public InboxService(final StationDao stationDao, final PhotoStorage photoStorage, final Monitor monitor,
                         final InboxDao inboxDao, final UserDao userDao, final CountryDao countryDao,
                         final PhotoDao photoDao, @Value("${inboxBaseUrl}") final String inboxBaseUrl, final MastodonBot mastodonBot) {
-        this.photoStationsService = photoStationsService;
+        this.stationDao = stationDao;
         this.photoStorage = photoStorage;
         this.monitor = monitor;
         this.inboxDao = inboxDao;
@@ -62,7 +59,7 @@ public class InboxService implements ManageInboxUseCase {
 
         LOG.info("New problem report: Nickname: {}; Country: {}; Station-Id: {}",
                 user.getName(), problemReport.getCountryCode(), problemReport.getStationId());
-        final var station = photoStationsService.findByCountryAndId(problemReport.getCountryCode(), problemReport.getStationId());
+        final var station = findStationByCountryAndId(problemReport.getCountryCode(), problemReport.getStationId());
         if (station.isEmpty()) {
             return new InboxResponse(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA, "Station not found");
         }
@@ -123,7 +120,7 @@ public class InboxService implements ManageInboxUseCase {
                 }
             } else {
                 if (hasConflict(inboxEntry.getId(),
-                        photoStationsService.findByCountryAndId(query.getCountryCode(), query.getStationId()).orElse(null))
+                        findStationByCountryAndId(query.getCountryCode(), query.getStationId()).orElse(null))
                         || (inboxEntry.getStationId() == null && hasConflict(inboxEntry.getId(), inboxEntry.getCoordinates()))) {
                     query.setState(InboxStateQuery.InboxState.CONFLICT);
                 } else {
@@ -192,7 +189,7 @@ public class InboxService implements ManageInboxUseCase {
         }
 
         final Station station = assertStationExists(inboxEntry);
-        photoStationsService.updateLocation(station, coordinates);
+        stationDao.updateLocation(station, coordinates);
         inboxDao.done(inboxEntry.getId());
     }
 
@@ -203,20 +200,20 @@ public class InboxService implements ManageInboxUseCase {
 
     @Override
     public String getNextZ() {
-        return photoStationsService.getNextZ();
+        return "Z" + (stationDao.getMaxZ() + 1);
     }
 
     private void updateStationActiveState(final InboxEntry inboxEntry, final boolean active) {
         final Station station = assertStationExists(inboxEntry);
         station.setActive(active);
-        photoStationsService.updateActive(station);
+        stationDao.updateActive(station);
         inboxDao.done(inboxEntry.getId());
         LOG.info("Problem report {} station {} set active to {}", inboxEntry.getId(), station.getKey(), active);
     }
 
     private void changeStationTitle(final InboxEntry inboxEntry, final String newTitle) {
         final Station station = assertStationExists(inboxEntry);
-        photoStationsService.changeStationTitle(station, newTitle);
+        stationDao.changeStationTitle(station, newTitle);
         inboxDao.done(inboxEntry.getId());
         LOG.info("Problem report {} station {} change name to {}", inboxEntry.getId(), station.getKey(), newTitle);
     }
@@ -224,7 +221,7 @@ public class InboxService implements ManageInboxUseCase {
     private void deleteStation(final InboxEntry inboxEntry) {
         final Station station = assertStationExists(inboxEntry);
         photoDao.delete(station.getKey());
-        photoStationsService.delete(station);
+        stationDao.delete(station);
         inboxDao.done(inboxEntry.getId());
         LOG.info("Problem report {} station {} deleted", inboxEntry.getId(), station.getKey());
     }
@@ -243,25 +240,59 @@ public class InboxService implements ManageInboxUseCase {
     }
 
     private Station assertStationExists(final InboxEntry inboxEntry) {
-        return photoStationsService.findByCountryAndId(inboxEntry.getCountryCode(), inboxEntry.getStationId())
+        return findStationByCountryAndId(inboxEntry.getCountryCode(), inboxEntry.getStationId())
                 .orElseThrow(() -> new IllegalArgumentException("Station not found"));
     }
 
     private void importUpload(final InboxEntry inboxEntry, final InboxEntry command) {
         LOG.info("Importing upload {}, {}", inboxEntry.getId(), inboxEntry.getFilename());
 
-        Optional<Station> station = photoStationsService.findByCountryAndId(inboxEntry.getCountryCode(), inboxEntry.getStationId());
-        if (station.isEmpty() && command.createStation()) {
-            station = photoStationsService.findByCountryAndId(command.getCountryCode(), command.getStationId());
-            station.ifPresent(value -> LOG.info("Importing missing station upload {} to existing station {}", inboxEntry.getId(), value.getKey()));
+        final var station = findOrCreateStation(inboxEntry, command);
+
+        if (station.hasPhoto() && !command.ignoreConflict()) {
+            throw new IllegalArgumentException("Station already has a photo");
         }
-        if (station.isEmpty()) {
+        if (hasConflict(inboxEntry.getId(), station) && !command.ignoreConflict()) {
+            throw new IllegalArgumentException("There is a conflict with another upload");
+        }
+
+        final var photographer = userDao.findById(inboxEntry.getPhotographerId()).orElseThrow();
+        final var country = countryDao.findById(StringUtils.lowerCase(station.getKey().getCountry()))
+                .orElseThrow(() -> new IllegalArgumentException("Country not found"));
+
+        try {
+            final var photo = new Photo(country, station.getKey().getId(), photographer, inboxEntry.getExtension());
+            if (station.hasPhoto()) {
+                photoDao.update(photo);
+            } else {
+                photoDao.insert(photo);
+            }
+            station.setPhoto(photo);
+
+            photoStorage.importPhoto(inboxEntry, country, station);
+            inboxDao.done(inboxEntry.getId());
+            LOG.info("Upload {} accepted: {}", inboxEntry.getId(), inboxEntry.getFilename());
+            mastodonBot.tootNewPhoto(station, inboxEntry);
+        } catch (final Exception e) {
+            LOG.error("Error importing upload {} photo {}", inboxEntry.getId(), inboxEntry.getFilename());
+            throw new RuntimeException("Error moving file: " + e.getMessage());
+        }
+    }
+
+    private Station findOrCreateStation(final InboxEntry inboxEntry, final InboxEntry command) {
+        var station = findStationByCountryAndId(inboxEntry.getCountryCode(), inboxEntry.getStationId());
+        if (station.isEmpty() && command.createStation()) {
+            station = findStationByCountryAndId(command.getCountryCode(), command.getStationId());
+            station.ifPresent(s -> LOG.info("Importing missing station upload {} to existing station {}", inboxEntry.getId(), s.getKey()));
+        }
+
+        return station.orElseGet(()-> {
             if (!command.createStation() || StringUtils.isNotBlank(inboxEntry.getStationId())) {
                 throw new IllegalArgumentException("Station not found");
             }
 
             // create station
-            final Optional<Country> country = countryDao.findById(StringUtils.lowerCase(command.getCountryCode()));
+            final var country = countryDao.findById(StringUtils.lowerCase(command.getCountryCode()));
             if (country.isEmpty()) {
                 throw new IllegalArgumentException("Country not found");
             }
@@ -275,45 +306,17 @@ public class InboxService implements ManageInboxUseCase {
                 throw new IllegalArgumentException("Lat/Lon out of range");
             }
 
-            Coordinates coordinates = inboxEntry.getCoordinates();
+            var coordinates = inboxEntry.getCoordinates();
             if (command.hasCoords()) {
                 coordinates = command.getCoordinates();
             }
 
-            final String title = command.getTitle() != null ? command.getTitle() : inboxEntry.getTitle();
+            final var title = command.getTitle() != null ? command.getTitle() : inboxEntry.getTitle();
 
-            station = Optional.of(new Station(new Station.Key(command.getCountryCode(), command.getStationId()), title, coordinates, command.getDs100(), null, command.getActive()));
-            photoStationsService.insert(station.get());
-        }
-
-        if (station.get().hasPhoto() && !command.ignoreConflict()) {
-            throw new IllegalArgumentException("Station already has a photo");
-        }
-        if (hasConflict(inboxEntry.getId(), station.get()) && !command.ignoreConflict()) {
-            throw new IllegalArgumentException("There is a conflict with another upload");
-        }
-
-        final Optional<User> user = userDao.findById(inboxEntry.getPhotographerId());
-        final Country country = countryDao.findById(StringUtils.lowerCase(station.get().getKey().getCountry()))
-                .orElseThrow(() -> new IllegalArgumentException("Country not found"));
-
-        try {
-            final Photo photo = new Photo(country, station.get().getKey().getId(), user.orElseThrow(), inboxEntry.getExtension());
-            if (station.get().hasPhoto()) {
-                photoDao.update(photo);
-            } else {
-                photoDao.insert(photo);
-            }
-            station.get().setPhoto(photo);
-
-            photoStorage.importPhoto(inboxEntry, country, station.get());
-            inboxDao.done(inboxEntry.getId());
-            LOG.info("Upload {} accepted: {}", inboxEntry.getId(), inboxEntry.getFilename());
-            mastodonBot.tootNewPhoto(photoStationsService.findByKey(station.get().getKey()).orElseThrow(), inboxEntry);
-        } catch (final Exception e) {
-            LOG.error("Error importing upload {} photo {}", inboxEntry.getId(), inboxEntry.getFilename());
-            throw new RuntimeException("Error moving file: " + e.getMessage());
-        }
+            final Station newStation = new Station(new Station.Key(command.getCountryCode(), command.getStationId()), title, coordinates, command.getDs100(), null, command.getActive());
+            stationDao.insert(newStation);
+            return newStation;
+        });
     }
 
     private void rejectInboxEntry(final InboxEntry inboxEntry, final String rejectReason) {
@@ -342,8 +345,8 @@ public class InboxService implements ManageInboxUseCase {
             return new InboxResponse(InboxResponse.InboxResponseState.UNAUTHORIZED,"Email not verified");
         }
 
-        final Optional<Station> station = photoStationsService.findByCountryAndId(country, stationId);
-        Coordinates coordinates = null;
+        final var station = findStationByCountryAndId(country, stationId);
+        final Coordinates coordinates;
         if (station.isEmpty()) {
             LOG.warn("Station not found");
             if (StringUtils.isBlank(stationTitle) || latitude == null || longitude == null) {
@@ -355,9 +358,11 @@ public class InboxService implements ManageInboxUseCase {
                 LOG.warn("Lat/Lon out of range: latitude={}, longitude={}", latitude, longitude);
                 return new InboxResponse(InboxResponse.InboxResponseState.LAT_LON_OUT_OF_RANGE, "'latitude' and/or 'longitude' out of range");
             }
+        } else {
+            coordinates = null;
         }
 
-        final String extension = ImageUtil.mimeToExtension(contentType);
+        final var extension = ImageUtil.mimeToExtension(contentType);
         if (extension == null) {
             LOG.warn("Unknown contentType '{}'", contentType);
             return new InboxResponse(InboxResponse.InboxResponseState.UNSUPPORTED_CONTENT_TYPE, "unsupported content type (only jpg and png are supported)");
@@ -370,20 +375,15 @@ public class InboxService implements ManageInboxUseCase {
         final Integer id;
         final Long crc32;
         try {
-            if (station.isPresent()) {
-                // existing station
-                id = inboxDao.insert(new InboxEntry(station.get().getKey().getCountry(), station.get().getKey().getId(), stationTitle,
-                        null, user.getId(), extension, comment, null, active));
-            } else {
-                // missing station
-                id = inboxDao.insert(new InboxEntry(country, null, stationTitle,
-                        coordinates, user.getId(), extension, comment, null, active));
-            }
+            id = station.map(s -> inboxDao.insert(new InboxEntry(s.getKey().getCountry(), s.getKey().getId(), stationTitle,
+                        null, user.getId(), extension, comment, null, active)))
+                    .orElseGet(() -> inboxDao.insert(new InboxEntry(country, null, stationTitle,
+                        coordinates, user.getId(), extension, comment, null, active)));
             filename = InboxEntry.getFilename(id, extension);
             crc32 = photoStorage.storeUpload(body, filename);
             inboxDao.updateCrc32(id, crc32);
 
-            final String duplicateInfo = conflict ? " (possible duplicate!)" : "";
+            final var duplicateInfo = conflict ? " (possible duplicate!)" : "";
             inboxUrl = inboxBaseUrl + "/" + UriUtils.encodePath(filename, StandardCharsets.UTF_8);
             if (station.isPresent()) {
                 monitor.sendMessage(String.format("New photo upload for %s - %s:%s%n%s%n%s%s%nby %s%nvia %s",
@@ -418,7 +418,11 @@ public class InboxService implements ManageInboxUseCase {
         if (coordinates == null || coordinates.hasZeroCoords()) {
             return false;
         }
-        return inboxDao.countPendingInboxEntriesForNearbyCoordinates(id, coordinates) > 0 || photoStationsService.countNearbyCoordinates(coordinates) > 0;
+        return inboxDao.countPendingInboxEntriesForNearbyCoordinates(id, coordinates) > 0 || stationDao.countNearbyCoordinates(coordinates) > 0;
     }
 
+    private Optional<Station> findStationByCountryAndId(final String countryCode, final String stationId) {
+        return stationDao.findByKey(countryCode, stationId).stream().findFirst();
+    }
+    
 }

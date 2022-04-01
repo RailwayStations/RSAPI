@@ -3,7 +3,6 @@ package org.railwaystations.rsapi.adapter.out.mastodon;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 
 @Service
-@SuppressWarnings("PMD.BeanMembersShouldSerialize")
 public class MastodonBotHttpClient implements MastodonBot {
 
     private static final Logger LOG = LoggerFactory.getLogger(MastodonBotHttpClient.class);
@@ -52,19 +50,19 @@ public class MastodonBotHttpClient implements MastodonBot {
         }
         LOG.info("Sending toot for new photo of : {}", station.getKey());
         try {
-            String status = String.format("%s%nby %s%n%s?countryCode=%s&stationId=%s",
+            var status = String.format("%s%nby %s%n%s?countryCode=%s&stationId=%s",
                     station.getTitle(), station.getPhotographer(), config.getStationUrl(),
                     station.getKey().getCountry(), station.getKey().getId());
             if (StringUtils.isNotBlank(inboxEntry.getComment())) {
                 status += String.format("%n%s", inboxEntry.getComment());
             }
-            final String json = MAPPER.writeValueAsString(new Toot(status));
-            final HttpPost httpPost = new HttpPost(config.getInstanceUrl() + "/api/v1/statuses");
+            final var json = MAPPER.writeValueAsString(new Toot(status));
+            final var httpPost = new HttpPost(config.getInstanceUrl() + "/api/v1/statuses");
             httpPost.setEntity(new StringEntity(json, ContentType.APPLICATION_JSON.withCharset("UTF-8")));
             httpPost.setHeader("Authorization", "Bearer " + config.getToken());
-            final CloseableHttpResponse response = httpclient.execute(httpPost);
+            final var response = httpclient.execute(httpPost);
             final int statusCode = response.getStatusLine().getStatusCode();
-            final String content = EntityUtils.toString(response.getEntity());
+            final var content = EntityUtils.toString(response.getEntity());
             if (statusCode >= 200 && statusCode < 300) {
                 LOG.info("Got json response from {}: {}", httpPost.getURI(), content);
             } else {

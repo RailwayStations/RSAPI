@@ -2,7 +2,6 @@ package org.railwaystations.rsapi.core.services;
 
 import org.apache.commons.lang3.StringUtils;
 import org.railwaystations.rsapi.adapter.out.db.StationDao;
-import org.railwaystations.rsapi.core.model.Coordinates;
 import org.railwaystations.rsapi.core.model.Station;
 import org.railwaystations.rsapi.core.ports.in.FindPhotoStationsUseCase;
 import org.springframework.beans.factory.annotation.Value;
@@ -63,36 +62,8 @@ public class PhotoStationsService implements FindPhotoStationsUseCase {
         return stationDao.findByKey(key.getCountry(), key.getId()).stream().findFirst().map(this::injectPhotoBaseUrl);
     }
 
-    public void insert(final Station station) {
-        stationDao.insert(station);
-    }
-
-    public void delete(final Station station) {
-        stationDao.delete(station);
-    }
-
-    public void updateActive(final Station station) {
-        stationDao.updateActive(station);
-    }
-
     public List<Station> findRecentImports(final Instant since) {
         return stationDao.findRecentImports(since).stream().map(this::injectPhotoBaseUrl).toList();
-    }
-
-    public int countNearbyCoordinates(final Coordinates coordinates) {
-        return stationDao.countNearbyCoordinates(coordinates);
-    }
-
-    public String getNextZ() {
-        return "Z" + (stationDao.getMaxZ() + 1);
-    }
-
-    public void changeStationTitle(final Station station, final String newTitle) {
-        stationDao.changeStationTitle(station, newTitle);
-    }
-
-    public void updateLocation(final Station station, final Coordinates coordinates) {
-        stationDao.updateLocation(station, coordinates);
     }
 
     public List<Station> findStationsBy(final Set<String> countries, final Boolean hasPhoto, final String photographer,
