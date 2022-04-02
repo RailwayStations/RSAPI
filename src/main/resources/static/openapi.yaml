@@ -7,7 +7,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20220219.1815"
+  version: "20220402.2100"
 servers:
 - url: https://api.railway-stations.org/
 tags:
@@ -581,6 +581,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InboxResponse'
+        403:
+          description: forbidden
+          content: {}
         409:
           description: photo already exists
           content:
@@ -629,6 +632,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InboxResponse'
+        403:
+          description: forbidden
+          content: {}
       x-codegen-request-body-name: problemReport
   /userInbox:
     post:
@@ -700,6 +706,9 @@ paths:
         401:
           description: not authorized
           content: {}
+        403:
+          description: forbidden
+          content: {}
     post:
       summary: Import or reject an uploaded photo or a problem report from the inbox
       parameters:
@@ -729,6 +738,9 @@ paths:
                 $ref: '#/components/schemas/AdminInboxCommandResponse'
         401:
           description: not authorized
+          content: {}
+        403:
+          description: forbidden
           content: {}
       x-codegen-request-body-name: UploadCommand
   /registration:
@@ -888,7 +900,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/Profile'
         401:
-          description: wrong token
+          description: authorization failed
+          content: {}
+        403:
+          description: forbidden
           content: {}
     post:
       summary: Update the users profile. In case the email has been changed, only
@@ -928,6 +943,9 @@ paths:
           content: {}
         401:
           description: authorization failed
+          content: {}
+        403:
+          description: forbidden
           content: {}
         409:
           description: conflict with existing name or email
@@ -1231,8 +1249,7 @@ components:
         countryCode:
           type: string
         stationId:
-          type: integer
-          format: int64
+          type: string
         lat:
           type: number
           format: double

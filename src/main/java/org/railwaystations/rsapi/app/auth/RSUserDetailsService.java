@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import static java.util.stream.Collectors.toList;
 
 @Service
-@SuppressWarnings("PMD.BeanMembersShouldSerialize")
 public class RSUserDetailsService implements UserDetailsService {
 
     private final UserDao userDao;

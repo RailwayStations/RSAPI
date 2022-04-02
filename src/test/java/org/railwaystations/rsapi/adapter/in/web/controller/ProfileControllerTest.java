@@ -3,7 +3,6 @@ package org.railwaystations.rsapi.adapter.in.web.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.railwaystations.rsapi.adapter.out.db.UserDao;
 import org.railwaystations.rsapi.adapter.out.monitoring.MockMonitor;
 import org.railwaystations.rsapi.app.auth.AuthUser;
@@ -12,7 +11,6 @@ import org.railwaystations.rsapi.core.model.ChangePassword;
 import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.ports.out.Mailer;
 import org.railwaystations.rsapi.core.services.ProfileService;
-import org.springframework.http.ResponseEntity;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -22,7 +20,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@SuppressWarnings("PMD.TooManyStaticImports")
 public class ProfileControllerTest {
 
     private static final String EMAIL_VERIFICATION_URL = "EMAIL_VERIFICATION_URL";
@@ -43,16 +40,16 @@ public class ProfileControllerTest {
 
     @Test
     public void testRegisterInvalidData() {
-        final User registration = new User("nickname", null, null, true, "https://link@example.com", false, null, true);
-        final ResponseEntity<String> response = resource.register("UserAgent", registration);
+        final var registration = new User("nickname", null, null, true, "https://link@example.com", false, null, true);
+        final var response = resource.register("UserAgent", registration);
 
         assertThat(response.getStatusCodeValue(), equalTo(400));
     }
 
     @Test
     public void testRegisterNewUser() {
-        final User registration = new User("nickname", "nickname@example.com", "CC0", true, "https://link@example.com", false, null, true);
-        final ResponseEntity<String> response = resource.register("UserAgent", registration);
+        final var registration = new User("nickname", "nickname@example.com", "CC0", true, "https://link@example.com", false, null, true);
+        final var response = resource.register("UserAgent", registration);
         verify(userDao).findByNormalizedName("nickname");
         verify(userDao).findByEmail("nickname@example.com");
         verify(userDao).insert(any(User.class));
@@ -67,8 +64,8 @@ public class ProfileControllerTest {
 
     @Test
     public void testRegisterNewUserWithPassword() {
-        final User registration = new User("nickname", "nickname@example.com", "CC0", true, "https://link@example.com", false, "verySecretPassword", true);
-        final ResponseEntity<String> response = resource.register("UserAgent", registration);
+        final var registration = new User("nickname", "nickname@example.com", "CC0", true, "https://link@example.com", false, "verySecretPassword", true);
+        final var response = resource.register("UserAgent", registration);
         verify(userDao).findByNormalizedName("nickname");
         verify(userDao).findByEmail("nickname@example.com");
         verify(userDao).insert(any(User.class));
@@ -82,49 +79,49 @@ public class ProfileControllerTest {
     }
 
     private void assertVerificationEmail() {
-        Mockito.verify(mailer, Mockito.times(1))
-                .send(anyString(),
-                        anyString(),matches("""
-                                Hello,
+        verify(mailer, times(1))
+            .send(anyString(),
+                anyString(),matches("""
+                    Hello,
 
-                                please click on EMAIL_VERIFICATION_URL.* to verify your eMail-Address.
+                    please click on EMAIL_VERIFICATION_URL.* to verify your eMail-Address.
 
-                                Cheers
-                                Your Railway-Stations-Team
+                    Cheers
+                    Your Railway-Stations-Team
 
-                                ---
-                                Hallo,
+                    ---
+                    Hallo,
 
-                                bitte klicke auf EMAIL_VERIFICATION_URL.*, um Deine eMail-Adresse zu verifizieren.
+                    bitte klicke auf EMAIL_VERIFICATION_URL.*, um Deine eMail-Adresse zu verifizieren.
 
-                                Viele Grüße
-                                Dein Bahnhofsfoto-Team"""));
+                    Viele Grüße
+                    Dein Bahnhofsfoto-Team"""));
     }
 
     private void assertNewPasswordEmail() {
-        Mockito.verify(mailer, Mockito.times(1))
-                .send(anyString(),
-                        anyString(),matches("""
-                Hello,
-                
-                your new password is: .*
-                
-                Cheers
-                Your Railway-Stations-Team
-                
-                ---
-                Hallo,
-                
-                Dein neues Passwort lautet: .*
-                
-                Viele Grüße
-                Dein Bahnhofsfoto-Team"""));
+        verify(mailer, times(1))
+            .send(anyString(),
+                anyString(),matches("""
+                    Hello,
+                    
+                    your new password is: .*
+                    
+                    Cheers
+                    Your Railway-Stations-Team
+                    
+                    ---
+                    Hallo,
+                    
+                    Dein neues Passwort lautet: .*
+                    
+                    Viele Grüße
+                    Dein Bahnhofsfoto-Team"""));
     }
 
     @Test
     public void testRegisterNewUserAnonymous() {
-        final User registration = new User("nickname", "nickname@example.com", "CC0", true, "https://link@example.com", true, null, true);
-        final ResponseEntity<String> response = resource.register("UserAgent", registration);
+        final var registration = new User("nickname", "nickname@example.com", "CC0", true, "https://link@example.com", true, null, true);
+        final var response = resource.register("UserAgent", registration);
 
         assertThat(response.getStatusCodeValue(), equalTo(202));
         assertThat(monitor.getMessages().get(0), equalTo("New registration{nickname='nickname', email='nickname@example.com', license='CC0 1.0 Universell (CC0 1.0)', photoOwner=true, link='https://link@example.com', anonymous=true}\nvia UserAgent"));
@@ -133,18 +130,18 @@ public class ProfileControllerTest {
     @Test
     public void testRegisterNewUserNameTaken() {
         when(userDao.findByNormalizedName("existing")).thenReturn(Optional.of(new User("existing", "existing@example.com", "CC0", true, "https://link@example.com", false, null, true)));
-        final User registration = new User("existing", "other@example.com", "CC0", true, "https://link@example.com", false, null, true);
-        final ResponseEntity<String> response = resource.register("UserAgent", registration);
+        final var registration = new User("existing", "other@example.com", "CC0", true, "https://link@example.com", false, null, true);
+        final var response = resource.register("UserAgent", registration);
 
         assertThat(response.getStatusCodeValue(), equalTo(409));
     }
 
     @Test
     public void testRegisterExistingUserEmailTaken() {
-        final User user = new User("existing", "existing@example.com", "CC0", true, "https://link@example.com", false, null, true);
+        final var user = new User("existing", "existing@example.com", "CC0", true, "https://link@example.com", false, null, true);
         when(userDao.findByNormalizedName(user.getName())).thenReturn(Optional.of(user));
         when(userDao.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-        final ResponseEntity<String> response = resource.register("UserAgent", user);
+        final var response = resource.register("UserAgent", user);
 
         assertThat(response.getStatusCodeValue(), equalTo(409));
         assertThat(monitor.getMessages().get(0), equalTo("Registration for user 'existing' with eMail 'existing@example.com' failed, eMail is already taken\nvia UserAgent"));
@@ -153,8 +150,8 @@ public class ProfileControllerTest {
     @Test
     public void testRegisterExistingUserNameTaken() {
         when(userDao.findByNormalizedName("existing")).thenReturn(Optional.of(new User("existing", "other@example.com", "CC0", true, "https://link@example.com", false, null, true)));
-        final User registration = new User("existing", "existing@example.com", "CC0", true, "https://link@example.com", false, null, true);
-        final ResponseEntity<String> response = resource.register("UserAgent", registration);
+        final var registration = new User("existing", "existing@example.com", "CC0", true, "https://link@example.com", false, null, true);
+        final var response = resource.register("UserAgent", registration);
 
         assertThat(response.getStatusCodeValue(), equalTo(409));
         assertThat(monitor.getMessages().get(0), equalTo("Registration for user 'existing' with eMail 'existing@example.com' failed, name is already taken by different eMail 'other@example.com'\nvia UserAgent"));
@@ -163,16 +160,16 @@ public class ProfileControllerTest {
     @Test
     public void testRegisterExistingUserEmptyName() {
         when(userDao.findByNormalizedName("existing")).thenReturn(Optional.of(new User("existing", "other@example.com", "CC0", true, "https://link@example.com", false, null, true)));
-        final User registration = new User("", "existing@example.com", "CC0", true, "https://link@example.com", false, null, true);
-        final ResponseEntity<String> response = resource.register("UserAgent", registration);
+        final var registration = new User("", "existing@example.com", "CC0", true, "https://link@example.com", false, null, true);
+        final var response = resource.register("UserAgent", registration);
 
         assertThat(response.getStatusCodeValue(), equalTo(400));
     }
 
     @Test
     public void testGetMyProfile() {
-        final User user = new User("existing", "existing@example.com", null, true, null, false, null, true);
-        final ResponseEntity<User> response = resource.getMyProfile(new AuthUser(user, Collections.emptyList()));
+        final var user = new User("existing", "existing@example.com", null, true, null, false, null, true);
+        final var response = resource.getMyProfile(new AuthUser(user, Collections.emptyList()));
 
         assertThat(response.getStatusCodeValue(), equalTo(200));
         assertThat(response.getBody(), sameInstance(user));
@@ -180,8 +177,8 @@ public class ProfileControllerTest {
 
     @Test
     public void testChangePasswordTooShortHeader() {
-        final User user = new User("existing", "existing@example.com", null, true, null, false, null, true);
-        final ResponseEntity<String> response = resource.changePassword(new AuthUser(user, Collections.emptyList()), "secret", null);
+        final var user = new User("existing", "existing@example.com", null, true, null, false, null, true);
+        final var response = resource.changePassword(new AuthUser(user, Collections.emptyList()), "secret", null);
         verify(userDao, never()).updateCredentials(anyInt(), anyString());
 
         assertThat(response.getStatusCodeValue(), equalTo(400));
@@ -189,8 +186,8 @@ public class ProfileControllerTest {
 
     @Test
     public void testChangePasswordTooShortBody() {
-        final User user = new User("existing", "existing@example.com", null, true, null, false, null, true);
-        final ResponseEntity<String> response = resource.changePassword(new AuthUser(user, Collections.emptyList()), null, new ChangePassword("secret"));
+        final var user = new User("existing", "existing@example.com", null, true, null, false, null, true);
+        final var response = resource.changePassword(new AuthUser(user, Collections.emptyList()), null, new ChangePassword("secret"));
         verify(userDao, never()).updateCredentials(anyInt(), anyString());
 
         assertThat(response.getStatusCodeValue(), equalTo(400));
@@ -198,11 +195,11 @@ public class ProfileControllerTest {
 
     @Test
     public void testChangePasswordHeader() {
-        final User user = new User("existing", "existing@example.com", null, true, null, false, null, true);
+        final var user = new User("existing", "existing@example.com", null, true, null, false, null, true);
         user.setId(4711);
-        final ArgumentCaptor<Integer> idCaptor = ArgumentCaptor.forClass(Integer.class);
-        final ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
-        final ResponseEntity<String> response = resource.changePassword(new AuthUser(user, Collections.emptyList()), "secretlong", null);
+        final var idCaptor = ArgumentCaptor.forClass(Integer.class);
+        final var keyCaptor = ArgumentCaptor.forClass(String.class);
+        final var response = resource.changePassword(new AuthUser(user, Collections.emptyList()), "secretlong", null);
         verify(userDao).updateCredentials(idCaptor.capture(), keyCaptor.capture());
 
         assertThat(response.getStatusCodeValue(), equalTo(200));
@@ -212,11 +209,11 @@ public class ProfileControllerTest {
 
     @Test
     public void testChangePasswordBody() {
-        final User user = new User("existing", "existing@example.com", null, true, null, false, null, true);
+        final var user = new User("existing", "existing@example.com", null, true, null, false, null, true);
         user.setId(4711);
-        final ArgumentCaptor<Integer> idCaptor = ArgumentCaptor.forClass(Integer.class);
-        final ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
-        final ResponseEntity<String> response = resource.changePassword(new AuthUser(user, Collections.emptyList()), null, new ChangePassword("secretlong"));
+        final var idCaptor = ArgumentCaptor.forClass(Integer.class);
+        final var keyCaptor = ArgumentCaptor.forClass(String.class);
+        final var response = resource.changePassword(new AuthUser(user, Collections.emptyList()), null, new ChangePassword("secretlong"));
         verify(userDao).updateCredentials(idCaptor.capture(), keyCaptor.capture());
 
         assertThat(response.getStatusCodeValue(), equalTo(200));
@@ -226,11 +223,11 @@ public class ProfileControllerTest {
 
     @Test
     public void testChangePasswordHeaderAndBody() {
-        final User user = new User("existing", "existing@example.com", null, true, null, false, null, true);
+        final var user = new User("existing", "existing@example.com", null, true, null, false, null, true);
         user.setId(4711);
-        final ArgumentCaptor<Integer> idCaptor = ArgumentCaptor.forClass(Integer.class);
-        final ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
-        final ResponseEntity<String> response = resource.changePassword(new AuthUser(user, Collections.emptyList()), "secretheader", new ChangePassword("secretbody"));
+        final var idCaptor = ArgumentCaptor.forClass(Integer.class);
+        final var keyCaptor = ArgumentCaptor.forClass(String.class);
+        final var response = resource.changePassword(new AuthUser(user, Collections.emptyList()), "secretheader", new ChangePassword("secretbody"));
         verify(userDao).updateCredentials(idCaptor.capture(), keyCaptor.capture());
 
         assertThat(response.getStatusCodeValue(), equalTo(200));
@@ -241,9 +238,9 @@ public class ProfileControllerTest {
     @Test
     public void testUpdateMyProfile() {
         when(userDao.findByNormalizedName("newname")).thenReturn(Optional.empty());
-        final User user = new User("existing", "existing@example.com", null, true, null, false, null, true);
-        final User newProfile = new User("new_name", "existing@example.com", "CC0", true, "http://twitter.com/", true, null, true);
-        final ResponseEntity<String> response = resource.updateMyProfile("UserAgent", newProfile, new AuthUser(user, Collections.emptyList()));
+        final var user = new User("existing", "existing@example.com", null, true, null, false, null, true);
+        final var newProfile = new User("new_name", "existing@example.com", "CC0", true, "http://twitter.com/", true, null, true);
+        final var response = resource.updateMyProfile("UserAgent", newProfile, new AuthUser(user, Collections.emptyList()));
 
         assertThat(response.getStatusCodeValue(), equalTo(200));
         verify(userDao).update(newProfile);
@@ -252,9 +249,9 @@ public class ProfileControllerTest {
     @Test
     public void testUpdateMyProfileConflict() {
         when(userDao.findByNormalizedName("newname")).thenReturn(Optional.of(new User("@New name", "newname@example.com", null, true, null, false, null, true)));
-        final User user = new User("existing", "existing@example.com", null, true, null, false, null, true);
-        final User newProfile = new User("new_name", "existing@example.com", "CC0", true, "http://twitter.com/", true, null, true);
-        final ResponseEntity<String> response = resource.updateMyProfile("UserAgent", newProfile, new AuthUser(user, Collections.emptyList()));
+        final var user = new User("existing", "existing@example.com", null, true, null, false, null, true);
+        final var newProfile = new User("new_name", "existing@example.com", "CC0", true, "http://twitter.com/", true, null, true);
+        final var response = resource.updateMyProfile("UserAgent", newProfile, new AuthUser(user, Collections.emptyList()));
 
         assertThat(response.getStatusCodeValue(), equalTo(409));
         verify(userDao, never()).update(newProfile);
@@ -263,9 +260,9 @@ public class ProfileControllerTest {
     @Test
     public void testUpdateMyProfileNewMail() {
         when(userDao.findByEmail("newname@example.com")).thenReturn(Optional.empty());
-        final User user = new User("existing", "existing@example.com", null, true, null, false, null, true);
-        final User newProfile = new User("existing", "newname@example.com", "CC0", true, "http://twitter.com/", true, null, true);
-        final ResponseEntity<String> response = resource.updateMyProfile("UserAgent", newProfile, new AuthUser(user, Collections.emptyList()));
+        final var user = new User("existing", "existing@example.com", null, true, null, false, null, true);
+        final var newProfile = new User("existing", "newname@example.com", "CC0", true, "http://twitter.com/", true, null, true);
+        final var response = resource.updateMyProfile("UserAgent", newProfile, new AuthUser(user, Collections.emptyList()));
 
         assertThat(response.getStatusCodeValue(), equalTo(200));
         assertVerificationEmail();
@@ -274,10 +271,10 @@ public class ProfileControllerTest {
 
     @Test
     public void testNewUploadTokenViaEmail() {
-        final User user = new User("existing", "existing@example.com", "CC0", true, "https://link@example.com", false, null, true);
+        final var user = new User("existing", "existing@example.com", "CC0", true, "https://link@example.com", false, null, true);
         when(userDao.findByNormalizedName(user.getName())).thenReturn(Optional.of(user));
         when(userDao.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-        final ResponseEntity<String> response = resource.newUploadToken("UserAgent", "existing@example.com");
+        final var response = resource.newUploadToken("UserAgent", "existing@example.com");
 
         assertThat(response.getStatusCodeValue(), equalTo(202));
         assertThat(monitor.getMessages().get(0), equalTo("Reset Password for 'existing', email='existing@example.com'"));
@@ -285,10 +282,10 @@ public class ProfileControllerTest {
 
     @Test
     public void testNewUploadTokenViaName() {
-        final User user = new User("existing", "existing@example.com", "CC0", true, "https://link@example.com", false, null, true);
+        final var user = new User("existing", "existing@example.com", "CC0", true, "https://link@example.com", false, null, true);
         when(userDao.findByNormalizedName(user.getName())).thenReturn(Optional.of(user));
         when(userDao.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-        final ResponseEntity<String> response = resource.newUploadToken("UserAgent", "existing");
+        final var response = resource.newUploadToken("UserAgent", "existing");
 
         assertThat(response.getStatusCodeValue(), equalTo(202));
         assertThat(monitor.getMessages().get(0), equalTo("Reset Password for 'existing', email='existing@example.com'"));
@@ -296,28 +293,28 @@ public class ProfileControllerTest {
 
     @Test
     public void testNewUploadTokenNotFound() {
-        final ResponseEntity<?> response = resource.newUploadToken("UserAgent", "doesnt-exist");
+        final var response = resource.newUploadToken("UserAgent", "doesnt-exist");
 
         assertThat(response.getStatusCodeValue(), equalTo(404));
     }
 
     @Test
     public void testNewUploadTokenEmailMissing() {
-        final User user = new User("existing", "", "CC0", true, "https://link@example.com", false, null, true);
+        final var user = new User("existing", "", "CC0", true, "https://link@example.com", false, null, true);
         when(userDao.findByNormalizedName(user.getName())).thenReturn(Optional.of(user));
         when(userDao.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-        final ResponseEntity<String> response = resource.newUploadToken("UserAgent", "existing");
+        final var response = resource.newUploadToken("UserAgent", "existing");
 
         assertThat(response.getStatusCodeValue(), equalTo(400));
     }
 
     @Test
     public void testVerifyEmailSuccess() {
-        final String token = "verification";
-        final String emailVerification = User.EMAIL_VERIFICATION_TOKEN + token;
-        final User user = new User("existing","https://link@example.com", "CC0", 42, "existing@example.com", true, false, null, false, emailVerification, true);
+        final var token = "verification";
+        final var emailVerification = User.EMAIL_VERIFICATION_TOKEN + token;
+        final var user = new User("existing","https://link@example.com", "CC0", 42, "existing@example.com", true, false, null, false, emailVerification, true);
         when(userDao.findByEmailVerification(emailVerification)).thenReturn(Optional.of(user));
-        final ResponseEntity<String> response = resource.emailVerification(token);
+        final var response = resource.emailVerification(token);
 
         assertThat(response.getStatusCodeValue(), equalTo(200));
         assertThat(monitor.getMessages().get(0), equalTo("Email verified {nickname='existing', email='existing@example.com'}"));
@@ -326,11 +323,11 @@ public class ProfileControllerTest {
 
     @Test
     public void testVerifyEmailFailed() {
-        final String token = "verification";
-        final String emailVerification = User.EMAIL_VERIFICATION_TOKEN + token;
-        final User user = new User("existing","https://link@example.com", "CC0", 42, "existing@example.com", true, false, null, false, emailVerification, true);
+        final var token = "verification";
+        final var emailVerification = User.EMAIL_VERIFICATION_TOKEN + token;
+        final var user = new User("existing","https://link@example.com", "CC0", 42, "existing@example.com", true, false, null, false, emailVerification, true);
         when(userDao.findByEmailVerification(emailVerification)).thenReturn(Optional.of(user));
-        final ResponseEntity<String> response = resource.emailVerification("wrong_token");
+        final var response = resource.emailVerification("wrong_token");
 
         assertThat(response.getStatusCodeValue(), equalTo(404));
         assertThat(monitor.getMessages().isEmpty(), equalTo(true));
@@ -340,8 +337,8 @@ public class ProfileControllerTest {
     @Test
     public void testResendEmailVerification() {
         when(userDao.findByEmail("newname@example.com")).thenReturn(Optional.empty());
-        final User user = new User("existing","https://link@example.com", "CC0", 42, "existing@example.com", true, false, null, false, User.EMAIL_VERIFIED_AT_NEXT_LOGIN, true);
-        final ResponseEntity<String> response = resource.resendEmailVerification(new AuthUser(user, Collections.emptyList()));
+        final var user = new User("existing","https://link@example.com", "CC0", 42, "existing@example.com", true, false, null, false, User.EMAIL_VERIFIED_AT_NEXT_LOGIN, true);
+        final var response = resource.resendEmailVerification(new AuthUser(user, Collections.emptyList()));
 
         assertThat(response.getStatusCodeValue(), equalTo(200));
         assertThat(user.getEmailVerification().startsWith(User.EMAIL_VERIFICATION_TOKEN), is(true));

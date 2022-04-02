@@ -69,16 +69,16 @@ class StatisticControllerTest {
         when(getStatisticUseCase.getStatistic("de")).thenReturn(new Statistic("de", 729, 84, 4));
 
         mvc.perform(get("/de/stats.txt"))
-                .andExpect(status().isOk())
-                .andExpect(openApi().isValid("static/openapi.yaml"))
-                .andExpect(content().string(is("""
-                      name	value
-                      total	729
-                      withPhoto	84
-                      withoutPhoto	645
-                      photographers	4
-                      countryCode	de
-                          """)));
+            .andExpect(status().isOk())
+            .andExpect(openApi().isValid("static/openapi.yaml"))
+            .andExpect(content().string(is("""
+                  name	value
+                  total	729
+                  withPhoto	84
+                  withoutPhoto	645
+                  photographers	4
+                  countryCode	de
+                      """)));
     }
 
 }

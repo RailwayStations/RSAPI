@@ -2,45 +2,56 @@ package org.railwaystations.rsapi.adapter.in.web.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.railwaystations.rsapi.adapter.in.web.ErrorHandlingControllerAdvice;
 import org.railwaystations.rsapi.core.model.Coordinates;
 import org.railwaystations.rsapi.core.model.Photo;
 import org.railwaystations.rsapi.core.model.Station;
 import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.services.PhotoStationsService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@WebMvcTest(controllers = StationsController.class)
+@ContextConfiguration(classes={WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class})
+@AutoConfigureMockMvc(addFilters = false)
 public class StationsControllerTest {
 
-    private StationsController resource;
+    @Autowired
+    private MockMvc mvc;
+
+    @MockBean
+    private PhotoStationsService photoStationsService;
 
     @BeforeEach
     public void setUp() {
-        final Station.Key key5 = new Station.Key("xy", "5");
-        final Station stationXY = new Station(key5, "Lummerland", new Coordinates(50.0, 9.0), "XYZ", new Photo(key5, "/fotos/xy/5.jpg", createTestPhotographer("Jim Knopf", "photographerUrl", "CC0"), null, "CC0"), false);
+        final var key5 = new Station.Key("xy", "5");
+        final var stationXY = new Station(key5, "Lummerland", new Coordinates(50.0, 9.0), "XYZ", new Photo(key5, "/fotos/xy/5.jpg", createTestPhotographer("Jim Knopf", "photographerUrl", "CC0"), null, "CC0"), false);
 
-        final Station.Key key3 = new Station.Key("ab", "3");
-        final Station stationAB = new Station(key3, "Nimmerland", new Coordinates(40.0, 6.0), "ABC", new Photo(key3, "/fotos/ab/3.jpg", createTestPhotographer("Peter Pan", "photographerUrl2", "CC0 by SA"), null, "CC0 by SA"), true);
+        final var key3 = new Station.Key("ab", "3");
+        final var stationAB = new Station(key3, "Nimmerland", new Coordinates(40.0, 6.0), "ABC", new Photo(key3, "/fotos/ab/3.jpg", createTestPhotographer("Peter Pan", "photographerUrl2", "CC0 by SA"), null, "CC0 by SA"), true);
 
-        final List<Station> stationsAll = List.of(stationAB, stationXY);
+        final var stationsAll = List.of(stationAB, stationXY);
 
-        final PhotoStationsService repository = Mockito.mock(PhotoStationsService.class);
-        when(repository.findStationsBy(Collections.singleton("xy"), null, null, null, null, null, null)).thenReturn(List.of(stationXY));
-        when(repository.findStationsBy(Collections.singleton("ab"), null, null, null, null, null, null)).thenReturn(List.of(stationAB));
-        when(repository.findStationsBy(null, null, null, null, null, null, null)).thenReturn(stationsAll);
-        when(repository.findStationsBy(allCountries(), null, null, null, null, null, null)).thenReturn(stationsAll);
-        when(repository.findByCountryAndId("ab", "3")).thenReturn(Optional.of(stationAB));
-
-        resource = new StationsController(repository);
+        when(photoStationsService.findStationsBy(Collections.singleton("xy"), null, null, null, null, null, null)).thenReturn(List.of(stationXY));
+        when(photoStationsService.findStationsBy(Collections.singleton("ab"), null, null, null, null, null, null)).thenReturn(List.of(stationAB));
+        when(photoStationsService.findStationsBy(null, null, null, null, null, null, null)).thenReturn(stationsAll);
+        when(photoStationsService.findStationsBy(allCountries(), null, null, null, null, null, null)).thenReturn(stationsAll);
+        when(photoStationsService.findByCountryAndId("ab", "3")).thenReturn(Optional.of(stationAB));
     }
 
     private Set<String> allCountries() {
@@ -48,65 +59,84 @@ public class StationsControllerTest {
     }
 
     @Test
-    public void testGetXY() {
-        final List<Station> resultXY = resource.get(Collections.singleton("xy"), null, null, null, null, null, null);
-        final Station stationXY = resultXY.get(0);
-        assertThat(stationXY, notNullValue());
-        assertThat(stationXY.getKey(), equalTo(new Station.Key("xy", "5")));
-        assertThat(stationXY.getTitle(), equalTo("Lummerland"));
-        assertThat(stationXY.getCoordinates().getLat(), equalTo(50.0));
-        assertThat(stationXY.getCoordinates().getLon(), equalTo(9.0));
-        assertThat(stationXY.getPhotographer(), equalTo("Jim Knopf"));
-        assertThat(stationXY.getDS100(), equalTo("XYZ"));
-        assertThat(stationXY.getPhotoUrl(), equalTo("/fotos/xy/5.jpg"));
-        assertThat(stationXY.getLicense(), equalTo("CC0"));
-        assertThat(stationXY.getPhotographerUrl(), equalTo("photographerUrl"));
-        assertThat(stationXY.isActive(), equalTo(false));
+    public void testGetXY() throws Exception {
+        mvc.perform(get("/stations?country=xy"))
+                .andExpect(status().isOk())
+                .andExpect(openApi().isValid("static/openapi.yaml"))
+                .andExpect(jsonPath("$.[0].country").value("xy"))
+                .andExpect(jsonPath("$.[0].idStr").value("5"))
+                .andExpect(jsonPath("$.[0].title").value("Lummerland"))
+                .andExpect(jsonPath("$.[0].lat").value(50.0))
+                .andExpect(jsonPath("$.[0].lon").value(9.0))
+                .andExpect(jsonPath("$.[0].photographer").value("Jim Knopf"))
+                .andExpect(jsonPath("$.[0].DS100").value("XYZ"))
+                .andExpect(jsonPath("$.[0].photoUrl").value("/fotos/xy/5.jpg"))
+                .andExpect(jsonPath("$.[0].license").value("CC0"))
+                .andExpect(jsonPath("$.[0].photographerUrl").value("photographerUrl"))
+                .andExpect(jsonPath("$.[0].active").value(false));
     }
 
     @Test
-    public void testGetXYWithFilterActive() {
-        final List<Station> resultXY = resource.get(Collections.singleton("xy"), null, null, null, null, null, true);
-        assertThat(resultXY.isEmpty(), equalTo(true));
+    public void testGetXYWithFilterActive() throws Exception {
+        mvc.perform(get("/stations?country=xy&active=true"))
+                .andExpect(status().isOk())
+                .andExpect(openApi().isValid("static/openapi.yaml"))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty());
     }
 
     @Test
-    public void testGetAB() {
-        final List<Station> resultAB = resource.get(Collections.singleton("ab"), null, null, null, null, null, null);
-        final Station station = resultAB.get(0);
-        assertNimmerland(station);
+    public void testGetAB() throws Exception {
+        mvc.perform(get("/stations?country=ab"))
+                .andExpect(status().isOk())
+                .andExpect(openApi().isValid("static/openapi.yaml"))
+                .andExpect(jsonPath("$.[0].country").value("ab"))
+                .andExpect(jsonPath("$.[0].idStr").value("3"))
+                .andExpect(jsonPath("$.[0].title").value("Nimmerland"))
+                .andExpect(jsonPath("$.[0].lat").value(40.0))
+                .andExpect(jsonPath("$.[0].lon").value(6.0))
+                .andExpect(jsonPath("$.[0].photographer").value("Peter Pan"))
+                .andExpect(jsonPath("$.[0].DS100").value("ABC"))
+                .andExpect(jsonPath("$.[0].photoUrl").value("/fotos/ab/3.jpg"))
+                .andExpect(jsonPath("$.[0].license").value("CC0 by SA"))
+                .andExpect(jsonPath("$.[0].photographerUrl").value("photographerUrl2"))
+                .andExpect(jsonPath("$.[0].active").value(true));
     }
 
     @Test
-    public void testGetABXY() {
-        final List<Station> resultAB = resource.get(allCountries(), null, null, null, null, null, null);
-        assertThat(resultAB.size(), equalTo(2));
-    }
-
-    private void assertNimmerland(final Station station) {
-        assertThat(station, notNullValue());
-        assertThat(station.getKey(), equalTo(new Station.Key("ab", "3")));
-        assertThat(station.getTitle(), equalTo("Nimmerland"));
-        assertThat(station.getCoordinates().getLat(), equalTo(40.0));
-        assertThat(station.getCoordinates().getLon(), equalTo(6.0));
-        assertThat(station.getPhotographer(), equalTo("Peter Pan"));
-        assertThat(station.getPhotoUrl(), equalTo("/fotos/ab/3.jpg"));
-        assertThat(station.getDS100(), equalTo("ABC"));
-        assertThat(station.getLicense(), equalTo("CC0 by SA"));
-        assertThat(station.getPhotographerUrl(), equalTo("photographerUrl2"));
-        assertThat(station.isActive(), equalTo(true));
-    }
-
-    @Test
-    public void testGetById() {
-        final Station station = resource.getById("ab", "3");
-        assertNimmerland(station);
+    public void testGetById() throws Exception {
+        mvc.perform(get("/ab/stations/3"))
+                .andExpect(status().isOk())
+                .andExpect(openApi().isValid("static/openapi.yaml"))
+                .andExpect(jsonPath("$.country").value("ab"))
+                .andExpect(jsonPath("$.idStr").value("3"))
+                .andExpect(jsonPath("$.title").value("Nimmerland"))
+                .andExpect(jsonPath("$.lat").value(40.0))
+                .andExpect(jsonPath("$.lon").value(6.0))
+                .andExpect(jsonPath("$.photographer").value("Peter Pan"))
+                .andExpect(jsonPath("$.DS100").value("ABC"))
+                .andExpect(jsonPath("$.photoUrl").value("/fotos/ab/3.jpg"))
+                .andExpect(jsonPath("$.license").value("CC0 by SA"))
+                .andExpect(jsonPath("$.photographerUrl").value("photographerUrl2"))
+                .andExpect(jsonPath("$.active").value(true));
     }
 
     @Test
-    public void testGetAll() {
-        final List<Station> resultAll = resource.get(null, null, null, null, null, null, null);
-        assertThat(resultAll.size(), equalTo(2));
+    public void testGetABXY() throws Exception {
+        mvc.perform(get("/stations?country=ab&country=xy"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0]").isNotEmpty())
+                .andExpect(jsonPath("$.[1]").isNotEmpty())
+                .andExpect(jsonPath("$.[2]").doesNotExist());
+    }
+
+    @Test
+    public void testGetAll() throws Exception {
+        mvc.perform(get("/stations"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0]").isNotEmpty())
+                .andExpect(jsonPath("$.[1]").isNotEmpty())
+                .andExpect(jsonPath("$.[2]").doesNotExist());
     }
 
     private User createTestPhotographer(final String name, final String url, final String license) {

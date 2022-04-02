@@ -46,7 +46,7 @@ public class CountriesControllerTest {
     public void testList(final String urlTemplate) throws Exception {
         when(countryDao.list(true)).thenReturn(createCountryList());
 
-        final String contentAsString = mvc.perform(get(urlTemplate))
+        final var contentAsString = mvc.perform(get(urlTemplate))
                 .andExpect(status().isOk())
                 .andExpect(openApi().isValid("static/openapi.yaml"))
                 .andReturn().getResponse().getContentAsString();
@@ -63,7 +63,7 @@ public class CountriesControllerTest {
 
     @NotNull
     private Country createCountry(final String code) {
-        final Country xy = new Country(code, "name-" + code, "email-" + code, "twitter-" + code, "timetable-" + code, "overrideLicense-" + code, true);
+        final var xy = new Country(code, "name-" + code, "email-" + code, "twitter-" + code, "timetable-" + code, "overrideLicense-" + code, true);
         xy.getProviderApps().add(new ProviderApp("android", "Provider-" + code, "providerAndroidApp-" + code));
         xy.getProviderApps().add(new ProviderApp("ios", "Provider-" + code, "providerIosApp-" + code));
         xy.getProviderApps().add(new ProviderApp("web", "Provider-" + code, "providerWebApp-" + code));

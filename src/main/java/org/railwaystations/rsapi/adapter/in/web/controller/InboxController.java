@@ -18,7 +18,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -65,7 +64,7 @@ public class InboxController {
      * Not part of the "official" API.
      * Supports upload of photos via the website.
      */
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/photoUpload", produces = MediaType.TEXT_HTML_VALUE)
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE + ";charset=UTF-8"}, value = "/photoUpload", produces = MediaType.TEXT_HTML_VALUE)
     @ResponseBody
     public ModelAndView photoUploadIframe(@RequestHeader(value = HttpHeaders.USER_AGENT, required = false) final String userAgent,
                                           @RequestParam(EMAIL) final String email,
@@ -80,15 +79,15 @@ public class InboxController {
                                           @RequestParam(value = FILE) final MultipartFile file,
                                           @RequestHeader(value = HttpHeaders.REFERER) final String referer) throws JsonProcessingException {
         LOG.info("MultipartFormData: email={}, station={}, country={}, file={}", email, stationId, countryCode, file.getName());
-        final URI refererUri = URI.create(referer);
+        final var refererUri = URI.create(referer);
 
         try {
-            final Authentication authentication = authenticator.authenticate(new UsernamePasswordAuthenticationToken(email, uploadToken));
+            final var authentication = authenticator.authenticate(new UsernamePasswordAuthenticationToken(email, uploadToken));
             if (authentication == null || !authentication.isAuthenticated()) {
                 return createIFrameAnswer(consumeBodyAndReturn(file.getInputStream(), new InboxResponse(InboxResponse.InboxResponseState.UNAUTHORIZED)), refererUri);
             }
 
-            final InboxResponse response = uploadPhoto(userAgent, file.getInputStream(), StringUtils.trimToNull(stationId),
+            final var response = uploadPhoto(userAgent, file.getInputStream(), StringUtils.trimToNull(stationId),
                     StringUtils.trimToNull(countryCode), file.getContentType(), stationTitle, latitude, longitude, comment, active, userDetailsService.loadUserByUsername(email));
             return createIFrameAnswer(response, refererUri);
         } catch (final Exception e) {
@@ -110,9 +109,9 @@ public class InboxController {
                                                      @RequestHeader(value = "Comment", required = false) final String encComment,
                                                      @RequestHeader(value = "Active", required = false) final Boolean active,
                                                      @AuthenticationPrincipal final AuthUser user) throws IOException {
-        final String stationTitle = encStationTitle != null ? URLDecoder.decode(encStationTitle, StandardCharsets.UTF_8) : null;
-        final String comment = encComment != null ? URLDecoder.decode(encComment, StandardCharsets.UTF_8) : null;
-        final InboxResponse inboxResponse = uploadPhoto(userAgent, request.getInputStream(), StringUtils.trimToNull(stationId),
+        final var stationTitle = encStationTitle != null ? URLDecoder.decode(encStationTitle, StandardCharsets.UTF_8) : null;
+        final var comment = encComment != null ? URLDecoder.decode(encComment, StandardCharsets.UTF_8) : null;
+        final var inboxResponse = uploadPhoto(userAgent, request.getInputStream(), StringUtils.trimToNull(stationId),
                 StringUtils.trimToNull(country), contentType, stationTitle, latitude, longitude, comment, active, user);
         return new ResponseEntity<>(inboxResponse, map(inboxResponse.getState()));
     }
@@ -171,7 +170,7 @@ public class InboxController {
                                       final String country, final String contentType, final String stationTitle,
                                       final Double latitude, final Double longitude, final String comment,
                                       final Boolean active, final AuthUser user) {
-        final InboxResponse inboxResponse = manageInboxUseCase.uploadPhoto(userAgent, body, stationId, country, contentType, stationTitle,
+        final InboxResponse inboxResponse = manageInboxUseCase.uploadPhoto(userAgent, body, stationId, country, contentType.split(";")[0], stationTitle,
                 latitude, longitude, comment, active, user.getUser());
         return consumeBodyAndReturn(body, inboxResponse);
     }
