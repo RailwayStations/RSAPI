@@ -780,7 +780,7 @@ paths:
         200:
           description: email successfully verified
           content: {}
-        400:
+        404:
           description: token not found, verification failed
           content: {}
   /resendEmailVerification:

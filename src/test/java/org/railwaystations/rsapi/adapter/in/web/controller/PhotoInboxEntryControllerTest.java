@@ -221,7 +221,7 @@ public class PhotoInboxEntryControllerTest {
     }
 
     @Test
-    public void testPost() throws Exception {
+    public void testUploadPhoto() throws Exception {
         final var uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
         when(inboxDao.insert(any())).thenReturn(1);
 

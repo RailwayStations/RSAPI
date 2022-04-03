@@ -68,7 +68,7 @@ public class ProfileController {
         try {
             manageProfileUseCase.register(newUser, userAgent);
         } catch (final IllegalArgumentException e) {
-            LOG.warn("Registration for '{}' with '{}' failed: {}", newUser.getName(), newUser.getEmail(), e.getMessage());
+            LOG.warn("Registration for '{}' with email '{}' failed: {}", newUser.getName(), newUser.getEmail(), e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (final ProfileService.ProfileConflictException e) {
             return new ResponseEntity<>("Conflict with other user or email", HttpStatus.CONFLICT);

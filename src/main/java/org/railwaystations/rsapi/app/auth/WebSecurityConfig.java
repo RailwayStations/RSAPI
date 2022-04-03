@@ -20,7 +20,6 @@ import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
-@SuppressWarnings("PMD.BeanMembersShouldSerialize")
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired

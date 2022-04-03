@@ -17,17 +17,17 @@ import java.nio.file.Files;
 public class MockMvcTestConfiguration {
 
     @Bean
-    MastodonBot createMastodonBot() {
+    MastodonBot mastodonBot() {
         return new MastodonBotHttpClient(new MastodonBotConfig());
     }
 
     @Bean
-    WorkDir createWorkDir() throws IOException {
+    WorkDir workDir() throws IOException {
         return new WorkDir(Files.createTempDirectory("rsapi").toString(), null);
     }
 
     @Bean
-    MockMonitor createMonitor() {
+    MockMonitor monitor() {
         return new MockMonitor();
     }
 
