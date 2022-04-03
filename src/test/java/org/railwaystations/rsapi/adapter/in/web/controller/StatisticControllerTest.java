@@ -11,12 +11,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 
 import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = StatisticController.class)
 @ContextConfiguration(classes={WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class, StatisticTxtWriter.class})
@@ -32,7 +35,7 @@ class StatisticControllerTest {
     @Test
     void whenCountryIsInvalidThenReturnsStatus400() throws Exception {
         mvc.perform(get("/x/stats"))
-                .andExpect(openApi().isValid("static/openapi.yaml"))
+                .andExpect(validOpenApi())
                 .andExpect(status().isBadRequest());
     }
 
@@ -42,12 +45,16 @@ class StatisticControllerTest {
 
         mvc.perform(get("/stats.json"))
                 .andExpect(status().isOk())
-                .andExpect(openApi().isValid("static/openapi.yaml"))
+                .andExpect(validOpenApi())
                 .andExpect(jsonPath("$.total").value(954))
                 .andExpect(jsonPath("$.withPhoto").value(91))
                 .andExpect(jsonPath("$.withoutPhoto").value(863))
                 .andExpect(jsonPath("$.photographers").value(6))
                 .andExpect(jsonPath("$.countryCode").doesNotExist());
+    }
+
+    private ResultMatcher validOpenApi() {
+        return openApi().isValid("static/openapi.yaml");
     }
 
     @Test
@@ -56,7 +63,7 @@ class StatisticControllerTest {
 
         mvc.perform(get("/de/stats.json"))
                 .andExpect(status().isOk())
-                .andExpect(openApi().isValid("static/openapi.yaml"))
+                .andExpect(validOpenApi())
                 .andExpect(jsonPath("$.total").value(729))
                 .andExpect(jsonPath("$.withPhoto").value(84))
                 .andExpect(jsonPath("$.withoutPhoto").value(645))
@@ -70,7 +77,7 @@ class StatisticControllerTest {
 
         mvc.perform(get("/de/stats.txt"))
             .andExpect(status().isOk())
-            .andExpect(openApi().isValid("static/openapi.yaml"))
+            .andExpect(validOpenApi())
             .andExpect(content().string(is("""
                   name	value
                   total	729

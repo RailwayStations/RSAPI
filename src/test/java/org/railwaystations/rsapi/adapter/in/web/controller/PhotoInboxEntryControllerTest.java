@@ -7,7 +7,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 import org.railwaystations.rsapi.adapter.in.web.ErrorHandlingControllerAdvice;
-import org.railwaystations.rsapi.adapter.out.db.*;
+import org.railwaystations.rsapi.adapter.out.db.CountryDao;
+import org.railwaystations.rsapi.adapter.out.db.InboxDao;
+import org.railwaystations.rsapi.adapter.out.db.PhotoDao;
+import org.railwaystations.rsapi.adapter.out.db.StationDao;
+import org.railwaystations.rsapi.adapter.out.db.UserDao;
 import org.railwaystations.rsapi.adapter.out.monitoring.MockMonitor;
 import org.railwaystations.rsapi.adapter.out.photostorage.PhotoFileStorage;
 import org.railwaystations.rsapi.adapter.out.photostorage.WorkDir;
@@ -15,7 +19,11 @@ import org.railwaystations.rsapi.app.auth.AuthUser;
 import org.railwaystations.rsapi.app.auth.RSAuthenticationProvider;
 import org.railwaystations.rsapi.app.auth.RSUserDetailsService;
 import org.railwaystations.rsapi.app.auth.WebSecurityConfig;
-import org.railwaystations.rsapi.core.model.*;
+import org.railwaystations.rsapi.core.model.Coordinates;
+import org.railwaystations.rsapi.core.model.InboxEntry;
+import org.railwaystations.rsapi.core.model.Photo;
+import org.railwaystations.rsapi.core.model.Station;
+import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.services.InboxService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -28,6 +36,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -39,11 +48,17 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -149,7 +164,11 @@ public class PhotoInboxEntryControllerTest {
                         .content(inputBytes)
                         .with(user(new AuthUser(new User(nickname, null, "CC0", userId, email, true, false, null, false, emailVerification, true), Collections.emptyList())))
                         .with(csrf()))
-                .andExpect(openApi().isValid("static/openapi.yaml"));
+                .andExpect(validOpenApi());
+    }
+
+    private ResultMatcher validOpenApi() {
+        return openApi().isValid("static/openapi.yaml");
     }
 
     @Test
@@ -338,7 +357,7 @@ public class PhotoInboxEntryControllerTest {
                         .content(inboxStateQueries)
                         .with(user(new AuthUser(new User("nickname", null, "CC0", 42, "nickname@example.com", true, false, null, false, User.EMAIL_VERIFIED, true), Collections.emptyList())))
                         .with(csrf()))
-                .andExpect(openApi().isValid("static/openapi.yaml"))
+                .andExpect(validOpenApi())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].state").value("REVIEW"))
                 .andExpect(jsonPath("$.[0].filename").value("1.jpg"))
@@ -398,7 +417,7 @@ public class PhotoInboxEntryControllerTest {
                         .content(problemReportJson)
                         .with(user(new AuthUser(new User("@nick name", null, "CC0", 42, "nickname@example.com", true, false, null, false, emailVerification, true), Collections.emptyList())))
                         .with(csrf()))
-                .andExpect(openApi().isValid("static/openapi.yaml"));
+                .andExpect(validOpenApi());
     }
 
     @Test

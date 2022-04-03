@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.util.Map;
 
@@ -19,7 +20,9 @@ import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.open
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = PhotographersController.class)
 @ContextConfiguration(classes={WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class, PhotographersTxtWriter.class})
@@ -38,8 +41,12 @@ class PhotographersControllerTest {
             "/x/photographers.txt", "/xyz/photographers.txt", "/photographers.txt?country=x", "/photographers.txt?country=xyz"})
     void whenCountryIsInvalidThenReturnsStatus400(final String urlTemplate) throws Exception {
         mvc.perform(get(urlTemplate))
-                .andExpect(openApi().isValid("static/openapi.yaml"))
+                .andExpect(validOpenApi())
                 .andExpect(status().isBadRequest());
+    }
+
+    private ResultMatcher validOpenApi() {
+        return openApi().isValid("static/openapi.yaml");
     }
 
     @ParameterizedTest
@@ -53,7 +60,7 @@ class PhotographersControllerTest {
                 .andExpect(jsonPath("$.@user8").value(29))
                 .andExpect(jsonPath("$.@user10").value(15))
                 .andExpect(jsonPath("$.@user0").value(9))
-                .andExpect(openApi().isValid("static/openapi.yaml"));
+                .andExpect(validOpenApi());
     }
 
     @ParameterizedTest
@@ -67,7 +74,7 @@ class PhotographersControllerTest {
                 .andExpect(jsonPath("$.@user8").value(29))
                 .andExpect(jsonPath("$.@user10").value(15))
                 .andExpect(jsonPath("$.@user0").value(9))
-                .andExpect(openApi().isValid("static/openapi.yaml"));
+                .andExpect(validOpenApi());
     }
 
     @ParameterizedTest
@@ -77,7 +84,7 @@ class PhotographersControllerTest {
 
         mvc.perform(get(urlTemplate))
                 .andExpect(status().isOk())
-                .andExpect(openApi().isValid("static/openapi.yaml"))
+                .andExpect(validOpenApi())
                 .andExpect(content().string(is("""
 					count	photographer
 					31	@user27

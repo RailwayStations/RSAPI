@@ -8,7 +8,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.railwaystations.rsapi.app.auth.AuthUser;
 import org.railwaystations.rsapi.app.auth.RSAuthenticationProvider;
 import org.railwaystations.rsapi.app.auth.RSUserDetailsService;
-import org.railwaystations.rsapi.core.model.*;
+import org.railwaystations.rsapi.core.model.InboxEntry;
+import org.railwaystations.rsapi.core.model.InboxResponse;
+import org.railwaystations.rsapi.core.model.InboxStateQuery;
+import org.railwaystations.rsapi.core.model.ProblemReport;
+import org.railwaystations.rsapi.core.model.PublicInboxEntry;
 import org.railwaystations.rsapi.core.ports.in.ManageInboxUseCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +23,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -88,7 +98,7 @@ public class InboxController {
             }
 
             final var response = uploadPhoto(userAgent, file.getInputStream(), StringUtils.trimToNull(stationId),
-                    StringUtils.trimToNull(countryCode), file.getContentType(), stationTitle, latitude, longitude, comment, active, userDetailsService.loadUserByUsername(email));
+                    countryCode, file.getContentType(), stationTitle, latitude, longitude, comment, active, userDetailsService.loadUserByUsername(email));
             return createIFrameAnswer(response, refererUri);
         } catch (final Exception e) {
             LOG.error("FormUpload error", e);
@@ -111,8 +121,8 @@ public class InboxController {
                                                      @AuthenticationPrincipal final AuthUser user) throws IOException {
         final var stationTitle = encStationTitle != null ? URLDecoder.decode(encStationTitle, StandardCharsets.UTF_8) : null;
         final var comment = encComment != null ? URLDecoder.decode(encComment, StandardCharsets.UTF_8) : null;
-        final var inboxResponse = uploadPhoto(userAgent, request.getInputStream(), StringUtils.trimToNull(stationId),
-                StringUtils.trimToNull(country), contentType, stationTitle, latitude, longitude, comment, active, user);
+        final var inboxResponse = uploadPhoto(userAgent, request.getInputStream(), stationId,
+                country, contentType, stationTitle, latitude, longitude, comment, active, user);
         return new ResponseEntity<>(inboxResponse, map(inboxResponse.getState()));
     }
 
@@ -167,10 +177,11 @@ public class InboxController {
     }
 
     private InboxResponse uploadPhoto(final String userAgent, final InputStream body, final String stationId,
-                                      final String country, final String contentType, final String stationTitle,
+                                      final String countryCode, final String contentType, final String stationTitle,
                                       final Double latitude, final Double longitude, final String comment,
                                       final Boolean active, final AuthUser user) {
-        final InboxResponse inboxResponse = manageInboxUseCase.uploadPhoto(userAgent, body, stationId, country, contentType.split(";")[0], stationTitle,
+        final InboxResponse inboxResponse = manageInboxUseCase.uploadPhoto(userAgent, body, StringUtils.trimToNull(stationId), StringUtils.trimToNull(countryCode),
+                StringUtils.trimToEmpty(contentType).split(";")[0], stationTitle,
                 latitude, longitude, comment, active, user.getUser());
         return consumeBodyAndReturn(body, inboxResponse);
     }

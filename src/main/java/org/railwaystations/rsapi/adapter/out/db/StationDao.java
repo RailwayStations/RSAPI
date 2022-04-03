@@ -12,7 +12,11 @@ import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
-import org.railwaystations.rsapi.core.model.*;
+import org.railwaystations.rsapi.core.model.Coordinates;
+import org.railwaystations.rsapi.core.model.Photo;
+import org.railwaystations.rsapi.core.model.Station;
+import org.railwaystations.rsapi.core.model.Statistic;
+import org.railwaystations.rsapi.core.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

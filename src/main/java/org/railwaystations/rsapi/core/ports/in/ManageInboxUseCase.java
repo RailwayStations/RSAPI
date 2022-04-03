@@ -1,6 +1,11 @@
 package org.railwaystations.rsapi.core.ports.in;
 
-import org.railwaystations.rsapi.core.model.*;
+import org.railwaystations.rsapi.core.model.InboxEntry;
+import org.railwaystations.rsapi.core.model.InboxResponse;
+import org.railwaystations.rsapi.core.model.InboxStateQuery;
+import org.railwaystations.rsapi.core.model.ProblemReport;
+import org.railwaystations.rsapi.core.model.PublicInboxEntry;
+import org.railwaystations.rsapi.core.model.User;
 
 import javax.validation.constraints.NotNull;
 import java.io.InputStream;
