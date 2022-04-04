@@ -1,6 +1,6 @@
 # TODOs and ideas
 
-- all Controller tests with MockMVC
+- reduce amount of integration tests
 
 - introduce Lombok?
   - or more Java records
