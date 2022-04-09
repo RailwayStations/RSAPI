@@ -19,23 +19,25 @@ import java.util.Set;
 
 public interface CountryDao {
 
-    @SqlQuery("select " +
-            "c.id c_id, c.name c_name, c.email c_email, c.twitterTags c_twitterTags, c.timetableUrlTemplate c_timetableUrlTemplate, c.overrideLicense c_overrideLicense, c.active c_active, " +
-            "p.type p_type, p.name p_name, p.url p_url " +
-            "from countries c left join providerApps p " +
-            "on c.id = p.countryCode " +
-            "where c.id = :id")
+    @SqlQuery("""
+            SELECT c.id c_id, c.name c_name, c.email c_email, c.twitterTags c_twitterTags, c.timetableUrlTemplate c_timetableUrlTemplate,
+                    c.overrideLicense c_overrideLicense, c.active c_active, p.type p_type, p.name p_name, p.url p_url
+            FROM countries c
+                LEFT JOIN providerApps p ON c.id = p.countryCode
+            WHERE c.id = :id
+            """)
     @UseRowReducer(CountryProviderAppReducer.class)
     @RegisterRowMapper(CountryMapper.class)
     @RegisterRowMapper(ProviderAppMapper.class)
     Optional<Country> findById(@Bind("id") final String id);
 
-    @SqlQuery("select " +
-            "c.id c_id, c.name c_name, c.email c_email, c.twitterTags c_twitterTags, c.timetableUrlTemplate c_timetableUrlTemplate, c.overrideLicense c_overrideLicense, c.active c_active, " +
-            "p.type p_type, p.name p_name, p.url p_url " +
-            "from countries c left join providerApps p " +
-            "on c.id = p.countryCode " +
-            "where :onlyActive = false or c.active = true")
+    @SqlQuery("""
+            SELECT c.id c_id, c.name c_name, c.email c_email, c.twitterTags c_twitterTags, c.timetableUrlTemplate c_timetableUrlTemplate,
+                    c.overrideLicense c_overrideLicense, c.active c_active, p.type p_type, p.name p_name, p.url p_url
+            FROM countries c
+                LEFT JOIN providerApps p ON c.id = p.countryCode
+            WHERE :onlyActive = false OR c.active = true
+            """)
     @UseRowReducer(CountryProviderAppReducer.class)
     @RegisterRowMapper(CountryMapper.class)
     @RegisterRowMapper(ProviderAppMapper.class)
@@ -66,11 +68,11 @@ public interface CountryDao {
     class CountryProviderAppReducer implements LinkedHashMapRowReducer<String, Country> {
         @Override
         public void accumulate(final Map<String, Country> map, final RowView rowView) {
-            final Country c = map.computeIfAbsent(rowView.getColumn("c_id", String.class),
+            final var country = map.computeIfAbsent(rowView.getColumn("c_id", String.class),
                     id -> rowView.getRow(Country.class));
 
             if (rowView.getColumn("p_type", String.class) != null) {
-                c.getProviderApps().add(rowView.getRow(ProviderApp.class));
+                country.getProviderApps().add(rowView.getRow(ProviderApp.class));
             }
         }
     }

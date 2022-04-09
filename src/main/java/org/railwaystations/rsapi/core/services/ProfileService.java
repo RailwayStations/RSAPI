@@ -3,6 +3,7 @@ package org.railwaystations.rsapi.core.services;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.railwaystations.rsapi.adapter.out.db.UserDao;
+import org.railwaystations.rsapi.core.model.PasswordChangeCommand;
 import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.ports.in.ManageProfileUseCase;
 import org.railwaystations.rsapi.core.ports.out.Mailer;
@@ -37,9 +38,9 @@ public class ProfileService implements ManageProfileUseCase {
     }
 
     @Override
-    public void changePassword(final User user, final String newPassword) {
+    public void changePassword(final User user, final PasswordChangeCommand passwordChangeCommand) {
         LOG.info("Password change for '{}'", user.getEmail());
-        final String trimmedPassword = StringUtils.trimToEmpty(newPassword);
+        final String trimmedPassword = StringUtils.trimToEmpty(passwordChangeCommand.newPassword());
         if (trimmedPassword.length() < 8 ) {
             throw new IllegalArgumentException("Password too short");
         }

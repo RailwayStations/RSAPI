@@ -259,6 +259,10 @@ public class InboxService implements ManageInboxUseCase {
     private void importUpload(final InboxEntry inboxEntry, final InboxEntry command) {
         LOG.info("Importing upload {}, {}", inboxEntry.getId(), inboxEntry.getFilename());
 
+        if (inboxEntry.isProblemReport()) {
+            throw new IllegalArgumentException("Can't import a problem report");
+        }
+
         final var station = findOrCreateStation(inboxEntry, command);
 
         if (station.hasPhoto() && !command.ignoreConflict()) {

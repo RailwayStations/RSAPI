@@ -1,7 +1,7 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
 import org.railwaystations.rsapi.app.auth.AuthUser;
-import org.railwaystations.rsapi.core.model.ChangePassword;
+import org.railwaystations.rsapi.core.model.PasswordChangeCommand;
 import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.ports.in.ManageProfileUseCase;
 import org.railwaystations.rsapi.core.services.ProfileService;
@@ -38,9 +38,9 @@ public class ProfileController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> changePassword(@AuthenticationPrincipal final AuthUser authUser,
                                                  @RequestHeader(value = "New-Password", required = false) final String newPassword,
-                                                 @RequestBody(required = false) final ChangePassword changePassword) {
+                                                 @RequestBody(required = false) final PasswordChangeCommand passwordChangeCommand) {
         try {
-            manageProfileUseCase.changePassword(authUser.getUser(), changePassword != null ? changePassword.getNewPassword() : newPassword);
+            manageProfileUseCase.changePassword(authUser.getUser(), passwordChangeCommand != null ? passwordChangeCommand : new PasswordChangeCommand(newPassword));
         } catch (final IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

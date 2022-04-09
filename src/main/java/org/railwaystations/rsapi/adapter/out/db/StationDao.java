@@ -10,6 +10,7 @@ import org.jdbi.v3.sqlobject.config.ValueColumn;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.customizer.BindList;
+import org.jdbi.v3.sqlobject.customizer.BindMethods;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.railwaystations.rsapi.core.model.Coordinates;
@@ -27,75 +28,95 @@ import java.util.Set;
 
 public interface StationDao {
 
-    String JOIN_QUERY = "select s.countryCode, s.id, s.DS100, s.title, s.lat, s.lon, s.active, p.urlPath, p.license, p.createdAt, u.id as photographerId, u.name, u.url as photographerUrl, u.license as photographerLicense, u.anonymous from countries c left join stations s on c.id = s.countryCode left join photos p on p.countryCode = s.countryCode and p.id = s.id left join users u on u.id = p.photographerId";
+    String JOIN_QUERY = """
+                SELECT s.countryCode, s.id, s.DS100, s.title, s.lat, s.lon, s.active, p.urlPath, p.license, p.createdAt, u.id AS photographerId,
+                        u.name, u.url AS photographerUrl, u.license AS photographerLicense, u.anonymous
+                FROM countries c
+                    LEFT JOIN stations s ON c.id = s.countryCode
+                    LEFT JOIN photos p ON p.countryCode = s.countryCode AND p.id = s.id
+                    LEFT JOIN users u ON u.id = p.photographerId
+                """;
 
-    @SqlQuery(JOIN_QUERY + " where c.active = true and s.countryCode in (<countryCodes>)")
+    @SqlQuery(JOIN_QUERY + " WHERE c.active = true AND s.countryCode IN (<countryCodes>)")
     @RegisterRowMapper(StationMapper.class)
     Set<Station> findByCountryCodes(@BindList("countryCodes") final Set<String> countryCodes);
 
-    @SqlQuery(JOIN_QUERY + " where c.active = true")
+    @SqlQuery(JOIN_QUERY + " WHERE c.active = true")
     @RegisterRowMapper(StationMapper.class)
     Set<Station> all();
 
-    @SqlQuery(JOIN_QUERY + " where (s.countryCode = :countryCode or :countryCode is null) and s.id = :id")
+    @SqlQuery(JOIN_QUERY + " WHERE (s.countryCode = :countryCode OR :countryCode IS NULL) AND s.id = :id")
     @RegisterRowMapper(StationMapper.class)
     Set<Station> findByKey(@Bind("countryCode") final String countryCode, @Bind("id") final String id);
 
-    @SqlQuery(JOIN_QUERY + " where s.id = :id")
+    @SqlQuery(JOIN_QUERY + " WHERE s.id = :id")
     @RegisterRowMapper(StationMapper.class)
     Set<Station> findById(@Bind("id") final String id);
 
-    @SqlQuery("select :countryCode countryCode, count(*) stations, count(p.urlPath) photos, count(distinct p.photographerId) photographers from stations s left join photos p on p.countryCode = s.countryCode and p.id = s.id where s.countryCode = :countryCode or :countryCode is null")
+    @SqlQuery("""
+        SELECT :countryCode countryCode, COUNT(*) stations, COUNT(p.urlPath) photos, COUNT(distinct p.photographerId) photographers
+        FROM stations s
+            LEFT JOIN photos p ON p.countryCode = s.countryCode AND p.id = s.id
+        WHERE s.countryCode = :countryCode OR :countryCode IS NULL
+        """)
     @RegisterRowMapper(StatisticMapper.class)
     @SingleValue
     Statistic getStatistic(@Bind("countryCode") final String countryCode);
 
-    @SqlQuery("select u.name photographer, count(*) photocount from stations s join photos p on p.countryCode = s.countryCode and p.id = s.id join users u on u.id = p.photographerId where s.countryCode = :countryCode or :countryCode is null group by u.name order by count(*) desc")
+    @SqlQuery("""
+        SELECT u.name photographer, COUNT(*) photocount
+        FROM stations s
+            JOIN photos p ON p.countryCode = s.countryCode AND p.id = s.id
+            JOIN users u ON u.id = p.photographerId
+        WHERE s.countryCode = :countryCode OR :countryCode IS NULL
+        GROUP BY u.name
+        ORDER BY COUNT(*) DESC
+        """)
     @KeyColumn("photographer")
     @ValueColumn("photocount")
     Map<String, Long> getPhotographerMap(@Bind("countryCode") final String countryCode);
 
-    @SqlQuery("select countryCode s_country, id s_id, title from stations s where LOCATE(LOWER(:name), LOWER(title)) > 0")
+    @SqlQuery("SELECT countryCode s_country, id s_id, title FROM stations s WHERE LOCATE(LOWER(:name), LOWER(title)) > 0")
     @RegisterConstructorMapper(value = Station.Key.class, prefix = "s")
     @ValueColumn("title")
     Map<Station.Key, String> findByName(@Bind("name") final String name);
 
-    @SqlUpdate("insert into stations (countryCode, id, title, lat, lon, ds100, active) values (:key.country, :key.id, :title, :coordinates?.lat, :coordinates?.lon, :DS100, :active)")
+    @SqlUpdate("INSERT INTO stations (countryCode, id, title, lat, lon, ds100, active) VALUES (:key.country, :key.id, :title, :coordinates?.lat, :coordinates?.lon, :DS100, :active)")
     void insert(@BindBean final Station station);
 
-    @SqlUpdate("delete from stations where countryCode = :key.country and id = :key.id")
+    @SqlUpdate("DELETE FROM stations WHERE countryCode = :key.country AND id = :key.id")
     void delete(@BindBean final Station station);
 
-    @SqlUpdate("update stations set active = :active where countryCode = :key.country and id = :key.id")
+    @SqlUpdate("UPDATE stations SET active = :active WHERE countryCode = :key.country AND id = :key.id")
     void updateActive(@BindBean final Station station);
 
-    @SqlQuery(JOIN_QUERY + " where createdAt > :since order by createdAt desc")
+    @SqlQuery(JOIN_QUERY + " WHERE createdAt > :since ORDER BY createdAt DESC")
     @RegisterRowMapper(StationMapper.class)
     List<Station> findRecentImports(@Bind("since") final Instant since);
 
     /**
      * Count nearby stations using simple pythagoras (only valid for a few km)
      */
-    @SqlQuery("select count(*) from stations where sqrt(power(71.5 * (lon - :coords.lon),2) + power(111.3 * (lat - :coords.lat),2)) < 0.5")
-    int countNearbyCoordinates(@BindBean("coords") final Coordinates coordinates);
+    @SqlQuery("SELECT COUNT(*) FROM stations WHERE SQRT(POWER(71.5 * (lon - :coords.lon),2) + POWER(111.3 * (lat - :coords.lat),2)) < 0.5")
+    int countNearbyCoordinates(@BindMethods("coords") final Coordinates coordinates);
 
-    @SqlQuery("SELECT max(cast(substring(id,2) as int)) FROM stations WHERE id like 'Z%'")
+    @SqlQuery("SELECT MAX(CAST(substring(id,2) AS INT)) FROM stations WHERE id LIKE 'Z%'")
     int getMaxZ();
 
-    @SqlUpdate("update stations set title = :new_title where countryCode = :key.country and id = :key.id")
+    @SqlUpdate("UPDATE stations SET title = :new_title WHERE countryCode = :key.country AND id = :key.id")
     void changeStationTitle(@BindBean final Station station, @Bind("new_title") final String newTitle);
 
-    @SqlUpdate("update stations set lat = :coords.lat, lon = :coords.lon where countryCode = :key.country and id = :key.id")
-    void updateLocation(@BindBean final Station station, @BindBean("coords") final Coordinates coordinates);
+    @SqlUpdate("UPDATE stations SET lat = :coords.lat, lon = :coords.lon WHERE countryCode = :key.country AND id = :key.id")
+    void updateLocation(@BindBean final Station station, @BindMethods("coords") final Coordinates coordinates);
 
     class StationMapper implements RowMapper<Station> {
 
         public Station map(final ResultSet rs, final StatementContext ctx) throws SQLException {
-            final Station.Key key = new Station.Key(rs.getString("countryCode"), rs.getString("id"));
-            final String photoUrlPath = rs.getString("urlPath");
+            final var key = new Station.Key(rs.getString("countryCode"), rs.getString("id"));
+            final var photoUrlPath = rs.getString("urlPath");
             Photo photo = null;
             if (photoUrlPath != null) {
-                final User photographer = new User(rs.getString("name"), rs.getString("photographerUrl"), rs.getString("photographerLicense"), rs.getInt("photographerId"), null, true, rs.getBoolean("anonymous"), null, false, null, false);
+                final var photographer = new User(rs.getString("name"), rs.getString("photographerUrl"), rs.getString("photographerLicense"), rs.getInt("photographerId"), null, true, rs.getBoolean("anonymous"), null, false, null, false);
                 photo = new Photo(key, photoUrlPath, photographer, rs.getTimestamp("createdAt").toInstant(), rs.getString("license"));
             }
             return new Station(key, rs.getString("title"),

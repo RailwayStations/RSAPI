@@ -265,8 +265,7 @@ public class PhotoInboxEntryControllerTest {
         assertThat(inboxEntry.getComment(), equalTo("Some Comment"));
         assertThat(Duration.between(inboxEntry.getCreatedAt(), Instant.now()).getSeconds() < 5, equalTo(true));
         if (coordinates != null) {
-            assertThat(inboxEntry.getCoordinates().getLat(), equalTo(coordinates.getLat()));
-            assertThat(inboxEntry.getCoordinates().getLon(), equalTo(coordinates.getLon()));
+            assertThat(inboxEntry.getCoordinates(), equalTo(coordinates));
         } else {
             assertThat(inboxEntry.getCoordinates(), nullValue());
         }

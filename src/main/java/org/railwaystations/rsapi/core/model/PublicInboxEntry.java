@@ -1,9 +1,9 @@
 package org.railwaystations.rsapi.core.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -18,7 +18,7 @@ public class PublicInboxEntry {
     @JsonProperty
     protected String title;
 
-    @JsonUnwrapped
+    @JsonIgnore
     protected Coordinates coordinates;
 
     public PublicInboxEntry() {
@@ -61,5 +61,13 @@ public class PublicInboxEntry {
 
     public void setCoordinates(final Coordinates coordinates) {
         this.coordinates = coordinates;
+    }
+
+    public Double getLat() {
+        return coordinates != null ? coordinates.lat() : null;
+    }
+
+    public Double getLon() {
+        return coordinates != null ? coordinates.lon() : null;
     }
 }

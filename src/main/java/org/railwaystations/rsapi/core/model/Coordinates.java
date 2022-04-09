@@ -2,30 +2,14 @@ package org.railwaystations.rsapi.core.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class Coordinates {
-
+public record Coordinates (double lat, double lon) {
     public static final double ZERO = 0.0;
-
-    private final double lat;
-    private final double lon;
 
     public Coordinates() {
         this(ZERO,ZERO);
     }
 
-    public Coordinates(final double lat, final double lon) {
-        this.lat = lat;
-        this.lon = lon;
-    }
-
-    public double getLat() {
-        return lat;
-    }
-
-    public double getLon() {
-        return lon;
-    }
-
+    @JsonIgnore
     public boolean hasZeroCoords() {
         return lat == ZERO && lon == ZERO;
     }

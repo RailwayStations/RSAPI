@@ -21,8 +21,7 @@ public class PhotographersTxtWriter extends AbstractHttpMessageConverter<Map<Str
     }
 
     private static void photographerToCsv(final PrintWriter pw, final Map.Entry<String, Long> photographer) {
-        pw.println(String.format("%s\t%s", photographer.getValue(),
-                photographer.getKey()));
+        pw.println(String.join("\t", Long.toString(photographer.getValue()), photographer.getKey()));
     }
 
     @Override

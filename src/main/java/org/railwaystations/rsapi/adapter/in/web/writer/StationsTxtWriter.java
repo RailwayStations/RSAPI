@@ -22,9 +22,9 @@ public class StationsTxtWriter extends AbstractHttpMessageConverter<List<Station
     }
 
     private static void stationToTxt(final PrintWriter pw, final Station station) {
-        pw.println(String.format("%s\t%s\t%s\t%s\t%s\t10,10\t0,-10", station.getCoordinates().getLat(),
-                station.getCoordinates().getLon(), station.getTitle(), station.getTitle(),
-                station.hasPhoto() ? "gruenpunkt.png" : "rotpunkt.png"));
+        pw.println(String.join("\t", Double.toString(station.getCoordinates().lat()),
+                Double.toString(station.getCoordinates().lon()), station.getTitle(), station.getTitle(),
+                station.hasPhoto() ? "gruenpunkt.png" : "rotpunkt.png", "10,10", "0,-10"));
     }
 
     @Override

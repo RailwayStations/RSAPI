@@ -7,13 +7,13 @@ import org.railwaystations.rsapi.core.model.Station;
 
 public interface PhotoDao {
 
-    @SqlUpdate("insert into photos (countryCode, id, urlPath, license, photographerId, createdAt) values (:stationKey.country, :stationKey.id, :urlPath, :license, :photographer.id, :createdAt)")
+    @SqlUpdate("INSERT INTO photos (countryCode, id, urlPath, license, photographerId, createdAt) VALUES (:stationKey.country, :stationKey.id, :urlPath, :license, :photographer.id, :createdAt)")
     void insert(@BindBean final Photo photo);
 
-    @SqlUpdate("update photos set urlPath = :urlPath, license = :license, photographerId = :photographer.id, createdAt = :createdAt where countryCode = :stationKey.country and id = :stationKey.id")
+    @SqlUpdate("UPDATE photos SET urlPath = :urlPath, license = :license, photographerId = :photographer.id, createdAt = :createdAt WHERE countryCode = :stationKey.country AND id = :stationKey.id")
     void update(@BindBean final Photo photo);
 
-    @SqlUpdate("delete from photos where countryCode = :country and id = :id")
+    @SqlUpdate("DELETE FROM photos WHERE countryCode = :country AND id = :id")
     void delete(@BindBean final Station.Key key);
 
 }

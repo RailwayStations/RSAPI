@@ -1,12 +1,13 @@
 package org.railwaystations.rsapi.core.ports.in;
 
+import org.railwaystations.rsapi.core.model.PasswordChangeCommand;
 import org.railwaystations.rsapi.core.model.User;
 
 import java.util.Optional;
 
 public interface ManageProfileUseCase {
 
-    void changePassword(User user, String newPassword);
+    void changePassword(User user, PasswordChangeCommand newPassword);
 
     User resetPassword(String nameOrEmail, String clientInfo);
 

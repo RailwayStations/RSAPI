@@ -17,37 +17,44 @@ import java.util.Optional;
 
 public interface UserDao {
 
-    @SqlQuery("select * from users")
+    @SqlQuery("SELECT * FROM users")
     @RegisterRowMapper(UserMapper.class)
     List<User> list();
 
-    @SqlQuery("select * from users where normalizedName = :normalizedName")
+    @SqlQuery("SELECT * FROM users WHERE normalizedName = :normalizedName")
     @RegisterRowMapper(UserMapper.class)
     Optional<User> findByNormalizedName(@Bind("normalizedName") final String normalizedName);
 
-    @SqlQuery("select * from users where id = :id")
+    @SqlQuery("SELECT * FROM users WHERE id = :id")
     @RegisterRowMapper(UserMapper.class)
     Optional<User> findById(@Bind("id") final int id);
 
-    @SqlQuery("select * from users where email = :email")
+    @SqlQuery("SELECT * FROM users WHERE email = :email")
     @RegisterRowMapper(UserMapper.class)
     Optional<User> findByEmail(@Bind("email") final String email);
 
-    @SqlUpdate("update users set `key` = :key where id = :id")
+    @SqlUpdate("UPDATE users SET `key` = :key WHERE id = :id")
     void updateCredentials(@Bind("id") final int id, @Bind("key") final String key);
 
-    @SqlUpdate("insert into users (id, name, url, license, email, normalizedName, ownPhotos, anonymous, `key`, emailVerification, sendNotifications) values (:id, :name, :url, :license, :email, :normalizedName, :ownPhotos, :anonymous, :key, :emailVerification, :sendNotifications)")
+    @SqlUpdate("""
+            INSERT INTO users (id, name, url, license, email, normalizedName, ownPhotos, anonymous, `key`, emailVerification, sendNotifications)
+                VALUES (:id, :name, :url, :license, :email, :normalizedName, :ownPhotos, :anonymous, :key, :emailVerification, :sendNotifications)
+            """)
     @GetGeneratedKeys("id")
     Integer insert(@BindBean final User user);
 
-    @SqlUpdate("update users set name = :name, url = :url, license = :license, email = :email, normalizedName = :normalizedName, ownPhotos = :ownPhotos, anonymous = :anonymous, emailVerification = :emailVerification, sendNotifications = :sendNotifications where id = :id")
+    @SqlUpdate("""
+            UPDATE users SET name = :name, url = :url, license = :license, email = :email, normalizedName = :normalizedName, ownPhotos = :ownPhotos,
+                            anonymous = :anonymous, emailVerification = :emailVerification, sendNotifications = :sendNotifications
+            WHERE id = :id
+            """)
     void update(@BindBean final User user);
 
-    @SqlQuery("select * from users where emailVerification = :emailVerification")
+    @SqlQuery("SELECT * FROM users WHERE emailVerification = :emailVerification")
     @RegisterRowMapper(UserMapper.class)
     Optional<User> findByEmailVerification(@Bind("emailVerification") final String emailVerification);
 
-    @SqlUpdate("update users set emailVerification = :emailVerification where id = :id")
+    @SqlUpdate("UPDATE users SET emailVerification = :emailVerification WHERE id = :id")
     void updateEmailVerification(@Bind("id") final int id, @Bind("emailVerification") final String emailVerification);
 
     class UserMapper implements RowMapper<User> {
