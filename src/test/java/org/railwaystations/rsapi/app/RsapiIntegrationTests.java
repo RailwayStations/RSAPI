@@ -52,10 +52,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
 		properties = {"server.error.include-message=always"})
@@ -92,20 +90,20 @@ class RsapiIntegrationTests {
 	@Test
 	public void stationsAllCountries() {
 		final var stations = assertLoadStationsOk("/stations");
-		assertThat(stations.length, is(954));
-		assertThat(findByKey(stations, new Station.Key("de", "6721")), notNullValue());
-		assertThat(findByKey(stations, new Station.Key("ch", "8500126")), notNullValue());
+		assertThat(stations.length).isEqualTo(954);
+		assertThat(findByKey(stations, new Station.Key("de", "6721"))).isNotNull();
+		assertThat(findByKey(stations, new Station.Key("ch", "8500126"))).isNotNull();
 	}
 
 	@Test
 	public void stationById() {
 		final var station = getStationDe6932();
-		assertThat(station.getKey().getId(), is("6932"));
-		assertThat(station.getTitle(), is( "Wuppertal-Ronsdorf"));
-		assertThat(station.getPhotoUrl(), is("https://api.railway-stations.org/photos/de/6932.jpg"));
-		assertThat(station.getPhotographer(), is("@user10"));
-		assertThat(station.getLicense(), is("CC0 1.0 Universell (CC0 1.0)"));
-		assertThat(station.isActive(), is(true));
+		assertThat(station.getKey().getId()).isEqualTo("6932");
+		assertThat(station.getTitle()).isEqualTo( "Wuppertal-Ronsdorf");
+		assertThat(station.getPhotoUrl()).isEqualTo("https://api.railway-stations.org/photos/de/6932.jpg");
+		assertThat(station.getPhotographer()).isEqualTo("@user10");
+		assertThat(station.getLicense()).isEqualTo("CC0 1.0 Universell (CC0 1.0)");
+		assertThat(station.isActive()).isTrue();
 	}
 
 	@Test
@@ -116,62 +114,62 @@ class RsapiIntegrationTests {
 	@Test
 	public void stationsDe() {
 		final var stations = assertLoadStationsOk(String.format("/de/%s", "stations"));
-		assertThat(findByKey(stations, new Station.Key("de", "6721")), notNullValue());
-		assertThat(findByKey(stations, new Station.Key("ch", "8500126")), nullValue());
+		assertThat(findByKey(stations, new Station.Key("de", "6721"))).isNotNull();
+		assertThat(findByKey(stations, new Station.Key("ch", "8500126"))).isNull();
 	}
 
 	@Test
 	public void stationsDeQueryParam() {
 		final var stations = assertLoadStationsOk(String.format("/%s?country=de", "stations"));
-		assertThat(findByKey(stations, new Station.Key("de", "6721")), notNullValue());
-		assertThat(findByKey(stations, new Station.Key("ch", "8500126")), nullValue());
+		assertThat(findByKey(stations, new Station.Key("de", "6721"))).isNotNull();
+		assertThat(findByKey(stations, new Station.Key("ch", "8500126"))).isNull();
 	}
 
 	@Test
 	public void stationsDeChQueryParam() {
 		final var stations = assertLoadStationsOk(String.format("/%s?country=de&country=ch", "stations"));
-		assertThat(findByKey(stations, new Station.Key("de", "6721")), notNullValue());
-		assertThat(findByKey(stations, new Station.Key("ch", "8500126")), notNullValue());
+		assertThat(findByKey(stations, new Station.Key("de", "6721"))).isNotNull();
+		assertThat(findByKey(stations, new Station.Key("ch", "8500126"))).isNotNull();
 	}
 
 	@Test
 	public void stationsDePhotograph() {
 		final var stations = assertLoadStationsOk(String.format("/de/%s?photographer=@user10", "stations"));
-		assertThat(findByKey(stations, new Station.Key("de", "6966")), notNullValue());
+		assertThat(findByKey(stations, new Station.Key("de", "6966"))).isNotNull();
 	}
 
 	@Test
 	public void stationsCh() {
 		final var stations = assertLoadStationsOk(String.format("/ch/%s", "stations"));
-		assertThat(findByKey(stations, new Station.Key("ch", "8500126")), notNullValue());
-		assertThat(findByKey(stations, new Station.Key("de", "6721")), nullValue());
+		assertThat(findByKey(stations, new Station.Key("ch", "8500126"))).isNotNull();
+		assertThat(findByKey(stations, new Station.Key("de", "6721"))).isNull();
 	}
 
 	@Test
 	public void stationsUnknownCountry() {
 		final var stations = assertLoadStationsOk("/jp/stations");
-		assertThat(stations.length, is(0));
+		assertThat(stations.length).isEqualTo(0);
 	}
 
 	@Test
 	public void stationsDeFromAnonym() {
 		final var stations = assertLoadStationsOk("/de/stations?photographer=Anonym");
-		assertThat(stations.length, is(9));
+		assertThat(stations.length).isEqualTo(9);
 	}
 
 	@Test
 	public void stationsDeFromDgerkrathWithinMax5km() {
 		final var stations = assertLoadStationsOk("/de/stations?maxDistance=5&lat=49.0065325041363&lon=13.2770955562592&photographer=@user27");
-		assertThat(stations.length, is(2));
+		assertThat(stations.length).isEqualTo(2);
 	}
 
 	@Test
 	public void stationsJson() throws IOException {
 		final var response = loadRaw("/de/stations.json", 200, String.class);
 		final var jsonNode = mapper.readTree(response.getBody());
-		assertThat(jsonNode, notNullValue());
-		assertThat(jsonNode.isArray(), is(true));
-		assertThat(jsonNode.size(), is(729));
+		assertThat(jsonNode).isNotNull();
+		assertThat(jsonNode.isArray()).isTrue();
+		assertThat(jsonNode.size()).isEqualTo(729);
 	}
 
 	@Test
@@ -182,12 +180,12 @@ class RsapiIntegrationTests {
 		final var content = readSaveStringEntity(response);
 		final var doc = builder.parse(new InputSource(new StringReader(content)));
 		final var gpx = doc.getDocumentElement();
-		assertThat(response.getHeaders().getFirst("Content-Type"), is("application/gpx+xml"));
-		assertThat(gpx.getTagName(), is("gpx"));
-		assertThat(gpx.getAttribute("xmlns"), is("http://www.topografix.com/GPX/1/1"));
-		assertThat(gpx.getAttribute("version"), is("1.1"));
+		assertThat(response.getHeaders().getFirst("Content-Type")).isEqualTo("application/gpx+xml");
+		assertThat(gpx.getTagName()).isEqualTo("gpx");
+		assertThat(gpx.getAttribute("xmlns")).isEqualTo("http://www.topografix.com/GPX/1/1");
+		assertThat(gpx.getAttribute("version")).isEqualTo("1.1");
 		final var wpts = gpx.getElementsByTagName("wpt");
-		assertThat(wpts.getLength(), is(7));
+		assertThat(wpts.getLength()).isEqualTo(7);
 	}
 
 	private String readSaveStringEntity(final ResponseEntity<String> response) {
@@ -207,7 +205,7 @@ class RsapiIntegrationTests {
 		final var response = restTemplate.getForEntity(String.format("http://localhost:%d%s", port, path),
 				responseType);
 
-		assertThat(response.getStatusCodeValue(), is(expectedStatus));
+		assertThat(response.getStatusCodeValue()).isEqualTo(expectedStatus);
 		return response;
 	}
 
@@ -219,13 +217,13 @@ class RsapiIntegrationTests {
 	public void photographersDeJson() throws IOException {
 		final var response = loadRaw("/de/photographers.json", 200, String.class);
 		final var jsonNode = mapper.readTree(response.getBody());
-		assertThat(jsonNode, notNullValue());
-		assertThat(jsonNode.isObject(), is(true));
-		assertThat(jsonNode.size(), is(4));
-		assertThat(jsonNode.get("@user27").asInt(), is(31));
-		assertThat(jsonNode.get("@user8").asInt(), is(29));
-		assertThat(jsonNode.get("@user10").asInt(), is(15));
-		assertThat(jsonNode.get("@user0").asInt(), is(9));
+		assertThat(jsonNode).isNotNull();
+		assertThat(jsonNode.isObject()).isTrue();
+		assertThat(jsonNode.size()).isEqualTo(4);
+		assertThat(jsonNode.get("@user27").asInt()).isEqualTo(31);
+		assertThat(jsonNode.get("@user8").asInt()).isEqualTo(29);
+		assertThat(jsonNode.get("@user10").asInt()).isEqualTo(15);
+		assertThat(jsonNode.get("@user0").asInt()).isEqualTo(9);
 	}
 
 	private Station getStationDe6932() {
@@ -236,12 +234,12 @@ class RsapiIntegrationTests {
 	public void statisticDeJson() throws IOException {
 		final var response = loadRaw("/de/stats.json", 200, String.class);
 		final var jsonNode = mapper.readTree(response.getBody());
-		assertThat(jsonNode, notNullValue());
-		assertThat(jsonNode.get("total").asInt(), is(729));
-		assertThat(jsonNode.get("withPhoto").asInt(), is(84));
-		assertThat(jsonNode.get("withoutPhoto").asInt(), is(645));
-		assertThat(jsonNode.get("photographers").asInt(), is(4));
-		assertThat(jsonNode.get("countryCode").asText(), is("de"));
+		assertThat(jsonNode).isNotNull();
+		assertThat(jsonNode.get("total").asInt()).isEqualTo(729);
+		assertThat(jsonNode.get("withPhoto").asInt()).isEqualTo(84);
+		assertThat(jsonNode.get("withoutPhoto").asInt()).isEqualTo(645);
+		assertThat(jsonNode.get("photographers").asInt()).isEqualTo(4);
+		assertThat(jsonNode.get("countryCode").asText()).isEqualTo("de");
 	}
 
 	@Test
@@ -257,7 +255,7 @@ class RsapiIntegrationTests {
 		final var response = restTemplate.postForEntity(
 				String.format("http://localhost:%d%s", port, "/photoUpload"), request, String.class);
 
-		assertThat(response.getStatusCodeValue(), is(401));
+		assertThat(response.getStatusCodeValue()).isEqualTo(401);
 	}
 
 	private final byte[] IMAGE = Base64.getDecoder().decode("/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=");
@@ -274,19 +272,19 @@ class RsapiIntegrationTests {
 		final var response = restTemplateWithBasicAuthUser10().postForEntity(
 				String.format("http://localhost:%d%s", port, "/photoUpload"), request, String.class);
 
-		assertThat(response.getStatusCodeValue(), is(202));
+		assertThat(response.getStatusCodeValue()).isEqualTo(202);
 		final var inboxResponse = mapper.readTree(response.getBody());
-		assertThat(inboxResponse.get("id"), notNullValue());
-		assertThat(inboxResponse.get("filename"), notNullValue());
-		assertThat(inboxResponse.get("crc32").asLong(), is(312729961L));
+		assertThat(inboxResponse.get("id")).isNotNull();
+		assertThat(inboxResponse.get("filename")).isNotNull();
+		assertThat(inboxResponse.get("crc32").asLong()).isEqualTo(312729961L);
 
 		// download uploaded photo from inbox
 		final var photoResponse = restTemplate.getForEntity(
 				String.format("http://localhost:%d%s%s", port, "/inbox/", inboxResponse.get("filename").asText()), byte[].class);
 		final var inputImage = ImageIO.read(new ByteArrayInputStream(Objects.requireNonNull(photoResponse.getBody())));
-		assertThat(inputImage, notNullValue());
+		assertThat(inputImage).isNotNull();
 		// we cannot binary compare the result anymore, the photos are re-encoded
-		// assertThat(IOUtils.readFully((InputStream)photoResponse.getEntity(), IMAGE.length), is(IMAGE));
+		// assertThat(IOUtils.readFully((InputStream)photoResponse.getEntity(), IMAGE.length)).isEqualTo(IMAGE));
 	}
 
 	@Test
@@ -294,7 +292,7 @@ class RsapiIntegrationTests {
 		final var response = restTemplate.withBasicAuth("@user27", "blahblubb")
 				.getForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), String.class);
 
-		assertThat(response.getStatusCodeValue(), is(401));
+		assertThat(response.getStatusCodeValue()).isEqualTo(401);
 	}
 
 	@Test
@@ -316,19 +314,19 @@ class RsapiIntegrationTests {
 				}""";
 		final var responsePostProblem = restTemplateWithBasicAuthUser10()
 				.postForEntity(String.format("http://localhost:%d%s", port, "/reportProblem"), new HttpEntity<>(problemReportJson, headers), String.class);
-		assertThat(responsePostProblem.getStatusCodeValue(), is(202));
+		assertThat(responsePostProblem.getStatusCodeValue()).isEqualTo(202);
 		final var jsonNodePostProblemReponse = mapper.readTree(responsePostProblem.getBody());
-		assertThat(jsonNodePostProblemReponse, notNullValue());
-		assertThat(jsonNodePostProblemReponse.get("state").asText(), is("REVIEW"));
+		assertThat(jsonNodePostProblemReponse).isNotNull();
+		assertThat(jsonNodePostProblemReponse.get("state").asText()).isEqualTo("REVIEW");
 		final var id = jsonNodePostProblemReponse.get("id").asInt();
 
 		final var responseUpdateLocation = restTemplateWithBasicAuthUser10()
 				.postForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), new HttpEntity<>("{\"id\": " + id + ", \"command\": \"UPDATE_LOCATION\"}", headers), String.class);
-		assertThat(responseUpdateLocation.getStatusCodeValue(), is(200));
+		assertThat(responseUpdateLocation.getStatusCodeValue()).isEqualTo(200);
 		final var jsonNodeUpdateLocationReponse = mapper.readTree(responseUpdateLocation.getBody());
-		assertThat(jsonNodeUpdateLocationReponse, notNullValue());
-		assertThat(jsonNodeUpdateLocationReponse.get("status").asInt(), is(200));
-		assertThat(jsonNodeUpdateLocationReponse.get("message").asText(), is("ok"));
+		assertThat(jsonNodeUpdateLocationReponse).isNotNull();
+		assertThat(jsonNodeUpdateLocationReponse.get("status").asInt()).isEqualTo(200);
+		assertThat(jsonNodeUpdateLocationReponse.get("message").asText()).isEqualTo("ok");
 
 		assertCoordinatesOfStation6815(51.123, 11.123);
 	}
@@ -339,9 +337,9 @@ class RsapiIntegrationTests {
 
 	private void assertCoordinatesOfStation6815(final double lat, final double lon) {
 		final var stationBefore = loadRaw("/de/stations/6815", 200, Station.class).getBody();
-		assertThat(stationBefore, notNullValue());
-		assertThat(stationBefore.getCoordinates().lat(), is(lat));
-		assertThat(stationBefore.getCoordinates().lon(), is(lon));
+		assertThat(stationBefore).isNotNull();
+		assertThat(stationBefore.getCoordinates().lat()).isEqualTo(lat);
+		assertThat(stationBefore.getCoordinates().lon()).isEqualTo(lon);
 	}
 
 	@Test
@@ -349,7 +347,7 @@ class RsapiIntegrationTests {
 		final var response = restTemplate.withBasicAuth("@user27", "y89zFqkL6hro")
 				.getForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), String.class);
 
-		assertThat(response.getStatusCodeValue(), is(403));
+		assertThat(response.getStatusCodeValue()).isEqualTo(403);
 	}
 
 	@Test
@@ -357,10 +355,10 @@ class RsapiIntegrationTests {
 		final var response = restTemplateWithBasicAuthUser10()
 				.getForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), String.class);
 
-		assertThat(response.getStatusCodeValue(), is(200));
+		assertThat(response.getStatusCodeValue()).isEqualTo(200);
 		final var jsonNode = mapper.readTree(response.getBody());
-		assertThat(jsonNode, notNullValue());
-		assertThat(jsonNode.isArray(), is(true));
+		assertThat(jsonNode).isNotNull();
+		assertThat(jsonNode.isArray()).isTrue();
 	}
 
 	@Test
@@ -371,10 +369,10 @@ class RsapiIntegrationTests {
 		final var response = restTemplateWithBasicAuthUser10()
 				.postForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), new HttpEntity<>("{\"id\": -1, \"command\": \"IMPORT\"}", headers), String.class);
 
-		assertThat(response.getStatusCodeValue(), is(400));
+		assertThat(response.getStatusCodeValue()).isEqualTo(400);
 		final var jsonNode = mapper.readTree(response.getBody());
-		assertThat(jsonNode.get("status").asInt(), is(400));
-		assertThat(jsonNode.get("message").asText(), is("No pending inbox entry found"));
+		assertThat(jsonNode.get("status").asInt()).isEqualTo(400);
+		assertThat(jsonNode.get("message").asText()).isEqualTo("No pending inbox entry found");
 	}
 
 	@ParameterizedTest
@@ -382,25 +380,25 @@ class RsapiIntegrationTests {
 	public void countries(final String path) throws IOException {
 		final var response = loadRaw(path, 200, String.class);
 		final var jsonNode = mapper.readTree(response.getBody());
-		assertThat(jsonNode, notNullValue());
-		assertThat(jsonNode.isArray(), is(true));
-		assertThat(jsonNode.size(), is(2));
+		assertThat(jsonNode).isNotNull();
+		assertThat(jsonNode.isArray()).isTrue();
+		assertThat(jsonNode.size()).isEqualTo(2);
 
 		final var foundCountries = new AtomicInteger();
 		jsonNode.forEach(node->{
 			switch (node.get("code").asText()) {
 				case "de" -> {
-					assertThat(node.get("code").asText(), is("de"));
-					assertThat(node.get("name").asText(), is("Deutschland"));
-					assertThat(node.get("providerApps").size(), is(3));
+					assertThat(node.get("code").asText()).isEqualTo("de");
+					assertThat(node.get("name").asText()).isEqualTo("Deutschland");
+					assertThat(node.get("providerApps").size()).isEqualTo(3);
 					assertProviderApp(node, 0, "android", "DB Navigator", "https://play.google.com/store/apps/details?id=de.hafas.android.db");
 					assertProviderApp(node, 1, "android", "FlixTrain", "https://play.google.com/store/apps/details?id=de.meinfernbus");
 					assertProviderApp(node, 2, "ios", "DB Navigator", "https://apps.apple.com/app/db-navigator/id343555245");
 					foundCountries.getAndIncrement();
 				}
 				case "ch" -> {
-					assertThat(node.get("name").asText(), is("Schweiz"));
-					assertThat(node.get("providerApps").size(), is(2));
+					assertThat(node.get("name").asText()).isEqualTo("Schweiz");
+					assertThat(node.get("providerApps").size()).isEqualTo(2);
 					assertProviderApp(node, 0, "android", "SBB Mobile", "https://play.google.com/store/apps/details?id=ch.sbb.mobile.android.b2c");
 					assertProviderApp(node, 1, "ios", "SBB Mobile", "https://apps.apple.com/app/sbb-mobile/id294855237");
 					foundCountries.getAndIncrement();
@@ -408,7 +406,7 @@ class RsapiIntegrationTests {
 			}
 		});
 
-		assertThat(foundCountries.get(), is(2));
+		assertThat(foundCountries.get()).isEqualTo(2);
 	}
 
 	@ParameterizedTest
@@ -416,16 +414,16 @@ class RsapiIntegrationTests {
 	public void countriesAll(final String path) throws IOException {
 		final var response = loadRaw(path + "?onlyActive=false", 200, String.class);
 		final var jsonNode = mapper.readTree(response.getBody());
-		assertThat(jsonNode, notNullValue());
-		assertThat(jsonNode.isArray(), is(true));
-		assertThat(jsonNode.size(), is(4));
+		assertThat(jsonNode).isNotNull();
+		assertThat(jsonNode.isArray()).isTrue();
+		assertThat(jsonNode.size()).isEqualTo(4);
 	}
 
 	private void assertProviderApp(final JsonNode countryNode, final int i, final String type, final String name, final String url) {
 		final var app = countryNode.get("providerApps").get(i);
-		assertThat(app.get("type").asText(), is(type));
-		assertThat(app.get("name").asText(), is(name));
-		assertThat(app.get("url").asText(), is(url));
+		assertThat(app.get("type").asText()).isEqualTo(type);
+		assertThat(app.get("name").asText()).isEqualTo(name);
+		assertThat(app.get("url").asText()).isEqualTo(url);
 	}
 
 	@TestConfiguration

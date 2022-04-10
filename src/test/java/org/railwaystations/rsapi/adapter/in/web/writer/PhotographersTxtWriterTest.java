@@ -8,8 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class PhotographersTxtWriterTest {
 
@@ -19,14 +18,14 @@ public class PhotographersTxtWriterTest {
         photographers.put("@foo", 10L);
         photographers.put("@bar", 5L);
 
-        final MockHttpOutputMessage outputMessage = new MockHttpOutputMessage();
+        final var outputMessage = new MockHttpOutputMessage();
         new PhotographersTxtWriter().writeInternal(photographers, outputMessage);
 
-        final String txt = outputMessage.getBodyAsString(StandardCharsets.UTF_8);
-        final String[] lines = txt.split("\n");
-        assertThat(lines[0], is("count\tphotographer"));
-        assertThat(lines[1], is("10\t@foo"));
-        assertThat(lines[2], is("5\t@bar"));
+        final var txt = outputMessage.getBodyAsString(StandardCharsets.UTF_8);
+        final var lines = txt.split("\n");
+        assertThat(lines[0]).isEqualTo("count\tphotographer");
+        assertThat(lines[1]).isEqualTo("10\t@foo");
+        assertThat(lines[2]).isEqualTo("5\t@bar");
     }
 
 }

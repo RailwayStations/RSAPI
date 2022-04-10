@@ -48,13 +48,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -177,9 +172,9 @@ public class PhotoInboxEntryControllerTest {
         when(inboxDao.insert(any())).thenReturn(1);
         final String response = whenPostImageIframe("unknown@example.com", "http://localhost/uploadPage.php");
 
-        assertThat(response, containsString("UNAUTHORIZED"));
+        assertThat(response).contains("UNAUTHORIZED");
         verify(inboxDao, never()).insert(any());
-        assertThat(monitor.getMessages().size(), is(0));
+        assertThat(monitor.getMessages().size()).isEqualTo(0);
     }
 
     @Test
@@ -188,39 +183,35 @@ public class PhotoInboxEntryControllerTest {
         when(inboxDao.insert(any())).thenReturn(1);
         final String response = whenPostImageIframe("someuser@example.com", "http://localhost/uploadPage.php");
 
-        assertThat(response, containsString("UNAUTHORIZED"));
-        assertThat(response, containsString("Email not verified"));
+        assertThat(response).contains("UNAUTHORIZED");
+        assertThat(response).contains("Email not verified");
         verify(inboxDao, never()).insert(any());
-        assertThat(monitor.getMessages().size(), is(0));
+        assertThat(monitor.getMessages().size()).isEqualTo(0);
     }
 
     @Test
     public void testPostIframeMaliciousReferer() {
         when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("nickname@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("","", Collections.emptyList()));
         when(inboxDao.insert(any())).thenReturn(1);
-        try {
-            final String response = whenPostImageIframe("nickname@example.com", "http://localhost/uploadPage.php<script>alert('FooBar!');</script>");
-            fail("IllegalArgumentException expected, but got: " + response);
-        } catch (final Exception e) {
-            assertThat(e.getCause(), instanceOf(IllegalArgumentException.class));
-        }
+        
+        assertThatThrownBy(() -> whenPostImageIframe("nickname@example.com", "http://localhost/uploadPage.php<script>alert('FooBar!');</script>")).getCause().isInstanceOf(IllegalArgumentException.class);
         verify(inboxDao, never()).insert(any());
-        assertThat(monitor.getMessages().size(), is(0));
+        assertThat(monitor.getMessages().size()).isEqualTo(0);
     }
 
     @Test
     public void testPostIframe() throws Exception {
-        final ArgumentCaptor<InboxEntry> uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
+        final var uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
         when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("nickname@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("","", Collections.emptyList()));
         when(inboxDao.insert(any())).thenReturn(1);
         final String response = whenPostImageIframe("nickname@example.com", "http://localhost/uploadPage.php");
 
-        assertThat(response, containsString("REVIEW"));
+        assertThat(response).contains("REVIEW");
         assertFileWithContentExistsInInbox("image-content", "1.jpg");
         verify(inboxDao).insert(uploadCaptor.capture());
         assertUpload(uploadCaptor.getValue(), "de","4711", null, null);
 
-        assertThat(monitor.getMessages().get(0), equalTo("New photo upload for Lummerland - de:4711\nSome Comment\nhttp://inbox.railway-stations.org/1.jpg\nby nickname\nvia UserAgent"));
+        assertThat(monitor.getMessages().get(0)).isEqualTo("New photo upload for Lummerland - de:4711\nSome Comment\nhttp://inbox.railway-stations.org/1.jpg\nby nickname\nvia UserAgent");
     }
 
     private String whenPostImageIframe(final String email,
@@ -254,22 +245,22 @@ public class PhotoInboxEntryControllerTest {
         assertFileWithContentExistsInInbox("image-content", "1.jpg");
         verify(inboxDao).insert(uploadCaptor.capture());
         assertUpload(uploadCaptor.getValue(), "de","4711", null, null);
-        assertThat(monitor.getMessages().get(0), equalTo("New photo upload for Lummerland - de:4711\nSome Comment\nhttp://inbox.railway-stations.org/1.jpg\nby @nick name\nvia UserAgent"));
+        assertThat(monitor.getMessages().get(0)).isEqualTo("New photo upload for Lummerland - de:4711\nSome Comment\nhttp://inbox.railway-stations.org/1.jpg\nby @nick name\nvia UserAgent");
     }
 
     private void assertUpload(final InboxEntry inboxEntry, final String countryCode, final String stationId, final String title, final Coordinates coordinates) {
-        assertThat(inboxEntry.getCountryCode(), equalTo(countryCode));
-        assertThat(inboxEntry.getStationId(), equalTo(stationId));
-        assertThat(inboxEntry.getTitle(), equalTo(title));
-        assertThat(inboxEntry.getPhotographerId(), equalTo(42));
-        assertThat(inboxEntry.getComment(), equalTo("Some Comment"));
-        assertThat(Duration.between(inboxEntry.getCreatedAt(), Instant.now()).getSeconds() < 5, equalTo(true));
+        assertThat(inboxEntry.getCountryCode()).isEqualTo(countryCode);
+        assertThat(inboxEntry.getStationId()).isEqualTo(stationId);
+        assertThat(inboxEntry.getTitle()).isEqualTo(title);
+        assertThat(inboxEntry.getPhotographerId()).isEqualTo(42);
+        assertThat(inboxEntry.getComment()).isEqualTo("Some Comment");
+        assertThat(Duration.between(inboxEntry.getCreatedAt(), Instant.now()).getSeconds() < 5).isTrue();
         if (coordinates != null) {
-            assertThat(inboxEntry.getCoordinates(), equalTo(coordinates));
+            assertThat(inboxEntry.getCoordinates()).isEqualTo(coordinates);
         } else {
-            assertThat(inboxEntry.getCoordinates(), nullValue());
+            assertThat(inboxEntry.getCoordinates()).isNull();
         }
-        assertThat(inboxEntry.isDone(), equalTo(false));
+        assertThat(inboxEntry.isDone()).isFalse();
     }
 
     @Test
@@ -287,7 +278,7 @@ public class PhotoInboxEntryControllerTest {
         verify(inboxDao).insert(uploadCaptor.capture());
         assertUpload(uploadCaptor.getValue(), null,null, "Missing Station", new Coordinates(50.9876, 9.1234));
 
-        assertThat(monitor.getMessages().get(0), equalTo("Photo upload for missing station Missing Station at https://map.railway-stations.org/index.php?mlat=50.9876&mlon=9.1234&zoom=18&layers=M\nSome Comment\nhttp://inbox.railway-stations.org/4.jpg\nby @nick name\nvia UserAgent"));
+        assertThat(monitor.getMessages().get(0)).isEqualTo("Photo upload for missing station Missing Station at https://map.railway-stations.org/index.php?mlat=50.9876&mlon=9.1234&zoom=18&layers=M\nSome Comment\nhttp://inbox.railway-stations.org/4.jpg\nby @nick name\nvia UserAgent");
     }
 
     @ParameterizedTest
@@ -314,7 +305,7 @@ public class PhotoInboxEntryControllerTest {
                 .andExpect(jsonPath("$.filename").value("3.jpg"));
 
         assertFileWithContentExistsInInbox(IMAGE_CONTENT, "3.jpg");
-        assertThat(monitor.getMessages().get(0), equalTo("New photo upload for Lummerland - de:4711\n\nhttp://inbox.railway-stations.org/3.jpg\nby @someuser\nvia UserAgent"));
+        assertThat(monitor.getMessages().get(0)).isEqualTo("New photo upload for Lummerland - de:4711\n\nhttp://inbox.railway-stations.org/3.jpg\nby @someuser\nvia UserAgent");
     }
 
     @Test
@@ -329,12 +320,12 @@ public class PhotoInboxEntryControllerTest {
                 .andExpect(jsonPath("$.filename").value("2.jpg"));
 
         assertFileWithContentExistsInInbox(IMAGE_CONTENT, "2.jpg");
-        assertThat(monitor.getMessages().get(0), equalTo("New photo upload for Lummerland - de:4711\n\nhttp://inbox.railway-stations.org/2.jpg (possible duplicate!)\nby @nick name\nvia UserAgent"));
+        assertThat(monitor.getMessages().get(0)).isEqualTo("New photo upload for Lummerland - de:4711\n\nhttp://inbox.railway-stations.org/2.jpg (possible duplicate!)\nby @nick name\nvia UserAgent");
     }
 
     @Test
     public void testUserInbox() throws Exception {
-        final User user = new User("nickname", null, "CC0", 42, "nickname@example.com", true, false, null, false, null, true);
+        final var user = new User("nickname", null, "CC0", 42, "nickname@example.com", true, false, null, false, null, true);
 
         when(inboxDao.findById(1)).thenReturn(new InboxEntry(1, "de", "4711", "Station 4711", new Coordinates(50.1,9.2), user.getId(), user.getName(), null, "jpg", null, null, Instant.now(), false, null, false, false, null, null, null, false));
         when(inboxDao.findById(2)).thenReturn(new InboxEntry(2, "de", "1234", "Station 1234", new Coordinates(50.1,9.2), user.getId(), user.getName(), null, "jpg", null, null, Instant.now(), true, null, false, false, null, null, null, false));
@@ -367,12 +358,12 @@ public class PhotoInboxEntryControllerTest {
 
     private void assertFileWithContentExistsInInbox(final String content, final String filename) throws IOException {
         final var image = workDir.getInboxDir().resolve(filename);
-        assertThat(Files.exists(image), equalTo(true));
+        assertThat(Files.exists(image)).isTrue();
 
         final var inputBytes = content.getBytes(Charset.defaultCharset());
         final var outputBytes = new byte[inputBytes.length];
         IOUtils.readFully(Files.newInputStream(image), outputBytes);
-        assertThat(outputBytes, equalTo(inputBytes));
+        assertThat(outputBytes).isEqualTo(inputBytes);
     }
 
     @Test
@@ -385,7 +376,7 @@ public class PhotoInboxEntryControllerTest {
                 .andExpect(jsonPath("$.filename").value("5.jpg"));
 
         assertFileWithContentExistsInInbox(IMAGE_CONTENT, "5.jpg");
-        assertThat(monitor.getMessages().get(0), equalTo("New photo upload for Neverland - de:1234\n\nhttp://inbox.railway-stations.org/5.jpg (possible duplicate!)\nby @nick name\nvia UserAgent"));
+        assertThat(monitor.getMessages().get(0)).isEqualTo("New photo upload for Neverland - de:1234\n\nhttp://inbox.railway-stations.org/5.jpg (possible duplicate!)\nby @nick name\nvia UserAgent");
     }
 
     @Test
@@ -429,7 +420,7 @@ public class PhotoInboxEntryControllerTest {
                 .andExpect(jsonPath("$.id").value(6))
                 .andExpect(jsonPath("$.filename").doesNotExist());
 
-        assertThat(monitor.getMessages().get(0), equalTo("New problem report for Neverland - de:1234\nOTHER: something is wrong\nby @nick name\nvia UserAgent"));
+        assertThat(monitor.getMessages().get(0)).isEqualTo("New problem report for Neverland - de:1234\nOTHER: something is wrong\nby @nick name\nvia UserAgent");
     }
 
     @Test

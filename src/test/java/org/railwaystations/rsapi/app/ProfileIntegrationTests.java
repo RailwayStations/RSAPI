@@ -1,8 +1,6 @@
 package org.railwaystations.rsapi.app;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -25,12 +23,10 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.matches;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
 		properties = {"server.error.include-message=always"})
@@ -69,23 +65,23 @@ class ProfileIntegrationTests {
 
 	@Test
 	public void register() {
-		final HttpHeaders headers = new HttpHeaders();
+		final var headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 
-		final ResponseEntity<String> response = restTemplate.postForEntity(
+		final var response = restTemplate.postForEntity(
 				String.format("http://localhost:%d%s", port, "/registration"), new HttpEntity<>("""
 						{
-						"nickname": "nickname ",
-						"email": "nick.name@example.com",
-						"license": "CC0",
-						"photoOwner": true,
-						"link": ""
+							"nickname": "nickname ",
+							"email": "nick.name@example.com",
+							"license": "CC0",
+							"photoOwner": true,
+							"link": ""
 						}
 						""", headers), String.class);
 
-		assertThat(response.getStatusCodeValue(), is(202));
+		assertThat(response.getStatusCodeValue()).isEqualTo(202);
 
-		Mockito.verify(mailer, Mockito.times(1))
+		verify(mailer, Mockito.times(1))
 				.send(eq("nick.name@example.com"),
 						eq("Railway-Stations.org new password"),
 						matches("""
@@ -107,131 +103,131 @@ class ProfileIntegrationTests {
 
 	@Test
 	public void registerDifferentEmail() {
-		final HttpHeaders headers = new HttpHeaders();
+		final var headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		final ResponseEntity<String> response = restTemplate.postForEntity(
+		final var response = restTemplate.postForEntity(
 				String.format("http://localhost:%d%s", port, "/registration"),new HttpEntity<>("""
 						{
-						\t"nickname": "user14",\s
-						\t"email": "other@example.com",\s
-						\t"license": "CC0",
-						\t"photoOwner": true,\s
-						\t"link": "link"
+							"nickname": "user14",
+							"email": "other@example.com",
+							"license": "CC0",
+							"photoOwner": true,
+							"link": "link"
 						}""", headers), String.class);
 
-		assertThat(response.getStatusCodeValue(), is(409));
+		assertThat(response.getStatusCodeValue()).isEqualTo(409);
 	}
 
 	@Test
 	public void getProfileForbidden() {
-		final HttpHeaders headers = new HttpHeaders();
+		final var headers = new HttpHeaders();
 		headers.add("Nickname", "nickname");
 		headers.add("Email", "nickname@example.com");
-		final ResponseEntity<String> response = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
+		final var response = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
 
-		assertThat(response.getStatusCodeValue(), is(401));
+		assertThat(response.getStatusCodeValue()).isEqualTo(401);
 	}
 
 	@Test
 	public void getMyProfileWithEmail() throws IOException {
-		final HttpHeaders headers = new HttpHeaders();
+		final var headers = new HttpHeaders();
 		headers.add("Upload-Token", "uON60I7XWTIN");
 		headers.add("Email", "user10@example.com");
-		final ResponseEntity<String> response = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
+		final var response = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
 
-		assertThat(response.getStatusCodeValue(), is(200));
+		assertThat(response.getStatusCodeValue()).isEqualTo(200);
 		assertProfile(response, "@user10", "https://www.example.com/user10", false, "user10@example.com");
 	}
 
 	@Test
 	public void getMyProfileWithName() throws IOException {
-		final HttpHeaders headers = new HttpHeaders();
+		final var headers = new HttpHeaders();
 		headers.add("Upload-Token", "uON60I7XWTIN");
 		headers.add("Email", "@user10");
-		final ResponseEntity<String> response = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
+		final var response = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
 
-		assertThat(response.getStatusCodeValue(), is(200));
+		assertThat(response.getStatusCodeValue()).isEqualTo(200);
 		assertProfile(response, "@user10", "https://www.example.com/user10", false, "user10@example.com");
 	}
 
 	@Test
 	public void getMyProfileWithBasicAuthUploadToken() throws IOException {
-		final ResponseEntity<String> response = restTemplate.withBasicAuth("@user10", "uON60I7XWTIN")
+		final var response = restTemplate.withBasicAuth("@user10", "uON60I7XWTIN")
 				.getForEntity(String.format("http://localhost:%d%s", port, "/myProfile"), String.class);
 
-		assertThat(response.getStatusCodeValue(), is(200));
+		assertThat(response.getStatusCodeValue()).isEqualTo(200);
 		assertProfile(response, "@user10", "https://www.example.com/user10", false, "user10@example.com");
 	}
 
 	@Test
 	public void getMyProfileWithBasicAuthPassword() throws IOException {
-		final ResponseEntity<String> response = restTemplate.withBasicAuth("@user27", "y89zFqkL6hro")
+		final var response = restTemplate.withBasicAuth("@user27", "y89zFqkL6hro")
 				.getForEntity(String.format("http://localhost:%d%s", port, "/myProfile"), String.class);
 
-		assertThat(response.getStatusCodeValue(), is(200));
+		assertThat(response.getStatusCodeValue()).isEqualTo(200);
 		assertProfile(response, "@user27", "https://www.example.com/user27", false, null);
 	}
 
 	@Test
 	public void getMyProfileWithBasicAuthPasswordFail() {
-		final ResponseEntity<String> response = restTemplate.withBasicAuth("@user27", "blahblubb")
+		final var response = restTemplate.withBasicAuth("@user27", "blahblubb")
 				.getForEntity(String.format("http://localhost:%d%s", port, "/myProfile"), String.class);
 
-		assertThat(response.getStatusCodeValue(), is(401));
+		assertThat(response.getStatusCodeValue()).isEqualTo(401);
 	}
 
 	private void assertProfile(final ResponseEntity<String> response, final String name, final String link, final boolean anonymous, final String email) throws IOException {
-		final JsonNode jsonNode = mapper.readTree(response.getBody());
-		assertThat(jsonNode.get("nickname").asText(), is(name));
+		final var jsonNode = mapper.readTree(response.getBody());
+		assertThat(jsonNode.get("nickname").asText()).isEqualTo(name);
 		if (email != null) {
-			assertThat(jsonNode.get("email").asText(), is(email));
+			assertThat(jsonNode.get("email").asText()).isEqualTo(email);
 		} else {
-			assertThat(jsonNode.get("email"), nullValue());
+			assertThat(jsonNode.get("email")).isNull();
 		}
-		assertThat(jsonNode.get("link").asText(), is(link));
-		assertThat(jsonNode.get("license").asText(), is("CC0 1.0 Universell (CC0 1.0)"));
-		assertThat(jsonNode.get("photoOwner").asBoolean(), is(true));
-		assertThat(jsonNode.get("anonymous").asBoolean(), is(anonymous));
-		assertThat(jsonNode.has("uploadToken"), is(false));
+		assertThat(jsonNode.get("link").asText()).isEqualTo(link);
+		assertThat(jsonNode.get("license").asText()).isEqualTo("CC0 1.0 Universell (CC0 1.0)");
+		assertThat(jsonNode.get("photoOwner").asBoolean()).isEqualTo(true);
+		assertThat(jsonNode.get("anonymous").asBoolean()).isEqualTo(anonymous);
+		assertThat(jsonNode.has("uploadToken")).isEqualTo(false);
 	}
 
 	@Test
 	public void updateMyProfileAndChangePassword() throws IOException {
-		final String firstPassword = "GDAkhaeU2vrK";
-		final HttpHeaders headers = new HttpHeaders();
+		final var firstPassword = "GDAkhaeU2vrK";
+		final var headers = new HttpHeaders();
 		headers.add("Upload-Token", firstPassword);
 		headers.add("Email", "user14@example.com");
-		final ResponseEntity<String> responseGetBefore = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
-		assertThat(responseGetBefore.getStatusCodeValue(), is(200));
-		assertThat(responseGetBefore.getBody(), notNullValue());
+		final var responseGetBefore = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
+		assertThat(responseGetBefore.getStatusCodeValue()).isEqualTo(200);
+		assertThat(responseGetBefore.getBody()).isNotNull();
 		assertProfile(responseGetBefore, "@user14", "https://www.example.com/user14", false, "user14@example.com");
 
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		final ResponseEntity<String> responsePostUpdate = restTemplate.postForEntity(
+		final var responsePostUpdate = restTemplate.postForEntity(
 				String.format("http://localhost:%d%s", port, "/myProfile"), new HttpEntity<>("""
 						{
-						\t"nickname": "user14",\s
-						\t"email": "user14@example.com",\s
-						\t"license": "CC0",
-						\t"photoOwner": true,\s
-						\t"anonymous": true
+							"nickname": "user14",
+							"email": "user14@example.com",
+							"license": "CC0",
+							"photoOwner": true,
+							"anonymous": true
 						}""", headers), String.class);
-		assertThat(responsePostUpdate.getStatusCodeValue(), is(200));
-		assertThat(responsePostUpdate.getBody(), notNullValue());
+		assertThat(responsePostUpdate.getStatusCodeValue()).isEqualTo(200);
+		assertThat(responsePostUpdate.getBody()).isNotNull();
 
-		final ResponseEntity<String> responseGetAfter = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
-		assertThat(responseGetAfter.getStatusCodeValue(), is(200));
-		assertThat(responseGetAfter.getBody(), notNullValue());
+		final var responseGetAfter = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
+		assertThat(responseGetAfter.getStatusCodeValue()).isEqualTo(200);
+		assertThat(responseGetAfter.getBody()).isNotNull();
 		assertProfile(responseGetAfter, "user14", "", true, "user14@example.com");
 
 
-		final String secondPassword = "!\"$%&/()=?-1234567890";
+		final var secondPassword = "!\"$%&/()=?-1234567890";
 		changePassword(firstPassword, secondPassword, true, true);
 		changePassword(secondPassword, "\\=oF`)X77__U}G", false, false);
 	}
 
 	public void changePassword(final String oldPassword, final String newPassword, final boolean authUploadToken, final boolean changePasswordViaHeader) {
-		final HttpHeaders headers = new HttpHeaders();
+		final var headers = new HttpHeaders();
 		if (authUploadToken) {
 			headers.add("Upload-Token", oldPassword);
 			headers.add("Email", "user14@example.com");
@@ -245,22 +241,22 @@ class ProfileIntegrationTests {
 			changePasswordRequest = new HttpEntity<>(headers);
 		} else {
 			headers.setContentType(MediaType.APPLICATION_JSON);
-			final ObjectNode changePassword = mapper.createObjectNode();
+			final var changePassword = mapper.createObjectNode();
 			changePassword.set("newPassword", new TextNode(newPassword));
 			changePasswordRequest = new HttpEntity<>(changePassword, headers);
 		}
 
-		final ResponseEntity<String> responseChangePassword = restTemplate.postForEntity(
+		final var responseChangePassword = restTemplate.postForEntity(
 				String.format("http://localhost:%d%s", port, "/changePassword"), changePasswordRequest, String.class);
-		assertThat(responseChangePassword.getStatusCodeValue(), is(200));
+		assertThat(responseChangePassword.getStatusCodeValue()).isEqualTo(200);
 
-		final ResponseEntity<String> responseAfterChangedPassword = restTemplate
+		final var responseAfterChangedPassword = restTemplate
 				.withBasicAuth("user14@example.com", newPassword)
 				.getForEntity(String.format("http://localhost:%d%s", port, "/myProfile"), String.class);
-		assertThat(responseAfterChangedPassword.getStatusCodeValue(), is(200));
+		assertThat(responseAfterChangedPassword.getStatusCodeValue()).isEqualTo(200);
 
-		final ResponseEntity<String> responseWithOldPassword = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
-		assertThat(responseWithOldPassword.getStatusCodeValue(), is(401));
+		final var responseWithOldPassword = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
+		assertThat(responseWithOldPassword.getStatusCodeValue()).isEqualTo(401);
 	}
 
 }

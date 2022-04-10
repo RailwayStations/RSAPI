@@ -14,7 +14,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
-import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -78,14 +77,14 @@ class StatisticControllerTest {
         mvc.perform(get("/de/stats.txt"))
             .andExpect(status().isOk())
             .andExpect(validOpenApi())
-            .andExpect(content().string(is("""
+            .andExpect(content().string("""
                   name	value
                   total	729
                   withPhoto	84
                   withoutPhoto	645
                   photographers	4
                   countryCode	de
-                      """)));
+                  """));
     }
 
 }

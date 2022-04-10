@@ -17,7 +17,6 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import java.util.Map;
 
 import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
-import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -85,13 +84,13 @@ class PhotographersControllerTest {
         mvc.perform(get(urlTemplate))
                 .andExpect(status().isOk())
                 .andExpect(validOpenApi())
-                .andExpect(content().string(is("""
+                .andExpect(content().string("""
 					count	photographer
 					31	@user27
 					29	@user8
 					15	@user10
 					9	@user0
-					""")));
+					"""));
     }
 
     @NotNull

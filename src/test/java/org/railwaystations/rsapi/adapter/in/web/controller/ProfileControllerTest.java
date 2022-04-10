@@ -28,9 +28,7 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import java.util.Optional;
 
 import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -77,8 +75,7 @@ public class ProfileControllerTest {
         final var givenUserProfileWithoutEmail = """
                     { "nickname": "nickname", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """;
-        postRegistration(givenUserProfileWithoutEmail)
-                .andExpect(status().isBadRequest());
+        postRegistration(givenUserProfileWithoutEmail).andExpect(status().isBadRequest());
     }
 
     @NotNull
@@ -96,15 +93,14 @@ public class ProfileControllerTest {
         final var givenUserProfile = """
                     { "nickname": "nickname", "email": "nickname@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """;
-        postRegistration(givenUserProfile)
-                .andExpect(status().isAccepted());
+        postRegistration(givenUserProfile).andExpect(status().isAccepted());
 
         verify(userDao).findByNormalizedName("nickname");
         verify(userDao).findByEmail("nickname@example.com");
         verify(userDao).insert(any(User.class));
         verify(userDao, never()).updateCredentials(anyInt(), anyString());
 
-        assertThat(monitor.getMessages().get(0), equalTo("New registration{nickname='nickname', email='nickname@example.com', license='CC0 1.0 Universell (CC0 1.0)', photoOwner=true, link='https://link@example.com', anonymous=false}\nvia UserAgent"));
+        assertThat(monitor.getMessages().get(0)).isEqualTo("New registration{nickname='nickname', email='nickname@example.com', license='CC0 1.0 Universell (CC0 1.0)', photoOwner=true, link='https://link@example.com', anonymous=false}\nvia UserAgent");
         assertNewPasswordEmail();
 
         verifyNoMoreInteractions(userDao);
@@ -135,15 +131,14 @@ public class ProfileControllerTest {
         final var givenUserProfileWithPassword = """
                     { "nickname": "nickname", "email": "nickname@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true, "newPassword": "verySecretPassword" }
                 """;
-        postRegistration(givenUserProfileWithPassword)
-                .andExpect(status().isAccepted());
+        postRegistration(givenUserProfileWithPassword).andExpect(status().isAccepted());
 
         verify(userDao).findByNormalizedName("nickname");
         verify(userDao).findByEmail("nickname@example.com");
         verify(userDao).insert(any(User.class));
         verify(userDao, never()).updateCredentials(anyInt(), anyString());
 
-        assertThat(monitor.getMessages().get(0), equalTo("New registration{nickname='nickname', email='nickname@example.com', license='CC0 1.0 Universell (CC0 1.0)', photoOwner=true, link='https://link@example.com', anonymous=false}\nvia UserAgent"));
+        assertThat(monitor.getMessages().get(0)).isEqualTo("New registration{nickname='nickname', email='nickname@example.com', license='CC0 1.0 Universell (CC0 1.0)', photoOwner=true, link='https://link@example.com', anonymous=false}\nvia UserAgent");
         assertVerificationEmail();
 
         verifyNoMoreInteractions(userDao);
@@ -174,10 +169,9 @@ public class ProfileControllerTest {
         final var givenAnonymousUserProfile = """
                     { "nickname": "nickname", "email": "nickname@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
                 """;
-        postRegistration(givenAnonymousUserProfile)
-                .andExpect(status().isAccepted());
+        postRegistration(givenAnonymousUserProfile).andExpect(status().isAccepted());
 
-        assertThat(monitor.getMessages().get(0), equalTo("New registration{nickname='nickname', email='nickname@example.com', license='CC0 1.0 Universell (CC0 1.0)', photoOwner=true, link='https://link@example.com', anonymous=true}\nvia UserAgent"));
+        assertThat(monitor.getMessages().get(0)).isEqualTo("New registration{nickname='nickname', email='nickname@example.com', license='CC0 1.0 Universell (CC0 1.0)', photoOwner=true, link='https://link@example.com', anonymous=true}\nvia UserAgent");
     }
 
     @Test
@@ -186,8 +180,7 @@ public class ProfileControllerTest {
         final var givenUserProfileWithSameName = """
                     { "nickname": "existing", "email": "other@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """;
-        postRegistration(givenUserProfileWithSameName)
-                .andExpect(status().isConflict());
+        postRegistration(givenUserProfileWithSameName).andExpect(status().isConflict());
     }
 
     @Test
@@ -196,10 +189,9 @@ public class ProfileControllerTest {
         final var givenUserProfileWithSameEmail = """
                     { "nickname": "othername", "email": "existing@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """;
-        postRegistration(givenUserProfileWithSameEmail)
-                .andExpect(status().isConflict());
+        postRegistration(givenUserProfileWithSameEmail).andExpect(status().isConflict());
 
-        assertThat(monitor.getMessages().get(0), equalTo("Registration for user 'othername' with eMail 'existing@example.com' failed, eMail is already taken\nvia UserAgent"));
+        assertThat(monitor.getMessages().get(0)).isEqualTo("Registration for user 'othername' with eMail 'existing@example.com' failed, eMail is already taken\nvia UserAgent");
     }
 
     @Test
@@ -208,8 +200,7 @@ public class ProfileControllerTest {
         final var givenUserProfileWithEmptyName = """
                     { "nickname": "", "email": "existing@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """;
-        postRegistration(givenUserProfileWithEmptyName)
-                .andExpect(status().isBadRequest());
+        postRegistration(givenUserProfileWithEmptyName).andExpect(status().isBadRequest());
     }
 
     @Test
@@ -284,8 +275,8 @@ public class ProfileControllerTest {
         final var keyCaptor = ArgumentCaptor.forClass(String.class);
         verify(userDao).updateCredentials(idCaptor.capture(), keyCaptor.capture());
 
-        assertThat(idCaptor.getValue(), equalTo(42));
-        assertThat(new LazySodiumPasswordEncoder().matches("secretlong", keyCaptor.getValue()), is(true));
+        assertThat(idCaptor.getValue()).isEqualTo(42);
+        assertThat(new LazySodiumPasswordEncoder().matches("secretlong", keyCaptor.getValue())).isTrue();
     }
 
     @Test
@@ -299,8 +290,8 @@ public class ProfileControllerTest {
         final var keyCaptor = ArgumentCaptor.forClass(String.class);
         verify(userDao).updateCredentials(idCaptor.capture(), keyCaptor.capture());
 
-        assertThat(idCaptor.getValue(), equalTo(42));
-        assertThat(new LazySodiumPasswordEncoder().matches("secretlong", keyCaptor.getValue()), is(true));
+        assertThat(idCaptor.getValue()).isEqualTo(42);
+        assertThat(new LazySodiumPasswordEncoder().matches("secretlong", keyCaptor.getValue())).isTrue();
     }
 
     @Test
@@ -314,8 +305,8 @@ public class ProfileControllerTest {
         final var keyCaptor = ArgumentCaptor.forClass(String.class);
         verify(userDao).updateCredentials(idCaptor.capture(), keyCaptor.capture());
 
-        assertThat(idCaptor.getValue(), equalTo(42));
-        assertThat(new LazySodiumPasswordEncoder().matches("secretbody", keyCaptor.getValue()), is(true));
+        assertThat(idCaptor.getValue()).isEqualTo(42);
+        assertThat(new LazySodiumPasswordEncoder().matches("secretbody", keyCaptor.getValue())).isTrue();
     }
 
     @Test
@@ -326,8 +317,7 @@ public class ProfileControllerTest {
                     { "nickname": "new_name", "email": "existing@example.com", "link": "http://twitter.com/", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
                 """;
 
-        postMyProfile(newProfileJson)
-                .andExpect(status().isOk());
+        postMyProfile(newProfileJson).andExpect(status().isOk());
 
         verify(userDao).update(new User("new_name", "existing@example.com", "CC0", true, "http://twitter.com/", true, null, true));
     }
@@ -352,8 +342,7 @@ public class ProfileControllerTest {
                     { "nickname": "new_name", "email": "existing@example.com", "link": "http://twitter.com/", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
                 """;
 
-        postMyProfile(newProfileJson)
-                .andExpect(status().isConflict());
+        postMyProfile(newProfileJson).andExpect(status().isConflict());
 
         verify(userDao, never()).update(any(User.class));
     }
@@ -366,8 +355,7 @@ public class ProfileControllerTest {
                     { "nickname": "existing", "email": "newname@example.com", "link": "http://twitter.com/", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
                 """;
 
-        postMyProfile(newProfileJson)
-                .andExpect(status().isOk());
+        postMyProfile(newProfileJson).andExpect(status().isOk());
 
         assertVerificationEmail();
         verify(userDao).update(new User("existing", "newname@example.com", "CC0", true, "http://twitter.com/", true, null, true));
@@ -386,7 +374,7 @@ public class ProfileControllerTest {
                 .andExpect(validOpenApi())
                 .andExpect(status().isAccepted());
 
-        assertThat(monitor.getMessages().get(0), equalTo("Reset Password for 'existing', email='existing@example.com'"));
+        assertThat(monitor.getMessages().get(0)).isEqualTo("Reset Password for 'existing', email='existing@example.com'");
     }
 
     @Test
@@ -395,10 +383,9 @@ public class ProfileControllerTest {
         when(userDao.findByNormalizedName(user.getName())).thenReturn(Optional.of(user));
         when(userDao.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
-        postResetPassword("existing@example.com")
-                .andExpect(status().isAccepted());
+        postResetPassword("existing@example.com").andExpect(status().isAccepted());
 
-        assertThat(monitor.getMessages().get(0), equalTo("Reset Password for 'existing', email='existing@example.com'"));
+        assertThat(monitor.getMessages().get(0)).isEqualTo("Reset Password for 'existing', email='existing@example.com'");
     }
 
     @NotNull
@@ -416,16 +403,14 @@ public class ProfileControllerTest {
         when(userDao.findByNormalizedName(user.getName())).thenReturn(Optional.of(user));
         when(userDao.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
-        postResetPassword("existing")
-                .andExpect(status().isAccepted());
+        postResetPassword("existing").andExpect(status().isAccepted());
 
-        assertThat(monitor.getMessages().get(0), equalTo("Reset Password for 'existing', email='existing@example.com'"));
+        assertThat(monitor.getMessages().get(0)).isEqualTo("Reset Password for 'existing', email='existing@example.com'");
     }
 
     @Test
     public void testResetPasswordUserNotFound() throws Exception {
-        postResetPassword("doesnt-exist")
-                .andExpect(status().isNotFound());
+        postResetPassword("doesnt-exist").andExpect(status().isNotFound());
     }
 
     @Test
@@ -441,14 +426,13 @@ public class ProfileControllerTest {
     @Test
     public void testVerifyEmailSuccess() throws Exception {
         final var token = "verification";
-        final var emailVerification = User.EMAIL_VERIFICATION_TOKEN + token;
-        final var user = new User("existing","https://link@example.com", "CC0", 42, "existing@example.com", true, false, null, false, emailVerification, true);
-        when(userDao.findByEmailVerification(emailVerification)).thenReturn(Optional.of(user));
+        final var user = new User("existing","https://link@example.com", "CC0", 42, "existing@example.com", true, false, null, false, User.EMAIL_VERIFICATION_TOKEN + token, true);
+        when(userDao.findByEmailVerification(User.EMAIL_VERIFICATION_TOKEN + token)).thenReturn(Optional.of(user));
 
         getEmailVerification(token)
                 .andExpect(status().isOk());
 
-        assertThat(monitor.getMessages().get(0), equalTo("Email verified {nickname='existing', email='existing@example.com'}"));
+        assertThat(monitor.getMessages().get(0)).isEqualTo("Email verified {nickname='existing', email='existing@example.com'}");
         verify(userDao).updateEmailVerification(42, User.EMAIL_VERIFIED);
     }
 
@@ -467,10 +451,9 @@ public class ProfileControllerTest {
         final var user = new User("existing","https://link@example.com", "CC0", 42, "existing@example.com", true, false, null, false, emailVerification, true);
         when(userDao.findByEmailVerification(emailVerification)).thenReturn(Optional.of(user));
 
-        getEmailVerification("wrong_token")
-                .andExpect(status().isNotFound());
+        getEmailVerification("wrong_token").andExpect(status().isNotFound());
 
-        assertThat(monitor.getMessages().isEmpty(), equalTo(true));
+        assertThat(monitor.getMessages().isEmpty()).isTrue();
         verify(userDao, never()).updateEmailVerification(42, User.EMAIL_VERIFIED);
     }
 

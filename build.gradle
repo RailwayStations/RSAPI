@@ -59,6 +59,7 @@ dependencies {
 	testImplementation "com.atlassian.oai:swagger-request-validator-core:$swaggerRequestValidatorVersion"
 	testImplementation "com.atlassian.oai:swagger-request-validator-springmvc:$swaggerRequestValidatorVersion"
 	testImplementation "com.atlassian.oai:swagger-request-validator-mockmvc:$swaggerRequestValidatorVersion"
+	testImplementation 'org.assertj:assertj-core:3.22.0'
 }
 
 test {

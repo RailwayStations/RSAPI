@@ -20,9 +20,8 @@ import java.util.List;
 import java.util.Set;
 
 import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Fail.fail;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -52,7 +51,7 @@ public class CountriesControllerTest {
                 .andReturn().getResponse().getContentAsString();
 
         final List<Country> countries = objectMapper.readerForListOf(Country.class).readValue(contentAsString);
-        assertThat(countries.size(), equalTo(2));
+        assertThat(countries.size()).isEqualTo(2);
         countries.forEach(this::assertCountry);
     }
 
@@ -71,17 +70,17 @@ public class CountriesControllerTest {
     }
 
     private void assertCountry(final Country country) {
-        assertThat(country.getName(), equalTo("name-" + country.getCode()));
-        assertThat(country.getEmail(), equalTo("email-" + country.getCode()));
-        assertThat(country.getTwitterTags(), equalTo("twitter-" + country.getCode()));
-        assertThat(country.getTimetableUrlTemplate(), equalTo("timetable-" + country.getCode()));
-        assertThat(country.getOverrideLicense(), equalTo("overrideLicense-" + country.getCode()));
-        assertThat(country.getProviderApps().size(), equalTo(3));
+        assertThat(country.getName()).isEqualTo("name-" + country.getCode());
+        assertThat(country.getEmail()).isEqualTo("email-" + country.getCode());
+        assertThat(country.getTwitterTags()).isEqualTo("twitter-" + country.getCode());
+        assertThat(country.getTimetableUrlTemplate()).isEqualTo("timetable-" + country.getCode());
+        assertThat(country.getOverrideLicense()).isEqualTo("overrideLicense-" + country.getCode());
+        assertThat(country.getProviderApps().size()).isEqualTo(3);
         country.getProviderApps().forEach(app -> {
             switch (app.getType()) {
-                case "android" -> assertThat(app.getUrl(), equalTo("providerAndroidApp-" + country.getCode()));
-                case "ios" -> assertThat(app.getUrl(), equalTo("providerIosApp-" + country.getCode()));
-                case "web" -> assertThat(app.getUrl(), equalTo("providerWebApp-" + country.getCode()));
+                case "android" -> assertThat(app.getUrl()).isEqualTo("providerAndroidApp-" + country.getCode());
+                case "ios" -> assertThat(app.getUrl()).isEqualTo("providerIosApp-" + country.getCode());
+                case "web" -> assertThat(app.getUrl()).isEqualTo("providerWebApp-" + country.getCode());
                 default -> fail("unknown app type");
             }
         });

@@ -15,8 +15,6 @@
 
 - introduce Repository classes to hide JDBI DAOs?
 
-- AssertJ instead of Hamcrest matchers?
-
 - reintroduce multistage docker build
 
 - harden docker
