@@ -1,8 +1,11 @@
 package org.railwaystations.rsapi.app;
 
+import com.atlassian.oai.validator.springmvc.OpenApiValidationFilter;
+import com.atlassian.oai.validator.springmvc.OpenApiValidationInterceptor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -11,11 +14,14 @@ import org.railwaystations.rsapi.adapter.out.photostorage.WorkDir;
 import org.railwaystations.rsapi.core.model.Station;
 import org.railwaystations.rsapi.core.ports.out.Monitor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.EncodedResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -23,12 +29,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.testcontainers.containers.MariaDBContainer;
 import org.testcontainers.utility.DockerImageName;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.imageio.ImageIO;
+import javax.servlet.Filter;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
@@ -51,7 +60,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
 		properties = {"server.error.include-message=always"})
 @ActiveProfiles("test")
-class RsapiApplicationTests {
+class RsapiIntegrationTests {
 
 	@Autowired
 	private ObjectMapper mapper;
@@ -244,7 +253,7 @@ class RsapiApplicationTests {
 		headers.add("Station-Id", "4711");
 		headers.add("Country", "de");
 		headers.setContentType(MediaType.IMAGE_JPEG);
-		final var request = new HttpEntity<>("", headers);
+		final var request = new HttpEntity<>(IMAGE, headers);
 		final var response = restTemplate.postForEntity(
 				String.format("http://localhost:%d%s", port, "/photoUpload"), request, String.class);
 
@@ -441,6 +450,22 @@ class RsapiApplicationTests {
 			}
 		}
 
+		@Bean
+		public Filter openApiValidationFilter() {
+			return new OpenApiValidationFilter(true, true);
+		}
+
+		@Bean
+		public WebMvcConfigurer addOpenApiValidationInterceptor(@Value("classpath:static/openapi.yaml") final Resource apiSpecification) throws IOException {
+			final EncodedResource specResource = new EncodedResource(apiSpecification, StandardCharsets.UTF_8);
+			final OpenApiValidationInterceptor openApiValidationInterceptor = new OpenApiValidationInterceptor(specResource);
+			return new WebMvcConfigurer() {
+				@Override
+				public void addInterceptors(final @NotNull InterceptorRegistry registry) {
+					registry.addInterceptor(openApiValidationInterceptor);
+				}
+			};
+		}
 	}
 
 }

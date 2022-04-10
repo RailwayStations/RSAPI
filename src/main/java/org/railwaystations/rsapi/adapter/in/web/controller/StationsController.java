@@ -36,8 +36,7 @@ public class StationsController {
         this.findPhotoStationsUseCase = findPhotoStationsUseCase;
     }
 
-    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8", StationsGpxWriter.GPX_MEDIA_TYPE_VALUE,
-            MediaType.TEXT_PLAIN_VALUE + ";charset=UTF-8"}, value = "/stations")
+    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8", StationsGpxWriter.GPX_MEDIA_TYPE_VALUE}, value = "/stations")
     public List<Station> get(@RequestParam(value = COUNTRY, required = false) final Set<String> countries,
                              @RequestParam(value = HAS_PHOTO, required = false) final Boolean hasPhoto,
                              @RequestParam(value = PHOTOGRAPHER, required = false) final String photographer,
@@ -59,17 +58,6 @@ public class StationsController {
         return get(countries, hasPhoto, photographer, maxDistance, lat, lon, active);
     }
 
-    @GetMapping(produces = {MediaType.TEXT_PLAIN_VALUE + ";charset=UTF-8"}, value = "/stations.txt")
-    public List<Station> getAsTxt(@RequestParam(value = COUNTRY, required = false) final Set<String> countries,
-                             @RequestParam(value = HAS_PHOTO, required = false) final Boolean hasPhoto,
-                             @RequestParam(value = PHOTOGRAPHER, required = false) final String photographer,
-                             @RequestParam(value = MAX_DISTANCE, required = false) final Integer maxDistance,
-                             @RequestParam(value = LAT, required = false) final Double lat,
-                             @RequestParam(value = LON, required = false) final Double lon,
-                             @RequestParam(value = ACTIVE, required = false) final Boolean active) {
-        return get(countries, hasPhoto, photographer, maxDistance, lat, lon, active);
-    }
-
     @GetMapping(produces = {StationsGpxWriter.GPX_MEDIA_TYPE_VALUE}, value = "/stations.gpx")
     public List<Station> getAsGpx(@RequestParam(value = COUNTRY, required = false) final Set<String> countries,
                              @RequestParam(value = HAS_PHOTO, required = false) final Boolean hasPhoto,
@@ -81,8 +69,7 @@ public class StationsController {
         return get(countries, hasPhoto, photographer, maxDistance, lat, lon, active);
     }
 
-    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8", StationsGpxWriter.GPX_MEDIA_TYPE_VALUE,
-            MediaType.TEXT_PLAIN_VALUE + ";charset=UTF-8"}, value = "/{country}/stations")
+    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8", StationsGpxWriter.GPX_MEDIA_TYPE_VALUE}, value = "/{country}/stations")
     public List<Station> getWithCountry(@PathVariable(COUNTRY) final String country,
                                         @RequestParam(value = HAS_PHOTO, required = false) final Boolean hasPhoto,
                                         @RequestParam(value = PHOTOGRAPHER, required = false) final String photographer,
@@ -101,17 +88,6 @@ public class StationsController {
                                               @RequestParam(value = LAT, required = false) final Double lat,
                                               @RequestParam(value = LON, required = false) final Double lon,
                                               @RequestParam(value = ACTIVE, required = false) final Boolean active) {
-        return getWithCountry(country, hasPhoto, photographer, maxDistance, lat, lon, active);
-    }
-
-    @GetMapping(produces = {MediaType.TEXT_PLAIN_VALUE + ";charset=UTF-8"}, value = "/{country}/stations.txt")
-    public List<Station> getWithCountryAsText(@PathVariable(COUNTRY) final String country,
-                                        @RequestParam(value = HAS_PHOTO, required = false) final Boolean hasPhoto,
-                                        @RequestParam(value = PHOTOGRAPHER, required = false) final String photographer,
-                                        @RequestParam(value = MAX_DISTANCE, required = false) final Integer maxDistance,
-                                        @RequestParam(value = LAT, required = false) final Double lat,
-                                        @RequestParam(value = LON, required = false) final Double lon,
-                                        @RequestParam(value = ACTIVE, required = false) final Boolean active) {
         return getWithCountry(country, hasPhoto, photographer, maxDistance, lat, lon, active);
     }
 
