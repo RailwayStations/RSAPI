@@ -28,7 +28,7 @@ ext {
 	springVersion = '2.6.6'
 	testContainersVersion = '1.17.1'
 	jdbiVersion = '3.28.0'
-	swaggerRequestValidatorVersion = '2.27.1'
+	swaggerRequestValidatorVersion = '2.27.2'
 }
 
 dependencies {
