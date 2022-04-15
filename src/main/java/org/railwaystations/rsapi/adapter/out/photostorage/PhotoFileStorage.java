@@ -41,20 +41,24 @@ public class PhotoFileStorage implements PhotoStorage {
 
     @Override
     public void importPhoto(final InboxEntry inboxEntry, final Country country, final Station station) throws IOException {
-        final Path originalFile = getUploadFile(inboxEntry.getFilename());
-        final Path processedFile = workDir.getInboxProcessedDir().resolve(inboxEntry.getFilename());
-        final Path destinationFile = workDir.getPhotosDir().resolve(country.getCode()).resolve(sanitizeFilename(station.getKey().getId() + "." + inboxEntry.getExtension()));
+        final var uploadedFile = getUploadFile(inboxEntry.getFilename());
+        final var processedFile = workDir.getInboxProcessedDir().resolve(inboxEntry.getFilename());
+        final var destinationFile = workDir.getPhotosDir().resolve(country.getCode()).resolve(sanitizeFilename(station.getKey().getId() + "." + inboxEntry.getExtension()));
         if (Files.exists(processedFile)) {
             Files.move(processedFile, destinationFile, REPLACE_EXISTING);
         } else {
-            Files.copy(originalFile, destinationFile, REPLACE_EXISTING);
+            Files.copy(uploadedFile, destinationFile, REPLACE_EXISTING);
         }
-        Files.move(originalFile, workDir.getInboxDoneDir().resolve(originalFile.getFileName()), REPLACE_EXISTING);
+        try {
+            Files.move(uploadedFile, workDir.getInboxDoneDir().resolve(uploadedFile.getFileName()), REPLACE_EXISTING);
+        } catch (final Exception e) {
+            LOG.warn("Couldn't move original file {} to done dir", uploadedFile, e);
+        }
     }
 
     @Override
     public void reject(final InboxEntry inboxEntry) throws IOException {
-        final Path file = getUploadFile(inboxEntry.getFilename());
+        final var file = getUploadFile(inboxEntry.getFilename());
         Files.move(file, workDir.getInboxRejectedDir().resolve(file.getFileName()), REPLACE_EXISTING);
         Files.deleteIfExists(workDir.getInboxToProcessDir().resolve(inboxEntry.getFilename()));
         Files.deleteIfExists(workDir.getInboxProcessedDir().resolve(inboxEntry.getFilename()));
@@ -62,12 +66,12 @@ public class PhotoFileStorage implements PhotoStorage {
 
     @Override
     public Long storeUpload(final InputStream body, final String filename) throws PhotoStorage.PhotoTooLargeException, IOException {
-        final Path file = getUploadFile(filename);
+        final var file = getUploadFile(filename);
         LOG.info("Writing photo to {}", file);
 
         // write the file to the inbox directory
-        final CheckedOutputStream cos = new CheckedOutputStream(Files.newOutputStream(file), new CRC32());
-        final long bytesRead = IOUtils.copyLarge(body, cos, 0L, MAX_SIZE);
+        final var cos = new CheckedOutputStream(Files.newOutputStream(file), new CRC32());
+        final var bytesRead = IOUtils.copyLarge(body, cos, 0L, MAX_SIZE);
         if (bytesRead == MAX_SIZE) {
             Files.deleteIfExists(file);
             throw new PhotoStorage.PhotoTooLargeException(MAX_SIZE);
@@ -101,7 +105,7 @@ public class PhotoFileStorage implements PhotoStorage {
 
     @Override
     public void cleanupOldCopies() {
-        final Instant maxAge = Instant.now().minus(workDir.getKeepFileCopiesInDays(), ChronoUnit.DAYS);
+        final var maxAge = Instant.now().minus(workDir.getKeepFileCopiesInDays(), ChronoUnit.DAYS);
         cleanupOldCopiesFrom(workDir.getInboxDoneDir(), maxAge);
         cleanupOldCopiesFrom(workDir.getInboxRejectedDir(), maxAge);
     }
