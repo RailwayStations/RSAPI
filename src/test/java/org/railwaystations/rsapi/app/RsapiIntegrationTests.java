@@ -235,6 +235,18 @@ class RsapiIntegrationTests {
 		assertThat(jsonNode.get("@user0").asInt()).isEqualTo(9);
 	}
 
+	@Test
+	public void photographersDeTxt() {
+		final var response = loadRaw("/de/photographers.txt", 200, String.class);
+		assertThat(response.getBody()).isEqualTo("""
+				count	photographer
+				31	@user27
+				29	@user8
+				15	@user10
+				9	@user0
+				""");
+	}
+
 	private Station loadStationDe6932() {
 		return loadStationByKey("de", "6932");
 	}
