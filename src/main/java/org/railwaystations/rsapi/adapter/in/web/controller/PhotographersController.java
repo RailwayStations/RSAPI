@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.constraints.Size;
 import java.util.Map;
 
+import static java.util.stream.Collectors.joining;
+
 @RestController
 @Validated
 public class PhotographersController {
@@ -30,8 +32,8 @@ public class PhotographersController {
     }
 
     @GetMapping(produces = {MediaType.TEXT_PLAIN_VALUE + ";charset=UTF-8"}, value = "/photographers.txt")
-    public Map<String, Long> getAsText(@RequestParam(value = COUNTRY, required = false) @Size(min = 2, max = 2) final String country) {
-        return getWithCountry(country);
+    public String getAsText(@RequestParam(value = COUNTRY, required = false) @Size(min = 2, max = 2) final String country) {
+        return toCsv(getWithCountry(country));
     }
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"},
@@ -41,8 +43,21 @@ public class PhotographersController {
     }
 
     @GetMapping(produces = {MediaType.TEXT_PLAIN_VALUE + ";charset=UTF-8"}, value = "/{country}/photographers.txt")
-    public Map<String, Long> getWithCountryAsText(@PathVariable(value = COUNTRY, required = false) @Size(min = 2, max = 2) final String country) {
-        return loadPhotographersUseCase.getPhotographersPhotocountMap(country);
+    public String getWithCountryAsText(@PathVariable(value = COUNTRY, required = false) @Size(min = 2, max = 2) final String country) {
+        return toCsv(loadPhotographersUseCase.getPhotographersPhotocountMap(country));
+    }
+
+    private String toCsv(final Map<String, Long> stringLongMap) {
+        return "count\tphotographer\n" +
+            stringLongMap.entrySet().stream()
+                    .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                    .map(this::photographerToCsv)
+                    .collect(joining("\n"))
+                + "\n";
+    }
+
+    private String photographerToCsv(final Map.Entry<String, Long> photographer) {
+        return String.join("\t", Long.toString(photographer.getValue()), photographer.getKey());
     }
 
 }

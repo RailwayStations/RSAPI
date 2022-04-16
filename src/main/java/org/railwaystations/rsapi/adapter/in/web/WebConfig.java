@@ -1,6 +1,5 @@
 package org.railwaystations.rsapi.adapter.in.web;
 
-import org.railwaystations.rsapi.adapter.in.web.writer.PhotographersTxtWriter;
 import org.railwaystations.rsapi.adapter.in.web.writer.StationsGpxWriter;
 import org.railwaystations.rsapi.adapter.in.web.writer.StatisticTxtWriter;
 import org.springframework.context.annotation.Bean;
@@ -26,7 +25,6 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void configureMessageConverters(final List<HttpMessageConverter<?>> converters) {
-        converters.add(new PhotographersTxtWriter());
         converters.add(new StationsGpxWriter());
         converters.add(new StatisticTxtWriter());
         converters.add(new MappingJackson2HttpMessageConverter());

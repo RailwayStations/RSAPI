@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.railwaystations.rsapi.adapter.in.web.ErrorHandlingControllerAdvice;
-import org.railwaystations.rsapi.adapter.in.web.writer.PhotographersTxtWriter;
 import org.railwaystations.rsapi.core.ports.in.LoadPhotographersUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = PhotographersController.class)
-@ContextConfiguration(classes={WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class, PhotographersTxtWriter.class})
+@ContextConfiguration(classes={WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class})
 @AutoConfigureMockMvc(addFilters = false)
 class PhotographersControllerTest {
 
