@@ -97,13 +97,22 @@ class RsapiIntegrationTests {
 
 	@Test
 	public void stationById() {
-		final var station = getStationDe6932();
+		final var station = loadStationDe6932();
 		assertThat(station.getKey().getId()).isEqualTo("6932");
 		assertThat(station.getTitle()).isEqualTo( "Wuppertal-Ronsdorf");
 		assertThat(station.getPhotoUrl()).isEqualTo("https://api.railway-stations.org/photos/de/6932.jpg");
 		assertThat(station.getPhotographer()).isEqualTo("@user10");
 		assertThat(station.getLicense()).isEqualTo("CC0 1.0 Universell (CC0 1.0)");
 		assertThat(station.isActive()).isTrue();
+		assertThat(station.getOutdated()).isFalse();
+	}
+
+	@Test
+	public void outdatedStationById() {
+		final var station = loadStationByKey("de", "7051");
+		assertThat(station.getKey().getCountry()).isEqualTo("de");
+		assertThat(station.getKey().getId()).isEqualTo("7051");
+		assertThat(station.getOutdated()).isTrue();
 	}
 
 	@Test
@@ -113,7 +122,7 @@ class RsapiIntegrationTests {
 
 	@Test
 	public void stationsDe() {
-		final var stations = assertLoadStationsOk(String.format("/de/%s", "stations"));
+		final var stations = assertLoadStationsOk("/de/stations");
 		assertThat(findByKey(stations, new Station.Key("de", "6721"))).isNotNull();
 		assertThat(findByKey(stations, new Station.Key("ch", "8500126"))).isNull();
 	}
@@ -226,8 +235,12 @@ class RsapiIntegrationTests {
 		assertThat(jsonNode.get("@user0").asInt()).isEqualTo(9);
 	}
 
-	private Station getStationDe6932() {
-		return loadRaw("/de/stations/6932", 200, Station.class).getBody();
+	private Station loadStationDe6932() {
+		return loadStationByKey("de", "6932");
+	}
+
+	private Station loadStationByKey(final String countryCode, final String id) {
+		return loadRaw("/" + countryCode + "/stations/" + id, 200, Station.class).getBody();
 	}
 
 	@Test
@@ -297,10 +310,6 @@ class RsapiIntegrationTests {
 
 	@Test
 	public void problemReportWithWrongLocation() throws JsonProcessingException {
-		final var headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-
 		assertCoordinatesOfStation6815(51.5764217543438, 11.281417285);
 
 		final var problemReportJson = """
@@ -312,34 +321,73 @@ class RsapiIntegrationTests {
 					"lat": 51.123,
 					"lon": 11.123
 				}""";
-		final var responsePostProblem = restTemplateWithBasicAuthUser10()
-				.postForEntity(String.format("http://localhost:%d%s", port, "/reportProblem"), new HttpEntity<>(problemReportJson, headers), String.class);
-		assertThat(responsePostProblem.getStatusCodeValue()).isEqualTo(202);
-		final var jsonNodePostProblemReponse = mapper.readTree(responsePostProblem.getBody());
-		assertThat(jsonNodePostProblemReponse).isNotNull();
-		assertThat(jsonNodePostProblemReponse.get("state").asText()).isEqualTo("REVIEW");
-		final var id = jsonNodePostProblemReponse.get("id").asInt();
-
-		final var responseUpdateLocation = restTemplateWithBasicAuthUser10()
-				.postForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), new HttpEntity<>("{\"id\": " + id + ", \"command\": \"UPDATE_LOCATION\"}", headers), String.class);
-		assertThat(responseUpdateLocation.getStatusCodeValue()).isEqualTo(200);
-		final var jsonNodeUpdateLocationReponse = mapper.readTree(responseUpdateLocation.getBody());
-		assertThat(jsonNodeUpdateLocationReponse).isNotNull();
-		assertThat(jsonNodeUpdateLocationReponse.get("status").asInt()).isEqualTo(200);
-		assertThat(jsonNodeUpdateLocationReponse.get("message").asText()).isEqualTo("ok");
+		final int id = sendProblemReport(problemReportJson);
+		sendInboxCommand("{\"id\": " + id + ", \"command\": \"UPDATE_LOCATION\"}");
 
 		assertCoordinatesOfStation6815(51.123, 11.123);
 	}
 
-	private TestRestTemplate restTemplateWithBasicAuthUser10() {
-		return restTemplate.withBasicAuth("@user10", "uON60I7XWTIN");
+	private int sendProblemReport(final String problemReportJson) throws JsonProcessingException {
+		final var responsePostProblem = restTemplateWithBasicAuthUser10()
+				.postForEntity(String.format("http://localhost:%d%s", port, "/reportProblem"), new HttpEntity<>(problemReportJson, createJsonHeaders()), String.class);
+		assertThat(responsePostProblem.getStatusCodeValue()).isEqualTo(202);
+		final var jsonNodePostProblemReponse = mapper.readTree(responsePostProblem.getBody());
+		assertThat(jsonNodePostProblemReponse).isNotNull();
+		assertThat(jsonNodePostProblemReponse.get("state").asText()).isEqualTo("REVIEW");
+		return jsonNodePostProblemReponse.get("id").asInt();
 	}
 
 	private void assertCoordinatesOfStation6815(final double lat, final double lon) {
-		final var stationBefore = loadRaw("/de/stations/6815", 200, Station.class).getBody();
-		assertThat(stationBefore).isNotNull();
-		assertThat(stationBefore.getCoordinates().lat()).isEqualTo(lat);
-		assertThat(stationBefore.getCoordinates().lon()).isEqualTo(lon);
+		final var station = loadStationByKey("de", "6815");
+		assertThat(station).isNotNull();
+		assertThat(station.getCoordinates().lat()).isEqualTo(lat);
+		assertThat(station.getCoordinates().lon()).isEqualTo(lon);
+	}
+
+	@Test
+	public void problemReportWithOutdatedPhoto() throws JsonProcessingException {
+		assertOutdatedPhotoOfStation7065(false);
+
+		final var problemReportJson = """
+				{
+					"countryCode": "de",
+					"stationId": "7065",
+					"type": "PHOTO_OUTDATED",
+					"comment": "Photo is outdated"
+				}""";
+		final var id = sendProblemReport(problemReportJson);
+		sendInboxCommand("{\"id\": " + id + ", \"command\": \"PHOTO_OUTDATED\"}");
+
+		assertOutdatedPhotoOfStation7065(true);
+	}
+
+	@NotNull
+	private HttpHeaders createJsonHeaders() {
+		final var headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+		return headers;
+	}
+
+	private void sendInboxCommand(final String inboxCommand) throws JsonProcessingException {
+		final var responseInboxCommand = restTemplateWithBasicAuthUser10()
+				.postForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), new HttpEntity<>(inboxCommand, createJsonHeaders()), String.class);
+		assertThat(responseInboxCommand.getStatusCodeValue()).isEqualTo(200);
+		final var jsonNodeInboxCommandReponse = mapper.readTree(responseInboxCommand.getBody());
+		assertThat(jsonNodeInboxCommandReponse).isNotNull();
+		assertThat(jsonNodeInboxCommandReponse.get("status").asInt()).isEqualTo(200);
+		assertThat(jsonNodeInboxCommandReponse.get("message").asText()).isEqualTo("ok");
+	}
+
+	private void assertOutdatedPhotoOfStation7065(final boolean outdated) {
+		final var station = loadStationByKey("de", "7065");
+		assertThat(station).isNotNull();
+		assertThat(station.getOutdated()).isEqualTo(outdated);
+	}
+
+
+	private TestRestTemplate restTemplateWithBasicAuthUser10() {
+		return restTemplate.withBasicAuth("@user10", "uON60I7XWTIN");
 	}
 
 	@Test
@@ -363,9 +411,7 @@ class RsapiIntegrationTests {
 
 	@Test
 	public void postAdminInboxCommandWithUnknownInboxExntry() throws JsonProcessingException {
-		final var headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+		final HttpHeaders headers = createJsonHeaders();
 		final var response = restTemplateWithBasicAuthUser10()
 				.postForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), new HttpEntity<>("{\"id\": -1, \"command\": \"IMPORT\"}", headers), String.class);
 

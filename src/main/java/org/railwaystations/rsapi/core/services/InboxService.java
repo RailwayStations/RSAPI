@@ -187,12 +187,17 @@ public class InboxService implements ManageInboxUseCase {
                 changeStationTitle(inboxEntry, command.getTitle());
             }
             case UPDATE_LOCATION -> updateLocation(inboxEntry, command);
+            case PHOTO_OUTDATED -> setPhotoOutdated(inboxEntry);
             default -> throw new IllegalArgumentException("Unexpected command value: " + command.getCommand());
         }
     }
 
+    private void setPhotoOutdated(final InboxEntry inboxEntry) {
+        photoDao.updatePhotoOutdated(inboxEntry.getCountryCode(), inboxEntry.getStationId());
+    }
+
     private void updateLocation(final InboxEntry inboxEntry, final InboxEntry command) {
-        Coordinates coordinates = inboxEntry.getCoordinates();
+        var coordinates = inboxEntry.getCoordinates();
         if (command.hasCoords()) {
             coordinates = command.getCoordinates();
         }
@@ -200,7 +205,7 @@ public class InboxService implements ManageInboxUseCase {
             throw new IllegalArgumentException("Can't update location, coordinates: " + command.getCommand());
         }
 
-        final Station station = assertStationExists(inboxEntry);
+        final var station = assertStationExists(inboxEntry);
         stationDao.updateLocation(station, coordinates);
         inboxDao.done(inboxEntry.getId());
     }
@@ -216,7 +221,7 @@ public class InboxService implements ManageInboxUseCase {
     }
 
     private void updateStationActiveState(final InboxEntry inboxEntry, final boolean active) {
-        final Station station = assertStationExists(inboxEntry);
+        final var station = assertStationExists(inboxEntry);
         station.setActive(active);
         stationDao.updateActive(station);
         inboxDao.done(inboxEntry.getId());
@@ -224,14 +229,14 @@ public class InboxService implements ManageInboxUseCase {
     }
 
     private void changeStationTitle(final InboxEntry inboxEntry, final String newTitle) {
-        final Station station = assertStationExists(inboxEntry);
+        final var station = assertStationExists(inboxEntry);
         stationDao.changeStationTitle(station, newTitle);
         inboxDao.done(inboxEntry.getId());
         LOG.info("Problem report {} station {} change name to {}", inboxEntry.getId(), station.getKey(), newTitle);
     }
 
     private void deleteStation(final InboxEntry inboxEntry) {
-        final Station station = assertStationExists(inboxEntry);
+        final var station = assertStationExists(inboxEntry);
         photoDao.delete(station.getKey());
         stationDao.delete(station);
         inboxDao.done(inboxEntry.getId());
@@ -239,7 +244,7 @@ public class InboxService implements ManageInboxUseCase {
     }
 
     private void deletePhoto(final InboxEntry inboxEntry) {
-        final Station station = assertStationExists(inboxEntry);
+        final var station = assertStationExists(inboxEntry);
         photoDao.delete(station.getKey());
         inboxDao.done(inboxEntry.getId());
         LOG.info("Problem report {} photo of station {} deleted", inboxEntry.getId(), station.getKey());

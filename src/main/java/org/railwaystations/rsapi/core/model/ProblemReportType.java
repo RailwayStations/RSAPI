@@ -6,6 +6,7 @@ public enum ProblemReportType {
     STATION_INACTIVE,
     STATION_NONEXISTENT,
     WRONG_PHOTO,
+    PHOTO_OUTDATED,
     OTHER,
     WRONG_NAME
 }

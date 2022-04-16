@@ -24,14 +24,20 @@ public class Photo {
     private final Instant createdAt;
     private final String license;
     private final String licenseUrl;
+    private final boolean outdated;
 
-    public Photo(final Station.Key stationKey, final String urlPath, final User photographer, final Instant createdAt, final String license) {
+    public Photo(final Station.Key stationKey, final String urlPath, final User photographer, final Instant createdAt, final String license, final boolean outdated) {
         this.stationKey = stationKey;
         this.urlPath = urlPath;
         this.photographer = photographer;
         this.createdAt = createdAt;
         this.license = license;
         this.licenseUrl = LICENSES.get(license);
+        this.outdated = outdated;
+    }
+
+    public Photo(final Station.Key stationKey, final String urlPath, final User photographer, final Instant createdAt, final String license) {
+        this(stationKey, urlPath, photographer, createdAt, license, false);
     }
 
     public Photo(final Country country, final String stationId, final User user, final String extension) {
@@ -61,6 +67,10 @@ public class Photo {
 
     public Instant getCreatedAt() {
         return createdAt;
+    }
+
+    public boolean isOutdated() {
+        return outdated;
     }
 
     /**

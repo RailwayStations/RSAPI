@@ -52,6 +52,9 @@ public class Station {
     @JsonProperty
     private boolean active;
 
+    @JsonProperty
+    private Boolean outdated;
+
     public Station() {
         this(new Key("", "0"), null, new Coordinates(0.0, 0.0), null, true);
     }
@@ -88,6 +91,7 @@ public class Station {
             this.licenseUrl = photo.getLicenseUrl();
             this.photographerUrl = photo.getPhotographer().getDisplayUrl();
             this.createdAt = photo.getCreatedAt();
+            this.outdated = photo.isOutdated();
         } else {
             this.photographerId = 0;
             this.photographer = null;
@@ -96,6 +100,7 @@ public class Station {
             this.licenseUrl = null;
             this.photographerUrl = null;
             this.createdAt = null;
+            this.outdated = null;
         }
     }
 
@@ -209,6 +214,14 @@ public class Station {
         if (photoUrl != null) {
             photoUrl = photoBaseUrl + photoUrl;
         }
+    }
+
+    public Boolean getOutdated() {
+        return outdated;
+    }
+
+    public void setOutdated(final Boolean outdated) {
+        this.outdated = outdated;
     }
 
     @SuppressWarnings("PMD.ShortClassName")

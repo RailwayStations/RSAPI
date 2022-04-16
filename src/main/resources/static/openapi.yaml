@@ -7,7 +7,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20220410.1600"
+  version: "20220416.1130"
 servers:
 - url: https://api.railway-stations.org/
 tags:
@@ -1206,6 +1206,8 @@ components:
           description: A short code of the station, depending on the country
         active:
           type: boolean
+        outdated:
+          type: boolean
     Photographers:
       type: object
       description: JSON Object with photographers nickname as parameter and number
@@ -1440,6 +1442,7 @@ components:
           - STATION_INACTIVE
           - STATION_NONEXISTENT
           - WRONG_PHOTO
+          - PHOTO_OUTDATED
           - OTHER
         isProcessed:
           type: boolean
@@ -1487,6 +1490,7 @@ components:
           - REJECT
           - CHANGE_NAME
           - UPDATE_LOCATION
+          - PHOTO_OUTDATED
       description: command to import or reject an inbox entry
     InboxCountResponse:
       type: object
@@ -1520,6 +1524,7 @@ components:
           - STATION_INACTIVE
           - STATION_NONEXISTENT
           - WRONG_PHOTO
+          - PHOTO_OUTDATED
           - OTHER
           - WRONG_NAME
         lat:

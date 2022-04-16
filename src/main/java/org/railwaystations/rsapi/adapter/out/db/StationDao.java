@@ -29,7 +29,8 @@ import java.util.Set;
 public interface StationDao {
 
     String JOIN_QUERY = """
-                SELECT s.countryCode, s.id, s.DS100, s.title, s.lat, s.lon, s.active, p.urlPath, p.license, p.createdAt, u.id AS photographerId,
+                SELECT s.countryCode, s.id, s.DS100, s.title, s.lat, s.lon, s.active,
+                        p.urlPath, p.license, p.createdAt, p.outdated, u.id AS photographerId,
                         u.name, u.url AS photographerUrl, u.license AS photographerLicense, u.anonymous
                 FROM countries c
                     LEFT JOIN stations s ON c.id = s.countryCode
@@ -117,7 +118,7 @@ public interface StationDao {
             Photo photo = null;
             if (photoUrlPath != null) {
                 final var photographer = new User(rs.getString("name"), rs.getString("photographerUrl"), rs.getString("photographerLicense"), rs.getInt("photographerId"), null, true, rs.getBoolean("anonymous"), null, false, null, false);
-                photo = new Photo(key, photoUrlPath, photographer, rs.getTimestamp("createdAt").toInstant(), rs.getString("license"));
+                photo = new Photo(key, photoUrlPath, photographer, rs.getTimestamp("createdAt").toInstant(), rs.getString("license"), rs.getBoolean("outdated"));
             }
             return new Station(key, rs.getString("title"),
                     new Coordinates(rs.getDouble("lat"), rs.getDouble("lon")),
