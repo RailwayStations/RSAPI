@@ -1,12 +1,22 @@
 package org.railwaystations.rsapi.core.model;
 
 public enum ProblemReportType {
-    WRONG_LOCATION,
-    STATION_ACTIVE,
-    STATION_INACTIVE,
-    STATION_NONEXISTENT,
-    WRONG_PHOTO,
-    PHOTO_OUTDATED,
-    OTHER,
-    WRONG_NAME
+    WRONG_LOCATION(false),
+    STATION_ACTIVE(false),
+    STATION_INACTIVE(false),
+    STATION_NONEXISTENT(false),
+    WRONG_PHOTO(true),
+    PHOTO_OUTDATED(true),
+    OTHER(false),
+    WRONG_NAME(false);
+
+    private final boolean needsPhoto;
+
+    ProblemReportType(final boolean needsPhoto) {
+        this.needsPhoto = needsPhoto;
+    }
+
+    public boolean needsPhoto() {
+        return needsPhoto;
+    }
 }

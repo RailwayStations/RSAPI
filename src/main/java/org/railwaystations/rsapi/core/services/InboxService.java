@@ -81,6 +81,9 @@ public class InboxService implements ManageInboxUseCase {
         if (problemReport.getType() == null) {
             return new InboxResponse(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA, "Problem type is mandatory");
         }
+        if (problemReport.getType().needsPhoto() && !station.get().hasPhoto()) {
+            return new InboxResponse(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA, "Problem type is only applicable to station with photo");
+        }
         final var inboxEntry = new InboxEntry(problemReport.getCountryCode(), problemReport.getStationId(),
                 null, problemReport.getCoordinates(), user.getId(), null, problemReport.getComment(),
                 problemReport.getType(), null);
@@ -187,13 +190,15 @@ public class InboxService implements ManageInboxUseCase {
                 changeStationTitle(inboxEntry, command.getTitle());
             }
             case UPDATE_LOCATION -> updateLocation(inboxEntry, command);
-            case PHOTO_OUTDATED -> setPhotoOutdated(inboxEntry);
+            case PHOTO_OUTDATED -> markPhotoOutdated(inboxEntry);
             default -> throw new IllegalArgumentException("Unexpected command value: " + command.getCommand());
         }
     }
 
-    private void setPhotoOutdated(final InboxEntry inboxEntry) {
+    private void markPhotoOutdated(final InboxEntry inboxEntry) {
+        assertStationExistsAndHasPhoto(inboxEntry);
         photoDao.updatePhotoOutdated(inboxEntry.getCountryCode(), inboxEntry.getStationId());
+        inboxDao.done(inboxEntry.getId());
     }
 
     private void updateLocation(final InboxEntry inboxEntry, final InboxEntry command) {
@@ -244,7 +249,7 @@ public class InboxService implements ManageInboxUseCase {
     }
 
     private void deletePhoto(final InboxEntry inboxEntry) {
-        final var station = assertStationExists(inboxEntry);
+        final var station = assertStationExistsAndHasPhoto(inboxEntry);
         photoDao.delete(station.getKey());
         inboxDao.done(inboxEntry.getId());
         LOG.info("Problem report {} photo of station {} deleted", inboxEntry.getId(), station.getKey());
@@ -259,6 +264,14 @@ public class InboxService implements ManageInboxUseCase {
     private Station assertStationExists(final InboxEntry inboxEntry) {
         return findStationByCountryAndId(inboxEntry.getCountryCode(), inboxEntry.getStationId())
                 .orElseThrow(() -> new IllegalArgumentException("Station not found"));
+    }
+
+    private Station assertStationExistsAndHasPhoto(final InboxEntry inboxEntry) {
+        final var station = assertStationExists(inboxEntry);
+        if (!station.hasPhoto()) {
+            throw new IllegalArgumentException("Station has no photo");
+        }
+        return station;
     }
 
     private void importUpload(final InboxEntry inboxEntry, final InboxEntry command) {
