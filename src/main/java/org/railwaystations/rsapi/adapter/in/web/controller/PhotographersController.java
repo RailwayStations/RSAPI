@@ -6,6 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.Size;
@@ -32,7 +33,8 @@ public class PhotographersController {
     }
 
     @GetMapping(produces = {MediaType.TEXT_PLAIN_VALUE + ";charset=UTF-8"}, value = "/photographers.txt")
-    public String getAsText(@RequestParam(value = COUNTRY, required = false) @Size(min = 2, max = 2) final String country) {
+    public @ResponseBody
+    String getAsText(@RequestParam(value = COUNTRY, required = false) @Size(min = 2, max = 2) final String country) {
         return toCsv(getWithCountry(country));
     }
 
@@ -43,7 +45,8 @@ public class PhotographersController {
     }
 
     @GetMapping(produces = {MediaType.TEXT_PLAIN_VALUE + ";charset=UTF-8"}, value = "/{country}/photographers.txt")
-    public String getWithCountryAsText(@PathVariable(value = COUNTRY, required = false) @Size(min = 2, max = 2) final String country) {
+    public @ResponseBody
+    String getWithCountryAsText(@PathVariable(value = COUNTRY, required = false) @Size(min = 2, max = 2) final String country) {
         return toCsv(loadPhotographersUseCase.getPhotographersPhotocountMap(country));
     }
 
