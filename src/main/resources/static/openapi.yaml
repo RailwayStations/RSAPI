@@ -1497,7 +1497,7 @@ components:
       properties:
         pendingInboxEntries:
           type: integer
-          format: inte64
+          format: int64
       description: counts the pending inbox entries
     AdminInboxCommandResponse:
       type: object
