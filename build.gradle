@@ -1,5 +1,5 @@
 plugins {
-	id 'org.springframework.boot' version '2.6.6'
+	id 'org.springframework.boot' version '2.6.7'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
 	id 'pmd'
@@ -25,7 +25,7 @@ openApiValidate {
 }
 
 ext {
-	springVersion = '2.6.6'
+	springVersion = '2.6.7'
 	testContainersVersion = '1.17.1'
 	jdbiVersion = '3.28.0'
 	swaggerRequestValidatorVersion = '2.27.2'
