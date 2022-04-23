@@ -7,67 +7,60 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20220416.1130"
+  version: "20220423.2100"
 servers:
-- url: https://api.railway-stations.org/
+  - url: https://api.railway-stations.org/
 tags:
-- name: bahnhofsfotos
-  description: Photos of railway stations
-  externalDocs:
-    description: Find out more
-    url: https://www.railway-stations.org
+  - name: bahnhofsfotos
+    description: Photos of railway stations
+    externalDocs:
+      description: Find out more
+      url: https://www.railway-stations.org
 paths:
-  /:
-    get:
-      summary: Root resource with link to documentation
-      responses:
-        200:
-          description: successful operation
-          content: {}
   /{country}/stations:
     get:
       summary: Finds railway stations by various query criteria
       parameters:
-      - name: country
-        in: path
-        description: filter by country code
-        required: true
-        schema:
-          type: string
-      - name: hasPhoto
-        in: query
-        description: filter by photo availalbe/missing
-        schema:
-          type: boolean
-      - name: photographer
-        in: query
-        description: filter by nickname of a photographer
-        schema:
-          type: string
-      - name: maxDistance
-        in: query
-        description: filter by max distance from the coordinates given by lat and
-          lon
-        schema:
-          type: integer
-          format: int64
-      - name: lat
-        in: query
-        description: latitute of the coordinates to filter by max distance
-        schema:
-          type: number
-          format: double
-      - name: lon
-        in: query
-        description: longitude of the coordinates to filter by max distance
-        schema:
-          type: number
-          format: double
-      - name: active
-        in: query
-        description: filter on active/inactive stations
-        schema:
-          type: boolean
+        - name: country
+          in: path
+          description: filter by country code
+          required: true
+          schema:
+            type: string
+        - name: hasPhoto
+          in: query
+          description: filter by photo availalbe/missing
+          schema:
+            type: boolean
+        - name: photographer
+          in: query
+          description: filter by nickname of a photographer
+          schema:
+            type: string
+        - name: maxDistance
+          in: query
+          description: filter by max distance from the coordinates given by lat and
+            lon
+          schema:
+            type: integer
+            format: int64
+        - name: lat
+          in: query
+          description: latitute of the coordinates to filter by max distance
+          schema:
+            type: number
+            format: double
+        - name: lon
+          in: query
+          description: longitude of the coordinates to filter by max distance
+          schema:
+            type: number
+            format: double
+        - name: active
+          in: query
+          description: filter on active/inactive stations
+          schema:
+            type: boolean
       responses:
         200:
           description: successful operation
@@ -144,47 +137,47 @@ paths:
     get:
       summary: Finds railway stations by various query criteria
       parameters:
-      - name: country
-        in: query
-        description: filter by country code
-        schema:
-          type: array
-          items:
+        - name: country
+          in: query
+          description: filter by country code
+          schema:
+            type: array
+            items:
+              type: string
+        - name: hasPhoto
+          in: query
+          description: filter by photo availalbe/missing
+          schema:
+            type: boolean
+        - name: photographer
+          in: query
+          description: filter by nickname of a photographer
+          schema:
             type: string
-      - name: hasPhoto
-        in: query
-        description: filter by photo availalbe/missing
-        schema:
-          type: boolean
-      - name: photographer
-        in: query
-        description: filter by nickname of a photographer
-        schema:
-          type: string
-      - name: maxDistance
-        in: query
-        description: filter by max distance from the coordinates given by lat and
-          lon
-        schema:
-          type: integer
-          format: int64
-      - name: lat
-        in: query
-        description: latitute of the coordinates to filter by max distance
-        schema:
-          type: number
-          format: double
-      - name: lon
-        in: query
-        description: longitude of the coordinates to filter by max distance
-        schema:
-          type: number
-          format: double
-      - name: active
-        in: query
-        description: filter on active/inactive stations
-        schema:
-          type: boolean
+        - name: maxDistance
+          in: query
+          description: filter by max distance from the coordinates given by lat and
+            lon
+          schema:
+            type: integer
+            format: int64
+        - name: lat
+          in: query
+          description: latitute of the coordinates to filter by max distance
+          schema:
+            type: number
+            format: double
+        - name: lon
+          in: query
+          description: longitude of the coordinates to filter by max distance
+          schema:
+            type: number
+            format: double
+        - name: active
+          in: query
+          description: filter on active/inactive stations
+          schema:
+            type: boolean
       responses:
         200:
           description: successful operation
@@ -256,18 +249,18 @@ paths:
     get:
       summary: Find a railway station by its ID
       parameters:
-      - name: country
-        in: path
-        description: country code
-        required: true
-        schema:
-          type: string
-      - name: id
-        in: path
-        description: id of the station
-        required: true
-        schema:
-          type: string
+        - name: country
+          in: path
+          description: country code
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          description: id of the station
+          required: true
+          schema:
+            type: string
       responses:
         200:
           description: successful operation
@@ -282,13 +275,13 @@ paths:
     get:
       summary: List stations with photo uploads in the las 24h
       parameters:
-      - name: sinceHours
-        in: query
-        description: defines the timeframe since when to look for recent photo uploads,
-          default is 10h
-        schema:
-          type: integer
-          format: int32
+        - name: sinceHours
+          in: query
+          description: defines the timeframe since when to look for recent photo uploads,
+            default is 10h
+          schema:
+            type: integer
+            format: int32
       responses:
         200:
           description: successful operation
@@ -301,12 +294,12 @@ paths:
       summary: List of all photographers of a given country with their number of photos
         taken
       parameters:
-      - name: country
-        in: path
-        description: filter by country code
-        required: true
-        schema:
-          type: string
+        - name: country
+          in: path
+          description: filter by country code
+          required: true
+          schema:
+            type: string
       responses:
         200:
           description: successful operation
@@ -417,12 +410,12 @@ paths:
     get:
       summary: Statistic of photos with and without photos by country
       parameters:
-      - name: country
-        in: path
-        description: filter by country code
-        required: true
-        schema:
-          type: string
+        - name: country
+          in: path
+          description: filter by country code
+          required: true
+          schema:
+            type: string
       responses:
         200:
           description: successful operation
@@ -567,11 +560,11 @@ paths:
     get:
       summary: List of all supported countries with their configuration
       parameters:
-      - name: onlyActive
-        in: query
-        description: return only active countries? Defaults to true.
-        schema:
-          type: boolean
+        - name: onlyActive
+          in: query
+          description: return only active countries? Defaults to true.
+          schema:
+            type: boolean
       responses:
         200:
           description: successful operation
@@ -585,69 +578,69 @@ paths:
     post:
       summary: Upload a new Photo
       parameters:
-      - name: Authorization
-        in: header
-        description: basic authorization
-        required: false
-        schema:
-          type: string
-      - name: Upload-Token
-        in: header
-        description: DEPRECATED, use basic authorization! Upload Token
-        required: false
-        schema:
-          type: string
-      - name: Email
-        in: header
-        description: DEPRECATED, use basic authorization! Email or name of the user
-        required: false
-        schema:
-          type: string
-      - name: Country
-        in: header
-        description: country code
-        schema:
-          type: string
-      - name: Station-Id
-        in: header
-        description: id of the railwaystation
-        schema:
-          type: string
-      - name: Content-Type
-        in: header
-        description: mime type of the image, "image/png" or "image/jpeg"
-        required: true
-        schema:
-          type: string
-      - name: Station-Title
-        in: header
-        description: name of the station, for upload of missing stations (needs to
-          be URL-encoded with UTF-8 charset)
-        schema:
-          type: string
-      - name: Latitude
-        in: header
-        description: latitude, for upload of missing stations
-        schema:
-          type: number
-          format: double
-      - name: Longitude
-        in: header
-        description: longitude, for upload of missing stations
-        schema:
-          type: number
-          format: double
-      - name: Comment
-        in: header
-        description: comment of the photographer to the reviewer (needs to be URL-encoded
-          with UTF-8 charset)
-        schema:
-          type: string
-      - name: Active
-        in: header
-        description: is this station active?
-        schema:
-          type: boolean
+        - name: Authorization
+          in: header
+          description: basic authorization
+          required: false
+          schema:
+            type: string
+        - name: Upload-Token
+          in: header
+          description: DEPRECATED, use basic authorization! Upload Token
+          required: false
+          schema:
+            type: string
+        - name: Email
+          in: header
+          description: DEPRECATED, use basic authorization! Email or name of the user
+          required: false
+          schema:
+            type: string
+        - name: Country
+          in: header
+          description: country code
+          schema:
+            type: string
+        - name: Station-Id
+          in: header
+          description: id of the railwaystation
+          schema:
+            type: string
+        - name: Content-Type
+          in: header
+          description: mime type of the image, "image/png" or "image/jpeg"
+          required: true
+          schema:
+            type: string
+        - name: Station-Title
+          in: header
+          description: name of the station, for upload of missing stations (needs to
+            be URL-encoded with UTF-8 charset)
+          schema:
+            type: string
+        - name: Latitude
+          in: header
+          description: latitude, for upload of missing stations
+          schema:
+            type: number
+            format: double
+        - name: Longitude
+          in: header
+          description: longitude, for upload of missing stations
+          schema:
+            type: number
+            format: double
+        - name: Comment
+          in: header
+          description: comment of the photographer to the reviewer (needs to be URL-encoded
+            with UTF-8 charset)
+          schema:
+            type: string
+        - name: Active
+          in: header
+          description: is this station active?
+          schema:
+            type: boolean
       requestBody:
         description: image
         content:
@@ -699,11 +692,11 @@ paths:
     post:
       summary: Report a for a Railway-Station
       parameters:
-      - name: Authorization
-        in: header
-        description: basic authorization
-        schema:
-          type: string
+        - name: Authorization
+          in: header
+          description: basic authorization
+          schema:
+            type: string
       requestBody:
         description: The problem report
         content:
@@ -738,11 +731,11 @@ paths:
     post:
       summary: Query the state of photo uploads of the authorized user
       parameters:
-      - name: Authorization
-        in: header
-        description: basic authorization
-        schema:
-          type: string
+        - name: Authorization
+          in: header
+          description: basic authorization
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -787,11 +780,11 @@ paths:
     get:
       summary: Get the current inbox, photos and problem reports under review.
       parameters:
-      - name: Authorization
-        in: header
-        description: basic authorization
-        schema:
-          type: string
+        - name: Authorization
+          in: header
+          description: basic authorization
+          schema:
+            type: string
       responses:
         200:
           description: array of inbox objects
@@ -810,11 +803,11 @@ paths:
     post:
       summary: Import or reject an uploaded photo or a problem report from the inbox
       parameters:
-      - name: Authorization
-        in: header
-        description: basic authorization
-        schema:
-          type: string
+        - name: Authorization
+          in: header
+          description: basic authorization
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -869,11 +862,11 @@ paths:
     get:
       summary: Verify eMail-Address with verification token
       parameters:
-      - name: token
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         200:
           description: email successfully verified
@@ -885,11 +878,11 @@ paths:
     post:
       summary: Sends a new eMail-Verification mail
       parameters:
-      - name: Authorization
-        in: header
-        description: basic authorization with old password
-        schema:
-          type: string
+        - name: Authorization
+          in: header
+          description: basic authorization with old password
+          schema:
+            type: string
       responses:
         200:
           description: email successfully sent
@@ -898,12 +891,12 @@ paths:
     post:
       summary: Requests a new password only
       parameters:
-      - name: NameOrEmail
-        in: header
-        description: name or email of the user
-        required: true
-        schema:
-          type: string
+        - name: NameOrEmail
+          in: header
+          description: name or email of the user
+          required: true
+          schema:
+            type: string
       responses:
         202:
           description: request accepted, email with new password will be sent
@@ -919,12 +912,12 @@ paths:
       summary: Requests a new Upload-Token (now password) only
       description: DEPRECATED, use reset password
       parameters:
-      - name: Email
-        in: header
-        description: email or name of the user
-        required: true
-        schema:
-          type: string
+        - name: Email
+          in: header
+          description: email or name of the user
+          required: true
+          schema:
+            type: string
       responses:
         202:
           description: request accepted, email with new password (uploadToken) will
@@ -940,17 +933,17 @@ paths:
     post:
       summary: Change user password
       parameters:
-      - name: Authorization
-        in: header
-        description: basic authorization with old password
-        schema:
-          type: string
-      - name: New-Password
-        in: header
-        description: new password, deprecated use body message for proper encoding
-        required: false
-        schema:
-          type: string
+        - name: Authorization
+          in: header
+          description: basic authorization with old password
+          schema:
+            type: string
+        - name: New-Password
+          in: header
+          description: new password, deprecated use body message for proper encoding
+          required: false
+          schema:
+            type: string
       requestBody:
         description: ChangePassword
         content:
@@ -972,24 +965,24 @@ paths:
     get:
       summary: Get the users profile
       parameters:
-      - name: Authorization
-        in: header
-        description: basic authorization
-        schema:
-          type: string
-        required: false
-      - name: Upload-Token
-        in: header
-        description: DEPRECATED, use basic authorization! Upload Token
-        required: false
-        schema:
-          type: string
-      - name: Email
-        in: header
-        description: DEPRECATED, use basic authorization! Email or name of the user
-        required: false
-        schema:
-          type: string
+        - name: Authorization
+          in: header
+          description: basic authorization
+          schema:
+            type: string
+          required: false
+        - name: Upload-Token
+          in: header
+          description: DEPRECATED, use basic authorization! Upload Token
+          required: false
+          schema:
+            type: string
+        - name: Email
+          in: header
+          description: DEPRECATED, use basic authorization! Email or name of the user
+          required: false
+          schema:
+            type: string
       responses:
         200:
           description: ok
@@ -1007,24 +1000,24 @@ paths:
       summary: Update the users profile. In case the email has been changed, only
         the email is saved and a new password / Upload-Token is send.
       parameters:
-      - name: Authorization
-        in: header
-        description: basic authorization
-        required: false
-        schema:
-          type: string
-      - name: Upload-Token
-        in: header
-        description: DEPRECATED, use basic authorization! Upload Token
-        required: false
-        schema:
-          type: string
-      - name: Email
-        in: header
-        description: DEPRECATED, use basic authorization! Email or name of the user
-        required: false
-        schema:
-          type: string
+        - name: Authorization
+          in: header
+          description: basic authorization
+          required: false
+          schema:
+            type: string
+        - name: Upload-Token
+          in: header
+          description: DEPRECATED, use basic authorization! Upload Token
+          required: false
+          schema:
+            type: string
+        - name: Email
+          in: header
+          description: DEPRECATED, use basic authorization! Email or name of the user
+          required: false
+          schema:
+            type: string
       requestBody:
         description: Userprofile
         content:
@@ -1053,28 +1046,36 @@ paths:
     get:
       summary: downloads the given photo
       parameters:
-      - name: country
-        in: path
-        description: country code
-        required: true
-        schema:
-          type: string
-      - name: filename
-        in: path
-        description: filename of the photo
-        required: true
-        schema:
-          type: string
-      - name: width
-        in: query
-        description: scale the image to the given width
-        schema:
-          type: integer
-          format: int32
+        - name: country
+          in: path
+          description: country code
+          required: true
+          schema:
+            type: string
+        - name: filename
+          in: path
+          description: filename of the photo
+          required: true
+          schema:
+            type: string
+        - name: width
+          in: query
+          description: scale the image to the given width
+          schema:
+            type: integer
+            format: int32
       responses:
         200:
           description: ok
-          content: {}
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
         404:
           description: file not found
           content: {}
@@ -1082,28 +1083,36 @@ paths:
     get:
       summary: downloads the given photo
       parameters:
-      - name: country
-        in: path
-        description: country code
-        required: true
-        schema:
-          type: string
-      - name: filename
-        in: path
-        description: filename of the photo
-        required: true
-        schema:
-          type: string
-      - name: width
-        in: query
-        description: scale the image to the given width
-        schema:
-          type: integer
-          format: int32
+        - name: country
+          in: path
+          description: country code
+          required: true
+          schema:
+            type: string
+        - name: filename
+          in: path
+          description: filename of the photo
+          required: true
+          schema:
+            type: string
+        - name: width
+          in: query
+          description: scale the image to the given width
+          schema:
+            type: integer
+            format: int32
       responses:
         200:
           description: ok
-          content: {}
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
         404:
           description: file not found
           content: {}
@@ -1111,22 +1120,30 @@ paths:
     get:
       summary: downloads the given photo from the inbox
       parameters:
-      - name: filename
-        in: path
-        description: filename of the photo
-        required: true
-        schema:
-          type: string
-      - name: width
-        in: query
-        description: scale the image to the given width
-        schema:
-          type: integer
-          format: int32
+        - name: filename
+          in: path
+          description: filename of the photo
+          required: true
+          schema:
+            type: string
+        - name: width
+          in: query
+          description: scale the image to the given width
+          schema:
+            type: integer
+            format: int32
       responses:
         200:
           description: ok
-          content: {}
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
         404:
           description: file not found
           content: {}
@@ -1134,22 +1151,30 @@ paths:
     get:
       summary: downloads the given photo from the processed inbox
       parameters:
-      - name: filename
-        in: path
-        description: filename of the photo
-        required: true
-        schema:
-          type: string
-      - name: width
-        in: query
-        description: scale the image to the given width
-        schema:
-          type: integer
-          format: int32
+        - name: filename
+          in: path
+          description: filename of the photo
+          required: true
+          schema:
+            type: string
+        - name: width
+          in: query
+          description: scale the image to the given width
+          schema:
+            type: integer
+            format: int32
       responses:
         200:
           description: ok
-          content: {}
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
         404:
           description: file not found
           content: {}
@@ -1268,9 +1293,9 @@ components:
         type:
           type: string
           enum:
-          - android
-          - ios
-          - web
+            - android
+            - ios
+            - web
         name:
           type: string
         url:
@@ -1287,10 +1312,10 @@ components:
         license:
           type: string
           enum:
-          - CC0
-          - CC0 1.0 Universell (CC0 1.0)
-          - CC4
-          - CC BY-SA 4.0
+            - CC0
+            - CC0 1.0 Universell (CC0 1.0)
+            - CC4
+            - CC BY-SA 4.0
         photoOwner:
           type: boolean
         link:
@@ -1316,14 +1341,14 @@ components:
         state:
           type: string
           enum:
-          - REVIEW
-          - LAT_LON_OUT_OF_RANGE
-          - NOT_ENOUGH_DATA
-          - UNSUPPORTED_CONTENT_TYPE
-          - PHOTO_TOO_LARGE
-          - CONFLICT
-          - UNAUTHORIZED
-          - ERROR
+            - REVIEW
+            - LAT_LON_OUT_OF_RANGE
+            - NOT_ENOUGH_DATA
+            - UNSUPPORTED_CONTENT_TYPE
+            - PHOTO_TOO_LARGE
+            - CONFLICT
+            - UNAUTHORIZED
+            - ERROR
         message:
           type: string
         id:
@@ -1371,11 +1396,11 @@ components:
         state:
           type: string
           enum:
-          - UNKNOWN
-          - REVIEW
-          - CONFLICT
-          - ACCEPTED
-          - REJECTED
+            - UNKNOWN
+            - REVIEW
+            - CONFLICT
+            - ACCEPTED
+            - REJECTED
       description: Upload state query
     PublicInboxEntry:
       type: object
@@ -1438,12 +1463,12 @@ components:
         problemReportType:
           type: string
           enum:
-          - WRONG_LOCATION
-          - STATION_INACTIVE
-          - STATION_NONEXISTENT
-          - WRONG_PHOTO
-          - PHOTO_OUTDATED
-          - OTHER
+            - WRONG_LOCATION
+            - STATION_INACTIVE
+            - STATION_NONEXISTENT
+            - WRONG_PHOTO
+            - PHOTO_OUTDATED
+            - OTHER
         isProcessed:
           type: boolean
           description: was this image process (e.g. pixelated)
@@ -1481,16 +1506,16 @@ components:
         command:
           type: string
           enum:
-          - IMPORT
-          - ACTIVATE_STATION
-          - DEACTIVATE_STATION
-          - DELETE_STATION
-          - DELETE_PHOTO
-          - MARK_SOLVED
-          - REJECT
-          - CHANGE_NAME
-          - UPDATE_LOCATION
-          - PHOTO_OUTDATED
+            - IMPORT
+            - ACTIVATE_STATION
+            - DEACTIVATE_STATION
+            - DELETE_STATION
+            - DELETE_PHOTO
+            - MARK_SOLVED
+            - REJECT
+            - CHANGE_NAME
+            - UPDATE_LOCATION
+            - PHOTO_OUTDATED
       description: command to import or reject an inbox entry
     InboxCountResponse:
       type: object
@@ -1519,14 +1544,14 @@ components:
         type:
           type: string
           enum:
-          - WRONG_LOCATION
-          - STATION_ACTIVE
-          - STATION_INACTIVE
-          - STATION_NONEXISTENT
-          - WRONG_PHOTO
-          - PHOTO_OUTDATED
-          - OTHER
-          - WRONG_NAME
+            - WRONG_LOCATION
+            - STATION_ACTIVE
+            - STATION_INACTIVE
+            - STATION_NONEXISTENT
+            - WRONG_PHOTO
+            - PHOTO_OUTDATED
+            - OTHER
+            - WRONG_NAME
         lat:
           type: number
           format: double
