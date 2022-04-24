@@ -7,7 +7,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20220423.2100"
+  version: "20220424.1200"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -1563,4 +1563,19 @@ components:
       type: object
       properties:
         newPassword:
+          type: string
+    GeneralErrorMessage:
+      type: object
+      properties:
+        timestamp:
+          type: number
+          format: int64
+        status:
+          type: number
+          format: int32
+        error:
+          type: string
+        message:
+          type: string
+        path:
           type: string

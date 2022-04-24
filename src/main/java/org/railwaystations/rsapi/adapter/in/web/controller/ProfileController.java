@@ -108,7 +108,7 @@ public class ProfileController {
 
     @PostMapping("/resendEmailVerification")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> resendEmailVerification(@AuthenticationPrincipal final AuthUser authUser) {
+    public ResponseEntity<Void> resendEmailVerification(@AuthenticationPrincipal final AuthUser authUser) {
         manageProfileUseCase.resendEmailVerification(authUser.getUser());
         return new ResponseEntity<>(HttpStatus.OK);
     }
