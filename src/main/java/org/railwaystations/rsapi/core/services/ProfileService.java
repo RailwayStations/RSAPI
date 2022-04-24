@@ -90,14 +90,14 @@ public class ProfileService implements ManageProfileUseCase {
             monitor.sendMessage(
                     String.format("Registration for user '%s' with eMail '%s' failed, name is already taken by different eMail '%s'%nvia %s",
                             newUser.getName(), newUser.getEmail(), existingName.get().getEmail(), clientInfo));
-            throw new ProfileConflictException("Name is already taken by different eMail");
+            throw new ProfileConflictException();
         }
 
         if (userDao.findByEmail(newUser.getEmail()).isPresent()) {
             monitor.sendMessage(
                     String.format("Registration for user '%s' with eMail '%s' failed, eMail is already taken%nvia %s",
                             newUser.getName(), newUser.getEmail(), clientInfo));
-            throw new ProfileConflictException("eMail is already taken");
+            throw new ProfileConflictException();
         }
 
         final boolean passwordProvided = StringUtils.isNotBlank(newUser.getNewPassword());
@@ -143,7 +143,7 @@ public class ProfileService implements ManageProfileUseCase {
         if (!newProfile.getNormalizedName().equals(user.getNormalizedName())) {
             if (userDao.findByNormalizedName(newProfile.getNormalizedName()).isPresent()) {
                 LOG.info("Name conflict '{}'", newProfile.getName());
-                throw new ProfileConflictException("Name conflict");
+                throw new ProfileConflictException();
             }
             monitor.sendMessage(
                     String.format("Update nickname for user '%s' to '%s'%nvia%s",
@@ -153,7 +153,7 @@ public class ProfileService implements ManageProfileUseCase {
         if (!newProfile.getEmail().equals(user.getEmail())) {
             if (userDao.findByEmail(newProfile.getEmail()).isPresent()) {
                 LOG.info("Email conflict '{}'", newProfile.getEmail());
-                throw new ProfileConflictException("Email conflict");
+                throw new ProfileConflictException();
             }
             newProfile.setEmailVerificationToken(UUID.randomUUID().toString());
             monitor.sendMessage(

@@ -7,7 +7,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20220424.1200"
+  version: "20220424.1700"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -306,13 +306,16 @@ paths:
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/Photographers'
+                type: string
             application/json:
               schema:
                 $ref: '#/components/schemas/Photographers'
         400:
           description: Bad Request
-          content: {}
+          content:
+            text/plain:
+              schema:
+                type: string
         404:
           description: Country not found
           content: {}
@@ -333,10 +336,13 @@ paths:
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/Photographers'
+                type: string
         400:
           description: Bad Request
-          content: {}
+          content:
+            text/plain:
+              schema:
+                type: string
         404:
           description: Country not found
           content: {}
@@ -360,7 +366,10 @@ paths:
                 $ref: '#/components/schemas/Photographers'
         400:
           description: Bad Request
-          content: {}
+          content:
+            text/plain:
+              schema:
+                type: string
         404:
           description: Country not found
           content: {}
@@ -373,13 +382,16 @@ paths:
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/Photographers'
+                type: string
             application/json:
               schema:
                 $ref: '#/components/schemas/Photographers'
         400:
           description: Bad Request
-          content: {}
+          content:
+            text/plain:
+              schema:
+                type: string
   /photographers.json:
     get:
       summary: List of all photographers with their number of photos taken
@@ -392,7 +404,10 @@ paths:
                 $ref: '#/components/schemas/Photographers'
         400:
           description: Bad Request
-          content: {}
+          content:
+            text/plain:
+              schema:
+                type: string
   /photographers.txt:
     get:
       summary: List of all photographers with their number of photos taken
@@ -402,10 +417,13 @@ paths:
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/Photographers'
+                type: string
         400:
           description: Bad Request
-          content: {}
+          content:
+            text/plain:
+              schema:
+                type: string
   /{country}/stats:
     get:
       summary: Statistic of photos with and without photos by country
@@ -422,13 +440,16 @@ paths:
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/Statistic'
+                type: string
             application/json:
               schema:
                 $ref: '#/components/schemas/Statistic'
         400:
           description: Bad Request
-          content: {}
+          content:
+            text/plain:
+              schema:
+                type: string
         404:
           description: Country not found
           content: {}
@@ -451,7 +472,10 @@ paths:
                 $ref: '#/components/schemas/Statistic'
         400:
           description: Bad Request
-          content: {}
+          content:
+            text/plain:
+              schema:
+                type: string
         404:
           description: Country not found
           content: {}
@@ -471,10 +495,13 @@ paths:
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/Statistic'
+                type: string
         400:
           description: Bad Request
-          content: {}
+          content:
+            text/plain:
+              schema:
+                type: string
         404:
           description: Country not found
           content: {}
@@ -493,7 +520,7 @@ paths:
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/Statistic'
+                type: string
             application/json:
               schema:
                 $ref: '#/components/schemas/Statistic'
@@ -534,7 +561,7 @@ paths:
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/Statistic'
+                type: string
         404:
           description: Country not found
           content: {}
@@ -661,7 +688,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/InboxResponse'
         400:
-          description: wrong request
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -712,7 +739,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/InboxResponse'
         400:
-          description: wrong request
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -822,7 +849,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AdminInboxCommandResponse'
         400:
-          description: bad request, something wrong with the data
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -849,11 +876,17 @@ paths:
           description: registration accepted
           content: {}
         400:
-          description: wrong request
-          content: {}
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                type: string
         409:
           description: conflict with existing name or email
-          content: {}
+          content:
+            text/plain:
+              schema:
+                type: string
         422:
           description: unprocessable entity, Registration input document error
           content: {}
@@ -902,8 +935,11 @@ paths:
           description: request accepted, email with new password will be sent
           content: {}
         400:
-          description: bad request, probably due to email not set
-          content: {}
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                type: string
         404:
           description: User not found
           content: {}
@@ -924,8 +960,11 @@ paths:
             be sent
           content: {}
         400:
-          description: bad request, probably due to email not set
-          content: {}
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                type: string
         404:
           description: User not found
           content: {}
@@ -956,8 +995,11 @@ paths:
           description: password changed
           content: {}
         400:
-          description: bad request, e.g. empty password, too short (< 8 chars)
-          content: {}
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                type: string
         404:
           description: User not found
           content: {}
@@ -1030,8 +1072,11 @@ paths:
           description: ok
           content: {}
         400:
-          description: wrong request
-          content: {}
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                type: string
         401:
           description: authorization failed
           content: {}
@@ -1040,7 +1085,10 @@ paths:
           content: {}
         409:
           description: conflict with existing name or email
-          content: {}
+          content:
+            text/plain:
+              schema:
+                type: string
       x-codegen-request-body-name: profile
   /fotos/{country}/{filename}:
     get:

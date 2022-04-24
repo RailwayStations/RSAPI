@@ -4,7 +4,6 @@ import org.railwaystations.rsapi.app.auth.AuthUser;
 import org.railwaystations.rsapi.core.model.PasswordChangeCommand;
 import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.ports.in.ManageProfileUseCase;
-import org.railwaystations.rsapi.core.services.ProfileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.constraints.NotNull;
 
@@ -34,17 +32,13 @@ public class ProfileController {
         this.manageProfileUseCase = manageProfileUseCase;
     }
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,value = "/changePassword")
+    @PostMapping("/changePassword")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> changePassword(@AuthenticationPrincipal final AuthUser authUser,
                                                  @RequestHeader(value = "New-Password", required = false) final String newPassword,
                                                  @RequestBody(required = false) final PasswordChangeCommand passwordChangeCommand) {
-        try {
-            manageProfileUseCase.changePassword(authUser.getUser(), passwordChangeCommand != null ? passwordChangeCommand : new PasswordChangeCommand(newPassword));
-        } catch (final IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>("Password changed", HttpStatus.OK);
+        manageProfileUseCase.changePassword(authUser.getUser(), passwordChangeCommand != null ? passwordChangeCommand : new PasswordChangeCommand(newPassword));
+        return ResponseEntity.ok("Password changed");
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,value = "/newUploadToken")
@@ -56,30 +50,19 @@ public class ProfileController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,value = "/resetPassword")
     public ResponseEntity<String> resetPassword(@RequestHeader(HttpHeaders.USER_AGENT) final String userAgent,
                                                 @NotNull @RequestHeader("NameOrEmail") final String nameOrEmail) {
-        try {
-            if (manageProfileUseCase.resetPassword(nameOrEmail, userAgent) == null) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-        } catch (final IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        if (manageProfileUseCase.resetPassword(nameOrEmail, userAgent) == null) {
+            return ResponseEntity.notFound().build();
         }
 
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        return ResponseEntity.accepted().build();
     }
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE, value = "/registration")
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, value = "/registration")
     public ResponseEntity<String> register(@RequestHeader(HttpHeaders.USER_AGENT) final String userAgent,
                                            @RequestBody @NotNull final User newUser) {
-        try {
-            manageProfileUseCase.register(newUser, userAgent);
-        } catch (final IllegalArgumentException e) {
-            LOG.warn("Registration for '{}' with email '{}' failed: {}", newUser.getName(), newUser.getEmail(), e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (final ProfileService.ProfileConflictException e) {
-            return new ResponseEntity<>("Conflict with other user or email", HttpStatus.CONFLICT);
-        }
+        manageProfileUseCase.register(newUser, userAgent);
 
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        return ResponseEntity.accepted().build();
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/myProfile")
@@ -87,7 +70,7 @@ public class ProfileController {
     public ResponseEntity<User> getMyProfile(@AuthenticationPrincipal final AuthUser authUser) {
         final User user = authUser.getUser();
         LOG.info("Get profile for '{}'", user.getEmail());
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, value = "/myProfile")
@@ -95,29 +78,23 @@ public class ProfileController {
     public ResponseEntity<String> updateMyProfile(@RequestHeader(HttpHeaders.USER_AGENT) final String userAgent,
                                                   @RequestBody @NotNull final User newProfile,
                                                   @AuthenticationPrincipal final AuthUser authUser) {
-        try {
-            manageProfileUseCase.updateProfile(authUser.getUser(), newProfile, userAgent);
-        } catch (final IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        } catch (final ProfileService.ProfileConflictException e) {
-            return new ResponseEntity<>("Conflict with other user or email", HttpStatus.CONFLICT);
-        }
+        manageProfileUseCase.updateProfile(authUser.getUser(), newProfile, userAgent);
 
-        return new ResponseEntity<>("Profile updated", HttpStatus.OK);
+        return ResponseEntity.ok("Profile updated");
     }
 
     @PostMapping("/resendEmailVerification")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> resendEmailVerification(@AuthenticationPrincipal final AuthUser authUser) {
         manageProfileUseCase.resendEmailVerification(authUser.getUser());
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/emailVerification/{token}")
     public ResponseEntity<String> emailVerification(@PathVariable("token") final String token) {
         return manageProfileUseCase.emailVerification(token)
                 .map(u -> new ResponseEntity<>("Email successfully verified!", HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .orElse(ResponseEntity.notFound().build());
     }
 
 }

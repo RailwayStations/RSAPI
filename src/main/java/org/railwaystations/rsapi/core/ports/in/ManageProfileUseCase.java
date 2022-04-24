@@ -19,10 +19,10 @@ public interface ManageProfileUseCase {
 
     Optional<User> emailVerification(String token);
 
-    class ProfileConflictException extends Exception {
+    class ProfileConflictException extends RuntimeException {
 
-        public ProfileConflictException(final String message) {
-            super(message);
+        public ProfileConflictException() {
+            super("Name or eMail is already taken");
         }
 
     }

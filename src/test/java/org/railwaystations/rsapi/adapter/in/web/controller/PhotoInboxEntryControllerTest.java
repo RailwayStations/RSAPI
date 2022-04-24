@@ -49,7 +49,6 @@ import java.util.Set;
 
 import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -190,11 +189,13 @@ public class PhotoInboxEntryControllerTest {
     }
 
     @Test
-    public void testPostIframeMaliciousReferer() {
+    public void testPostIframeMaliciousReferer() throws Exception {
         when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("nickname@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("","", Collections.emptyList()));
         when(inboxDao.insert(any())).thenReturn(1);
         
-        assertThatThrownBy(() -> whenPostImageIframe("nickname@example.com", "http://localhost/uploadPage.php<script>alert('FooBar!');</script>")).getCause().isInstanceOf(IllegalArgumentException.class);
+        final var response = whenPostImageIframe("nickname@example.com", "http://localhost/uploadPage.php<script>alert('FooBar!');</script>");
+
+        assertThat(response).isEqualTo("Illegal character in path at index 31: http://localhost/uploadPage.php<script>alert('FooBar!');</script>");
         verify(inboxDao, never()).insert(any());
         assertThat(monitor.getMessages().size()).isEqualTo(0);
     }
@@ -204,7 +205,7 @@ public class PhotoInboxEntryControllerTest {
         final var uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
         when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("nickname@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("","", Collections.emptyList()));
         when(inboxDao.insert(any())).thenReturn(1);
-        final String response = whenPostImageIframe("nickname@example.com", "http://localhost/uploadPage.php");
+        final var response = whenPostImageIframe("nickname@example.com", "http://localhost/uploadPage.php");
 
         assertThat(response).contains("REVIEW");
         assertFileWithContentExistsInInbox("image-content", "1.jpg");
