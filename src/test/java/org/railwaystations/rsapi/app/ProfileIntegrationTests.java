@@ -28,8 +28,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.verify;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-		properties = {"server.error.include-message=always"})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = { RsapiApplication.class },
+		properties = {"server.error.include-message=always", "spring.jackson.default-property-inclusion=non_null"})
 @ActiveProfiles("test")
 class ProfileIntegrationTests {
 

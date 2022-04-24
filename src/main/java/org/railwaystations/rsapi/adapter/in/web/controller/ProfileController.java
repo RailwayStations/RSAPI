@@ -1,5 +1,6 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
+import org.railwaystations.rsapi.adapter.in.web.model.ProfileDto;
 import org.railwaystations.rsapi.app.auth.AuthUser;
 import org.railwaystations.rsapi.core.model.PasswordChangeCommand;
 import org.railwaystations.rsapi.core.model.User;
@@ -67,10 +68,23 @@ public class ProfileController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/myProfile")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<User> getMyProfile(@AuthenticationPrincipal final AuthUser authUser) {
+    public ResponseEntity<ProfileDto> getMyProfile(@AuthenticationPrincipal final AuthUser authUser) {
         final User user = authUser.getUser();
         LOG.info("Get profile for '{}'", user.getEmail());
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(toProfileDto(user));
+    }
+
+    private ProfileDto toProfileDto(final User user) {
+        return new ProfileDto()
+                .admin(user.isAdmin())
+                .email(user.getEmail())
+                .anonymous(user.isAnonymous())
+                .emailVerified(user.isEmailVerified())
+                .sendNotifications(user.isSendNotifications())
+                .license(ProfileDto.LicenseEnum.fromValue(user.getLicense()))
+                .link(user.getUrl())
+                .nickname(user.getName())
+                .photoOwner(user.isOwnPhotos());
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, value = "/myProfile")
