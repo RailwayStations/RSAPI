@@ -78,7 +78,7 @@ class NotifyUsersServiceTest {
     }
 
     private static Optional<User> createUser(final String email, final String emailVerification, final boolean sendNotifications) {
-        return Optional.of(new User("nickname", null, null, 1, email, true, false, null, false, emailVerification, sendNotifications));
+        return Optional.of(User.builder().name("nickname").id(1).email(email).ownPhotos(true).anonymous(false).admin(false).emailVerification(emailVerification).sendNotifications(sendNotifications).build());
     }
 
     @NotNull

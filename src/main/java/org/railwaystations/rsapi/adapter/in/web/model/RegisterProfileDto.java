@@ -13,9 +13,9 @@ import java.util.Objects;
  * User profile information
  */
 
-@Schema(name = "Profile", description = "User profile information")
+@Schema(name = "RegisterProfile", description = "User profile information")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-04-25T21:59:47.380653632+02:00[Europe/Berlin]")
-public class ProfileDto   {
+public class RegisterProfileDto   {
 
   @JsonProperty("nickname")
   private String nickname;
@@ -35,19 +35,13 @@ public class ProfileDto   {
   @JsonProperty("anonymous")
   private Boolean anonymous;
 
-  @JsonProperty("admin")
-  private Boolean admin;
+  @JsonProperty("sendNotifications")
+  private Boolean sendNotifications;
 
   @JsonProperty("newPassword")
   private String newPassword;
 
-  @JsonProperty("emailVerified")
-  private Boolean emailVerified;
-
-  @JsonProperty("sendNotifications")
-  private Boolean sendNotifications;
-
-  public ProfileDto nickname(String nickname) {
+  public RegisterProfileDto nickname(String nickname) {
     this.nickname = nickname;
     return this;
   }
@@ -66,7 +60,7 @@ public class ProfileDto   {
     this.nickname = nickname;
   }
 
-  public ProfileDto email(String email) {
+  public RegisterProfileDto email(String email) {
     this.email = email;
     return this;
   }
@@ -75,8 +69,8 @@ public class ProfileDto   {
    * Get email
    * @return email
   */
-  @Email
-  @Schema(name = "email", required = false)
+  @NotNull @Email
+  @Schema(name = "email", required = true)
   public String getEmail() {
     return email;
   }
@@ -85,7 +79,7 @@ public class ProfileDto   {
     this.email = email;
   }
 
-  public ProfileDto license(LicenseDto license) {
+  public RegisterProfileDto license(LicenseDto license) {
     this.license = license;
     return this;
   }
@@ -104,7 +98,7 @@ public class ProfileDto   {
     this.license = license;
   }
 
-  public ProfileDto photoOwner(Boolean photoOwner) {
+  public RegisterProfileDto photoOwner(Boolean photoOwner) {
     this.photoOwner = photoOwner;
     return this;
   }
@@ -123,7 +117,7 @@ public class ProfileDto   {
     this.photoOwner = photoOwner;
   }
 
-  public ProfileDto link(String link) {
+  public RegisterProfileDto link(String link) {
     this.link = link;
     return this;
   }
@@ -142,7 +136,7 @@ public class ProfileDto   {
     this.link = link;
   }
 
-  public ProfileDto anonymous(Boolean anonymous) {
+  public RegisterProfileDto anonymous(Boolean anonymous) {
     this.anonymous = anonymous;
     return this;
   }
@@ -151,8 +145,8 @@ public class ProfileDto   {
    * Get anonymous
    * @return anonymous
   */
-  
-  @Schema(name = "anonymous", required = false)
+  @NotNull 
+  @Schema(name = "anonymous", required = true)
   public Boolean getAnonymous() {
     return anonymous;
   }
@@ -161,64 +155,7 @@ public class ProfileDto   {
     this.anonymous = anonymous;
   }
 
-  public ProfileDto admin(Boolean admin) {
-    this.admin = admin;
-    return this;
-  }
-
-  /**
-   * Get admin
-   * @return admin
-  */
-  
-  @Schema(name = "admin", required = false)
-  public Boolean getAdmin() {
-    return admin;
-  }
-
-  public void setAdmin(Boolean admin) {
-    this.admin = admin;
-  }
-
-  public ProfileDto newPassword(String newPassword) {
-    this.newPassword = newPassword;
-    return this;
-  }
-
-  /**
-   * Get newPassword
-   * @return newPassword
-  */
-  
-  @Schema(name = "newPassword", required = false)
-  public String getNewPassword() {
-    return newPassword;
-  }
-
-  public void setNewPassword(String newPassword) {
-    this.newPassword = newPassword;
-  }
-
-  public ProfileDto emailVerified(Boolean emailVerified) {
-    this.emailVerified = emailVerified;
-    return this;
-  }
-
-  /**
-   * Get emailVerified
-   * @return emailVerified
-  */
-  
-  @Schema(name = "emailVerified", required = false)
-  public Boolean getEmailVerified() {
-    return emailVerified;
-  }
-
-  public void setEmailVerified(Boolean emailVerified) {
-    this.emailVerified = emailVerified;
-  }
-
-  public ProfileDto sendNotifications(Boolean sendNotifications) {
+  public RegisterProfileDto sendNotifications(Boolean sendNotifications) {
     this.sendNotifications = sendNotifications;
     return this;
   }
@@ -237,6 +174,25 @@ public class ProfileDto   {
     this.sendNotifications = sendNotifications;
   }
 
+  public RegisterProfileDto newPassword(String newPassword) {
+    this.newPassword = newPassword;
+    return this;
+  }
+
+  /**
+   * Get newPassword
+   * @return newPassword
+  */
+  
+  @Schema(name = "newPassword", required = false)
+  public String getNewPassword() {
+    return newPassword;
+  }
+
+  public void setNewPassword(String newPassword) {
+    this.newPassword = newPassword;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -245,38 +201,34 @@ public class ProfileDto   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ProfileDto profile = (ProfileDto) o;
-    return Objects.equals(this.nickname, profile.nickname) &&
-        Objects.equals(this.email, profile.email) &&
-        Objects.equals(this.license, profile.license) &&
-        Objects.equals(this.photoOwner, profile.photoOwner) &&
-        Objects.equals(this.link, profile.link) &&
-        Objects.equals(this.anonymous, profile.anonymous) &&
-        Objects.equals(this.admin, profile.admin) &&
-        Objects.equals(this.newPassword, profile.newPassword) &&
-        Objects.equals(this.emailVerified, profile.emailVerified) &&
-        Objects.equals(this.sendNotifications, profile.sendNotifications);
+    RegisterProfileDto registerProfile = (RegisterProfileDto) o;
+    return Objects.equals(this.nickname, registerProfile.nickname) &&
+        Objects.equals(this.email, registerProfile.email) &&
+        Objects.equals(this.license, registerProfile.license) &&
+        Objects.equals(this.photoOwner, registerProfile.photoOwner) &&
+        Objects.equals(this.link, registerProfile.link) &&
+        Objects.equals(this.anonymous, registerProfile.anonymous) &&
+        Objects.equals(this.sendNotifications, registerProfile.sendNotifications) &&
+        Objects.equals(this.newPassword, registerProfile.newPassword);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(nickname, email, license, photoOwner, link, anonymous, admin, newPassword, emailVerified, sendNotifications);
+    return Objects.hash(nickname, email, license, photoOwner, link, anonymous, sendNotifications, newPassword);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ProfileDto {\n");
+    sb.append("class RegisterProfileDto {\n");
     sb.append("    nickname: ").append(toIndentedString(nickname)).append("\n");
     sb.append("    email: ").append(toIndentedString(email)).append("\n");
     sb.append("    license: ").append(toIndentedString(license)).append("\n");
     sb.append("    photoOwner: ").append(toIndentedString(photoOwner)).append("\n");
     sb.append("    link: ").append(toIndentedString(link)).append("\n");
     sb.append("    anonymous: ").append(toIndentedString(anonymous)).append("\n");
-    sb.append("    admin: ").append(toIndentedString(admin)).append("\n");
-    sb.append("    newPassword: ").append(toIndentedString(newPassword)).append("\n");
-    sb.append("    emailVerified: ").append(toIndentedString(emailVerified)).append("\n");
     sb.append("    sendNotifications: ").append(toIndentedString(sendNotifications)).append("\n");
+    sb.append("    newPassword: ").append(toIndentedString(newPassword)).append("\n");
     sb.append("}");
     return sb.toString();
   }

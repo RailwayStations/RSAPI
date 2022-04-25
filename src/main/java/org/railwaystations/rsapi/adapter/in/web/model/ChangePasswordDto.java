@@ -10,7 +10,7 @@ import java.util.Objects;
  * ChangePasswordDto
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-04-24T21:38:04.362626534+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-04-25T21:59:47.380653632+02:00[Europe/Berlin]")
 public class ChangePasswordDto   {
 
   @JsonProperty("newPassword")

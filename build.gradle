@@ -11,6 +11,12 @@ group = 'org.railwaystations'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '18'
 
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
 repositories {
 	mavenCentral()
 }
@@ -65,6 +71,8 @@ dependencies {
 	implementation "org.apache.httpcomponents:httpclient:4.5.13"
 	implementation "javax.validation:validation-api:2.0.1.Final"
 	implementation 'io.swagger.core.v3:swagger-annotations:2.2.0'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
 	runtimeOnly "org.mariadb.jdbc:mariadb-java-client:3.0.4"
 	testImplementation "org.springframework.boot:spring-boot-starter-test:$springVersion"
 	testImplementation "org.springframework.security:spring-security-test:5.6.3"

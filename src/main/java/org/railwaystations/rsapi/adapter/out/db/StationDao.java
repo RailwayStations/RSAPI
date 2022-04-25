@@ -117,7 +117,13 @@ public interface StationDao {
             final var photoUrlPath = rs.getString("urlPath");
             Photo photo = null;
             if (photoUrlPath != null) {
-                final var photographer = new User(rs.getString("name"), rs.getString("photographerUrl"), rs.getString("photographerLicense"), rs.getInt("photographerId"), null, true, rs.getBoolean("anonymous"), null, false, null, false);
+                final var photographer = User.builder()
+                        .name(rs.getString("name"))
+                        .url(rs.getString("photographerUrl"))
+                        .license(rs.getString("photographerLicense"))
+                        .id(rs.getInt("photographerId"))
+                        .anonymous(rs.getBoolean("anonymous"))
+                        .build();
                 photo = new Photo(key, photoUrlPath, photographer, rs.getTimestamp("createdAt").toInstant(), rs.getString("license"), rs.getBoolean("outdated"));
             }
             return new Station(key, rs.getString("title"),

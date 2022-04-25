@@ -108,9 +108,23 @@ public class PhotoInboxEntryControllerTest {
         final Station.Key key9876 = new Station.Key("de", "9876");
         final Station station9876 = new Station(key9876, "Station 9876", new Coordinates(52.0, 8.0), "EFF", new Photo(key9876, "URL", createUser("nickname", 42), null, "CC0"), true);
 
-        final User userNickname = new User("nickname", null, "CC0", 42, "nickname@example.com", true, true, null, false, User.EMAIL_VERIFIED, false);
+        final User userNickname = User.builder()
+                .name("nickname")
+                .license("CC0")
+                .id(42)
+                .email("nickname@example.com")
+                .ownPhotos(true)
+                .anonymous(true)
+                .admin(false)
+                .emailVerification(User.EMAIL_VERIFIED)
+                .sendNotifications(false)
+                .build();
         when(userDao.findByEmail("nickname@example.com")).thenReturn(Optional.of(userNickname));
-        final User userSomeuser = new User("someuser", "someuser@example.com", "CC0", true, null, true, null, true);
+        final User userSomeuser = User.builder()
+                .name("someuser")
+                .license("CC0")
+                .email("someuser@example.com")
+                .build();
         when(userDao.findByEmail("someuser@example.com")).thenReturn(Optional.of(userSomeuser));
 
         when(stationDao.findByKey(key4711.getCountry(), key4711.getId())).thenReturn(Set.of(station4711));
@@ -156,7 +170,7 @@ public class PhotoInboxEntryControllerTest {
         return mvc.perform(post("/photoUpload")
                         .headers(headers)
                         .content(inputBytes)
-                        .with(user(new AuthUser(new User(nickname, null, "CC0", userId, email, true, false, null, false, emailVerification, true), Collections.emptyList())))
+                        .with(user(new AuthUser(User.builder().name(nickname).license("CC0").id(userId).email(email).emailVerification(emailVerification).build(),Collections.emptyList())))
                         .with(csrf()))
                 .andExpect(validOpenApi());
     }
@@ -326,7 +340,7 @@ public class PhotoInboxEntryControllerTest {
 
     @Test
     public void testUserInbox() throws Exception {
-        final var user = new User("nickname", null, "CC0", 42, "nickname@example.com", true, false, null, false, null, true);
+        final var user = User.builder().name("nickname").license("CC0").id(42).email("nickname@example.com").build();
 
         when(inboxDao.findById(1)).thenReturn(new InboxEntry(1, "de", "4711", "Station 4711", new Coordinates(50.1,9.2), user.getId(), user.getName(), null, "jpg", null, null, Instant.now(), false, null, false, false, null, null, null, false));
         when(inboxDao.findById(2)).thenReturn(new InboxEntry(2, "de", "1234", "Station 1234", new Coordinates(50.1,9.2), user.getId(), user.getName(), null, "jpg", null, null, Instant.now(), true, null, false, false, null, null, null, false));
@@ -346,7 +360,7 @@ public class PhotoInboxEntryControllerTest {
                         .header("User-Agent", "UserAgent")
                         .contentType("application/json")
                         .content(inboxStateQueries)
-                        .with(user(new AuthUser(new User("nickname", null, "CC0", 42, "nickname@example.com", true, false, null, false, User.EMAIL_VERIFIED, true), Collections.emptyList())))
+                        .with(user(new AuthUser(User.builder().name("nickname").license("CC0").id(42).email("nickname@example.com").emailVerification(User.EMAIL_VERIFIED).build(), Collections.emptyList())))
                         .with(csrf()))
                 .andExpect(validOpenApi())
                 .andExpect(status().isOk())
@@ -406,7 +420,7 @@ public class PhotoInboxEntryControllerTest {
                         .header("User-Agent", "UserAgent")
                         .contentType("application/json")
                         .content(problemReportJson)
-                        .with(user(new AuthUser(new User("@nick name", null, "CC0", 42, "nickname@example.com", true, false, null, false, emailVerification, true), Collections.emptyList())))
+                        .with(user(new AuthUser(User.builder().name("@nick name").license("CC0").id(42).email("nickname@example.com").ownPhotos(true).anonymous(false).emailVerification(emailVerification).build(), Collections.emptyList())))
                         .with(csrf()))
                 .andExpect(validOpenApi());
     }
@@ -438,7 +452,7 @@ public class PhotoInboxEntryControllerTest {
     }
 
     private User createUser(final String name, final int id) {
-        return new User(name, "photographerUrl", "CC0", id, null, true, false, null, false, User.EMAIL_VERIFIED, true);
+        return User.builder().name(name).url("photographerUrl").license("CC0").id(id).ownPhotos(true).anonymous(false).admin(false).emailVerification(User.EMAIL_VERIFIED).sendNotifications(true).build();
     }
 
 

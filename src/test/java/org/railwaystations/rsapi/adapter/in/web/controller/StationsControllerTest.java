@@ -145,6 +145,14 @@ public class StationsControllerTest {
     }
 
     private User createTestPhotographer(final String name, final String url, final String license) {
-        return new User(name, url, license, 0, null, true, false, null, false, null, true);
+        return User.builder()
+                .id(0)
+                .name(name)
+                .license(license)
+                .ownPhotos(true)
+                .anonymous(false)
+                .url(url)
+                .build();
     }
+
 }

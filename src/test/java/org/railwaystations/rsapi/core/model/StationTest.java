@@ -57,7 +57,7 @@ public class StationTest {
     }
 
     private User createTestPhotographer() {
-        return new User("test", "photographerUrl", "CC0", 0, null, true, false, null, false, null, true);
+        return User.builder().name("test").url("photographerUrl").license("CC0").id(0).ownPhotos(true).sendNotifications(true).build();
     }
 
 }

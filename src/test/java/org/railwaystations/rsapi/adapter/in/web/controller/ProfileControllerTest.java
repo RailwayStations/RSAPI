@@ -79,13 +79,18 @@ public class ProfileControllerTest {
     }
 
     @NotNull
+    private ResultActions postRegistrationWithApiValidation(final String userProfileJson) throws Exception {
+        return postRegistration(userProfileJson)
+                .andExpect(validOpenApi());
+    }
+
+    @NotNull
     private ResultActions postRegistration(final String userProfileJson) throws Exception {
         return mvc.perform(post("/registration")
-                        .header("User-Agent", "UserAgent")
-                        .contentType("application/json")
-                        .content(userProfileJson)
-                        .with(csrf()))
-                .andExpect(validOpenApi());
+                .header("User-Agent", "UserAgent")
+                .contentType("application/json")
+                .content(userProfileJson)
+                .with(csrf()));
     }
 
     @Test
@@ -93,7 +98,7 @@ public class ProfileControllerTest {
         final var givenUserProfile = """
                     { "nickname": "nickname", "email": "nickname@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """;
-        postRegistration(givenUserProfile).andExpect(status().isAccepted());
+        postRegistrationWithApiValidation(givenUserProfile).andExpect(status().isAccepted());
 
         verify(userDao).findByNormalizedName("nickname");
         verify(userDao).findByEmail("nickname@example.com");
@@ -131,7 +136,7 @@ public class ProfileControllerTest {
         final var givenUserProfileWithPassword = """
                     { "nickname": "nickname", "email": "nickname@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true, "newPassword": "verySecretPassword" }
                 """;
-        postRegistration(givenUserProfileWithPassword).andExpect(status().isAccepted());
+        postRegistrationWithApiValidation(givenUserProfileWithPassword).andExpect(status().isAccepted());
 
         verify(userDao).findByNormalizedName("nickname");
         verify(userDao).findByEmail("nickname@example.com");
@@ -169,7 +174,7 @@ public class ProfileControllerTest {
         final var givenAnonymousUserProfile = """
                     { "nickname": "nickname", "email": "nickname@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
                 """;
-        postRegistration(givenAnonymousUserProfile).andExpect(status().isAccepted());
+        postRegistrationWithApiValidation(givenAnonymousUserProfile).andExpect(status().isAccepted());
 
         assertThat(monitor.getMessages().get(0)).isEqualTo("New registration{nickname='nickname', email='nickname@example.com', license='CC0 1.0 Universell (CC0 1.0)', photoOwner=true, link='https://link@example.com', anonymous=true}\nvia UserAgent");
     }
@@ -180,7 +185,7 @@ public class ProfileControllerTest {
         final var givenUserProfileWithSameName = """
                     { "nickname": "existing", "email": "other@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """;
-        postRegistration(givenUserProfileWithSameName).andExpect(status().isConflict());
+        postRegistrationWithApiValidation(givenUserProfileWithSameName).andExpect(status().isConflict());
     }
 
     @Test
@@ -189,7 +194,7 @@ public class ProfileControllerTest {
         final var givenUserProfileWithSameEmail = """
                     { "nickname": "othername", "email": "existing@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """;
-        postRegistration(givenUserProfileWithSameEmail).andExpect(status().isConflict());
+        postRegistrationWithApiValidation(givenUserProfileWithSameEmail).andExpect(status().isConflict());
 
         assertThat(monitor.getMessages().get(0)).isEqualTo("Registration for user 'othername' with eMail 'existing@example.com' failed, eMail is already taken\nvia UserAgent");
     }
@@ -200,7 +205,7 @@ public class ProfileControllerTest {
         final var givenUserProfileWithEmptyName = """
                     { "nickname": "", "email": "existing@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """;
-        postRegistration(givenUserProfileWithEmptyName).andExpect(status().isBadRequest());
+        postRegistrationWithApiValidation(givenUserProfileWithEmptyName).andExpect(status().isBadRequest());
     }
 
     @Test
@@ -220,7 +225,16 @@ public class ProfileControllerTest {
 
     private void givenExistingUser() {
         final var key = "246172676F6E32696424763D3139246D3D36353533362C743D322C703D3124426D4F637165757646794E44754132726B566A6A3177246A7568362F6E6C2F49437A4B475570446E6B674171754A304F7A486A62694F587442542F2B62584D49476300000000000000000000000000000000000000000000000000000000000000";
-        final var user = new User("existing", null, "CC0", 42, "existing@example.com", true, false, key, false, null, true);
+        final var user = User.builder()
+                .name("existing")
+                .license("CC0")
+                .id(42)
+                .email("existing@example.com")
+                .ownPhotos(true)
+                .anonymous(false)
+                .key(key)
+                .admin(false)
+                .sendNotifications(true).build();
         when(userDao.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
         when(userDao.findByNormalizedName(user.getName())).thenReturn(Optional.of(user));
     }
@@ -319,7 +333,15 @@ public class ProfileControllerTest {
 
         postMyProfile(newProfileJson).andExpect(status().isOk());
 
-        verify(userDao).update(new User("new_name", "existing@example.com", "CC0", true, "http://twitter.com/", true, null, true));
+        final var user = User.builder()
+                .name("new_name")
+                .license("CC0")
+                .email("existing@example.com")
+                .ownPhotos(true)
+                .url("http://twitter.com/")
+                .anonymous(true)
+                .sendNotifications(true).build();
+        verify(userDao).update(user);
     }
 
     @NotNull
@@ -336,7 +358,11 @@ public class ProfileControllerTest {
 
     @Test
     public void testUpdateMyProfileConflict() throws Exception {
-        when(userDao.findByNormalizedName("newname")).thenReturn(Optional.of(new User("@New name", "newname@example.com", null, true, null, false, null, true)));
+        final var user = User.builder()
+                .name("@New name")
+                .email("newname@example.com")
+                .sendNotifications(true).build();
+        when(userDao.findByNormalizedName("newname")).thenReturn(Optional.of(user));
         givenExistingUser();
         final var newProfileJson = """
                     { "nickname": "new_name", "email": "existing@example.com", "link": "http://twitter.com/", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
@@ -358,12 +384,27 @@ public class ProfileControllerTest {
         postMyProfile(newProfileJson).andExpect(status().isOk());
 
         assertVerificationEmail();
-        verify(userDao).update(new User("existing", "newname@example.com", "CC0", true, "http://twitter.com/", true, null, true));
+        final var user = User.builder()
+                .name("existing")
+                .license("CC0")
+                .email("newname@example.com")
+                .ownPhotos(true)
+                .anonymous(false)
+                .url("http://twitter.com/")
+                .sendNotifications(true).build();
+        verify(userDao).update(user);
     }
 
     @Test
     public void testNewUploadTokenViaEmail() throws Exception {
-        final var user = new User("existing", "existing@example.com", "CC0", true, "https://link@example.com", false, null, true);
+        final var user = User.builder()
+                .name("existing")
+                .license("CC0")
+                .email("existing@example.com")
+                .ownPhotos(true)
+                .anonymous(false)
+                .url("https://link@example.com")
+                .sendNotifications(true).build();
         when(userDao.findByNormalizedName(user.getName())).thenReturn(Optional.of(user));
         when(userDao.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
@@ -379,7 +420,14 @@ public class ProfileControllerTest {
 
     @Test
     public void testResetPasswordViaEmail() throws Exception {
-        final var user = new User("existing", "existing@example.com", "CC0", true, "https://link@example.com", false, null, true);
+        final var user = User.builder()
+                .name("existing")
+                .license("CC0")
+                .email("existing@example.com")
+                .ownPhotos(true)
+                .anonymous(false)
+                .url("https://link@example.com")
+                .sendNotifications(true).build();
         when(userDao.findByNormalizedName(user.getName())).thenReturn(Optional.of(user));
         when(userDao.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
@@ -399,7 +447,14 @@ public class ProfileControllerTest {
 
     @Test
     public void testResetPasswordViaName() throws Exception {
-        final var user = new User("existing", "existing@example.com", "CC0", true, "https://link@example.com", false, null, true);
+        final var user = User.builder()
+                .name("existing")
+                .license("CC0")
+                .email("existing@example.com")
+                .ownPhotos(true)
+                .anonymous(false)
+                .url("https://link@example.com")
+                .sendNotifications(true).build();
         when(userDao.findByNormalizedName(user.getName())).thenReturn(Optional.of(user));
         when(userDao.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
@@ -415,7 +470,9 @@ public class ProfileControllerTest {
 
     @Test
     public void testResetPasswordEmailMissing() throws Exception {
-        final var user = new User("existing", "", "CC0", true, "https://link@example.com", false, null, true);
+        final var user = User.builder()
+                .name("existing")
+                .build();
         when(userDao.findByNormalizedName(user.getName())).thenReturn(Optional.of(user));
         when(userDao.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
@@ -426,7 +483,16 @@ public class ProfileControllerTest {
     @Test
     public void testVerifyEmailSuccess() throws Exception {
         final var token = "verification";
-        final var user = new User("existing","https://link@example.com", "CC0", 42, "existing@example.com", true, false, null, false, User.EMAIL_VERIFICATION_TOKEN + token, true);
+        final var user = User.builder()
+                .id(42)
+                .name("existing")
+                .license("CC0")
+                .email("existing@example.com")
+                .ownPhotos(true)
+                .anonymous(false)
+                .url("https://link@example.com")
+                .emailVerificationToken(User.EMAIL_VERIFICATION_TOKEN + token)
+                .sendNotifications(true).build();
         when(userDao.findByEmailVerification(User.EMAIL_VERIFICATION_TOKEN + token)).thenReturn(Optional.of(user));
 
         getEmailVerification(token)
@@ -448,7 +514,16 @@ public class ProfileControllerTest {
     public void testVerifyEmailFailed() throws Exception {
         final var token = "verification";
         final var emailVerification = User.EMAIL_VERIFICATION_TOKEN + token;
-        final var user = new User("existing","https://link@example.com", "CC0", 42, "existing@example.com", true, false, null, false, emailVerification, true);
+        final var user = User.builder()
+                .id(42)
+                .name("existing")
+                .license("CC0")
+                .email("existing@example.com")
+                .ownPhotos(true)
+                .anonymous(false)
+                .url("https://link@example.com")
+                .emailVerificationToken(emailVerification)
+                .sendNotifications(true).build();
         when(userDao.findByEmailVerification(emailVerification)).thenReturn(Optional.of(user));
 
         getEmailVerification("wrong_token").andExpect(status().isNotFound());

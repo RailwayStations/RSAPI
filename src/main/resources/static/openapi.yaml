@@ -869,7 +869,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Profile'
+              $ref: '#/components/schemas/RegisterProfile'
         required: true
       responses:
         202:
@@ -1065,7 +1065,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Profile'
+              $ref: '#/components/schemas/UpdateProfile'
         required: true
       responses:
         200:
@@ -1349,6 +1349,63 @@ components:
         url:
           type: string
       description: Provider App information
+    License:
+      type: string
+      enum:
+        - CC0
+        - CC0 1.0 Universell (CC0 1.0)
+        - CC4
+        - CC BY-SA 4.0
+    UpdateProfile:
+      type: object
+      properties:
+        nickname:
+          type: string
+        email:
+          type: string
+          format: email
+        license:
+          $ref: '#/components/schemas/License'
+        photoOwner:
+          type: boolean
+        link:
+          type: string
+        anonymous:
+          type: boolean
+        sendNotifications:
+          type: boolean
+      description: User profile information
+      required:
+        - nickname
+        - email
+        - license
+        - photoOwner
+    RegisterProfile:
+      type: object
+      properties:
+        nickname:
+          type: string
+        email:
+          type: string
+          format: email
+        license:
+          $ref: '#/components/schemas/License'
+        photoOwner:
+          type: boolean
+        link:
+          type: string
+        anonymous:
+          type: boolean
+        sendNotifications:
+          type: boolean
+        newPassword:
+          type: string
+      description: User profile information
+      required:
+        - nickname
+        - email
+        - license
+        - photoOwner
     Profile:
       type: object
       properties:
@@ -1358,12 +1415,7 @@ components:
           type: string
           format: email
         license:
-          type: string
-          enum:
-            - CC0
-            - CC0 1.0 Universell (CC0 1.0)
-            - CC4
-            - CC BY-SA 4.0
+          $ref: '#/components/schemas/License'
         photoOwner:
           type: boolean
         link:
