@@ -136,7 +136,7 @@ public interface StationDao {
     class StatisticMapper implements RowMapper<Statistic> {
         @Override
         public Statistic map(final ResultSet rs, final StatementContext ctx) throws SQLException {
-            return new Statistic(rs.getString("countryCode"), rs.getInt("stations"), rs.getInt("photos"), rs.getInt("photographers"));
+            return new Statistic(rs.getString("countryCode"), rs.getLong("stations"), rs.getLong("photos"), rs.getLong("photographers"));
         }
     }
 }

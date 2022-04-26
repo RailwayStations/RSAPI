@@ -1,5 +1,6 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
+import org.railwaystations.rsapi.adapter.in.web.model.StatisticDto;
 import org.railwaystations.rsapi.core.model.Statistic;
 import org.railwaystations.rsapi.core.ports.in.GetStatisticUseCase;
 import org.springframework.http.MediaType;
@@ -25,37 +26,46 @@ public class StatisticController {
     }
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE}, value = "/stats")
-    public Statistic get(@Nullable @RequestParam(value = StatisticController.COUNTRY, required = false) @Size(min = 2, max = 2) final String country) {
+    public StatisticDto get(@Nullable @RequestParam(value = StatisticController.COUNTRY, required = false) @Size(min = 2, max = 2) final String country) {
         return getWithCountry(country);
     }
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE}, value = "/stats.json")
-    public Statistic getAsJson(@Nullable @RequestParam(value = StatisticController.COUNTRY, required = false) @Size(min = 2, max = 2) final String country) {
+    public StatisticDto getAsJson(@Nullable @RequestParam(value = StatisticController.COUNTRY, required = false) @Size(min = 2, max = 2) final String country) {
         return getWithCountry(country);
     }
 
     @GetMapping(produces = {MediaType.TEXT_PLAIN_VALUE}, value = "/stats.txt")
-    public Statistic getAsText(@Nullable @RequestParam(value = StatisticController.COUNTRY, required = false) @Size(min = 2, max = 2) final String country) {
+    public StatisticDto getAsText(@Nullable @RequestParam(value = StatisticController.COUNTRY, required = false) @Size(min = 2, max = 2) final String country) {
         return getWithCountry(country);
     }
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE}, value = "/{country}/stats")
-    public Statistic getWithCountry(@PathVariable(StatisticController.COUNTRY) @Size(min = 2, max = 2) final String country) {
+    public StatisticDto getWithCountry(@PathVariable(StatisticController.COUNTRY) @Size(min = 2, max = 2) final String country) {
         return getStatisticMap(country);
     }
 
     @GetMapping(produces = {MediaType.TEXT_PLAIN_VALUE}, value = "/{country}/stats.txt")
-    public Statistic getWithCountryAsText(@PathVariable(StatisticController.COUNTRY) @Size(min = 2, max = 2) final String country) {
+    public StatisticDto getWithCountryAsText(@PathVariable(StatisticController.COUNTRY) @Size(min = 2, max = 2) final String country) {
         return getStatisticMap(country);
     }
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE}, value = "/{country}/stats.json")
-    public Statistic getWithCountryAsJson(@PathVariable(StatisticController.COUNTRY) @Size(min = 2, max = 2) final String country) {
+    public StatisticDto getWithCountryAsJson(@PathVariable(StatisticController.COUNTRY) @Size(min = 2, max = 2) final String country) {
         return getStatisticMap(country);
     }
 
-    private Statistic getStatisticMap(final String country) {
-        return getStatisticUseCase.getStatistic(country);
+    private StatisticDto getStatisticMap(final String country) {
+        return toDto(getStatisticUseCase.getStatistic(country));
+    }
+
+    private StatisticDto toDto(final Statistic statistic) {
+        return new StatisticDto()
+                .countryCode(statistic.countryCode())
+                .photographers(statistic.photographers())
+                .total(statistic.total())
+                .withoutPhoto(statistic.withoutPhoto())
+                .withPhoto(statistic.withPhoto());
     }
 
 }
