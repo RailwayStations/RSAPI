@@ -52,7 +52,7 @@ public class MastodonBotHttpClient implements MastodonBot {
         try {
             var status = String.format("%s%nby %s%n%s?countryCode=%s&stationId=%s",
                     station.getTitle(), station.getPhotographer(), config.getStationUrl(),
-                    station.getKey().getCountry(), station.getKey().getId());
+                    station.getKey().country(), station.getKey().id());
             if (StringUtils.isNotBlank(inboxEntry.getComment())) {
                 status += String.format("%n%s", inboxEntry.getComment());
             }

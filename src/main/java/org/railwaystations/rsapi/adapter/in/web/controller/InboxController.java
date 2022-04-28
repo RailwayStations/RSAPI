@@ -2,6 +2,7 @@ package org.railwaystations.rsapi.adapter.in.web.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.commons.lang3.StringUtils;
@@ -14,8 +15,7 @@ import org.railwaystations.rsapi.core.model.InboxStateQuery;
 import org.railwaystations.rsapi.core.model.ProblemReport;
 import org.railwaystations.rsapi.core.model.PublicInboxEntry;
 import org.railwaystations.rsapi.core.ports.in.ManageInboxUseCase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -43,11 +43,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
+@Slf4j
 public class InboxController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(InboxController.class);
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
     public static final String EMAIL = "email";
     public static final String UPLOAD_TOKEN = "uploadToken";
     public static final String STATION_ID = "stationId";
@@ -59,16 +57,17 @@ public class InboxController {
     public static final String ACTIVE = "active";
     public static final String FILE = "file";
 
-    private final ManageInboxUseCase manageInboxUseCase;
-    private final RSAuthenticationProvider authenticator;
-    private final RSUserDetailsService userDetailsService;
+    @Autowired
+    private ObjectMapper mapper;
 
-    public InboxController(final ManageInboxUseCase manageInboxUseCase, final RSAuthenticationProvider authenticator,
-                           final RSUserDetailsService userDetailsService) {
-        this.manageInboxUseCase = manageInboxUseCase;
-        this.authenticator = authenticator;
-        this.userDetailsService = userDetailsService;
-    }
+    @Autowired
+    private ManageInboxUseCase manageInboxUseCase;
+
+    @Autowired
+    private RSAuthenticationProvider authenticator;
+
+    @Autowired
+    private RSUserDetailsService userDetailsService;
 
     /**
      * Not part of the "official" API.
@@ -88,7 +87,7 @@ public class InboxController {
                                           @RequestParam(value = ACTIVE, required = false) final Boolean active,
                                           @RequestParam(value = FILE) final MultipartFile file,
                                           @RequestHeader(value = HttpHeaders.REFERER) final String referer) throws JsonProcessingException {
-        LOG.info("MultipartFormData: email={}, station={}, country={}, file={}", email, stationId, countryCode, file.getName());
+        log.info("MultipartFormData: email={}, station={}, country={}, file={}", email, stationId, countryCode, file.getName());
         final var refererUri = URI.create(referer);
 
         try {
@@ -101,7 +100,7 @@ public class InboxController {
                     countryCode, file.getContentType(), stationTitle, latitude, longitude, comment, active, userDetailsService.loadUserByUsername(email));
             return createIFrameAnswer(response, refererUri);
         } catch (final Exception e) {
-            LOG.error("FormUpload error", e);
+            log.error("FormUpload error", e);
             return createIFrameAnswer(new InboxResponse(InboxResponse.InboxResponseState.ERROR), refererUri);
         }
     }
@@ -158,7 +157,7 @@ public class InboxController {
         try {
             manageInboxUseCase.processAdminInboxCommand(user.getUser(), command);
         } catch (final IllegalArgumentException e) {
-            LOG.warn("adminInbox command {} failed", command, e);
+            log.warn("adminInbox command {} failed", command, e);
             return new ResponseEntity<>(new AdminInboxCommandResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
         }
 
@@ -200,7 +199,7 @@ public class InboxController {
     private ModelAndView createIFrameAnswer(final InboxResponse response, final URI referer) throws JsonProcessingException {
         final ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("iframe");
-        modelAndView.getModel().put("response", MAPPER.writeValueAsString(response));
+        modelAndView.getModel().put("response", mapper.writeValueAsString(response));
         modelAndView.getModel().put("referer", referer);
         return modelAndView;
     }
@@ -210,7 +209,7 @@ public class InboxController {
             try {
                 IOUtils.copy(body, NullOutputStream.NULL_OUTPUT_STREAM);
             } catch (final IOException e) {
-                LOG.warn("Unable to consume body", e);
+                log.warn("Unable to consume body", e);
             }
         }
         return response;

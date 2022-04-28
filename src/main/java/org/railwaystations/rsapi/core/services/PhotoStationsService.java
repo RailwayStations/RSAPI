@@ -59,7 +59,7 @@ public class PhotoStationsService implements FindPhotoStationsUseCase {
     }
 
     public Optional<Station> findByKey(final Station.Key key) {
-        return stationDao.findByKey(key.getCountry(), key.getId()).stream().findFirst().map(this::injectPhotoBaseUrl);
+        return stationDao.findByKey(key.country(), key.id()).stream().findFirst().map(this::injectPhotoBaseUrl);
     }
 
     public List<Station> findRecentImports(final Instant since) {

@@ -1,5 +1,6 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.railwaystations.rsapi.adapter.in.web.model.ChangePasswordDto;
 import org.railwaystations.rsapi.adapter.in.web.model.LicenseDto;
@@ -9,8 +10,7 @@ import org.railwaystations.rsapi.adapter.in.web.model.UpdateProfileDto;
 import org.railwaystations.rsapi.app.auth.AuthUser;
 import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.ports.in.ManageProfileUseCase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,15 +30,11 @@ import static org.railwaystations.rsapi.adapter.in.web.model.LicenseDto.CC0_1_0_
 import static org.railwaystations.rsapi.adapter.in.web.model.LicenseDto.CC_BY_SA_4_0;
 
 @RestController
+@Slf4j
 public class ProfileController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ProfileController.class);
-
-    private final ManageProfileUseCase manageProfileUseCase;
-
-    public ProfileController(final ManageProfileUseCase manageProfileUseCase) {
-        this.manageProfileUseCase = manageProfileUseCase;
-    }
+    @Autowired
+    private ManageProfileUseCase manageProfileUseCase;
 
     @PostMapping("/changePassword")
     @PreAuthorize("isAuthenticated()")
@@ -90,7 +86,7 @@ public class ProfileController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ProfileDto> getMyProfile(@AuthenticationPrincipal final AuthUser authUser) {
         final User user = authUser.getUser();
-        LOG.info("Get profile for '{}'", user.getEmail());
+        log.info("Get profile for '{}'", user.getEmail());
         return ResponseEntity.ok(toProfileDto(user));
     }
 

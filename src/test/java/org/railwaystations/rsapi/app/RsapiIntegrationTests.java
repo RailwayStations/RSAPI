@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.railwaystations.rsapi.adapter.in.web.model.StationDto;
 import org.railwaystations.rsapi.adapter.out.monitoring.LoggingMonitor;
 import org.railwaystations.rsapi.adapter.out.photostorage.WorkDir;
 import org.railwaystations.rsapi.core.model.Station;
@@ -98,20 +99,20 @@ class RsapiIntegrationTests {
 	@Test
 	public void stationById() {
 		final var station = loadStationDe6932();
-		assertThat(station.getKey().getId()).isEqualTo("6932");
+		assertThat(station.getIdStr()).isEqualTo("6932");
 		assertThat(station.getTitle()).isEqualTo( "Wuppertal-Ronsdorf");
 		assertThat(station.getPhotoUrl()).isEqualTo("https://api.railway-stations.org/photos/de/6932.jpg");
 		assertThat(station.getPhotographer()).isEqualTo("@user10");
 		assertThat(station.getLicense()).isEqualTo("CC0 1.0 Universell (CC0 1.0)");
-		assertThat(station.isActive()).isTrue();
+		assertThat(station.getActive()).isTrue();
 		assertThat(station.getOutdated()).isFalse();
 	}
 
 	@Test
 	public void outdatedStationById() {
 		final var station = loadStationByKey("de", "7051");
-		assertThat(station.getKey().getCountry()).isEqualTo("de");
-		assertThat(station.getKey().getId()).isEqualTo("7051");
+		assertThat(station.getCountry()).isEqualTo("de");
+		assertThat(station.getIdStr()).isEqualTo("7051");
 		assertThat(station.getOutdated()).isTrue();
 	}
 
@@ -201,11 +202,11 @@ class RsapiIntegrationTests {
 		return response.getBody();
 	}
 
-	private Station[] assertLoadStationsOk(final String path) {
-		final var response = loadRaw(path, 200, Station[].class);
+	private StationDto[] assertLoadStationsOk(final String path) {
+		final var response = loadRaw(path, 200, StationDto[].class);
 
 		if (response.getStatusCodeValue() != 200) {
-			return new Station[0];
+			return new StationDto[0];
 		}
 		return response.getBody();
 	}
@@ -218,8 +219,8 @@ class RsapiIntegrationTests {
 		return response;
 	}
 
-	private Station findByKey(final Station[] stations, final Station.Key key) {
-		return Arrays.stream(stations).filter(station -> station.getKey().equals(key)).findAny().orElse(null);
+	private StationDto findByKey(final StationDto[] stations, final Station.Key key) {
+		return Arrays.stream(stations).filter(station -> station.getCountry().equals(key.country()) && station.getIdStr().equals(key.id())).findAny().orElse(null);
 	}
 
 	@Test
@@ -247,12 +248,12 @@ class RsapiIntegrationTests {
 				""");
 	}
 
-	private Station loadStationDe6932() {
+	private StationDto loadStationDe6932() {
 		return loadStationByKey("de", "6932");
 	}
 
-	private Station loadStationByKey(final String countryCode, final String id) {
-		return loadRaw("/" + countryCode + "/stations/" + id, 200, Station.class).getBody();
+	private StationDto loadStationByKey(final String countryCode, final String id) {
+		return loadRaw("/" + countryCode + "/stations/" + id, 200, StationDto.class).getBody();
 	}
 
 	@Test
@@ -352,8 +353,8 @@ class RsapiIntegrationTests {
 	private void assertCoordinatesOfStation6815(final double lat, final double lon) {
 		final var station = loadStationByKey("de", "6815");
 		assertThat(station).isNotNull();
-		assertThat(station.getCoordinates().lat()).isEqualTo(lat);
-		assertThat(station.getCoordinates().lon()).isEqualTo(lon);
+		assertThat(station.getLat()).isEqualTo(lat);
+		assertThat(station.getLon()).isEqualTo(lon);
 	}
 
 	@Test

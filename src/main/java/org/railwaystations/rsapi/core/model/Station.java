@@ -1,58 +1,36 @@
 package org.railwaystations.rsapi.core.model;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
-
-import java.beans.ConstructorProperties;
 import java.time.Instant;
 import java.util.Objects;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Station {
 
     private static final int EARTH_RADIUS = 6371;
 
-    @JsonUnwrapped
     private final Key key;
 
-    @JsonProperty
     private String title;
 
-    @JsonUnwrapped
     private Coordinates coordinates;
 
-    @JsonIgnore
     private int photographerId;
 
-    @JsonProperty
     private String photographer;
 
-    @JsonProperty
     private String photographerUrl;
 
-    @JsonProperty("DS100")
     private final String ds100;
 
-    @JsonProperty
     private String photoUrl;
 
-    @JsonProperty
     private String license;
 
-    @JsonProperty
     private String licenseUrl;
 
-    @JsonIgnore
     private Instant createdAt;
 
-    @JsonProperty
     private boolean active;
 
-    @JsonProperty
     private Boolean outdated;
 
     public Station() {
@@ -175,17 +153,14 @@ public class Station {
         return photographerUrl;
     }
 
-    @JsonIgnore
     public Instant getCreatedAt() {
         return createdAt;
     }
 
-    @JsonGetter("createdAt")
     private Long getCreatedAtEpochMilli() {
         return createdAt != null ? createdAt.toEpochMilli() : null;
     }
 
-    @JsonSetter("createdAt")
     private void setCreatedAtEpochMilli(final Long time) {
         this.createdAt = time != null ? Instant.ofEpochMilli(time) : null;
     }
@@ -224,34 +199,9 @@ public class Station {
         this.outdated = outdated;
     }
 
-    @SuppressWarnings("PMD.ShortClassName")
-    public static final class Key {
-        @JsonProperty
-        private final String country;
+    public record Key (String country, String id) {
 
-        @JsonProperty("idStr")
-        private final String id;
-
-        public Key() {
-            this("","");
-        }
-
-        @ConstructorProperties({"country", "id"})
-        public Key(final String country, final String id) {
-            this.country = country;
-            this.id = id;
-        }
-
-        public String getCountry() {
-            return country;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        @JsonGetter("id")
-        public int getIdLegacy() {
+        public int legacyId() {
             try {
                 return Integer.parseInt(id);
             } catch (final NumberFormatException ignored) {
@@ -259,30 +209,6 @@ public class Station {
             }
         }
 
-        @Override
-        public boolean equals(final Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (!(o instanceof final Key key)) {
-                return false;
-            }
-            return Objects.equals(country, key.country) &&
-                    Objects.equals(id, key.id);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(country, id);
-        }
-
-        @Override
-        public String toString() {
-            return "Key{" +
-                    "country='" + country + '\'' +
-                    ", id='" + id + '\'' +
-                    '}';
-        }
     }
 
     @Override

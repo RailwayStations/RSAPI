@@ -43,7 +43,7 @@ public class PhotoFileStorage implements PhotoStorage {
     public void importPhoto(final InboxEntry inboxEntry, final Country country, final Station station) throws IOException {
         final var uploadedFile = getUploadFile(inboxEntry.getFilename());
         final var processedFile = workDir.getInboxProcessedDir().resolve(inboxEntry.getFilename());
-        final var destinationFile = workDir.getPhotosDir().resolve(country.getCode()).resolve(sanitizeFilename(station.getKey().getId() + "." + inboxEntry.getExtension()));
+        final var destinationFile = workDir.getPhotosDir().resolve(country.getCode()).resolve(sanitizeFilename(station.getKey().id() + "." + inboxEntry.getExtension()));
         if (Files.exists(processedFile)) {
             Files.move(processedFile, destinationFile, REPLACE_EXISTING);
         } else {

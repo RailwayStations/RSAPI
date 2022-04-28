@@ -1,8 +1,7 @@
 package org.railwaystations.rsapi.adapter.in.web.writer;
 
 import org.junit.jupiter.api.Test;
-import org.railwaystations.rsapi.core.model.Coordinates;
-import org.railwaystations.rsapi.core.model.Station;
+import org.railwaystations.rsapi.adapter.in.web.model.StationDto;
 import org.springframework.mock.http.MockHttpOutputMessage;
 
 import java.io.IOException;
@@ -15,9 +14,9 @@ public class StationsGpxWriterTest {
 
 	@Test
 	public void testWriteTo() throws IOException {
-		final var stations = new ArrayList<Station>();
-		stations.add(new Station(new Station.Key("de", "4711"), "Test", new Coordinates(50d, 9d), null, null, true));
-		stations.add(new Station(new Station.Key("de", "4712"), "Foo", new Coordinates(51d, 8d), null, null, true));
+		final var stations = new ArrayList<StationDto>();
+		stations.add(new StationDto().country("de").idStr("4711").title("Test").lat(50d).lon(9d));
+		stations.add(new StationDto().country("de").idStr("4712").title("Foo").lat(51d).lon(8d));
 
 		final var outputMessage = new MockHttpOutputMessage();
 		new StationsGpxWriter().writeInternal(stations, outputMessage);

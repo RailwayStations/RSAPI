@@ -88,7 +88,7 @@ public class InboxService implements ManageInboxUseCase {
                 null, problemReport.getCoordinates(), user.getId(), null, problemReport.getComment(),
                 problemReport.getType(), null);
         monitor.sendMessage(String.format("New problem report for %s - %s:%s%n%s: %s%nby %s%nvia %s",
-                station.get().getTitle(), station.get().getKey().getCountry(), station.get().getKey().getId(), problemReport.getType(),
+                station.get().getTitle(), station.get().getKey().country(), station.get().getKey().id(), problemReport.getType(),
                 StringUtils.trimToEmpty(problemReport.getComment()), user.getName(), clientInfo));
         return new InboxResponse(InboxResponse.InboxResponseState.REVIEW, inboxDao.insert(inboxEntry));
     }
@@ -211,7 +211,7 @@ public class InboxService implements ManageInboxUseCase {
         }
 
         final var station = assertStationExists(inboxEntry);
-        stationDao.updateLocation(station, coordinates);
+        stationDao.updateLocation(station.getKey(), coordinates);
         inboxDao.done(inboxEntry.getId());
     }
 
@@ -228,7 +228,7 @@ public class InboxService implements ManageInboxUseCase {
     private void updateStationActiveState(final InboxEntry inboxEntry, final boolean active) {
         final var station = assertStationExists(inboxEntry);
         station.setActive(active);
-        stationDao.updateActive(station);
+        stationDao.updateActive(station.getKey(), station.isActive());
         inboxDao.done(inboxEntry.getId());
         LOG.info("Problem report {} station {} set active to {}", inboxEntry.getId(), station.getKey(), active);
     }
@@ -243,7 +243,7 @@ public class InboxService implements ManageInboxUseCase {
     private void deleteStation(final InboxEntry inboxEntry) {
         final var station = assertStationExists(inboxEntry);
         photoDao.delete(station.getKey());
-        stationDao.delete(station);
+        stationDao.delete(station.getKey());
         inboxDao.done(inboxEntry.getId());
         LOG.info("Problem report {} station {} deleted", inboxEntry.getId(), station.getKey());
     }
@@ -291,11 +291,11 @@ public class InboxService implements ManageInboxUseCase {
         }
 
         final var photographer = userDao.findById(inboxEntry.getPhotographerId()).orElseThrow();
-        final var country = countryDao.findById(StringUtils.lowerCase(station.getKey().getCountry()))
+        final var country = countryDao.findById(StringUtils.lowerCase(station.getKey().country()))
                 .orElseThrow(() -> new IllegalArgumentException("Country not found"));
 
         try {
-            final var photo = new Photo(country, station.getKey().getId(), photographer, inboxEntry.getExtension());
+            final var photo = new Photo(country, station.getKey().id(), photographer, inboxEntry.getExtension());
             if (station.hasPhoto()) {
                 photoDao.update(photo);
             } else {
@@ -409,7 +409,7 @@ public class InboxService implements ManageInboxUseCase {
         final Integer id;
         final Long crc32;
         try {
-            id = station.map(s -> inboxDao.insert(new InboxEntry(s.getKey().getCountry(), s.getKey().getId(), stationTitle,
+            id = station.map(s -> inboxDao.insert(new InboxEntry(s.getKey().country(), s.getKey().id(), stationTitle,
                         null, user.getId(), extension, comment, null, active)))
                     .orElseGet(() -> inboxDao.insert(new InboxEntry(country, null, stationTitle,
                         coordinates, user.getId(), extension, comment, null, active)));
@@ -421,7 +421,7 @@ public class InboxService implements ManageInboxUseCase {
             inboxUrl = inboxBaseUrl + "/" + UriUtils.encodePath(filename, StandardCharsets.UTF_8);
             if (station.isPresent()) {
                 monitor.sendMessage(String.format("New photo upload for %s - %s:%s%n%s%n%s%s%nby %s%nvia %s",
-                        station.get().getTitle(), station.get().getKey().getCountry(), station.get().getKey().getId(),
+                        station.get().getTitle(), station.get().getKey().country(), station.get().getKey().id(),
                         StringUtils.trimToEmpty(comment), inboxUrl, duplicateInfo, user.getName(), clientInfo), photoStorage.getUploadFile(filename));
             } else {
                 monitor.sendMessage(String.format("Photo upload for missing station %s at https://map.railway-stations.org/index.php?mlat=%s&mlon=%s&zoom=18&layers=M%n%s%n%s%s%nby %s%nvia %s",
@@ -445,7 +445,7 @@ public class InboxService implements ManageInboxUseCase {
         if (station.hasPhoto()) {
             return true;
         }
-        return inboxDao.countPendingInboxEntriesForStation(id, station.getKey().getCountry(), station.getKey().getId()) > 0;
+        return inboxDao.countPendingInboxEntriesForStation(id, station.getKey().country(), station.getKey().id()) > 0;
     }
 
     private boolean hasConflict(final Integer id, final Coordinates coordinates) {
