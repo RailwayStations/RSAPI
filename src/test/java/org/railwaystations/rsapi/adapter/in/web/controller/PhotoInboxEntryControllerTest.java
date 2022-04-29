@@ -127,11 +127,11 @@ public class PhotoInboxEntryControllerTest {
                 .build();
         when(userDao.findByEmail("someuser@example.com")).thenReturn(Optional.of(userSomeuser));
 
-        when(stationDao.findByKey(key4711.country(), key4711.id())).thenReturn(Set.of(station4711));
-        when(stationDao.findByKey(key1234.country(), key1234.id())).thenReturn(Set.of(station1234));
-        when(stationDao.findByKey(key5678.country(), key5678.id())).thenReturn(Set.of(station5678));
-        when(stationDao.findByKey(key0815.country(), key0815.id())).thenReturn(Set.of(station0815));
-        when(stationDao.findByKey(key9876.country(), key9876.id())).thenReturn(Set.of(station9876));
+        when(stationDao.findByKey(key4711.getCountry(), key4711.getId())).thenReturn(Set.of(station4711));
+        when(stationDao.findByKey(key1234.getCountry(), key1234.getId())).thenReturn(Set.of(station1234));
+        when(stationDao.findByKey(key5678.getCountry(), key5678.getId())).thenReturn(Set.of(station5678));
+        when(stationDao.findByKey(key0815.getCountry(), key0815.getId())).thenReturn(Set.of(station0815));
+        when(stationDao.findByKey(key9876.getCountry(), key9876.getId())).thenReturn(Set.of(station9876));
 
         monitor.getMessages().clear();
     }

@@ -7,7 +7,6 @@ import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.customizer.BindList;
-import org.jdbi.v3.sqlobject.customizer.BindMethods;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -83,7 +82,7 @@ public interface InboxDao {
      * Count nearby pending uploads using simple pythagoras (only valid for a few km)
      */
     @SqlQuery("SELECT COUNT(*) FROM inbox WHERE SQRT(POWER(71.5 * (lon - :coords.lon),2) + POWER(111.3 * (lat - :coords.lat),2)) < 0.5 AND done = false AND (:id IS NULL OR id <> :id)")
-    int countPendingInboxEntriesForNearbyCoordinates(@Bind(ID) final Integer id, @BindMethods(COORDS) final Coordinates coordinates);
+    int countPendingInboxEntriesForNearbyCoordinates(@Bind(ID) final Integer id, @BindBean(COORDS) final Coordinates coordinates);
 
     @SqlUpdate("UPDATE inbox SET crc32 = :crc32 WHERE id = :id")
     void updateCrc32(@Bind(ID) Integer id, @Bind("crc32") Long crc32);

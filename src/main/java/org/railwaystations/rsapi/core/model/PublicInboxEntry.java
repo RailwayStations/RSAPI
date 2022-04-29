@@ -64,10 +64,10 @@ public class PublicInboxEntry {
     }
 
     public Double getLat() {
-        return coordinates != null ? coordinates.lat() : null;
+        return coordinates != null ? coordinates.getLat() : null;
     }
 
     public Double getLon() {
-        return coordinates != null ? coordinates.lon() : null;
+        return coordinates != null ? coordinates.getLon() : null;
     }
 }

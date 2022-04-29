@@ -88,7 +88,7 @@ public class InboxService implements ManageInboxUseCase {
                 null, problemReport.getCoordinates(), user.getId(), null, problemReport.getComment(),
                 problemReport.getType(), null);
         monitor.sendMessage(String.format("New problem report for %s - %s:%s%n%s: %s%nby %s%nvia %s",
-                station.get().getTitle(), station.get().getKey().country(), station.get().getKey().id(), problemReport.getType(),
+                station.get().getTitle(), station.get().getKey().getCountry(), station.get().getKey().getId(), problemReport.getType(),
                 StringUtils.trimToEmpty(problemReport.getComment()), user.getName(), clientInfo));
         return new InboxResponse(InboxResponse.InboxResponseState.REVIEW, inboxDao.insert(inboxEntry));
     }
@@ -291,11 +291,11 @@ public class InboxService implements ManageInboxUseCase {
         }
 
         final var photographer = userDao.findById(inboxEntry.getPhotographerId()).orElseThrow();
-        final var country = countryDao.findById(StringUtils.lowerCase(station.getKey().country()))
+        final var country = countryDao.findById(StringUtils.lowerCase(station.getKey().getCountry()))
                 .orElseThrow(() -> new IllegalArgumentException("Country not found"));
 
         try {
-            final var photo = new Photo(country, station.getKey().id(), photographer, inboxEntry.getExtension());
+            final var photo = new Photo(country, station.getKey().getId(), photographer, inboxEntry.getExtension());
             if (station.hasPhoto()) {
                 photoDao.update(photo);
             } else {
@@ -309,7 +309,7 @@ public class InboxService implements ManageInboxUseCase {
             mastodonBot.tootNewPhoto(station, inboxEntry);
         } catch (final Exception e) {
             LOG.error("Error importing upload {} photo {}", inboxEntry.getId(), inboxEntry.getFilename());
-            throw new RuntimeException("Error moving file: " + e.getMessage());
+            throw new RuntimeException("Error moving file", e);
         }
     }
 
@@ -347,7 +347,7 @@ public class InboxService implements ManageInboxUseCase {
 
             final var title = command.getTitle() != null ? command.getTitle() : inboxEntry.getTitle();
 
-            final Station newStation = new Station(new Station.Key(command.getCountryCode(), command.getStationId()), title, coordinates, command.getDs100(), null, command.getActive());
+            final var newStation = new Station(new Station.Key(command.getCountryCode(), command.getStationId()), title, coordinates, command.getDs100(), null, command.getActive());
             stationDao.insert(newStation);
             return newStation;
         });
@@ -409,7 +409,7 @@ public class InboxService implements ManageInboxUseCase {
         final Integer id;
         final Long crc32;
         try {
-            id = station.map(s -> inboxDao.insert(new InboxEntry(s.getKey().country(), s.getKey().id(), stationTitle,
+            id = station.map(s -> inboxDao.insert(new InboxEntry(s.getKey().getCountry(), s.getKey().getId(), stationTitle,
                         null, user.getId(), extension, comment, null, active)))
                     .orElseGet(() -> inboxDao.insert(new InboxEntry(country, null, stationTitle,
                         coordinates, user.getId(), extension, comment, null, active)));
@@ -421,7 +421,7 @@ public class InboxService implements ManageInboxUseCase {
             inboxUrl = inboxBaseUrl + "/" + UriUtils.encodePath(filename, StandardCharsets.UTF_8);
             if (station.isPresent()) {
                 monitor.sendMessage(String.format("New photo upload for %s - %s:%s%n%s%n%s%s%nby %s%nvia %s",
-                        station.get().getTitle(), station.get().getKey().country(), station.get().getKey().id(),
+                        station.get().getTitle(), station.get().getKey().getCountry(), station.get().getKey().getId(),
                         StringUtils.trimToEmpty(comment), inboxUrl, duplicateInfo, user.getName(), clientInfo), photoStorage.getUploadFile(filename));
             } else {
                 monitor.sendMessage(String.format("Photo upload for missing station %s at https://map.railway-stations.org/index.php?mlat=%s&mlon=%s&zoom=18&layers=M%n%s%n%s%s%nby %s%nvia %s",
@@ -445,7 +445,7 @@ public class InboxService implements ManageInboxUseCase {
         if (station.hasPhoto()) {
             return true;
         }
-        return inboxDao.countPendingInboxEntriesForStation(id, station.getKey().country(), station.getKey().id()) > 0;
+        return inboxDao.countPendingInboxEntriesForStation(id, station.getKey().getCountry(), station.getKey().getId()) > 0;
     }
 
     private boolean hasConflict(final Integer id, final Coordinates coordinates) {

@@ -9,7 +9,6 @@ import org.jdbi.v3.sqlobject.config.ValueColumn;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.customizer.BindList;
-import org.jdbi.v3.sqlobject.customizer.BindMethods;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.railwaystations.rsapi.core.model.Coordinates;
@@ -79,11 +78,11 @@ public interface StationDao {
     @SqlUpdate("INSERT INTO stations (countryCode, id, title, lat, lon, ds100, active) VALUES (:key.country, :key.id, :title, :coordinates?.lat, :coordinates?.lon, :DS100, :active)")
     void insert(@BindBean final Station station);
 
-    @SqlUpdate("DELETE FROM stations WHERE countryCode = :key.country AND id = :key.id")
-    void delete(@BindMethods("key") final Station.Key key);
+    @SqlUpdate("DELETE FROM stations WHERE countryCode = :country AND id = :id")
+    void delete(@BindBean final Station.Key key);
 
     @SqlUpdate("UPDATE stations SET active = :active WHERE countryCode = :key.country AND id = :key.id")
-    void updateActive(@BindMethods("key") final Station.Key key, @Bind("active") final boolean active);
+    void updateActive(@BindBean("key") final Station.Key key, @Bind("active") final boolean active);
 
     @SqlQuery(JOIN_QUERY + " WHERE createdAt > :since ORDER BY createdAt DESC")
     @RegisterRowMapper(StationMapper.class)
@@ -92,8 +91,8 @@ public interface StationDao {
     /**
      * Count nearby stations using simple pythagoras (only valid for a few km)
      */
-    @SqlQuery("SELECT COUNT(*) FROM stations WHERE SQRT(POWER(71.5 * (lon - :coords.lon),2) + POWER(111.3 * (lat - :coords.lat),2)) < 0.5")
-    int countNearbyCoordinates(@BindMethods("coords") final Coordinates coordinates);
+    @SqlQuery("SELECT COUNT(*) FROM stations WHERE SQRT(POWER(71.5 * (lon - :lon),2) + POWER(111.3 * (lat - :lat),2)) < 0.5")
+    int countNearbyCoordinates(@BindBean final Coordinates coordinates);
 
     @SqlQuery("SELECT MAX(CAST(substring(id,2) AS INT)) FROM stations WHERE id LIKE 'Z%'")
     int getMaxZ();
@@ -102,7 +101,7 @@ public interface StationDao {
     void changeStationTitle(@BindBean final Station station, @Bind("new_title") final String newTitle);
 
     @SqlUpdate("UPDATE stations SET lat = :coords.lat, lon = :coords.lon WHERE countryCode = :key.country AND id = :key.id")
-    void updateLocation(@BindMethods("key") final Station.Key key, @BindMethods("coords") final Coordinates coordinates);
+    void updateLocation(@BindBean("key") final Station.Key key, @BindBean("coords") final Coordinates coordinates);
 
     class StationMapper implements RowMapper<Station> {
 

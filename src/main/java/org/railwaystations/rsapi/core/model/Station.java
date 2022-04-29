@@ -1,5 +1,8 @@
 package org.railwaystations.rsapi.core.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Value;
+
 import java.time.Instant;
 import java.util.Objects;
 
@@ -107,10 +110,10 @@ public class Station {
      * @returns Distance in km
      */
     public double distanceTo(final double latitude, final double longitude) {
-        final double latDistance = Math.toRadians(latitude - this.coordinates.lat());
-        final double lonDistance = Math.toRadians(longitude - this.coordinates.lon());
+        final double latDistance = Math.toRadians(latitude - this.coordinates.getLat());
+        final double lonDistance = Math.toRadians(longitude - this.coordinates.getLon());
         final double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
-                + Math.cos(Math.toRadians(this.coordinates.lat())) * Math.cos(Math.toRadians(latitude))
+                + Math.cos(Math.toRadians(this.coordinates.getLat())) * Math.cos(Math.toRadians(latitude))
                 * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
         final double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return Station.EARTH_RADIUS * c;
@@ -199,16 +202,12 @@ public class Station {
         this.outdated = outdated;
     }
 
-    public record Key (String country, String id) {
 
-        public int legacyId() {
-            try {
-                return Integer.parseInt(id);
-            } catch (final NumberFormatException ignored) {
-                return -1;
-            }
-        }
-
+    @Value
+    @AllArgsConstructor
+    public static class Key {
+        String country;
+        String id;
     }
 
     @Override

@@ -118,21 +118,29 @@ public class StationsController {
 
     private StationDto toDto(final Station station) {
         return new StationDto()
-                .country(station.getKey().country())
-                .idStr(station.getKey().id())
-                .id((long) station.getKey().legacyId())
+                .country(station.getKey().getCountry())
+                .idStr(station.getKey().getId())
+                .id(legacyStationId(station.getKey().getId()))
                 .title(station.getTitle())
                 .DS100(station.getDS100())
                 .license(station.getLicense())
                 .active(station.isActive())
-                .lat(station.getCoordinates().lat())
-                .lon(station.getCoordinates().lon())
+                .lat(station.getCoordinates().getLat())
+                .lon(station.getCoordinates().getLon())
                 .photoUrl(station.getPhotoUrl())
                 .photographer(station.getPhotographer())
                 .photographerUrl(station.getPhotographerUrl())
                 .createdAt(station.getCreatedAt() != null ? station.getCreatedAt().toEpochMilli() : null)
                 .outdated(station.getOutdated())
                 .licenseUrl(station.getLicenseUrl());
+    }
+
+    public long legacyStationId(final String stationId) {
+        try {
+            return Long.parseLong(stationId);
+        } catch (final NumberFormatException ignored) {
+            return -1;
+        }
     }
 
 }

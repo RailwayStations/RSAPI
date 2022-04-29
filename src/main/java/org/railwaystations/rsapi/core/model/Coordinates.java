@@ -1,9 +1,17 @@
 package org.railwaystations.rsapi.core.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Value;
 
-public record Coordinates (double lat, double lon) {
+@Value
+@AllArgsConstructor
+public class Coordinates {
+
     public static final double ZERO = 0.0;
+
+    double lat;
+    double lon;
 
     public Coordinates() {
         this(ZERO,ZERO);
