@@ -1,6 +1,6 @@
 package org.railwaystations.rsapi.adapter.in.web.writer;
 
-import org.railwaystations.rsapi.core.model.Statistic;
+import org.railwaystations.rsapi.adapter.in.web.model.StatisticDto;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -14,7 +14,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 
-public class StatisticTxtWriter extends AbstractHttpMessageConverter<Statistic> {
+public class StatisticTxtWriter extends AbstractHttpMessageConverter<StatisticDto> {
 
     public StatisticTxtWriter() {
         super(MediaType.TEXT_PLAIN);
@@ -22,17 +22,17 @@ public class StatisticTxtWriter extends AbstractHttpMessageConverter<Statistic> 
 
     @Override
     protected boolean supports(@NonNull final Class<?> clazz) {
-        return Statistic.class.isAssignableFrom(clazz);
+        return StatisticDto.class.isAssignableFrom(clazz);
     }
 
     @Override
     @NonNull
-    protected Statistic readInternal(@NonNull final Class<? extends Statistic> clazz, @NonNull final HttpInputMessage inputMessage) throws HttpMessageNotReadableException {
+    protected StatisticDto readInternal(@NonNull final Class<? extends StatisticDto> clazz, @NonNull final HttpInputMessage inputMessage) throws HttpMessageNotReadableException {
         throw new HttpMessageNotReadableException("read not supported", inputMessage);
     }
 
     @Override
-    protected void writeInternal(final Statistic statistic, final HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
+    protected void writeInternal(final StatisticDto statistic, final HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
         try (final PrintWriter pw = new PrintWriter(new OutputStreamWriter(outputMessage.getBody(), StandardCharsets.UTF_8))) {
             pw.println("name\tvalue");
             statisticToCsv(pw, "total", statistic.getTotal());
@@ -44,7 +44,7 @@ public class StatisticTxtWriter extends AbstractHttpMessageConverter<Statistic> 
         }
     }
 
-    private static void statisticToCsv(final PrintWriter pw, final String name, final int value) {
+    private static void statisticToCsv(final PrintWriter pw, final String name, final long value) {
         pw.println(String.format("%s\t%s", name, value));
     }
 

@@ -4,13 +4,11 @@ import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 import org.jdbi.v3.sqlobject.SingleValue;
 import org.jdbi.v3.sqlobject.config.KeyColumn;
-import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.config.ValueColumn;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.customizer.BindList;
-import org.jdbi.v3.sqlobject.customizer.BindMethods;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.railwaystations.rsapi.core.model.Coordinates;
@@ -77,19 +75,14 @@ public interface StationDao {
     @ValueColumn("photocount")
     Map<String, Long> getPhotographerMap(@Bind("countryCode") final String countryCode);
 
-    @SqlQuery("SELECT countryCode s_country, id s_id, title FROM stations s WHERE LOCATE(LOWER(:name), LOWER(title)) > 0")
-    @RegisterConstructorMapper(value = Station.Key.class, prefix = "s")
-    @ValueColumn("title")
-    Map<Station.Key, String> findByName(@Bind("name") final String name);
-
     @SqlUpdate("INSERT INTO stations (countryCode, id, title, lat, lon, ds100, active) VALUES (:key.country, :key.id, :title, :coordinates?.lat, :coordinates?.lon, :DS100, :active)")
     void insert(@BindBean final Station station);
 
-    @SqlUpdate("DELETE FROM stations WHERE countryCode = :key.country AND id = :key.id")
-    void delete(@BindBean final Station station);
+    @SqlUpdate("DELETE FROM stations WHERE countryCode = :country AND id = :id")
+    void delete(@BindBean final Station.Key key);
 
     @SqlUpdate("UPDATE stations SET active = :active WHERE countryCode = :key.country AND id = :key.id")
-    void updateActive(@BindBean final Station station);
+    void updateActive(@BindBean("key") final Station.Key key, @Bind("active") final boolean active);
 
     @SqlQuery(JOIN_QUERY + " WHERE createdAt > :since ORDER BY createdAt DESC")
     @RegisterRowMapper(StationMapper.class)
@@ -98,8 +91,8 @@ public interface StationDao {
     /**
      * Count nearby stations using simple pythagoras (only valid for a few km)
      */
-    @SqlQuery("SELECT COUNT(*) FROM stations WHERE SQRT(POWER(71.5 * (lon - :coords.lon),2) + POWER(111.3 * (lat - :coords.lat),2)) < 0.5")
-    int countNearbyCoordinates(@BindMethods("coords") final Coordinates coordinates);
+    @SqlQuery("SELECT COUNT(*) FROM stations WHERE SQRT(POWER(71.5 * (lon - :lon),2) + POWER(111.3 * (lat - :lat),2)) < 0.5")
+    int countNearbyCoordinates(@BindBean final Coordinates coordinates);
 
     @SqlQuery("SELECT MAX(CAST(substring(id,2) AS INT)) FROM stations WHERE id LIKE 'Z%'")
     int getMaxZ();
@@ -108,7 +101,7 @@ public interface StationDao {
     void changeStationTitle(@BindBean final Station station, @Bind("new_title") final String newTitle);
 
     @SqlUpdate("UPDATE stations SET lat = :coords.lat, lon = :coords.lon WHERE countryCode = :key.country AND id = :key.id")
-    void updateLocation(@BindBean final Station station, @BindMethods("coords") final Coordinates coordinates);
+    void updateLocation(@BindBean("key") final Station.Key key, @BindBean("coords") final Coordinates coordinates);
 
     class StationMapper implements RowMapper<Station> {
 
@@ -117,7 +110,13 @@ public interface StationDao {
             final var photoUrlPath = rs.getString("urlPath");
             Photo photo = null;
             if (photoUrlPath != null) {
-                final var photographer = new User(rs.getString("name"), rs.getString("photographerUrl"), rs.getString("photographerLicense"), rs.getInt("photographerId"), null, true, rs.getBoolean("anonymous"), null, false, null, false);
+                final var photographer = User.builder()
+                        .name(rs.getString("name"))
+                        .url(rs.getString("photographerUrl"))
+                        .license(rs.getString("photographerLicense"))
+                        .id(rs.getInt("photographerId"))
+                        .anonymous(rs.getBoolean("anonymous"))
+                        .build();
                 photo = new Photo(key, photoUrlPath, photographer, rs.getTimestamp("createdAt").toInstant(), rs.getString("license"), rs.getBoolean("outdated"));
             }
             return new Station(key, rs.getString("title"),
@@ -130,7 +129,7 @@ public interface StationDao {
     class StatisticMapper implements RowMapper<Statistic> {
         @Override
         public Statistic map(final ResultSet rs, final StatementContext ctx) throws SQLException {
-            return new Statistic(rs.getString("countryCode"), rs.getInt("stations"), rs.getInt("photos"), rs.getInt("photographers"));
+            return new Statistic(rs.getString("countryCode"), rs.getLong("stations"), rs.getLong("photos"), rs.getLong("photographers"));
         }
     }
 }

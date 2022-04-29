@@ -1,6 +1,7 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
 import org.railwaystations.rsapi.core.ports.in.LoadPhotographersUseCase;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -24,11 +25,8 @@ public class PhotographersController {
 
     private static final String COUNTRY = "country";
 
-    private final LoadPhotographersUseCase loadPhotographersUseCase;
-
-    public PhotographersController(final LoadPhotographersUseCase loadPhotographersUseCase) {
-        this.loadPhotographersUseCase = loadPhotographersUseCase;
-    }
+    @Autowired
+    private LoadPhotographersUseCase loadPhotographersUseCase;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE,
             value = {"/photographers", "/photographers.json"})

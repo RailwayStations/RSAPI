@@ -1,8 +1,10 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
+import org.railwaystations.rsapi.adapter.in.web.model.StationDto;
 import org.railwaystations.rsapi.adapter.in.web.writer.StationsGpxWriter;
 import org.railwaystations.rsapi.core.model.Station;
 import org.railwaystations.rsapi.core.ports.in.FindPhotoStationsUseCase;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,25 +32,22 @@ public class StationsController {
     private static final String ACTIVE = "active";
     private static final String SINCE_HOURS = "sinceHours";
 
-    private final FindPhotoStationsUseCase findPhotoStationsUseCase;
-
-    public StationsController(final FindPhotoStationsUseCase findPhotoStationsUseCase) {
-        this.findPhotoStationsUseCase = findPhotoStationsUseCase;
-    }
+    @Autowired
+    private FindPhotoStationsUseCase findPhotoStationsUseCase;
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8", StationsGpxWriter.GPX_MEDIA_TYPE_VALUE}, value = "/stations")
-    public List<Station> get(@RequestParam(value = COUNTRY, required = false) final Set<String> countries,
-                             @RequestParam(value = HAS_PHOTO, required = false) final Boolean hasPhoto,
-                             @RequestParam(value = PHOTOGRAPHER, required = false) final String photographer,
-                             @RequestParam(value = MAX_DISTANCE, required = false) final Integer maxDistance,
-                             @RequestParam(value = LAT, required = false) final Double lat,
-                             @RequestParam(value = LON, required = false) final Double lon,
-                             @RequestParam(value = ACTIVE, required = false) final Boolean active) {
-        return findPhotoStationsUseCase.findStationsBy(countries, hasPhoto, photographer, maxDistance, lat, lon, active);
+    public List<StationDto> get(@RequestParam(value = COUNTRY, required = false) final Set<String> countries,
+                                @RequestParam(value = HAS_PHOTO, required = false) final Boolean hasPhoto,
+                                @RequestParam(value = PHOTOGRAPHER, required = false) final String photographer,
+                                @RequestParam(value = MAX_DISTANCE, required = false) final Integer maxDistance,
+                                @RequestParam(value = LAT, required = false) final Double lat,
+                                @RequestParam(value = LON, required = false) final Double lon,
+                                @RequestParam(value = ACTIVE, required = false) final Boolean active) {
+        return toDto(findPhotoStationsUseCase.findStationsBy(countries, hasPhoto, photographer, maxDistance, lat, lon, active));
     }
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"}, value = "/stations.json")
-    public List<Station> getAsJson(@RequestParam(value = COUNTRY, required = false) final Set<String> countries,
+    public List<StationDto> getAsJson(@RequestParam(value = COUNTRY, required = false) final Set<String> countries,
                                   @RequestParam(value = HAS_PHOTO, required = false) final Boolean hasPhoto,
                                   @RequestParam(value = PHOTOGRAPHER, required = false) final String photographer,
                                   @RequestParam(value = MAX_DISTANCE, required = false) final Integer maxDistance,
@@ -59,7 +58,7 @@ public class StationsController {
     }
 
     @GetMapping(produces = {StationsGpxWriter.GPX_MEDIA_TYPE_VALUE}, value = "/stations.gpx")
-    public List<Station> getAsGpx(@RequestParam(value = COUNTRY, required = false) final Set<String> countries,
+    public List<StationDto> getAsGpx(@RequestParam(value = COUNTRY, required = false) final Set<String> countries,
                              @RequestParam(value = HAS_PHOTO, required = false) final Boolean hasPhoto,
                              @RequestParam(value = PHOTOGRAPHER, required = false) final String photographer,
                              @RequestParam(value = MAX_DISTANCE, required = false) final Integer maxDistance,
@@ -70,7 +69,7 @@ public class StationsController {
     }
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8", StationsGpxWriter.GPX_MEDIA_TYPE_VALUE}, value = "/{country}/stations")
-    public List<Station> getWithCountry(@PathVariable(COUNTRY) final String country,
+    public List<StationDto> getWithCountry(@PathVariable(COUNTRY) final String country,
                                         @RequestParam(value = HAS_PHOTO, required = false) final Boolean hasPhoto,
                                         @RequestParam(value = PHOTOGRAPHER, required = false) final String photographer,
                                         @RequestParam(value = MAX_DISTANCE, required = false) final Integer maxDistance,
@@ -81,7 +80,7 @@ public class StationsController {
     }
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"}, value = "/{country}/stations.json")
-    public List<Station> getWithCountryAsJson(@PathVariable(COUNTRY) final String country,
+    public List<StationDto> getWithCountryAsJson(@PathVariable(COUNTRY) final String country,
                                               @RequestParam(value = HAS_PHOTO, required = false) final Boolean hasPhoto,
                                               @RequestParam(value = PHOTOGRAPHER, required = false) final String photographer,
                                               @RequestParam(value = MAX_DISTANCE, required = false) final Integer maxDistance,
@@ -92,7 +91,7 @@ public class StationsController {
     }
 
     @GetMapping(produces = {StationsGpxWriter.GPX_MEDIA_TYPE_VALUE}, value = "/{country}/stations.gpx")
-    public List<Station> getWithCountryAsGpx(@PathVariable(COUNTRY) final String country,
+    public List<StationDto> getWithCountryAsGpx(@PathVariable(COUNTRY) final String country,
                                               @RequestParam(value = HAS_PHOTO, required = false) final Boolean hasPhoto,
                                               @RequestParam(value = PHOTOGRAPHER, required = false) final String photographer,
                                               @RequestParam(value = MAX_DISTANCE, required = false) final Integer maxDistance,
@@ -103,14 +102,45 @@ public class StationsController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8", value = "/{country}/stations/{id}")
-    public Station getById(@PathVariable(COUNTRY) final String country,
+    public StationDto getById(@PathVariable(COUNTRY) final String country,
                            @PathVariable(ID) final String id) {
-        return findPhotoStationsUseCase.findByCountryAndId(country, id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return toDto(findPhotoStationsUseCase.findByCountryAndId(country, id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8", value = "/recentPhotoImports")
-    public List<Station> recentPhotoImports(@RequestParam(value = SINCE_HOURS, required = false, defaultValue = "10") final long sinceHours) {
-        return findPhotoStationsUseCase.findRecentImports(Instant.now().minus(sinceHours, ChronoUnit.HOURS));
+    public List<StationDto> recentPhotoImports(@RequestParam(value = SINCE_HOURS, required = false, defaultValue = "10") final long sinceHours) {
+        return toDto(findPhotoStationsUseCase.findRecentImports(Instant.now().minus(sinceHours, ChronoUnit.HOURS)));
+    }
+
+    private List<StationDto> toDto(final List<Station> stations) {
+        return stations.stream().map(this::toDto).toList();
+    }
+
+    private StationDto toDto(final Station station) {
+        return new StationDto()
+                .country(station.getKey().getCountry())
+                .idStr(station.getKey().getId())
+                .id(legacyStationId(station.getKey().getId()))
+                .title(station.getTitle())
+                .DS100(station.getDS100())
+                .license(station.getLicense())
+                .active(station.isActive())
+                .lat(station.getCoordinates().getLat())
+                .lon(station.getCoordinates().getLon())
+                .photoUrl(station.getPhotoUrl())
+                .photographer(station.getPhotographer())
+                .photographerUrl(station.getPhotographerUrl())
+                .createdAt(station.getCreatedAt() != null ? station.getCreatedAt().toEpochMilli() : null)
+                .outdated(station.getOutdated())
+                .licenseUrl(station.getLicenseUrl());
+    }
+
+    public long legacyStationId(final String stationId) {
+        try {
+            return Long.parseLong(stationId);
+        } catch (final NumberFormatException ignored) {
+            return -1;
+        }
     }
 
 }

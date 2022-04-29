@@ -23,7 +23,7 @@ public class StatisticService implements org.railwaystations.rsapi.core.ports.in
     public String getCountryStatisticMessage() {
         return "Countries statistic: \n" + countryDao.list(true).stream()
                 .map(country -> getStatistic(country.getCode()))
-                .map(statistic -> "- " + statistic.getCountryCode() + ": " + statistic.getWithPhoto() + " of " + statistic.getTotal())
+                .map(statistic -> "- " + statistic.countryCode() + ": " + statistic.withPhoto() + " of " + statistic.total())
                 .collect(Collectors.joining("\n"));
     }
 

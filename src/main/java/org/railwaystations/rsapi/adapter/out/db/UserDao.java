@@ -59,18 +59,19 @@ public interface UserDao {
 
     class UserMapper implements RowMapper<User> {
         public User map(final ResultSet rs, final StatementContext ctx) throws SQLException {
-            return new User(rs.getString("name"),
-                    rs.getString("url"),
-                    rs.getString("license"),
-                    rs.getInt("id"),
-                    rs.getString("email"),
-                    rs.getBoolean("ownPhotos"),
-                    rs.getBoolean("anonymous"),
-                    rs.getString("key"),
-                    rs.getBoolean("admin"),
-                    rs.getString("emailVerification"),
-                    rs.getBoolean("sendNotifications")
-                    );
+            return User.builder()
+                    .id(rs.getInt("id"))
+                    .name(rs.getString("name"))
+                    .url(rs.getString("url"))
+                    .license(rs.getString("license"))
+                    .email(rs.getString("email"))
+                    .ownPhotos(rs.getBoolean("ownPhotos"))
+                    .anonymous(rs.getBoolean("anonymous"))
+                    .key(rs.getString("key"))
+                    .admin(rs.getBoolean("admin"))
+                    .emailVerification(rs.getString("emailVerification"))
+                    .sendNotifications(rs.getBoolean("sendNotifications"))
+                    .build();
         }
     }
 

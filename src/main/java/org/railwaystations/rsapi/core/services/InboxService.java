@@ -211,7 +211,7 @@ public class InboxService implements ManageInboxUseCase {
         }
 
         final var station = assertStationExists(inboxEntry);
-        stationDao.updateLocation(station, coordinates);
+        stationDao.updateLocation(station.getKey(), coordinates);
         inboxDao.done(inboxEntry.getId());
     }
 
@@ -228,7 +228,7 @@ public class InboxService implements ManageInboxUseCase {
     private void updateStationActiveState(final InboxEntry inboxEntry, final boolean active) {
         final var station = assertStationExists(inboxEntry);
         station.setActive(active);
-        stationDao.updateActive(station);
+        stationDao.updateActive(station.getKey(), station.isActive());
         inboxDao.done(inboxEntry.getId());
         LOG.info("Problem report {} station {} set active to {}", inboxEntry.getId(), station.getKey(), active);
     }
@@ -243,7 +243,7 @@ public class InboxService implements ManageInboxUseCase {
     private void deleteStation(final InboxEntry inboxEntry) {
         final var station = assertStationExists(inboxEntry);
         photoDao.delete(station.getKey());
-        stationDao.delete(station);
+        stationDao.delete(station.getKey());
         inboxDao.done(inboxEntry.getId());
         LOG.info("Problem report {} station {} deleted", inboxEntry.getId(), station.getKey());
     }
@@ -309,7 +309,7 @@ public class InboxService implements ManageInboxUseCase {
             mastodonBot.tootNewPhoto(station, inboxEntry);
         } catch (final Exception e) {
             LOG.error("Error importing upload {} photo {}", inboxEntry.getId(), inboxEntry.getFilename());
-            throw new RuntimeException("Error moving file: " + e.getMessage());
+            throw new RuntimeException("Error moving file", e);
         }
     }
 
@@ -347,7 +347,7 @@ public class InboxService implements ManageInboxUseCase {
 
             final var title = command.getTitle() != null ? command.getTitle() : inboxEntry.getTitle();
 
-            final Station newStation = new Station(new Station.Key(command.getCountryCode(), command.getStationId()), title, coordinates, command.getDs100(), null, command.getActive());
+            final var newStation = new Station(new Station.Key(command.getCountryCode(), command.getStationId()), title, coordinates, command.getDs100(), null, command.getActive());
             stationDao.insert(newStation);
             return newStation;
         });

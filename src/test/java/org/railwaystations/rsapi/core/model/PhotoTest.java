@@ -24,7 +24,7 @@ public class PhotoTest {
     }
 
     private User createTestPhotographer(final String license) {
-        return new User("photographer", "photographerUrl", license, 0, null, true, false, null, false, null, true);
+        return User.builder().name("photographer").url("photographerUrl").license(license).id(0).ownPhotos(true).anonymous(false).admin(false).build();
     }
 
     /**

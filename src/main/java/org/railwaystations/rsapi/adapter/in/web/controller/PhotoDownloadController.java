@@ -1,9 +1,9 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.railwaystations.rsapi.core.ports.out.PhotoStorage;
 import org.railwaystations.rsapi.utils.ImageUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,18 +18,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 @RestController
+@Slf4j
 public class PhotoDownloadController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PhotoDownloadController.class);
     public static final String COUNTRY_CODE = "countryCode";
     public static final String FILENAME = "filename";
     public static final String WIDTH = "width";
 
-    private final PhotoStorage photoStorage;
-
-    public PhotoDownloadController(final PhotoStorage photoStorage) {
-        this.photoStorage = photoStorage;
-    }
+    @Autowired
+    private PhotoStorage photoStorage;
 
     @GetMapping(value = "/fotos/{countryCode}/{filename}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
     public ResponseEntity<byte[]> fotos(@PathVariable(COUNTRY_CODE) final String countryCode,
@@ -42,7 +39,7 @@ public class PhotoDownloadController {
     public ResponseEntity<byte[]> photos(@PathVariable(COUNTRY_CODE) final String countryCode,
                                   @PathVariable(FILENAME) final String filename,
                                   @RequestParam(value = WIDTH, required = false) final Integer width) throws IOException {
-        LOG.info("Download photo country={}, file={}", countryCode, filename);
+        log.info("Download photo country={}, file={}", countryCode, filename);
         return downloadPhoto(photoStorage.getPhotoFile(countryCode, filename), width);
     }
 
@@ -57,14 +54,14 @@ public class PhotoDownloadController {
     @GetMapping(value = "/inbox/{filename}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
     public ResponseEntity<byte[]> inbox(@PathVariable(FILENAME) final String filename,
                                  @RequestParam(value = WIDTH, required = false) final Integer width) throws IOException {
-        LOG.info("Download inbox file={}", filename);
+        log.info("Download inbox file={}", filename);
         return downloadPhoto(photoStorage.getInboxFile(filename), width);
     }
 
     @GetMapping(value = "/inbox/processed/{filename}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
     public ResponseEntity<byte[]> inboxProcessed(@PathVariable(FILENAME) final String filename,
                                           @RequestParam(value = WIDTH, required = false) final Integer width) throws IOException {
-        LOG.info("Download inbox file={}", filename);
+        log.info("Download inbox file={}", filename);
         return downloadPhoto(photoStorage.getInboxProcessedFile(filename), width);
     }
 

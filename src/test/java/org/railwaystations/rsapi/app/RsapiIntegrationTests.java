@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.railwaystations.rsapi.adapter.in.web.model.StationDto;
 import org.railwaystations.rsapi.adapter.out.monitoring.LoggingMonitor;
 import org.railwaystations.rsapi.adapter.out.photostorage.WorkDir;
 import org.railwaystations.rsapi.core.model.Station;
@@ -69,6 +70,9 @@ class RsapiIntegrationTests {
 	@Autowired
 	private TestRestTemplate restTemplate;
 
+	@Autowired
+	private WorkDir workDir;
+
 	private static final MariaDBContainer<?> mariadb;
 
 	static {
@@ -98,20 +102,20 @@ class RsapiIntegrationTests {
 	@Test
 	public void stationById() {
 		final var station = loadStationDe6932();
-		assertThat(station.getKey().getId()).isEqualTo("6932");
+		assertThat(station.getIdStr()).isEqualTo("6932");
 		assertThat(station.getTitle()).isEqualTo( "Wuppertal-Ronsdorf");
 		assertThat(station.getPhotoUrl()).isEqualTo("https://api.railway-stations.org/photos/de/6932.jpg");
 		assertThat(station.getPhotographer()).isEqualTo("@user10");
 		assertThat(station.getLicense()).isEqualTo("CC0 1.0 Universell (CC0 1.0)");
-		assertThat(station.isActive()).isTrue();
+		assertThat(station.getActive()).isTrue();
 		assertThat(station.getOutdated()).isFalse();
 	}
 
 	@Test
 	public void outdatedStationById() {
 		final var station = loadStationByKey("de", "7051");
-		assertThat(station.getKey().getCountry()).isEqualTo("de");
-		assertThat(station.getKey().getId()).isEqualTo("7051");
+		assertThat(station.getCountry()).isEqualTo("de");
+		assertThat(station.getIdStr()).isEqualTo("7051");
 		assertThat(station.getOutdated()).isTrue();
 	}
 
@@ -201,11 +205,11 @@ class RsapiIntegrationTests {
 		return response.getBody();
 	}
 
-	private Station[] assertLoadStationsOk(final String path) {
-		final var response = loadRaw(path, 200, Station[].class);
+	private StationDto[] assertLoadStationsOk(final String path) {
+		final var response = loadRaw(path, 200, StationDto[].class);
 
 		if (response.getStatusCodeValue() != 200) {
-			return new Station[0];
+			return new StationDto[0];
 		}
 		return response.getBody();
 	}
@@ -218,8 +222,8 @@ class RsapiIntegrationTests {
 		return response;
 	}
 
-	private Station findByKey(final Station[] stations, final Station.Key key) {
-		return Arrays.stream(stations).filter(station -> station.getKey().equals(key)).findAny().orElse(null);
+	private StationDto findByKey(final StationDto[] stations, final Station.Key key) {
+		return Arrays.stream(stations).filter(station -> station.getCountry().equals(key.getCountry()) && station.getIdStr().equals(key.getId())).findAny().orElse(null);
 	}
 
 	@Test
@@ -247,12 +251,12 @@ class RsapiIntegrationTests {
 				""");
 	}
 
-	private Station loadStationDe6932() {
+	private StationDto loadStationDe6932() {
 		return loadStationByKey("de", "6932");
 	}
 
-	private Station loadStationByKey(final String countryCode, final String id) {
-		return loadRaw("/" + countryCode + "/stations/" + id, 200, Station.class).getBody();
+	private StationDto loadStationByKey(final String countryCode, final String id) {
+		return loadRaw("/" + countryCode + "/stations/" + id, 200, StationDto.class).getBody();
 	}
 
 	@Test
@@ -286,30 +290,82 @@ class RsapiIntegrationTests {
 	private final byte[] IMAGE = Base64.getDecoder().decode("/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=");
 
 	@Test
-	public void photoUploadUnknownStation() throws IOException {
+	public void photoUploadUnknownStationThenDeletePhotoThenDeleteStation() throws IOException {
 		final var headers = new HttpHeaders();
-		headers.add("Station-Title", URLEncoder.encode("Achères-Grand-Cormier", StandardCharsets.UTF_8.toString()));
+		headers.add("Station-Title", URLEncoder.encode("Hintertupfingen", StandardCharsets.UTF_8.toString()));
 		headers.add("Latitude", "50.123");
-		headers.add("Longitude", "10.123");
+		headers.add("Longitude", "9.123");
 		headers.add("Comment", "Missing Station");
 		headers.setContentType(MediaType.IMAGE_JPEG);
 		final var request = new HttpEntity<>(IMAGE, headers);
-		final var response = restTemplateWithBasicAuthUser10().postForEntity(
+		final var uploadResponse = restTemplateWithBasicAuthUser10().postForEntity(
 				String.format("http://localhost:%d%s", port, "/photoUpload"), request, String.class);
 
-		assertThat(response.getStatusCodeValue()).isEqualTo(202);
-		final var inboxResponse = mapper.readTree(response.getBody());
-		assertThat(inboxResponse.get("id")).isNotNull();
-		assertThat(inboxResponse.get("filename")).isNotNull();
+		assertThat(uploadResponse.getStatusCodeValue()).isEqualTo(202);
+		final var inboxResponse = mapper.readTree(uploadResponse.getBody());
+		final var uploadId = inboxResponse.get("id").asInt();
+		final var filename = inboxResponse.get("filename").asText();
+		assertThat(filename).isNotBlank();
 		assertThat(inboxResponse.get("crc32").asLong()).isEqualTo(312729961L);
 
 		// download uploaded photo from inbox
 		final var photoResponse = restTemplate.getForEntity(
-				String.format("http://localhost:%d%s%s", port, "/inbox/", inboxResponse.get("filename").asText()), byte[].class);
+				String.format("http://localhost:%d%s%s", port, "/inbox/", filename), byte[].class);
 		final var inputImage = ImageIO.read(new ByteArrayInputStream(Objects.requireNonNull(photoResponse.getBody())));
 		assertThat(inputImage).isNotNull();
 		// we cannot binary compare the result anymore, the photos are re-encoded
 		// assertThat(IOUtils.readFully((InputStream)photoResponse.getEntity(), IMAGE.length)).isEqualTo(IMAGE));
+
+		// simulate VsionAI
+		Files.move(workDir.getInboxToProcessDir().resolve(filename), workDir.getInboxProcessedDir().resolve(filename));
+
+		// get nextZ value for stationId
+		final var nextZResponse = restTemplateWithBasicAuthUser10().getForEntity(
+				String.format("http://localhost:%d%s", port, "/nextZ"), String.class);
+		final var nextZResponseJson = mapper.readTree(nextZResponse.getBody());
+		final var stationId = nextZResponseJson.get("nextZ").asText();
+
+
+
+		// send import command
+		sendInboxCommand("{\"id\": " + uploadId + ", \"stationId\": \"" + stationId + "\", \"countryCode\": \"de\", \"command\": \"IMPORT\", \"createStation\": true}");
+
+		// assert station is imported
+		final var newStation = loadStationByKey("de", stationId);
+		assertThat(newStation.getTitle()).isEqualTo("Hintertupfingen");
+		assertThat(newStation.getLat()).isEqualTo(50.123);
+		assertThat(newStation.getLon()).isEqualTo(9.123);
+		assertThat(newStation.getPhotographer()).isEqualTo("@user10");
+		assertThat(newStation.getPhotoUrl()).isNotNull();
+
+		// send problem report wrong photo
+		final var problemReportWrongPhotoJson = """
+				{
+					"countryCode": "de",
+					"stationId": "%s",
+					"type": "WRONG_PHOTO",
+					"comment": "This photo is clearly wrong"
+				}""".formatted(stationId);
+		final int idWrongPhoto = sendProblemReport(problemReportWrongPhotoJson);
+		sendInboxCommand("{\"id\": " + idWrongPhoto + ", \"command\": \"DELETE_PHOTO\"}");
+
+		// assert station has no photo anymore
+		final var deletedPhotoStation = loadStationByKey("de", stationId);
+		assertThat(deletedPhotoStation.getPhotoUrl()).isNull();
+
+		// send problem report station not existing
+		final var problemReportStationNonExistentJson = """
+				{
+					"countryCode": "de",
+					"stationId": "%s",
+					"type": "STATION_NONEXISTENT",
+					"comment": "This photo is clearly wrong"
+				}""".formatted(stationId);
+		final int idStationNonExistent = sendProblemReport(problemReportStationNonExistentJson);
+		sendInboxCommand("{\"id\": " + idStationNonExistent + ", \"command\": \"DELETE_STATION\"}");
+
+		// assert station doesn't exist anymore
+		loadRaw("/de/stations/" + stationId, 404, StationDto.class);
 	}
 
 	@Test
@@ -352,8 +408,8 @@ class RsapiIntegrationTests {
 	private void assertCoordinatesOfStation6815(final double lat, final double lon) {
 		final var station = loadStationByKey("de", "6815");
 		assertThat(station).isNotNull();
-		assertThat(station.getCoordinates().lat()).isEqualTo(lat);
-		assertThat(station.getCoordinates().lon()).isEqualTo(lon);
+		assertThat(station.getLat()).isEqualTo(lat);
+		assertThat(station.getLon()).isEqualTo(lon);
 	}
 
 	@Test

@@ -1,7 +1,7 @@
 package org.railwaystations.rsapi.adapter.in.web.writer;
 
 import org.junit.jupiter.api.Test;
-import org.railwaystations.rsapi.core.model.Statistic;
+import org.railwaystations.rsapi.adapter.in.web.model.StatisticDto;
 import org.springframework.mock.http.MockHttpOutputMessage;
 
 import java.io.IOException;
@@ -14,7 +14,7 @@ public class StatisticTxtWriterTest {
 
     @Test
     public void test() throws IOException {
-        final var stat = new Statistic("de", 1500, 500, 20);
+        final var stat = new StatisticDto().countryCode("de").total(1500L).withPhoto(500L).withoutPhoto(1000L).photographers(20L);
 
 
         final var outputMessage = new MockHttpOutputMessage();

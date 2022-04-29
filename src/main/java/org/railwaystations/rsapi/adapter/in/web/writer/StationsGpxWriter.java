@@ -1,6 +1,6 @@
 package org.railwaystations.rsapi.adapter.in.web.writer;
 
-import org.railwaystations.rsapi.core.model.Station;
+import org.railwaystations.rsapi.adapter.in.web.model.StationDto;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
@@ -15,7 +15,7 @@ import javax.xml.stream.XMLStreamWriter;
 import java.io.IOException;
 import java.util.List;
 
-public class StationsGpxWriter extends AbstractHttpMessageConverter<List<Station>> {
+public class StationsGpxWriter extends AbstractHttpMessageConverter<List<StationDto>> {
 
     private static final String UTF_8 = "UTF-8";
 
@@ -41,12 +41,12 @@ public class StationsGpxWriter extends AbstractHttpMessageConverter<List<Station
     }
 
     @Override
-    protected @NonNull List<Station> readInternal(@NonNull final Class<? extends List<Station>> clazz, @NonNull final HttpInputMessage inputMessage) throws HttpMessageNotReadableException {
+    protected @NonNull List<StationDto> readInternal(@NonNull final Class<? extends List<StationDto>> clazz, @NonNull final HttpInputMessage inputMessage) throws HttpMessageNotReadableException {
         throw new HttpMessageNotReadableException("read not supported", inputMessage);
     }
 
     @Override
-    protected void writeInternal(final List<Station> stations, final HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
+    protected void writeInternal(final List<StationDto> stations, final HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
         final XMLStreamWriter xmlw;
         try {
             xmlw = XMLOutputFactory.newInstance().createXMLStreamWriter(outputMessage.getBody(), StationsGpxWriter.UTF_8);
@@ -64,11 +64,11 @@ public class StationsGpxWriter extends AbstractHttpMessageConverter<List<Station
         }
     }
 
-    private static void stationToXml(final XMLStreamWriter xmlw, final Station station) {
+    private static void stationToXml(final XMLStreamWriter xmlw, final StationDto station) {
         try {
             xmlw.writeStartElement(StationsGpxWriter.WPT_ELEMENT);
-            xmlw.writeAttribute(StationsGpxWriter.LAT_ELEMENT, Double.toString(station.getCoordinates().lat()));
-            xmlw.writeAttribute(StationsGpxWriter.LON_ELEMENT, Double.toString(station.getCoordinates().lon()));
+            xmlw.writeAttribute(StationsGpxWriter.LAT_ELEMENT, Double.toString(station.getLat()));
+            xmlw.writeAttribute(StationsGpxWriter.LON_ELEMENT, Double.toString(station.getLon()));
             xmlw.writeStartElement(StationsGpxWriter.NAME_ELEMENT);
             xmlw.writeCharacters(station.getTitle());
             xmlw.writeEndElement();

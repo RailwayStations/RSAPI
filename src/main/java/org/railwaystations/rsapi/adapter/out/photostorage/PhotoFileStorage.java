@@ -44,6 +44,7 @@ public class PhotoFileStorage implements PhotoStorage {
         final var uploadedFile = getUploadFile(inboxEntry.getFilename());
         final var processedFile = workDir.getInboxProcessedDir().resolve(inboxEntry.getFilename());
         final var destinationFile = workDir.getPhotosDir().resolve(country.getCode()).resolve(sanitizeFilename(station.getKey().getId() + "." + inboxEntry.getExtension()));
+        Files.createDirectories(workDir.getPhotosDir().resolve(country.getCode()));
         if (Files.exists(processedFile)) {
             Files.move(processedFile, destinationFile, REPLACE_EXISTING);
         } else {
