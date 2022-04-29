@@ -5,12 +5,12 @@
 - introduce Lombok or Java records where useful
 
 - separate outgoing Station with a DTO
-  - use OpenApi Generator
-    - issue: DS100 field duplication in json: https://github.com/OpenAPITools/openapi-generator/issues/5705
+    - use OpenApi Generator
+        - issue: DS100 field duplication in json: https://github.com/OpenAPITools/openapi-generator/issues/5705
 
 - package structure:
-  - app vs. application vs. core
-  - core/mode vs. domain
+    - app vs. application vs. core
+    - core/mode vs. domain
 
 - full (incoming) model validation
 
@@ -19,5 +19,5 @@
 - reintroduce multistage docker build
 
 - harden docker
-  - user
-  - readonly filesystem
+    - user
+    - readonly filesystem
