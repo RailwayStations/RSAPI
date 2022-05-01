@@ -7,6 +7,7 @@ import org.railwaystations.rsapi.adapter.out.db.PhotoDao;
 import org.railwaystations.rsapi.adapter.out.db.StationDao;
 import org.railwaystations.rsapi.adapter.out.db.UserDao;
 import org.railwaystations.rsapi.core.model.Coordinates;
+import org.railwaystations.rsapi.core.model.Country;
 import org.railwaystations.rsapi.core.model.InboxEntry;
 import org.railwaystations.rsapi.core.model.InboxResponse;
 import org.railwaystations.rsapi.core.model.InboxStateQuery;
@@ -30,6 +31,7 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -99,50 +101,46 @@ public class InboxService implements ManageInboxUseCase {
     }
 
     @Override
-    public List<InboxStateQuery> userInbox(@NotNull final User user, @NotNull final List<InboxStateQuery> queries) {
+    public List<InboxStateQuery> userInbox(@NotNull final User user, final List<Long> ids) {
         LOG.info("Query uploadStatus for Nickname: {}", user.getName());
 
-        queries.forEach(inboxStateQuery -> updateInboxStateQuery(user, inboxStateQuery));
-
-        return queries;
+        return ids.stream()
+                .map(inboxDao::findById)
+                .filter(inboxEntry -> inboxEntry != null && inboxEntry.getPhotographerId() == user.getId())
+                .map(this::mapToInboxStateQuery)
+                .toList();
     }
 
-    private void updateInboxStateQuery(final User user, final InboxStateQuery query) {
+    private InboxStateQuery mapToInboxStateQuery(final InboxEntry inboxEntry) {
+        final InboxStateQuery query = new InboxStateQuery();
+        query.setId(inboxEntry.getId());
         query.setState(InboxStateQuery.InboxState.UNKNOWN);
-        InboxEntry inboxEntry = null;
-        if (query.getId() != null) {
-            inboxEntry = inboxDao.findById(query.getId());
-        } else if (query.getCountryCode() != null && query.getStationId() != null) {
-            inboxEntry = inboxDao.findNewestPendingByCountryAndStationIdAndPhotographerId(query.getCountryCode(), query.getStationId(), user.getId());
-        }
-
-        if (inboxEntry != null && inboxEntry.getPhotographerId() == user.getId()) {
-            query.setId(inboxEntry.getId());
-            query.setRejectedReason(inboxEntry.getRejectReason());
-            query.setCountryCode(inboxEntry.getCountryCode());
-            query.setStationId(inboxEntry.getStationId());
-            query.setCoordinates(inboxEntry.getCoordinates());
-            query.setFilename(inboxEntry.getFilename());
-            query.setInboxUrl(getInboxUrl(inboxEntry.getFilename(), photoStorage.isProcessed(inboxEntry.getFilename())));
-            query.setCrc32(inboxEntry.getCrc32());
+        query.setId(inboxEntry.getId());
+        query.setRejectedReason(inboxEntry.getRejectReason());
+        query.setCountryCode(inboxEntry.getCountryCode());
+        query.setStationId(inboxEntry.getStationId());
+        query.setCoordinates(inboxEntry.getCoordinates());
+        query.setFilename(inboxEntry.getFilename());
+        query.setInboxUrl(getInboxUrl(inboxEntry.getFilename(), photoStorage.isProcessed(inboxEntry.getFilename())));
+        query.setCrc32(inboxEntry.getCrc32());
 
 
-            if (inboxEntry.isDone()) {
-                if (inboxEntry.getRejectReason() == null) {
-                    query.setState(InboxStateQuery.InboxState.ACCEPTED);
-                } else {
-                    query.setState(InboxStateQuery.InboxState.REJECTED);
-                }
+        if (inboxEntry.isDone()) {
+            if (inboxEntry.getRejectReason() == null) {
+                query.setState(InboxStateQuery.InboxState.ACCEPTED);
             } else {
-                if (hasConflict(inboxEntry.getId(),
-                        findStationByCountryAndId(query.getCountryCode(), query.getStationId()).orElse(null))
-                        || (inboxEntry.getStationId() == null && hasConflict(inboxEntry.getId(), inboxEntry.getCoordinates()))) {
-                    query.setState(InboxStateQuery.InboxState.CONFLICT);
-                } else {
-                    query.setState(InboxStateQuery.InboxState.REVIEW);
-                }
+                query.setState(InboxStateQuery.InboxState.REJECTED);
+            }
+        } else {
+            if (hasConflict(inboxEntry.getId(),
+                    findStationByCountryAndId(query.getCountryCode(), query.getStationId()).orElse(null))
+                    || (inboxEntry.getStationId() == null && hasConflict(inboxEntry.getId(), inboxEntry.getCoordinates()))) {
+                query.setState(InboxStateQuery.InboxState.CONFLICT);
+            } else {
+                query.setState(InboxStateQuery.InboxState.REVIEW);
             }
         }
+        return query;
     }
 
     @Override
@@ -216,7 +214,7 @@ public class InboxService implements ManageInboxUseCase {
     }
 
     @Override
-    public int countPendingInboxEntries() {
+    public long countPendingInboxEntries() {
         return inboxDao.countPendingInboxEntries();
     }
 
@@ -295,7 +293,8 @@ public class InboxService implements ManageInboxUseCase {
                 .orElseThrow(() -> new IllegalArgumentException("Country not found"));
 
         try {
-            final var photo = new Photo(country, station.getKey().getId(), photographer, inboxEntry.getExtension());
+            final var photo = new Photo(station.getKey(), getPhotoUrlPath(inboxEntry, station, country),
+                    photographer, Instant.now(), getLicenseForPhoto(photographer, country));
             if (station.hasPhoto()) {
                 photoDao.update(photo);
             } else {
@@ -312,6 +311,21 @@ public class InboxService implements ManageInboxUseCase {
             throw new RuntimeException("Error moving file", e);
         }
     }
+
+    private String getPhotoUrlPath(final InboxEntry inboxEntry, final Station station, final Country country) {
+        return "/" + country.getCode() + "/" + station.getKey().getId() + "." + inboxEntry.getExtension();
+    }
+
+    /**
+     * Gets the applicable license for the given country.
+     * We need to override the license for some countries, because of limitations of the "Freedom of panorama".
+     */
+    protected static String getLicenseForPhoto(final User photographer, final Country country) {
+        if (country != null && StringUtils.isNotBlank(country.getOverrideLicense())) {
+            return country.getOverrideLicense();
+        }
+        return photographer.getLicense();
+    }    
 
     private Station findOrCreateStation(final InboxEntry inboxEntry, final InboxEntry command) {
         var station = findStationByCountryAndId(inboxEntry.getCountryCode(), inboxEntry.getStationId());
@@ -406,7 +420,7 @@ public class InboxService implements ManageInboxUseCase {
 
         final String filename;
         final String inboxUrl;
-        final Integer id;
+        final Long id;
         final Long crc32;
         try {
             id = station.map(s -> inboxDao.insert(new InboxEntry(s.getKey().getCountry(), s.getKey().getId(), stationTitle,
@@ -432,13 +446,13 @@ public class InboxService implements ManageInboxUseCase {
             return new InboxResponse(InboxResponse.InboxResponseState.PHOTO_TOO_LARGE, "Photo too large, max " + e.getMaxSize() + " bytes allowed");
         } catch (final IOException e) {
             LOG.error("Error uploading photo", e);
-            return new InboxResponse(InboxResponse.InboxResponseState.ERROR);
+            return new InboxResponse(InboxResponse.InboxResponseState.ERROR, "Internal Error");
         }
 
         return new InboxResponse(conflict ? InboxResponse.InboxResponseState.CONFLICT : InboxResponse.InboxResponseState.REVIEW, id, filename, inboxUrl, crc32);
     }
 
-    private boolean hasConflict(final Integer id, final Station station) {
+    private boolean hasConflict(final Long id, final Station station) {
         if (station == null) {
             return false;
         }
@@ -448,7 +462,7 @@ public class InboxService implements ManageInboxUseCase {
         return inboxDao.countPendingInboxEntriesForStation(id, station.getKey().getCountry(), station.getKey().getId()) > 0;
     }
 
-    private boolean hasConflict(final Integer id, final Coordinates coordinates) {
+    private boolean hasConflict(final Long id, final Coordinates coordinates) {
         if (coordinates == null || coordinates.hasZeroCoords()) {
             return false;
         }

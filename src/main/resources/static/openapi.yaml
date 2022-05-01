@@ -769,7 +769,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/InboxStateQuery'
+                $ref: '#/components/schemas/InboxStateQueryRequest'
         required: true
       responses:
         200:
@@ -779,7 +779,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/InboxStateQuery'
+                  $ref: '#/components/schemas/InboxStateQueryResponse'
       x-codegen-request-body-name: UploadStateQueries
   /publicInbox:
     get:
@@ -803,6 +803,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InboxCountResponse'
+  /nextZ:
+    get:
+      summary: Get next Z-StationId for missing stations
+      responses:
+        200:
+          description: next Z-StationId value
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NextZResponse'
   /adminInbox:
     get:
       summary: Get the current inbox, photos and problem reports under review.
@@ -1465,7 +1475,15 @@ components:
           type: integer
           format: int64
       description: Response status of photo uploads and problem reports
-    InboxStateQuery:
+    InboxStateQueryRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+      required:
+        - id
+    InboxStateQueryResponse:
       type: object
       properties:
         id:
@@ -1501,7 +1519,10 @@ components:
             - CONFLICT
             - ACCEPTED
             - REJECTED
-      description: Upload state query
+      description: Inbox state query
+      required:
+        - id
+        - state
     PublicInboxEntry:
       type: object
       properties:
@@ -1565,7 +1586,9 @@ components:
           enum:
             - WRONG_LOCATION
             - STATION_INACTIVE
+            - STATION_ACTIVE
             - STATION_NONEXISTENT
+            - WRONG_NAME
             - WRONG_PHOTO
             - PHOTO_OUTDATED
             - OTHER
@@ -1632,6 +1655,16 @@ components:
           format: int32
         message:
           type: string
+      required:
+        - status
+        - message
+    NextZResponse:
+      type: object
+      properties:
+        nextZ:
+          type: string
+      required:
+        - nextZ
     ProblemReport:
       type: object
       properties:

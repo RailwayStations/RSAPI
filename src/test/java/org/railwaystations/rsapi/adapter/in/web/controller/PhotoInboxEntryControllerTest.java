@@ -182,7 +182,7 @@ public class PhotoInboxEntryControllerTest {
     @Test
     public void testPostIframeUnauthorized() throws Exception {
         when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("unknown@example.com", "secretUploadToken"))).thenReturn(null);
-        when(inboxDao.insert(any())).thenReturn(1);
+        when(inboxDao.insert(any())).thenReturn(1L);
         final String response = whenPostImageIframe("unknown@example.com", "http://localhost/uploadPage.php");
 
         assertThat(response).contains("UNAUTHORIZED");
@@ -193,7 +193,7 @@ public class PhotoInboxEntryControllerTest {
     @Test
     public void testPostIframeEmailNotVerified() throws Exception {
         when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("someuser@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("","", Collections.emptyList()));
-        when(inboxDao.insert(any())).thenReturn(1);
+        when(inboxDao.insert(any())).thenReturn(1L);
         final String response = whenPostImageIframe("someuser@example.com", "http://localhost/uploadPage.php");
 
         assertThat(response).contains("UNAUTHORIZED");
@@ -205,7 +205,7 @@ public class PhotoInboxEntryControllerTest {
     @Test
     public void testPostIframeMaliciousReferer() throws Exception {
         when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("nickname@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("","", Collections.emptyList()));
-        when(inboxDao.insert(any())).thenReturn(1);
+        when(inboxDao.insert(any())).thenReturn(1L);
         
         final var response = whenPostImageIframe("nickname@example.com", "http://localhost/uploadPage.php<script>alert('FooBar!');</script>");
 
@@ -218,7 +218,7 @@ public class PhotoInboxEntryControllerTest {
     public void testPostIframe() throws Exception {
         final var uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
         when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("nickname@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("","", Collections.emptyList()));
-        when(inboxDao.insert(any())).thenReturn(1);
+        when(inboxDao.insert(any())).thenReturn(1L);
         final var response = whenPostImageIframe("nickname@example.com", "http://localhost/uploadPage.php");
 
         assertThat(response).contains("REVIEW");
@@ -248,7 +248,7 @@ public class PhotoInboxEntryControllerTest {
     @Test
     public void testUploadPhoto() throws Exception {
         final var uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
-        when(inboxDao.insert(any())).thenReturn(1);
+        when(inboxDao.insert(any())).thenReturn(1L);
 
         whenPostImage("@nick name", 42, "nickname@example.com","4711", "de", null, null, null, "Some Comment")
                 .andExpect(status().isAccepted())
@@ -280,7 +280,7 @@ public class PhotoInboxEntryControllerTest {
 
     @Test
     public void testPostMissingStation() throws Exception {
-        when(inboxDao.insert(any())).thenReturn(4);
+        when(inboxDao.insert(any())).thenReturn(4L);
         final var uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
 
         whenPostImage("@nick name", 42, "nickname@example.com",null, null, "Missing Station", 50.9876d, 9.1234d, "Some Comment")
@@ -312,7 +312,7 @@ public class PhotoInboxEntryControllerTest {
 
     @Test
     public void testPostSomeUserWithTokenSalt() throws Exception {
-        when(inboxDao.insert(any())).thenReturn(3);
+        when(inboxDao.insert(any())).thenReturn(3L);
         whenPostImage("@someuser", 11, "someuser@example.com","4711", "de", null, null, null, null)
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$.state").value("REVIEW"))
@@ -325,7 +325,7 @@ public class PhotoInboxEntryControllerTest {
 
     @Test
     public void testPostDuplicateInbox() throws Exception {
-        when(inboxDao.insert(any())).thenReturn(2);
+        when(inboxDao.insert(any())).thenReturn(2L);
         when(inboxDao.countPendingInboxEntriesForStation(null, "de", "4711")).thenReturn(1);
 
         whenPostImage("@nick name", 42, "nickname@example.com","4711", "de", null, null, null, null)
@@ -349,10 +349,10 @@ public class PhotoInboxEntryControllerTest {
 
         final var inboxStateQueries = """
                 [
-                    {"id": 1, "countryCode": "de", "stationId": "4711"},
-                    {"id": 2, "countryCode": "de", "stationId": "1234"},
-                    {"id": 3, "countryCode": "de", "stationId": "5678"},
-                    {"id": 4, "countryCode": "ch", "stationId": "0815"}
+                    {"id": 1},
+                    {"id": 2},
+                    {"id": 3},
+                    {"id": 4}
                 ]
                 """;
 
@@ -383,7 +383,7 @@ public class PhotoInboxEntryControllerTest {
 
     @Test
     public void testPostDuplicate() throws Exception {
-        when(inboxDao.insert(any())).thenReturn(5);
+        when(inboxDao.insert(any())).thenReturn(5L);
         whenPostImage("@nick name", 42, "nickname@example.com","1234", "de", null, null, null, null)
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.state").value("CONFLICT"))
@@ -427,7 +427,7 @@ public class PhotoInboxEntryControllerTest {
 
     @Test
     public void testPostProblemReport() throws Exception {
-        when(inboxDao.insert(any())).thenReturn(6);
+        when(inboxDao.insert(any())).thenReturn(6L);
 
         whenPostProblemReport(User.EMAIL_VERIFIED)
                 .andExpect(status().isAccepted())

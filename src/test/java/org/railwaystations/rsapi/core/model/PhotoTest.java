@@ -36,14 +36,4 @@ public class PhotoTest {
         assertThat(photo.getLicenseUrl()).isNull();
     }
 
-    @Test
-    public void getLicenseNoOverride() {
-        assertThat(Photo.getLicense("CCO", new Country("de"))).isEqualTo("CCO");
-    }
-
-    @Test
-    public void getLicenseOverride() {
-        assertThat(Photo.getLicense("CCO", new Country("fr", "France", null, null, null, "CC1", true))).isEqualTo("CC1");
-    }
-
 }

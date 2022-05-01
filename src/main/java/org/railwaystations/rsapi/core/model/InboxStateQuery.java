@@ -1,16 +1,9 @@
 package org.railwaystations.rsapi.core.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class InboxStateQuery {
-    private Integer id;
+    private Long id;
     private String countryCode;
     private String stationId;
-    @JsonUnwrapped
     private Coordinates coordinates;
     private InboxState state = InboxState.UNKNOWN;
     private String rejectedReason;
@@ -19,16 +12,6 @@ public class InboxStateQuery {
     private Long crc32;
 
     public InboxStateQuery() {
-    }
-
-    public InboxStateQuery(final Integer id, final String countryCode, final String stationId, final Coordinates coordinates, final String rejectedReason, final String filename) {
-        super();
-        this.id = id;
-        this.countryCode = countryCode;
-        this.stationId = stationId;
-        this.coordinates = coordinates;
-        this.rejectedReason = rejectedReason;
-        this.filename = filename;
     }
 
     public String getCountryCode() {
@@ -47,11 +30,11 @@ public class InboxStateQuery {
         return state;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(final Integer id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 

@@ -1,6 +1,5 @@
 package org.railwaystations.rsapi.core.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 
@@ -17,12 +16,10 @@ public class Coordinates {
         this(ZERO,ZERO);
     }
 
-    @JsonIgnore
     public boolean hasZeroCoords() {
         return lat == ZERO && lon == ZERO;
     }
 
-    @JsonIgnore
     public boolean isValid() {
         return Math.abs(lat) < 90 && Math.abs(lon) < 180 && !hasZeroCoords();
     }

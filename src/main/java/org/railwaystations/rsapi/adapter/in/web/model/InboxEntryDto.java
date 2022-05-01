@@ -13,7 +13,7 @@ import java.util.Objects;
  */
 
 @Schema(name = "InboxEntry", description = "Represents an uploaded photo with processing state")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-04-25T21:59:47.380653632+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-05-01T17:38:12.901376066+02:00[Europe/Berlin]")
 public class InboxEntryDto   {
 
   @JsonProperty("id")
@@ -69,7 +69,11 @@ public class InboxEntryDto   {
     
     STATION_INACTIVE("STATION_INACTIVE"),
     
+    STATION_ACTIVE("STATION_ACTIVE"),
+    
     STATION_NONEXISTENT("STATION_NONEXISTENT"),
+    
+    WRONG_NAME("WRONG_NAME"),
     
     WRONG_PHOTO("WRONG_PHOTO"),
     

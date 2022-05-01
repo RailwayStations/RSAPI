@@ -6,15 +6,16 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.annotation.Generated;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
- * Upload state query
+ * Inbox state query
  */
 
-@Schema(name = "InboxStateQuery", description = "Upload state query")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-04-25T21:59:47.380653632+02:00[Europe/Berlin]")
-public class InboxStateQueryDto   {
+@Schema(name = "InboxStateQueryResponse", description = "Inbox state query")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-05-01T18:10:17.233905176+02:00[Europe/Berlin]")
+public class InboxStateQueryResponseDto   {
 
   @JsonProperty("id")
   private Long id;
@@ -87,7 +88,7 @@ public class InboxStateQueryDto   {
   @JsonProperty("state")
   private StateEnum state;
 
-  public InboxStateQueryDto id(Long id) {
+  public InboxStateQueryResponseDto id(Long id) {
     this.id = id;
     return this;
   }
@@ -96,8 +97,8 @@ public class InboxStateQueryDto   {
    * Get id
    * @return id
   */
-  
-  @Schema(name = "id", required = false)
+  @NotNull 
+  @Schema(name = "id", required = true)
   public Long getId() {
     return id;
   }
@@ -106,7 +107,7 @@ public class InboxStateQueryDto   {
     this.id = id;
   }
 
-  public InboxStateQueryDto countryCode(String countryCode) {
+  public InboxStateQueryResponseDto countryCode(String countryCode) {
     this.countryCode = countryCode;
     return this;
   }
@@ -125,7 +126,7 @@ public class InboxStateQueryDto   {
     this.countryCode = countryCode;
   }
 
-  public InboxStateQueryDto stationId(String stationId) {
+  public InboxStateQueryResponseDto stationId(String stationId) {
     this.stationId = stationId;
     return this;
   }
@@ -144,7 +145,7 @@ public class InboxStateQueryDto   {
     this.stationId = stationId;
   }
 
-  public InboxStateQueryDto lat(Double lat) {
+  public InboxStateQueryResponseDto lat(Double lat) {
     this.lat = lat;
     return this;
   }
@@ -163,7 +164,7 @@ public class InboxStateQueryDto   {
     this.lat = lat;
   }
 
-  public InboxStateQueryDto lon(Double lon) {
+  public InboxStateQueryResponseDto lon(Double lon) {
     this.lon = lon;
     return this;
   }
@@ -182,7 +183,7 @@ public class InboxStateQueryDto   {
     this.lon = lon;
   }
 
-  public InboxStateQueryDto rejectedReason(String rejectedReason) {
+  public InboxStateQueryResponseDto rejectedReason(String rejectedReason) {
     this.rejectedReason = rejectedReason;
     return this;
   }
@@ -201,7 +202,7 @@ public class InboxStateQueryDto   {
     this.rejectedReason = rejectedReason;
   }
 
-  public InboxStateQueryDto filename(String filename) {
+  public InboxStateQueryResponseDto filename(String filename) {
     this.filename = filename;
     return this;
   }
@@ -220,7 +221,7 @@ public class InboxStateQueryDto   {
     this.filename = filename;
   }
 
-  public InboxStateQueryDto inboxUrl(String inboxUrl) {
+  public InboxStateQueryResponseDto inboxUrl(String inboxUrl) {
     this.inboxUrl = inboxUrl;
     return this;
   }
@@ -239,7 +240,7 @@ public class InboxStateQueryDto   {
     this.inboxUrl = inboxUrl;
   }
 
-  public InboxStateQueryDto crc32(Long crc32) {
+  public InboxStateQueryResponseDto crc32(Long crc32) {
     this.crc32 = crc32;
     return this;
   }
@@ -258,7 +259,7 @@ public class InboxStateQueryDto   {
     this.crc32 = crc32;
   }
 
-  public InboxStateQueryDto state(StateEnum state) {
+  public InboxStateQueryResponseDto state(StateEnum state) {
     this.state = state;
     return this;
   }
@@ -267,8 +268,8 @@ public class InboxStateQueryDto   {
    * Get state
    * @return state
   */
-  
-  @Schema(name = "state", required = false)
+  @NotNull 
+  @Schema(name = "state", required = true)
   public StateEnum getState() {
     return state;
   }
@@ -285,17 +286,17 @@ public class InboxStateQueryDto   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    InboxStateQueryDto inboxStateQuery = (InboxStateQueryDto) o;
-    return Objects.equals(this.id, inboxStateQuery.id) &&
-        Objects.equals(this.countryCode, inboxStateQuery.countryCode) &&
-        Objects.equals(this.stationId, inboxStateQuery.stationId) &&
-        Objects.equals(this.lat, inboxStateQuery.lat) &&
-        Objects.equals(this.lon, inboxStateQuery.lon) &&
-        Objects.equals(this.rejectedReason, inboxStateQuery.rejectedReason) &&
-        Objects.equals(this.filename, inboxStateQuery.filename) &&
-        Objects.equals(this.inboxUrl, inboxStateQuery.inboxUrl) &&
-        Objects.equals(this.crc32, inboxStateQuery.crc32) &&
-        Objects.equals(this.state, inboxStateQuery.state);
+    InboxStateQueryResponseDto inboxStateQueryResponse = (InboxStateQueryResponseDto) o;
+    return Objects.equals(this.id, inboxStateQueryResponse.id) &&
+        Objects.equals(this.countryCode, inboxStateQueryResponse.countryCode) &&
+        Objects.equals(this.stationId, inboxStateQueryResponse.stationId) &&
+        Objects.equals(this.lat, inboxStateQueryResponse.lat) &&
+        Objects.equals(this.lon, inboxStateQueryResponse.lon) &&
+        Objects.equals(this.rejectedReason, inboxStateQueryResponse.rejectedReason) &&
+        Objects.equals(this.filename, inboxStateQueryResponse.filename) &&
+        Objects.equals(this.inboxUrl, inboxStateQueryResponse.inboxUrl) &&
+        Objects.equals(this.crc32, inboxStateQueryResponse.crc32) &&
+        Objects.equals(this.state, inboxStateQueryResponse.state);
   }
 
   @Override
@@ -306,7 +307,7 @@ public class InboxStateQueryDto   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class InboxStateQueryDto {\n");
+    sb.append("class InboxStateQueryResponseDto {\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    countryCode: ").append(toIndentedString(countryCode)).append("\n");
     sb.append("    stationId: ").append(toIndentedString(stationId)).append("\n");

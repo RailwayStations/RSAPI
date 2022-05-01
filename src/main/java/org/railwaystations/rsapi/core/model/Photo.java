@@ -1,7 +1,5 @@
 package org.railwaystations.rsapi.core.model;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,11 +38,6 @@ public class Photo {
         this(stationKey, urlPath, photographer, createdAt, license, false);
     }
 
-    public Photo(final Country country, final String stationId, final User user, final String extension) {
-        this(new Station.Key(country.getCode(), stationId), "/" + country.getCode() + "/" + stationId + "." + extension, user, Instant.now(), getLicense(user.getLicense(), country));
-    }
-
-
     public String getUrlPath() {
         return urlPath;
     }
@@ -71,17 +64,6 @@ public class Photo {
 
     public boolean isOutdated() {
         return outdated;
-    }
-
-    /**
-     * Gets the applicable license for the given country.
-     * We need to override the license for some countries, because of limitations of the "Freedom of panorama".
-     */
-    protected static String getLicense(final String photographerLicense, final Country country) {
-        if (country != null && StringUtils.isNotBlank(country.getOverrideLicense())) {
-            return country.getOverrideLicense();
-        }
-        return photographerLicense;
     }
 
 }

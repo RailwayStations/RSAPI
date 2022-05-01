@@ -41,7 +41,7 @@ public class NotifyUsersService implements org.railwaystations.rsapi.core.ports.
                         sendEmailNotification(user, entriesForUser);
                     }
                 }));
-        final List<Integer> ids = entries.stream()
+        final List<Long> ids = entries.stream()
                 .map(InboxEntry::getId)
                 .collect(Collectors.toList());
         if (!ids.isEmpty()) {

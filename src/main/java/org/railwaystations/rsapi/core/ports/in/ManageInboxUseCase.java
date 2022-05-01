@@ -17,13 +17,13 @@ public interface ManageInboxUseCase {
 
     List<PublicInboxEntry> publicInbox();
 
-    List<InboxStateQuery> userInbox(@NotNull User user, @NotNull List<InboxStateQuery> queries);
+    List<InboxStateQuery> userInbox(@NotNull User user, List<Long> ids);
 
     List<InboxEntry> listAdminInbox(@NotNull User user);
 
     void processAdminInboxCommand(@NotNull User user, @NotNull InboxEntry command);
 
-    int countPendingInboxEntries();
+    long countPendingInboxEntries();
 
     String getNextZ();
 

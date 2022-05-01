@@ -1,23 +1,15 @@
 package org.railwaystations.rsapi.core.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class InboxResponse {
     private final InboxResponseState state;
     private final String message;
-    private final Integer id;
+    private final Long id;
     private final String filename;
     private final String inboxUrl;
     private final Long crc32;
 
-    public InboxResponse(@JsonProperty("state") final InboxResponseState state,
-                         @JsonProperty("message") final String message,
-                         @JsonProperty("id") final Integer id,
-                         @JsonProperty("filename") final String filename,
-                         @JsonProperty("inboxUrl") final String inboxUrl,
-                         @JsonProperty("crc32") final Long crc32) {
+    public InboxResponse(final InboxResponseState state, final String message, final Long id, final String filename,
+                         final String inboxUrl, final Long crc32) {
         this.state = state;
         this.message = message;
         this.id = id;
@@ -26,20 +18,16 @@ public class InboxResponse {
         this.crc32 = crc32;
     }
 
-    public InboxResponse(final InboxResponseState state, final Integer id, final String filename, final String inboxUrl, final Long crc32) {
+    public InboxResponse(final InboxResponseState state, final Long id, final String filename, final String inboxUrl, final Long crc32) {
         this(state, state.name(), id, filename, inboxUrl, crc32);
     }
 
-    public InboxResponse(final InboxResponseState state, final Integer id) {
+    public InboxResponse(final InboxResponseState state, final Long id) {
         this(state, state.name(), id, null, null, null);
     }
 
     public InboxResponse(final InboxResponseState state, final String message) {
         this(state, message, null, null, null, null);
-    }
-
-    public InboxResponse(final InboxResponseState state) {
-        this(state, state.name());
     }
 
     public InboxResponseState getState() {
@@ -50,7 +38,7 @@ public class InboxResponse {
         return message;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

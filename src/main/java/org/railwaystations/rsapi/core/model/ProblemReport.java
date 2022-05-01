@@ -1,27 +1,16 @@
 package org.railwaystations.rsapi.core.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
-
 public class ProblemReport {
 
-    @JsonProperty
     private String countryCode;
 
-    @JsonProperty
     private String stationId;
 
-    @JsonProperty
     private ProblemReportType type;
 
-    @JsonProperty
     private String comment;
 
-    @JsonUnwrapped
     private Coordinates coordinates;
-
-    public ProblemReport() {
-    }
 
     public ProblemReport(final String countryCode, final String stationId, final ProblemReportType type, final String comment, final Coordinates coordinates) {
         super();
