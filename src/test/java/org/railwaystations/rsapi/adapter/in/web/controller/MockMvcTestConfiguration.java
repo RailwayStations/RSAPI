@@ -1,5 +1,6 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.railwaystations.rsapi.adapter.out.mastodon.MastodonBotConfig;
 import org.railwaystations.rsapi.adapter.out.mastodon.MastodonBotHttpClient;
 import org.railwaystations.rsapi.adapter.out.monitoring.MockMonitor;
@@ -17,8 +18,8 @@ import java.nio.file.Files;
 public class MockMvcTestConfiguration {
 
     @Bean
-    MastodonBot mastodonBot() {
-        return new MastodonBotHttpClient(new MastodonBotConfig());
+    MastodonBot mastodonBot(final ObjectMapper objectMapper) {
+        return new MastodonBotHttpClient(new MastodonBotConfig(), objectMapper);
     }
 
     @Bean

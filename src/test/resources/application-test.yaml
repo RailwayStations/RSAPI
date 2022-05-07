@@ -17,8 +17,3 @@ mastodonBot:
   token:
   stationUrl: https://map.railway-stations.org/station.php
 
-# Matrix Monitor
-matrix:
-  uploadUrl: https://matrix.org/_matrix/media/r0/upload
-  roomUrl:
-  accessToken:

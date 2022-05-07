@@ -1,76 +1,81 @@
 package org.railwaystations.rsapi.adapter.out.mastodon;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.railwaystations.rsapi.core.model.InboxEntry;
 import org.railwaystations.rsapi.core.model.Station;
 import org.railwaystations.rsapi.core.ports.out.MastodonBot;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 @Service
+@Slf4j
 public class MastodonBotHttpClient implements MastodonBot {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MastodonBotHttpClient.class);
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     private final MastodonBotConfig config;
 
-    private final CloseableHttpClient httpclient;
+    private final HttpClient client;
 
-    public MastodonBotHttpClient(final MastodonBotConfig config) {
+    public MastodonBotHttpClient(final MastodonBotConfig config, final ObjectMapper objectMapper) {
         super();
         this.config = config;
-        this.httpclient = HttpClients.custom().setDefaultRequestConfig(
-                RequestConfig.custom()
-                        .setSocketTimeout(5000)
-                        .setConnectTimeout(5000)
-                        .setConnectionRequestTimeout(5000).build()
-        ).build();
+        this.objectMapper = objectMapper;
+        this.client = HttpClient.newBuilder()
+                .connectTimeout(Duration.of(5, ChronoUnit.SECONDS))
+                .build();
     }
 
     @Override
     @Async
     public void tootNewPhoto(final Station station, final InboxEntry inboxEntry) {
         if (StringUtils.isBlank(config.getInstanceUrl()) || StringUtils.isBlank(config.getToken()) || StringUtils.isBlank(config.getStationUrl())) {
-            LOG.info("New photo for Station {} not tooted, {}", station.getKey(), this);
+            log.info("New photo for Station {} not tooted, {}", station.getKey(), this);
             return;
         }
-        LOG.info("Sending toot for new photo of : {}", station.getKey());
+        log.info("Sending toot for new photo of: {}", station.getKey());
         try {
-            var status = String.format("%s%nby %s%n%s?countryCode=%s&stationId=%s",
-                    station.getTitle(), station.getPhotographer(), config.getStationUrl(),
-                    station.getKey().getCountry(), station.getKey().getId());
-            if (StringUtils.isNotBlank(inboxEntry.getComment())) {
-                status += String.format("%n%s", inboxEntry.getComment());
-            }
-            final var json = MAPPER.writeValueAsString(new Toot(status));
-            final var httpPost = new HttpPost(config.getInstanceUrl() + "/api/v1/statuses");
-            httpPost.setEntity(new StringEntity(json, ContentType.APPLICATION_JSON.withCharset("UTF-8")));
-            httpPost.setHeader("Authorization", "Bearer " + config.getToken());
-            final var response = httpclient.execute(httpPost);
-            final int statusCode = response.getStatusLine().getStatusCode();
-            final var content = EntityUtils.toString(response.getEntity());
+            final String json = createStatusJson(station, inboxEntry);
+            final var request = HttpRequest.newBuilder()
+                    .uri(URI.create(config.getInstanceUrl() + "/api/v1/statuses"))
+                    .header("Content-Type", MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
+                    .header("Authorization", "Bearer " + config.getToken())
+                    .timeout(Duration.of(5, ChronoUnit.SECONDS))
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
+
+            final var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            final var statusCode = response.statusCode();
+            final var content = response.body();
             if (statusCode >= 200 && statusCode < 300) {
-                LOG.info("Got json response from {}: {}", httpPost.getURI(), content);
+                log.info("Got json response from {}: {}", request.uri(), content);
             } else {
-                LOG.error("Error reading json from {}, status {}: {}", httpPost.getURI(), status, content);
+                log.error("Error reading json from {}, status {}: {}", request.uri(), json, content);
             }
-        } catch (final RuntimeException | IOException e) {
-            LOG.error("Error sending Toot", e);
+        } catch (final Exception e) {
+            log.error("Error sending Toot", e);
         }
+    }
+
+    private String createStatusJson(final Station station, final InboxEntry inboxEntry) throws JsonProcessingException {
+        var status = String.format("%s%nby %s%n%s?countryCode=%s&stationId=%s",
+                station.getTitle(), station.getPhotographer(), config.getStationUrl(),
+                station.getKey().getCountry(), station.getKey().getId());
+        if (StringUtils.isNotBlank(inboxEntry.getComment())) {
+            status += String.format("%n%s", inboxEntry.getComment());
+        }
+        return objectMapper.writeValueAsString(new Toot(status));
     }
 
     @Override

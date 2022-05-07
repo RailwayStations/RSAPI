@@ -2,46 +2,41 @@ package org.railwaystations.rsapi.adapter.out.monitoring;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.railwaystations.rsapi.core.ports.out.Monitor;
 import org.railwaystations.rsapi.utils.ImageUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Profile;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 @Service
-@Profile("prod")
+@ConditionalOnProperty(prefix = "monitor", name = "service", havingValue = "matrix")
+@Slf4j
 public class MatrixMonitor implements Monitor {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final Logger LOG = LoggerFactory.getLogger(MatrixMonitor.class);
+    private final ObjectMapper objectMapper;
 
-    private final CloseableHttpClient httpclient;
+    private final HttpClient client;
+
     private final MatrixMonitorConfig config;
 
-    public MatrixMonitor(final MatrixMonitorConfig config) {
+    public MatrixMonitor(final MatrixMonitorConfig config, final ObjectMapper objectMapper) {
         super();
         this.config = config;
-        this.httpclient = HttpClients.custom().setDefaultRequestConfig(
-                RequestConfig.custom()
-                        .setSocketTimeout(5000)
-                        .setConnectTimeout(5000)
-                        .setConnectionRequestTimeout(10000).build()
-        ).build();
+        this.objectMapper = objectMapper;
+        this.client = HttpClient.newBuilder()
+                .connectTimeout(Duration.of(10, ChronoUnit.SECONDS))
+                .build();
     }
 
     @Override
@@ -53,58 +48,69 @@ public class MatrixMonitor implements Monitor {
     @Override
     @Async
     public void sendMessage(final String message, final Path photo) {
-        LOG.info("Sending message: {}", message);
+        log.info("Sending message: {}", message);
         if (StringUtils.isBlank(config.getRoomUrl())) {
-            LOG.warn("Skipping message, missing Matrix Room URL config");
+            log.warn("Skipping message, missing Matrix Room URL config");
             return;
         }
         try {
-            final CloseableHttpResponse response = sendRoomMessage(new MatrixTextMessage(message));
-            final int status = response.getStatusLine().getStatusCode();
-            final String content = EntityUtils.toString(response.getEntity());
+            final var response = sendRoomMessage(new MatrixTextMessage(message));
+            final var status = response.statusCode();
+            final var content = response.body();
             if (status >= 200 && status < 300) {
-                LOG.info("Got json response: {}", content);
+                log.info("Got json response: {}", content);
             } else {
-                LOG.error("Error reading json, status {}: {}", status, content);
+                log.error("Error reading json, status {}: {}", status, content);
             }
 
             if (photo != null) {
                 sendPhoto(photo);
             }
-        } catch (final RuntimeException | IOException e) {
-            LOG.warn("Error sending MatrixMonitor message", e);
+        } catch (final Exception e) {
+            log.warn("Error sending MatrixMonitor message", e);
         }
     }
 
-    private CloseableHttpResponse sendRoomMessage(final Object message) throws IOException {
-        final String json = MAPPER.writeValueAsString(message);
-        final HttpPost httpPost = new HttpPost(config.getRoomUrl() + "?access_token=" + config.getAccessToken());
-        httpPost.setEntity(new StringEntity(json, ContentType.APPLICATION_JSON.withCharset("UTF-8")));
-        return httpclient.execute(httpPost);
+    private HttpResponse<String> sendRoomMessage(final Object message) throws Exception {
+        final var json = objectMapper.writeValueAsString(message);
+
+        final var request = HttpRequest.newBuilder()
+                .uri(URI.create(config.getRoomUrl() + "?access_token=" + config.getAccessToken()))
+                .header("Content-Type", MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
+                .timeout(Duration.of(5, ChronoUnit.SECONDS))
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
-    private void sendPhoto(final Path photo) throws IOException {
-        final HttpPost httpPost = new HttpPost(config.getUploadUrl() + "?filename" + photo.getFileName() + "&access_token=" + config.getAccessToken());
-        httpPost.setEntity(new ByteArrayEntity(ImageUtil.scalePhoto(photo, 300), ContentType.getByMimeType(ImageUtil.extensionToMimeType(ImageUtil.getExtension(photo.getFileName().toString())))));
-        final CloseableHttpResponse responseUpload = httpclient.execute(httpPost);
-        final int statusUpload = responseUpload.getStatusLine().getStatusCode();
-        final String contentUpload = EntityUtils.toString(responseUpload.getEntity());
+    private void sendPhoto(final Path photo) throws Exception {
+        final var request = HttpRequest.newBuilder()
+                .uri(URI.create(config.getUploadUrl() + "?filename" + photo.getFileName() + "&access_token=" + config.getAccessToken()))
+                .header("Content-Type", ImageUtil.extensionToMimeType(ImageUtil.getExtension(photo.getFileName().toString())))
+                .timeout(Duration.of(5, ChronoUnit.SECONDS))
+                .POST(HttpRequest.BodyPublishers.ofByteArray(ImageUtil.scalePhoto(photo, 300)))
+                .build();
+
+        final var responseUpload = client.send(request, HttpResponse.BodyHandlers.ofString());
+        final var statusUpload = responseUpload.statusCode();
+        final var contentUpload = responseUpload.body();
         if (statusUpload >= 200 && statusUpload < 300) {
-            LOG.info("Got json response: {}", contentUpload);
+            log.info("Got json response: {}", contentUpload);
         } else {
-            LOG.error("Error reading json, statusUpload {}: {}", statusUpload, contentUpload);
+            log.error("Error reading json, statusUpload {}: {}", statusUpload, contentUpload);
             return;
         }
 
-        final MatrixUploadResponse matrixUploadResponse = MAPPER.readValue(contentUpload, MatrixUploadResponse.class);
+        final var matrixUploadResponse = objectMapper.readValue(contentUpload, MatrixUploadResponse.class);
 
-        final CloseableHttpResponse responseImage = sendRoomMessage(new MatrixImageMessage(photo.getFileName().toString(), matrixUploadResponse.contentUri));
-        final int statusImage = responseImage.getStatusLine().getStatusCode();
-        final String contentImage = EntityUtils.toString(responseImage.getEntity());
+        final var responseImage = sendRoomMessage(new MatrixImageMessage(photo.getFileName().toString(), matrixUploadResponse.contentUri));
+        final var statusImage = responseImage.statusCode();
+        final var contentImage = responseImage.body();
         if (statusImage >= 200 && statusImage < 300) {
-            LOG.info("Got json response: {}", contentImage);
+            log.info("Got json response: {}", contentImage);
         } else {
-            LOG.error("Error reading json, statusUpload {}: {}", statusImage, contentImage);
+            log.error("Error reading json, statusUpload {}: {}", statusImage, contentImage);
         }
     }
 

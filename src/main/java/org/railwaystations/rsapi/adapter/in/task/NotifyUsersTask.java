@@ -5,7 +5,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
-@SuppressWarnings("PMD.BeanMembersShouldSerialize")
 public class NotifyUsersTask {
 
     private final NotifyUsersService notifyUsersService;
