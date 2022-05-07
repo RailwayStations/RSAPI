@@ -3,15 +3,15 @@
 - reduce amount of integration tests
 
 - test outgoing http adapters with Wiremock
-    - MastodonBotHttpClient
-    - MatrixMonitor
-    - WebDavSyncTask
+  - MastodonBotHttpClient
+  - MatrixMonitor
+  - WebDavSyncTask
 
 - introduce Lombok or Java records where useful
 
 - package structure:
-    - app vs. application vs. core
-    - core/mode vs. domain
+  - app vs. application vs. core
+  - core/mode vs. domain
 
 - full (incoming) model validation
 
@@ -20,5 +20,5 @@
 - reintroduce multistage docker build
 
 - harden docker
-    - user
-    - readonly filesystem
+  - user
+  - readonly filesystem
