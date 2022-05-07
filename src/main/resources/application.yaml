@@ -68,3 +68,10 @@ matrix:
   uploadUrl: https://matrix.org/_matrix/media/r0/upload
   roomUrl:
   accessToken:
+
+webdavsync:
+  enabled: false
+  toProcessUrl: https://cloud.railway-stations.org/remote.php/webdav/VsionAI/roh
+  processedUrl: https://cloud.railway-stations.org/remote.php/webdav/VsionAI/verpixelt
+  user: rsapi
+  password:

@@ -26,6 +26,8 @@ public interface PhotoStorage {
 
     Path getInboxProcessedFile(String filename);
 
+    Path getInboxToProcessFile(String filename);
+
     void cleanupOldCopies();
 
     class PhotoTooLargeException extends Exception {

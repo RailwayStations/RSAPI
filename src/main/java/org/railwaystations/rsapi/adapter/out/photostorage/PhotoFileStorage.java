@@ -105,6 +105,11 @@ public class PhotoFileStorage implements PhotoStorage {
     }
 
     @Override
+    public Path getInboxToProcessFile(final String filename) {
+        return workDir.getInboxToProcessDir().resolve(sanitizeFilename(filename));
+    }
+
+    @Override
     public void cleanupOldCopies() {
         final var maxAge = Instant.now().minus(workDir.getKeepFileCopiesInDays(), ChronoUnit.DAYS);
         cleanupOldCopiesFrom(workDir.getInboxDoneDir(), maxAge);

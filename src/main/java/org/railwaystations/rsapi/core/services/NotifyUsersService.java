@@ -1,12 +1,12 @@
 package org.railwaystations.rsapi.core.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.railwaystations.rsapi.adapter.out.db.InboxDao;
 import org.railwaystations.rsapi.adapter.out.db.UserDao;
 import org.railwaystations.rsapi.core.model.InboxEntry;
 import org.railwaystations.rsapi.core.model.User;
+import org.railwaystations.rsapi.core.ports.in.NotifyUsersUseCase;
 import org.railwaystations.rsapi.core.ports.out.Mailer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
@@ -16,9 +16,8 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.groupingBy;
 
 @Service
-public class NotifyUsersService implements org.railwaystations.rsapi.core.ports.in.NotifyUsersUseCase {
-
-    private static final Logger LOG = LoggerFactory.getLogger(NotifyUsersService.class);
+@Slf4j
+public class NotifyUsersService implements NotifyUsersUseCase {
 
     private final UserDao userDao;
     private final InboxDao inboxDao;
@@ -33,7 +32,7 @@ public class NotifyUsersService implements org.railwaystations.rsapi.core.ports.
 
     @Override
     public void notifyUsers() {
-        final List<InboxEntry> entries = inboxDao.findInboxEntriesToNotify();
+        final var entries = inboxDao.findInboxEntriesToNotify();
         entries.stream()
                 .collect(groupingBy(InboxEntry::getPhotographerId))
                 .forEach((userId, entriesForUser) -> userDao.findById(userId).ifPresent(user -> {
@@ -41,7 +40,7 @@ public class NotifyUsersService implements org.railwaystations.rsapi.core.ports.
                         sendEmailNotification(user, entriesForUser);
                     }
                 }));
-        final List<Long> ids = entries.stream()
+        final var ids = entries.stream()
                 .map(InboxEntry::getId)
                 .collect(Collectors.toList());
         if (!ids.isEmpty()) {
@@ -50,14 +49,14 @@ public class NotifyUsersService implements org.railwaystations.rsapi.core.ports.
     }
 
     private void sendEmailNotification(@NotNull final User user, final List<InboxEntry> entriesForUser) {
-        final StringBuilder report = new StringBuilder();
+        final var report = new StringBuilder();
         entriesForUser.forEach(entry -> report.append(entry.getId()).append(". ").append(entry.getTitle())
                 .append(entry.isProblemReport() ? " (" + entry.getProblemReportType() + ")" : "")
                 .append(": ")
                 .append(entry.getRejectReason() == null ? "accepted" : "rejected - " + entry.getRejectReason())
                 .append("\n"));
 
-        final String text = String.format("""
+        final var text = String.format("""
                 Hello %1$s,
                 
                 thank you for your contributions.
@@ -77,7 +76,7 @@ public class NotifyUsersService implements org.railwaystations.rsapi.core.ports.
                 
                 %2$s""" , user.getName(), report);
         mailer.send(user.getEmail(), "Railway-Stations.org review result", text);
-        LOG.info("Email notification sent to {}", user.getEmail());
+        log.info("Email notification sent to {}", user.getEmail());
     }
 
 }
