@@ -293,6 +293,9 @@ public class InboxController {
     }
 
     private InboxEntryDto.ProblemReportTypeEnum toDto(final ProblemReportType problemReportType) {
+        if (problemReportType == null) {
+            return null;
+        }
         return switch (problemReportType) {
             case STATION_NONEXISTENT -> InboxEntryDto.ProblemReportTypeEnum.STATION_NONEXISTENT;
             case WRONG_LOCATION -> InboxEntryDto.ProblemReportTypeEnum.WRONG_LOCATION;

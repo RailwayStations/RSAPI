@@ -77,7 +77,7 @@ public class MatrixMonitor implements Monitor {
         final var request = HttpRequest.newBuilder()
                 .uri(URI.create(config.getRoomUrl() + "?access_token=" + config.getAccessToken()))
                 .header("Content-Type", MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
-                .timeout(Duration.of(5, ChronoUnit.SECONDS))
+                .timeout(Duration.of(30, ChronoUnit.SECONDS))
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
 
@@ -88,7 +88,7 @@ public class MatrixMonitor implements Monitor {
         final var request = HttpRequest.newBuilder()
                 .uri(URI.create(config.getUploadUrl() + "?filename" + photo.getFileName() + "&access_token=" + config.getAccessToken()))
                 .header("Content-Type", ImageUtil.extensionToMimeType(ImageUtil.getExtension(photo.getFileName().toString())))
-                .timeout(Duration.of(5, ChronoUnit.SECONDS))
+                .timeout(Duration.of(1, ChronoUnit.MINUTES))
                 .POST(HttpRequest.BodyPublishers.ofByteArray(ImageUtil.scalePhoto(photo, 300)))
                 .build();
 

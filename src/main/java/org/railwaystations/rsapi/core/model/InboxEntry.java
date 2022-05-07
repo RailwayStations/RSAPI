@@ -283,6 +283,8 @@ public class InboxEntry extends PublicInboxEntry {
         this.inboxUrl = inboxUrl;
     }
 
+    public boolean isPhotoUpload() { return problemReportType == null; }
+
     public boolean isProblemReport() {
         return problemReportType != null;
     }

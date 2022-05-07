@@ -33,7 +33,7 @@ public class MastodonBotHttpClient implements MastodonBot {
         this.config = config;
         this.objectMapper = objectMapper;
         this.client = HttpClient.newBuilder()
-                .connectTimeout(Duration.of(5, ChronoUnit.SECONDS))
+                .connectTimeout(Duration.of(10, ChronoUnit.SECONDS))
                 .build();
     }
 
@@ -51,7 +51,7 @@ public class MastodonBotHttpClient implements MastodonBot {
                     .uri(URI.create(config.getInstanceUrl() + "/api/v1/statuses"))
                     .header("Content-Type", MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
                     .header("Authorization", "Bearer " + config.getToken())
-                    .timeout(Duration.of(5, ChronoUnit.SECONDS))
+                    .timeout(Duration.of(30, ChronoUnit.SECONDS))
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
 
