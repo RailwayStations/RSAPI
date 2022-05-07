@@ -2,11 +2,12 @@
 
 - reduce amount of integration tests
 
-- introduce Lombok or Java records where useful
+- test outgoing http adapters with Wiremock
+    - MastodonBotHttpClient
+    - MatrixMonitor
+    - WebDavSyncTask
 
-- separate outgoing Station with a DTO
-    - use OpenApi Generator
-        - issue: DS100 field duplication in json: https://github.com/OpenAPITools/openapi-generator/issues/5705
+- introduce Lombok or Java records where useful
 
 - package structure:
     - app vs. application vs. core
