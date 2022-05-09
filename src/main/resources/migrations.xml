@@ -601,4 +601,15 @@
         </update>
     </changeSet>
 
+    <changeSet id="37" author="pstorch">
+        <update tableName="countries">
+            <column name="twitterTags" value="@Bahnhofsoma, #dbHackathon, #dbOpendata, #Bahnhofsfoto, @khgdrn"/>
+            <where>id &lt;&gt; 'ch'</where>
+        </update>
+        <update tableName="countries">
+            <column name="twitterTags" value="@BahnhoefeCH, @Bahnhofsoma, #BahnhofsfotoCH"/>
+            <where>id = 'ch'</where>
+        </update>
+    </changeSet>
+
 </databaseChangeLog>

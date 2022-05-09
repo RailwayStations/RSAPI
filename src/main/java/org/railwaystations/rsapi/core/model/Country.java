@@ -9,7 +9,7 @@ public class Country {
     private String code;
     private String name;
     private String email = "bahnhofsfotos@deutschlands-bahnhoefe.de";
-    private String twitterTags = "@android_oma, #dbHackathon, #dbOpendata, #Bahnhofsfoto, @khgdrn";
+    private String twitterTags = "@Bahnhofsoma, #dbHackathon, #dbOpendata, #Bahnhofsfoto, @khgdrn";
     private String timetableUrlTemplate;
     private String overrideLicense;
     private boolean active;
