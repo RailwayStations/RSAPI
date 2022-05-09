@@ -41,7 +41,7 @@ public class WebDavSyncTask {
                 .authenticator(new Authenticator() {
                     @Override
                     protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(config.getUser(), config.getPassword().toCharArray());
+                        return new PasswordAuthentication(config.user(), config.password().toCharArray());
                     }
                 })
                 .build();
@@ -78,7 +78,7 @@ public class WebDavSyncTask {
     private void downloadProcessed(final Path processedPath) throws IOException, InterruptedException {
         log.info("Downloading processed file of {}", processedPath);
         final var getRequest = HttpRequest.newBuilder()
-                .uri(URI.create(config.getProcessedUrl() + "/" + processedPath.getFileName().toString()))
+                .uri(URI.create(config.processedUrl() + "/" + processedPath.getFileName().toString()))
                 .timeout(Duration.of(1, ChronoUnit.MINUTES))
                 .GET()
                 .build();
@@ -87,7 +87,7 @@ public class WebDavSyncTask {
 
         if (getResponse.statusCode() == 200 || getResponse.statusCode() == 201) {
             final var delRequest = HttpRequest.newBuilder()
-                    .uri(URI.create(config.getProcessedUrl() + "/" + processedPath.getFileName().toString()))
+                    .uri(URI.create(config.processedUrl() + "/" + processedPath.getFileName().toString()))
                     .timeout(Duration.of(1, ChronoUnit.MINUTES))
                     .DELETE()
                     .build();
@@ -100,7 +100,7 @@ public class WebDavSyncTask {
         try {
             log.info("Check if downloading {} is needed", processedPath);
             final var request = HttpRequest.newBuilder()
-                    .uri(URI.create(config.getProcessedUrl() + "/" + processedPath.getFileName().toString()))
+                    .uri(URI.create(config.processedUrl() + "/" + processedPath.getFileName().toString()))
                     .timeout(Duration.of(30, ChronoUnit.SECONDS))
                     .HEAD()
                     .build();
@@ -115,7 +115,7 @@ public class WebDavSyncTask {
     private void uploadToProcess(final Path toProcessPath) throws IOException, InterruptedException {
         log.info("Uploading " + toProcessPath);
         final var request = HttpRequest.newBuilder()
-                .uri(URI.create(config.getToProcessUrl() + "/" + toProcessPath.getFileName().toString()))
+                .uri(URI.create(config.processedUrl() + "/" + toProcessPath.getFileName().toString()))
                 .timeout(Duration.of(1, ChronoUnit.MINUTES))
                 .PUT(HttpRequest.BodyPublishers.ofFile(toProcessPath))
                 .build();

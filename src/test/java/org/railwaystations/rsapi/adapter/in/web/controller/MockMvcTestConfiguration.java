@@ -19,7 +19,7 @@ public class MockMvcTestConfiguration {
 
     @Bean
     MastodonBot mastodonBot(final ObjectMapper objectMapper) {
-        return new MastodonBotHttpClient(new MastodonBotConfig(), objectMapper);
+        return new MastodonBotHttpClient(new MastodonBotConfig(null, null, null), objectMapper);
     }
 
     @Bean

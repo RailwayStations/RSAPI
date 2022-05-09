@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
 @ComponentScan("org.railwaystations.rsapi")
-@ConfigurationPropertiesScan
+@ConfigurationPropertiesScan("org.railwaystations.rsapi")
 @EnableScheduling
 @EnableAsync
 @EnableTransactionManagement

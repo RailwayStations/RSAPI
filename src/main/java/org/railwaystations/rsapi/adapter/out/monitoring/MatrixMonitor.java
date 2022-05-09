@@ -49,7 +49,7 @@ public class MatrixMonitor implements Monitor {
     @Async
     public void sendMessage(final String message, final Path photo) {
         log.info("Sending message: {}", message);
-        if (StringUtils.isBlank(config.getRoomUrl())) {
+        if (StringUtils.isBlank(config.roomUrl())) {
             log.warn("Skipping message, missing Matrix Room URL config");
             return;
         }
@@ -75,7 +75,7 @@ public class MatrixMonitor implements Monitor {
         final var json = objectMapper.writeValueAsString(message);
 
         final var request = HttpRequest.newBuilder()
-                .uri(URI.create(config.getRoomUrl() + "?access_token=" + config.getAccessToken()))
+                .uri(URI.create(config.roomUrl() + "?access_token=" + config.accessToken()))
                 .header("Content-Type", MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
                 .timeout(Duration.of(30, ChronoUnit.SECONDS))
                 .POST(HttpRequest.BodyPublishers.ofString(json))
@@ -86,7 +86,7 @@ public class MatrixMonitor implements Monitor {
 
     private void sendPhoto(final Path photo) throws Exception {
         final var request = HttpRequest.newBuilder()
-                .uri(URI.create(config.getUploadUrl() + "?filename" + photo.getFileName() + "&access_token=" + config.getAccessToken()))
+                .uri(URI.create(config.uploadUrl() + "?filename" + photo.getFileName() + "&access_token=" + config.accessToken()))
                 .header("Content-Type", ImageUtil.extensionToMimeType(ImageUtil.getExtension(photo.getFileName().toString())))
                 .timeout(Duration.of(1, ChronoUnit.MINUTES))
                 .POST(HttpRequest.BodyPublishers.ofByteArray(ImageUtil.scalePhoto(photo, 300)))

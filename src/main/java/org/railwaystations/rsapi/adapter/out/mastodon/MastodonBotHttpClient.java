@@ -40,7 +40,7 @@ public class MastodonBotHttpClient implements MastodonBot {
     @Override
     @Async
     public void tootNewPhoto(final Station station, final InboxEntry inboxEntry) {
-        if (StringUtils.isBlank(config.getInstanceUrl()) || StringUtils.isBlank(config.getToken()) || StringUtils.isBlank(config.getStationUrl())) {
+        if (StringUtils.isBlank(config.instanceUrl()) || StringUtils.isBlank(config.token()) || StringUtils.isBlank(config.stationUrl())) {
             log.info("New photo for Station {} not tooted, {}", station.getKey(), this);
             return;
         }
@@ -48,9 +48,9 @@ public class MastodonBotHttpClient implements MastodonBot {
         try {
             final String json = createStatusJson(station, inboxEntry);
             final var request = HttpRequest.newBuilder()
-                    .uri(URI.create(config.getInstanceUrl() + "/api/v1/statuses"))
+                    .uri(URI.create(config.instanceUrl() + "/api/v1/statuses"))
                     .header("Content-Type", MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
-                    .header("Authorization", "Bearer " + config.getToken())
+                    .header("Authorization", "Bearer " + config.token())
                     .timeout(Duration.of(30, ChronoUnit.SECONDS))
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
@@ -70,7 +70,7 @@ public class MastodonBotHttpClient implements MastodonBot {
 
     private String createStatusJson(final Station station, final InboxEntry inboxEntry) throws JsonProcessingException {
         var status = String.format("%s%nby %s%n%s?countryCode=%s&stationId=%s",
-                station.getTitle(), station.getPhotographer(), config.getStationUrl(),
+                station.getTitle(), station.getPhotographer(), config.stationUrl(),
                 station.getKey().getCountry(), station.getKey().getId());
         if (StringUtils.isNotBlank(inboxEntry.getComment())) {
             status += String.format("%n%s", inboxEntry.getComment());
@@ -78,24 +78,6 @@ public class MastodonBotHttpClient implements MastodonBot {
         return objectMapper.writeValueAsString(new Toot(status));
     }
 
-    @Override
-    public String toString() {
-        return "MastodonBot{" +
-                "stationUrl='" + config.getStationUrl() + '\'' +
-                ", instanceUrl='" + config.getInstanceUrl() + '\'' +
-                '}';
-    }
-
-    static class Toot {
-        private final String status;
-
-        public Toot(final String status) {
-            this.status = status;
-        }
-
-        public String getStatus() {
-            return status;
-        }
-    }
+    record Toot(String status) { }
 
 }
