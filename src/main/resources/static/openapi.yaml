@@ -1701,10 +1701,10 @@ components:
       type: object
       properties:
         timestamp:
-          type: number
+          type: integer
           format: int64
         status:
-          type: number
+          type: integer
           format: int32
         error:
           type: string
