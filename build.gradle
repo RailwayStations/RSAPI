@@ -46,20 +46,19 @@ openApiGenerate {
 }
 
 ext {
-	springBootVersion = '2.7.0'
 	testContainersVersion = '1.17.1'
 	jdbiVersion = '3.28.0'
 	swaggerRequestValidatorVersion = '2.27.3'
 }
 
 dependencies {
-	implementation "org.springframework.boot:spring-boot-starter-mail:$springBootVersion"
-	implementation "org.springframework.boot:spring-boot-starter-security:$springBootVersion"
-	implementation "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
-	implementation "org.springframework.boot:spring-boot-starter-validation:$springBootVersion"
-	implementation "org.springframework.boot:spring-boot-starter-jdbc:$springBootVersion"
-	implementation "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
-	implementation "org.springframework.boot:spring-boot-starter-thymeleaf:$springBootVersion"
+	implementation "org.springframework.boot:spring-boot-starter-mail"
+	implementation "org.springframework.boot:spring-boot-starter-security"
+	implementation "org.springframework.boot:spring-boot-starter-web"
+	implementation "org.springframework.boot:spring-boot-starter-validation"
+	implementation "org.springframework.boot:spring-boot-starter-jdbc"
+	implementation "org.springframework.boot:spring-boot-starter-actuator"
+	implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
 	implementation 'org.liquibase:liquibase-core:4.10.0'
 	implementation "org.jdbi:jdbi3-spring5:$jdbiVersion"
 	implementation "org.jdbi:jdbi3-sqlobject:$jdbiVersion"
@@ -73,8 +72,8 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	runtimeOnly "org.mariadb.jdbc:mariadb-java-client:3.0.4"
-	testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
-	testImplementation "org.springframework.security:spring-security-test:5.7.0"
+	testImplementation "org.springframework.boot:spring-boot-starter-test"
+	testImplementation "org.springframework.security:spring-security-test:5.7.1"
 	testImplementation "org.awaitility:awaitility:4.2.0"
 	testImplementation "org.testcontainers:testcontainers:$testContainersVersion"
 	testImplementation "org.testcontainers:junit-jupiter:$testContainersVersion"
