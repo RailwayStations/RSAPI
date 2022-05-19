@@ -1,5 +1,5 @@
 plugins {
-	id 'org.springframework.boot' version '2.6.7'
+	id 'org.springframework.boot' version '2.7.0'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
 	id 'pmd'
@@ -46,7 +46,7 @@ openApiGenerate {
 }
 
 ext {
-	springBootVersion = '2.6.7'
+	springBootVersion = '2.7.0'
 	testContainersVersion = '1.17.1'
 	jdbiVersion = '3.28.0'
 	swaggerRequestValidatorVersion = '2.27.3'
