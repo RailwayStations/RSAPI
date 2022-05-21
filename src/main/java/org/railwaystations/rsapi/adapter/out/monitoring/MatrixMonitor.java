@@ -86,7 +86,7 @@ public class MatrixMonitor implements Monitor {
 
     private void sendPhoto(final Path photo) throws Exception {
         final var request = HttpRequest.newBuilder()
-                .uri(URI.create(config.uploadUrl() + "?filename" + photo.getFileName() + "&access_token=" + config.accessToken()))
+                .uri(URI.create(config.uploadUrl() + "?filename=" + photo.getFileName() + "&access_token=" + config.accessToken()))
                 .header("Content-Type", ImageUtil.extensionToMimeType(ImageUtil.getExtension(photo.getFileName().toString())))
                 .timeout(Duration.of(1, ChronoUnit.MINUTES))
                 .POST(HttpRequest.BodyPublishers.ofByteArray(ImageUtil.scalePhoto(photo, 300)))
@@ -114,52 +114,14 @@ public class MatrixMonitor implements Monitor {
         }
     }
 
-    private static class MatrixTextMessage {
-
-        private static final String MSGTYPE = "m.text";
-        private final String body;
-
-        private MatrixTextMessage(final String body) {
-            this.body = body;
-        }
-
-        public String getBody() {
-            return body;
-        }
-
-        public String getMsgtype() {
-            return MSGTYPE;
-        }
-
+    private record MatrixTextMessage(String body) {
+        public String getMsgtype() { return "m.text";}
     }
 
-    private static class MatrixImageMessage {
-
-        private static final String MSGTYPE = "m.image";
-        private final String body;
-        private final String url;
-
-        private MatrixImageMessage(final String body, final String url) {
-            this.body = body;
-            this.url = url;
-        }
-
-        public String getBody() {
-            return body;
-        }
-
-        public String getMsgtype() {
-            return MSGTYPE;
-        }
-
-        public String getUrl() {
-            return url;
-        }
+    private record MatrixImageMessage(String body, String url) {
+        public String getMsgtype() { return "m.image";}
     }
 
-    private static class MatrixUploadResponse {
-        @JsonProperty("content_uri")
-        private String contentUri;
-    }
+    private record MatrixUploadResponse(@JsonProperty("content_uri") String contentUri) {}
 
 }
