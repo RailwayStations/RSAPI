@@ -115,7 +115,7 @@ public class WebDavSyncTask {
     private void uploadToProcess(final Path toProcessPath) throws IOException, InterruptedException {
         log.info("Uploading " + toProcessPath);
         final var request = HttpRequest.newBuilder()
-                .uri(URI.create(config.processedUrl() + "/" + toProcessPath.getFileName().toString()))
+                .uri(URI.create(config.toProcessUrl() + "/" + toProcessPath.getFileName().toString()))
                 .timeout(Duration.of(1, ChronoUnit.MINUTES))
                 .PUT(HttpRequest.BodyPublishers.ofFile(toProcessPath))
                 .build();
