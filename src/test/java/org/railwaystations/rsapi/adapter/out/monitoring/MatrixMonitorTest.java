@@ -7,6 +7,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.github.tomakehurst.wiremock.matching.MatchResult;
 import com.github.tomakehurst.wiremock.matching.RequestMatcherExtension;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
@@ -29,8 +30,7 @@ class MatrixMonitorTest {
 
     @Test
     void sendTextMessage(final WireMockRuntimeInfo wmRuntimeInfo) {
-        final var config = new MatrixMonitorConfig(wmRuntimeInfo.getHttpBaseUrl() + "/roomUrl", "/uploadUrl", "accessToken");
-        final var client = new MatrixMonitor(config, new ObjectMapper());
+        final var client = createMatrixMonitor(wmRuntimeInfo);
         stubFor(post(urlPathEqualTo("/roomUrl"))
                 .withQueryParam("access_token", equalTo("accessToken"))
                 .willReturn(ok()));
@@ -51,8 +51,7 @@ class MatrixMonitorTest {
 
     @Test
     void sendPhotoMessage(final WireMockRuntimeInfo wmRuntimeInfo) throws URISyntaxException {
-        final var config = new MatrixMonitorConfig(wmRuntimeInfo.getHttpBaseUrl() + "/roomUrl", wmRuntimeInfo.getHttpBaseUrl() + "/uploadUrl", "accessToken");
-        final var client = new MatrixMonitor(config, new ObjectMapper());
+        final var client = createMatrixMonitor(wmRuntimeInfo);
         stubFor(post(urlPathEqualTo("/roomUrl"))
                 .withQueryParam("access_token", equalTo("accessToken"))
                 .willReturn(ok()));
@@ -91,6 +90,12 @@ class MatrixMonitorTest {
                             "msgtype": "m.image"
                         }"""
                 )));
+    }
+
+    @NotNull
+    private MatrixMonitor createMatrixMonitor(final WireMockRuntimeInfo wmRuntimeInfo) {
+        final var config = new MatrixMonitorConfig(wmRuntimeInfo.getHttpBaseUrl() + "/roomUrl", wmRuntimeInfo.getHttpBaseUrl() + "/uploadUrl", "accessToken");
+        return new MatrixMonitor(config, new ObjectMapper());
     }
 
     private static class ValidImageContentPattern extends RequestMatcherExtension {

@@ -117,11 +117,11 @@ public class PhotoFileStorage implements PhotoStorage {
     }
 
     static void cleanupOldCopiesFrom(final Path dir, final Instant maxAge) {
-        try {
-            Files.list(dir)
-                    .filter(Files::isRegularFile)
-                    .filter(f -> isOlderThan(f, maxAge))
-                    .forEach(PhotoFileStorage::deleteSilently);
+        try (final var pathStream = Files.list(dir)){
+            pathStream
+                .filter(Files::isRegularFile)
+                .filter(f -> isOlderThan(f, maxAge))
+                .forEach(PhotoFileStorage::deleteSilently);
         } catch (final Exception e) {
             LOG.error("Failed to cleanup old copies from {}", dir, e);
         }

@@ -65,7 +65,7 @@ public class WebDavSyncTask {
                 log.error("Unable to upload toProcess {}", toProcessPath, e);
             }
         }
-        final Path processedPath = photoStorage.getInboxProcessedFile(inboxEntry.getFilename());
+        final var processedPath = photoStorage.getInboxProcessedFile(inboxEntry.getFilename());
         if (checkIfDownloadProcessedNeeded(processedPath)) {
             try {
                 downloadProcessed(processedPath);
@@ -85,7 +85,7 @@ public class WebDavSyncTask {
         final var getResponse = client.send(getRequest, HttpResponse.BodyHandlers.ofFile(processedPath));
         log.info("Download getResponse {}, bytes {}", getResponse.statusCode(), Files.size(processedPath));
 
-        if (getResponse.statusCode() == 200 || getResponse.statusCode() == 201) {
+        if (getResponse.statusCode() == 200) {
             final var delRequest = HttpRequest.newBuilder()
                     .uri(URI.create(config.processedUrl() + "/" + processedPath.getFileName().toString()))
                     .timeout(Duration.of(1, ChronoUnit.MINUTES))
@@ -93,6 +93,8 @@ public class WebDavSyncTask {
                     .build();
             final var delResponse = client.send(delRequest, HttpResponse.BodyHandlers.ofFile(processedPath));
             log.info("Deleted {}, status {}", delRequest.uri(), delResponse.statusCode());
+        } else {
+            Files.deleteIfExists(processedPath);
         }
     }
 
@@ -121,6 +123,9 @@ public class WebDavSyncTask {
                 .build();
         final var response = client.send(request, HttpResponse.BodyHandlers.ofString());
         log.info("Upload response " + response.statusCode());
+        if (response.statusCode() != 201) {
+            throw new RuntimeException("Failed Upload, statusCode=" + response.statusCode());
+        }
     }
 
 }
