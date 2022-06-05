@@ -8,7 +8,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.xmlunit.assertj3.XmlAssert.assertThat;
+import static org.xmlunit.builder.Input.fromString;
 
 public class StationsGpxWriterTest {
 
@@ -23,7 +24,14 @@ public class StationsGpxWriterTest {
 
 		final var gpx = outputMessage.getBodyAsString(StandardCharsets.UTF_8);
 		assertThat(gpx)
-				.isEqualTo("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<gpx xmlns=\"http://www.topografix.com/GPX/1/1\" version=\"1.1\">\n<wpt lat=\"50.0\" lon=\"9.0\"><name>Test</name></wpt>\n<wpt lat=\"51.0\" lon=\"8.0\"><name>Foo</name></wpt>\n</gpx>");
+				.and(fromString("""
+									<?xml version="1.0" encoding="UTF-8"?>
+									<gpx xmlns="http://www.topografix.com/GPX/1/1" version="1.1">
+										<wpt lat="50.0" lon="9.0"><name>Test</name></wpt>
+										<wpt lat="51.0" lon="8.0"><name>Foo</name></wpt>
+									</gpx>"""))
+				.normalizeWhitespace()
+				.areSimilar();
 	}
 
 }

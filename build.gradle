@@ -84,6 +84,7 @@ dependencies {
 	testImplementation "com.atlassian.oai:swagger-request-validator-mockmvc:$swaggerRequestValidatorVersion"
 	testImplementation 'org.assertj:assertj-core:3.23.1'
 	testImplementation 'com.github.tomakehurst:wiremock-jre8:2.33.2'
+	testImplementation 'org.xmlunit:xmlunit-assertj3:2.9.0'
 }
 
 test {
