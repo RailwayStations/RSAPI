@@ -15,6 +15,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
@@ -28,23 +29,35 @@ import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 @WireMockTest
 class MatrixMonitorTest {
 
+    static final String ACCESS_TOKEN_PARAM = "access_token";
+    static final String FILENAME_PARAM = "filename";
+    static final String ANY_ACCESS_TOKEN = "accessToken";
+    static final String ROOM_URL_PATH = "/roomUrl";
+    static final String UPLOAD_URL_PATH = "/uploadUrl";
+    static final String CONTENT_TYPE_HEADER = "Content-Type";
+    static final String APPLICATION_JSON_CHARSET_UTF_8 = "application/json;charset=UTF-8";
+    static final String ANY_FILENAME = "test.jpg";
+    static final String ANY_PHOTO_MESSAGE = "photoMessage";
+    static final String ANY_TEXT_MESSAGE = "textMessage";
+    static final String ANY_CONTENT_URI = "/contentUri";
+
     @Test
     void sendTextMessage(final WireMockRuntimeInfo wmRuntimeInfo) {
         final var client = createMatrixMonitor(wmRuntimeInfo);
-        stubFor(post(urlPathEqualTo("/roomUrl"))
-                .withQueryParam("access_token", equalTo("accessToken"))
+        stubFor(post(urlPathEqualTo(ROOM_URL_PATH))
+                .withQueryParam(ACCESS_TOKEN_PARAM, equalTo(ANY_ACCESS_TOKEN))
                 .willReturn(ok()));
 
-        client.sendMessage("textMessage");
+        client.sendMessage(ANY_TEXT_MESSAGE);
 
-        verify(postRequestedFor(urlPathEqualTo("/roomUrl"))
-                .withQueryParam("access_token", equalTo("accessToken"))
-                .withHeader("Content-Type", equalTo("application/json;charset=UTF-8"))
+        verify(postRequestedFor(urlPathEqualTo(ROOM_URL_PATH))
+                .withQueryParam(ACCESS_TOKEN_PARAM, equalTo(ANY_ACCESS_TOKEN))
+                .withHeader(CONTENT_TYPE_HEADER, equalTo(APPLICATION_JSON_CHARSET_UTF_8))
                 .withRequestBody(equalToJson("""
                         {
-                            "body" : "textMessage",
+                            "body" : "%s",
                             "msgtype" : "m.text"
-                        }"""
+                        }""".formatted(ANY_TEXT_MESSAGE)
                 )));
     }
 
@@ -52,53 +65,56 @@ class MatrixMonitorTest {
     @Test
     void sendPhotoMessage(final WireMockRuntimeInfo wmRuntimeInfo) throws URISyntaxException {
         final var client = createMatrixMonitor(wmRuntimeInfo);
-        stubFor(post(urlPathEqualTo("/roomUrl"))
-                .withQueryParam("access_token", equalTo("accessToken"))
+        stubFor(post(urlPathEqualTo(ROOM_URL_PATH))
+                .withQueryParam(ACCESS_TOKEN_PARAM, equalTo(ANY_ACCESS_TOKEN))
                 .willReturn(ok()));
-        stubFor(post(urlPathEqualTo("/uploadUrl"))
-                .withQueryParam("filename", equalTo("test.jpg"))
-                .withQueryParam("access_token", equalTo("accessToken"))
+        stubFor(post(urlPathEqualTo(UPLOAD_URL_PATH))
+                .withQueryParam(FILENAME_PARAM, equalTo(ANY_FILENAME))
+                .withQueryParam(ACCESS_TOKEN_PARAM, equalTo(ANY_ACCESS_TOKEN))
                 .andMatching(new ValidImageContentPattern())
-                .willReturn(ok("{\"content_uri\": \"/contentUri\"}")));
-
-        final var imagePath = Path.of(getClass().getClassLoader().getResource("test.jpg").toURI());
-        client.sendMessage("photoMessage", imagePath);
-
-        verify(postRequestedFor(urlPathEqualTo("/roomUrl"))
-                .withQueryParam("access_token", equalTo("accessToken"))
-                .withHeader("Content-Type", equalTo("application/json;charset=UTF-8"))
-                .withRequestBody(equalToJson("""
-                        {
-                            "body" : "photoMessage",
-                            "msgtype" : "m.text"
-                        }"""
+                .willReturn(ok("""
+                            {"content_uri": "%s"}
+                            """.formatted(ANY_CONTENT_URI)
                 )));
 
-        verify(postRequestedFor(urlPathEqualTo("/uploadUrl"))
-                .withQueryParam("filename", equalTo("test.jpg"))
-                .withQueryParam("access_token", equalTo("accessToken"))
-                .withHeader("Content-Type", equalTo("image/jpeg"))
-                .andMatching(new ValidImageContentPattern()));
+        final var imagePath = Path.of(Objects.requireNonNull(getClass().getClassLoader().getResource(ANY_FILENAME)).toURI());
+        client.sendMessage(ANY_PHOTO_MESSAGE, imagePath);
 
-        verify(postRequestedFor(urlPathEqualTo("/roomUrl"))
-                .withQueryParam("access_token", equalTo("accessToken"))
-                .withHeader("Content-Type", equalTo("application/json;charset=UTF-8"))
+        verify(postRequestedFor(urlPathEqualTo(ROOM_URL_PATH))
+                .withQueryParam(ACCESS_TOKEN_PARAM, equalTo(ANY_ACCESS_TOKEN))
+                .withHeader(CONTENT_TYPE_HEADER, equalTo(APPLICATION_JSON_CHARSET_UTF_8))
                 .withRequestBody(equalToJson("""
                         {
-                            "body": "test.jpg",
-                            "url": "/contentUri",
+                            "body" : "%s",
+                            "msgtype" : "m.text"
+                        }""".formatted(ANY_PHOTO_MESSAGE)
+                )));
+
+        verify(postRequestedFor(urlPathEqualTo(UPLOAD_URL_PATH))
+                .withQueryParam(FILENAME_PARAM, equalTo(ANY_FILENAME))
+                .withQueryParam(ACCESS_TOKEN_PARAM, equalTo(ANY_ACCESS_TOKEN))
+                .withHeader(CONTENT_TYPE_HEADER, equalTo("image/jpeg"))
+                .andMatching(new ValidImageContentPattern()));
+
+        verify(postRequestedFor(urlPathEqualTo(ROOM_URL_PATH))
+                .withQueryParam(ACCESS_TOKEN_PARAM, equalTo(ANY_ACCESS_TOKEN))
+                .withHeader(CONTENT_TYPE_HEADER, equalTo(APPLICATION_JSON_CHARSET_UTF_8))
+                .withRequestBody(equalToJson("""
+                        {
+                            "body": "%s",
+                            "url": "%s",
                             "msgtype": "m.image"
-                        }"""
+                        }""".formatted(ANY_FILENAME, ANY_CONTENT_URI)
                 )));
     }
 
     @NotNull
-    private MatrixMonitor createMatrixMonitor(final WireMockRuntimeInfo wmRuntimeInfo) {
-        final var config = new MatrixMonitorConfig(wmRuntimeInfo.getHttpBaseUrl() + "/roomUrl", wmRuntimeInfo.getHttpBaseUrl() + "/uploadUrl", "accessToken");
+    MatrixMonitor createMatrixMonitor(final WireMockRuntimeInfo wmRuntimeInfo) {
+        final var config = new MatrixMonitorConfig(wmRuntimeInfo.getHttpBaseUrl() + ROOM_URL_PATH, wmRuntimeInfo.getHttpBaseUrl() + UPLOAD_URL_PATH, ANY_ACCESS_TOKEN);
         return new MatrixMonitor(config, new ObjectMapper());
     }
 
-    private static class ValidImageContentPattern extends RequestMatcherExtension {
+    static class ValidImageContentPattern extends RequestMatcherExtension {
         @Override
         public MatchResult match(final Request request, final Parameters parameters) {
             try {
