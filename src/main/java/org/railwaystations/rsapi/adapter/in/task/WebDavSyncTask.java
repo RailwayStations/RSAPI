@@ -1,5 +1,11 @@
 package org.railwaystations.rsapi.adapter.in.task;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.railwaystations.rsapi.adapter.out.db.InboxDao;
 import org.railwaystations.rsapi.core.model.InboxEntry;
@@ -19,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Component
 @ConditionalOnProperty(prefix = "webdavsync", name = "enabled", havingValue = "true")
@@ -50,12 +57,43 @@ public class WebDavSyncTask {
     @Scheduled(fixedRate = 60_000)
     public void syncWebDav() {
         log.info("Starting WebDavSync");
-        inboxDao.findPendingInboxEntries().stream()
+        final var pendingInboxEntries = inboxDao.findPendingInboxEntries();
+        if (pendingInboxEntries.isEmpty()) {
+            return; // nothing to do
+        }
+
+        final var processedFiles = listProcessedFiles();
+        pendingInboxEntries.stream()
                 .filter(InboxEntry::isPhotoUpload)
-                .forEach(this::checkWebDav);
+                .forEach(inboxEntry -> checkWebDav(inboxEntry, processedFiles));
     }
 
-    private void checkWebDav(final InboxEntry inboxEntry) {
+    private List<MultistatusResponse> listProcessedFiles() {
+        log.info("ListProcessedFiles");
+        final var request = HttpRequest.newBuilder()
+                .uri(URI.create(config.processedUrl()))
+                .timeout(Duration.of(1, ChronoUnit.MINUTES))
+                .method("PROPFIND", HttpRequest.BodyPublishers.ofString("""
+                        <?xml version="1.0"?>
+                        <a:propfind xmlns:a="DAV:">
+                        <a:prop><a:resourcetype/></a:prop>
+                        </a:propfind>"""))
+                .header("Depth", "1")
+                .build();
+        final HttpResponse<String> response;
+        try {
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            log.info("ListProcessedFiles response " + response.statusCode());
+            if (response.statusCode() != 207) {
+                throw new RuntimeException("Failed to list processed files, statusCode=" + response.statusCode());
+            }
+            return new XmlMapper().readValue(response.body(), Multistatus.class).getResponses();
+        } catch (final IOException | InterruptedException e) {
+            throw new RuntimeException("Failed to list processed files", e);
+        }
+    }
+
+    private void checkWebDav(final InboxEntry inboxEntry, final List<MultistatusResponse> processedFiles) {
         final var toProcessPath = photoStorage.getInboxToProcessFile(inboxEntry.getFilename());
         if (Files.exists(toProcessPath)) {
             try {
@@ -66,7 +104,7 @@ public class WebDavSyncTask {
             }
         }
         final var processedPath = photoStorage.getInboxProcessedFile(inboxEntry.getFilename());
-        if (checkIfDownloadProcessedNeeded(processedPath)) {
+        if (checkIfDownloadProcessedNeeded(processedPath, processedFiles)) {
             try {
                 downloadProcessed(processedPath);
             } catch (final Exception e) {
@@ -77,8 +115,9 @@ public class WebDavSyncTask {
 
     private void downloadProcessed(final Path processedPath) throws IOException, InterruptedException {
         log.info("Downloading processed file of {}", processedPath);
+        final var processedUri = URI.create(config.processedUrl() + "/" + processedPath.getFileName().toString());
         final var getRequest = HttpRequest.newBuilder()
-                .uri(URI.create(config.processedUrl() + "/" + processedPath.getFileName().toString()))
+                .uri(processedUri)
                 .timeout(Duration.of(1, ChronoUnit.MINUTES))
                 .GET()
                 .build();
@@ -87,7 +126,7 @@ public class WebDavSyncTask {
 
         if (getResponse.statusCode() == 200) {
             final var delRequest = HttpRequest.newBuilder()
-                    .uri(URI.create(config.processedUrl() + "/" + processedPath.getFileName().toString()))
+                    .uri(processedUri)
                     .timeout(Duration.of(1, ChronoUnit.MINUTES))
                     .DELETE()
                     .build();
@@ -98,20 +137,9 @@ public class WebDavSyncTask {
         }
     }
 
-    private boolean checkIfDownloadProcessedNeeded(final Path processedPath) {
-        try {
-            log.info("Check if downloading {} is needed", processedPath);
-            final var request = HttpRequest.newBuilder()
-                    .uri(URI.create(config.processedUrl() + "/" + processedPath.getFileName().toString()))
-                    .timeout(Duration.of(30, ChronoUnit.SECONDS))
-                    .HEAD()
-                    .build();
-            final var response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            return response.statusCode() == 200;
-        } catch (final Exception e) {
-            log.error("Unable to check download of {}", processedPath, e);
-        }
-        return false;
+    private boolean checkIfDownloadProcessedNeeded(final Path processedPath, final List<MultistatusResponse> processedFiles) {
+        return processedFiles.stream()
+                .anyMatch(multistatusResponse -> multistatusResponse.getHref().endsWith(processedPath.getFileName().toString()));
     }
 
     private void uploadToProcess(final Path toProcessPath) throws IOException, InterruptedException {
@@ -126,6 +154,22 @@ public class WebDavSyncTask {
         if (response.statusCode() != 201) {
             throw new RuntimeException("Failed Upload, statusCode=" + response.statusCode());
         }
+    }
+
+    @Data
+    @NoArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown=true)
+    static class Multistatus {
+        @JacksonXmlElementWrapper(useWrapping = false)
+        @JsonProperty("response")
+        List<MultistatusResponse> responses;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown=true)
+    static class MultistatusResponse {
+        String href;
     }
 
 }

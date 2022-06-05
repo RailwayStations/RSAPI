@@ -1,9 +1,10 @@
 package org.railwaystations.rsapi.adapter.in.task;
 
 import com.github.tomakehurst.wiremock.client.BasicCredentials;
+import com.github.tomakehurst.wiremock.http.RequestMethod;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
-import com.github.tomakehurst.wiremock.matching.UrlPattern;
+import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,25 +20,24 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.badRequest;
 import static com.github.tomakehurst.wiremock.client.WireMock.binaryEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.created;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.deleteRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.head;
-import static com.github.tomakehurst.wiremock.client.WireMock.headRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.noContent;
-import static com.github.tomakehurst.wiremock.client.WireMock.notFound;
 import static com.github.tomakehurst.wiremock.client.WireMock.ok;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.putRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.request;
 import static com.github.tomakehurst.wiremock.client.WireMock.serverError;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.unauthorized;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -53,6 +53,7 @@ class WebDavSyncTaskTest {
     static final String PROCESSED_PATH_FILE = PROCESSED_PATH + "/" + FILENAME;
     static final String USERNAME = "username";
     static final String PASSWORD = "password";
+    public static final String PROPFIND_METHOD = "PROPFIND";
 
     Path tempdir;
     PhotoStorage photoStorage;
@@ -67,7 +68,7 @@ class WebDavSyncTaskTest {
     }
 
     @Test
-    void should_authenticate(final WireMockRuntimeInfo wmRuntimeInfo) throws IOException {
+    void shouldAuthenticate(final WireMockRuntimeInfo wmRuntimeInfo) throws IOException {
         final var task = createWebDavSyncTask(wmRuntimeInfo);
         final var toProcessPath = createFile(tempdir);
         when(photoStorage.getInboxToProcessFile(FILENAME)).thenReturn(toProcessPath);
@@ -78,7 +79,7 @@ class WebDavSyncTaskTest {
         stubFor(put(TO_PROCESS_PATH_FILE)
                 .withBasicAuth(USERNAME, PASSWORD)
                 .willReturn(created()));
-        stubFor(head(new UrlPattern(equalTo(PROCESSED_PATH_FILE), false)).willReturn(notFound()));
+        stubPropfindEmpty();
 
         task.syncWebDav();
 
@@ -92,33 +93,32 @@ class WebDavSyncTaskTest {
     }
 
     @Test
-    void should_upload_to_process_file(final WireMockRuntimeInfo wmRuntimeInfo) throws IOException {
+    void shouldUploadToProcessFile(final WireMockRuntimeInfo wmRuntimeInfo) throws IOException {
         final var task = createWebDavSyncTask(wmRuntimeInfo);
         final var toProcessPath1 = createFile(tempdir);
         when(photoStorage.getInboxToProcessFile(FILENAME)).thenReturn(toProcessPath1);
         when(photoStorage.getInboxProcessedFile(FILENAME)).thenReturn(tempdir.resolve(FILENAME));
 
         stubFor(put(TO_PROCESS_PATH_FILE).willReturn(created()));
-        stubFor(head(new UrlPattern(equalTo(PROCESSED_PATH_FILE), false)).willReturn(notFound()));
+        stubPropfindEmpty();
 
         task.syncWebDav();
 
         verify(putRequestedFor(urlEqualTo(TO_PROCESS_PATH_FILE))
                 .withRequestBody(binaryEqualTo(FILENAME.getBytes(StandardCharsets.UTF_8))));
-        verify(headRequestedFor(urlEqualTo(PROCESSED_PATH_FILE)));
 
         assertThat(Files.exists(toProcessPath1)).isFalse();
     }
 
     @Test
-    void should_keep_file_if_upload_fails(final WireMockRuntimeInfo wmRuntimeInfo) throws IOException {
+    void shouldKeepFileIfUploadFails(final WireMockRuntimeInfo wmRuntimeInfo) throws IOException {
         final var task = createWebDavSyncTask(wmRuntimeInfo);
         final var toProcessPath = createFile(tempdir);
         when(photoStorage.getInboxToProcessFile(FILENAME)).thenReturn(toProcessPath);
         when(photoStorage.getInboxProcessedFile(FILENAME)).thenReturn(tempdir.resolve(FILENAME));
 
         stubFor(put(TO_PROCESS_PATH_FILE).willReturn(badRequest()));
-        stubFor(head(new UrlPattern(equalTo(PROCESSED_PATH_FILE), false)).willReturn(notFound()));
+        stubPropfindEmpty();
 
         task.syncWebDav();
 
@@ -130,39 +130,92 @@ class WebDavSyncTaskTest {
     }
 
     @Test
-    void should_download_processed_file(final WireMockRuntimeInfo wmRuntimeInfo) {
+    void shouldDownloadProcessedFile(final WireMockRuntimeInfo wmRuntimeInfo) {
         final var task = createWebDavSyncTask(wmRuntimeInfo);
         when(photoStorage.getInboxToProcessFile(FILENAME)).thenReturn(tempdir.resolve(FILENAME));
         final var processedPath = tempdir.resolve(FILENAME);
         when(photoStorage.getInboxProcessedFile(FILENAME)).thenReturn(processedPath);
 
-        stubFor(head(new UrlPattern(equalTo(PROCESSED_PATH_FILE), false)).willReturn(ok()));
+        stubPropfind(createMultistatusResponseForFile());
         stubFor(get(PROCESSED_PATH_FILE).willReturn(ok(FILENAME)));
         stubFor(delete(PROCESSED_PATH_FILE).willReturn(noContent()));
 
         task.syncWebDav();
 
-        verify(headRequestedFor(urlEqualTo(PROCESSED_PATH_FILE)));
+        verifyPropfindRequest();
         verify(getRequestedFor(urlEqualTo(PROCESSED_PATH_FILE)));
         verify(deleteRequestedFor(urlEqualTo(PROCESSED_PATH_FILE)));
 
         assertThat(Files.exists(processedPath)).isTrue();
     }
 
+    private void verifyPropfindRequest() {
+        verify(new RequestPatternBuilder(RequestMethod.fromString(PROPFIND_METHOD), urlEqualTo(PROCESSED_PATH)));
+    }
+
+    private void stubPropfindEmpty() {
+        stubPropfind("");
+    }
+
+    private void stubPropfind(final String multistatusResponse) {
+        stubFor(request(PROPFIND_METHOD, urlPathEqualTo(PROCESSED_PATH)).willReturn(
+                aResponse().withStatus(207).withBody("""
+                        <?xml version="1.0"?>
+                        <d:multistatus xmlns:d="DAV:" xmlns:s="http://sabredav.org/ns" xmlns:oc="http://owncloud.org/ns"
+                                       xmlns:nc="http://nextcloud.org/ns">
+                            <d:response>
+                                <d:href>%s/</d:href>
+                                <d:propstat>
+                                    <d:prop>
+                                        <d:resourcetype>
+                                            <d:collection/>
+                                        </d:resourcetype>
+                                    </d:prop>
+                                    <d:status>HTTP/1.1 200 OK</d:status>
+                                </d:propstat>
+                            </d:response>
+                            <d:response>
+                                <d:href>%s/Readme.md</d:href>
+                                <d:propstat>
+                                    <d:prop>
+                                        <d:resourcetype/>
+                                    </d:prop>
+                                    <d:status>HTTP/1.1 200 OK</d:status>
+                                </d:propstat>
+                            </d:response>
+                            %s
+                        </d:multistatus>
+                        """.formatted(PROCESSED_PATH, PROCESSED_PATH, multistatusResponse))));
+    }
+
+    String createMultistatusResponseForFile() {
+        return """
+                <d:response>
+                    <d:href>%s</d:href>
+                    <d:propstat>
+                        <d:prop>
+                            <d:resourcetype/>
+                        </d:prop>
+                        <d:status>HTTP/1.1 200 OK</d:status>
+                    </d:propstat>
+                </d:response>
+                """.formatted(PROCESSED_PATH_FILE);
+    }
+
     @Test
-    void should_not_send_delete_if_download_failed(final WireMockRuntimeInfo wmRuntimeInfo) {
+    void shouldNotSendDeleteIfDownloadFailed(final WireMockRuntimeInfo wmRuntimeInfo) {
         final var task = createWebDavSyncTask(wmRuntimeInfo);
         when(photoStorage.getInboxToProcessFile(FILENAME)).thenReturn(tempdir.resolve(FILENAME));
         final var processedPath = tempdir.resolve(FILENAME);
         when(photoStorage.getInboxProcessedFile(FILENAME)).thenReturn(processedPath);
 
-        stubFor(head(new UrlPattern(equalTo(PROCESSED_PATH_FILE), false)).willReturn(ok()));
+        stubPropfind(createMultistatusResponseForFile());
         stubFor(get(PROCESSED_PATH_FILE).willReturn(serverError()));
         stubFor(delete(PROCESSED_PATH_FILE).willReturn(noContent()));
 
         task.syncWebDav();
 
-        verify(headRequestedFor(urlEqualTo(PROCESSED_PATH_FILE)));
+        verifyPropfindRequest();
         verify(getRequestedFor(urlEqualTo(PROCESSED_PATH_FILE)));
         verify(0, deleteRequestedFor(urlEqualTo(PROCESSED_PATH_FILE)));
 
@@ -170,14 +223,14 @@ class WebDavSyncTaskTest {
     }
 
     @NotNull
-    private WebDavSyncTask createWebDavSyncTask(final WireMockRuntimeInfo wmRuntimeInfo) {
+    WebDavSyncTask createWebDavSyncTask(final WireMockRuntimeInfo wmRuntimeInfo) {
         final var config = new WebDavSyncConfig(wmRuntimeInfo.getHttpBaseUrl() + TO_PROCESS_PATH,
                 wmRuntimeInfo.getHttpBaseUrl() + PROCESSED_PATH, USERNAME, PASSWORD);
         return new WebDavSyncTask(config, photoStorage, inboxDao);
     }
 
     @NotNull
-    private InboxEntry createInboxEntry() {
+    InboxEntry createInboxEntry() {
         return new InboxEntry(1, "de", "stationId", "title", new Coordinates(),
                 1, "nickname", null,
                 "jpg", null, null, Instant.now(),
@@ -186,7 +239,7 @@ class WebDavSyncTaskTest {
     }
 
     @NotNull
-    private Path createFile(final Path dir) throws IOException {
+    Path createFile(final Path dir) throws IOException {
         final var path = dir.resolve(WebDavSyncTaskTest.FILENAME);
         Files.writeString(path, WebDavSyncTaskTest.FILENAME);
         return path;
