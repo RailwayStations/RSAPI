@@ -172,8 +172,13 @@ public class InboxController {
     }
 
     private ProblemReport toDomain(final ProblemReportDto problemReport) {
-        return new ProblemReport(problemReport.getCountryCode(), problemReport.getStationId(),
-                toDomain(problemReport.getType()), problemReport.getComment(), mapCoordinates(problemReport.getLat(), problemReport.getLon()));
+        return ProblemReport.builder()
+                .countryCode(problemReport.getCountryCode())
+                .stationId(problemReport.getStationId())
+                .type(toDomain(problemReport.getType()))
+                .comment(problemReport.getComment())
+                .coordinates(mapCoordinates(problemReport.getLat(), problemReport.getLon()))
+                .build();
     }
 
     private ProblemReportType toDomain(final ProblemReportDto.TypeEnum dtoType) {
