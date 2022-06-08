@@ -45,14 +45,15 @@ public interface CountryDao {
 
     class CountryMapper implements RowMapper<Country> {
         public Country map(final ResultSet rs, final StatementContext ctx) throws SQLException {
-            return new Country(rs.getString("c_id"),
-                    rs.getString("c_name"),
-                    rs.getString("c_email"),
-                    rs.getString("c_twitterTags"),
-                    rs.getString("c_timetableUrlTemplate"),
-                    rs.getString("c_overrideLicense"),
-                    rs.getBoolean("c_active")
-                    );
+            return Country.builder()
+                    .code(rs.getString("c_id"))
+                    .name(rs.getString("c_name"))
+                    .email(rs.getString("c_email"))
+                    .twitterTags(rs.getString("c_twitterTags"))
+                    .timetableUrlTemplate(rs.getString("c_timetableUrlTemplate"))
+                    .overrideLicense(rs.getString("c_overrideLicense"))
+                    .active(rs.getBoolean("c_active"))
+                    .build();
         }
     }
 

@@ -10,7 +10,11 @@ class InboxServiceTest {
 
     @Test
     public void getLicenseNoOverride() {
-        assertThat(InboxService.getLicenseForPhoto(createUserWithCC0License(), new Country("de"))).isEqualTo("CC0");
+        assertThat(InboxService.getLicenseForPhoto(createUserWithCC0License(),
+                Country.builder()
+                        .code("de")
+                        .build()))
+                .isEqualTo("CC0");
     }
 
     private User createUserWithCC0License() {
@@ -21,7 +25,14 @@ class InboxServiceTest {
 
     @Test
     public void getLicenseOverride() {
-        assertThat(InboxService.getLicenseForPhoto(createUserWithCC0License(), new Country("fr", "France", null, null, null, "CC1", true))).isEqualTo("CC1");
+        assertThat(InboxService.getLicenseForPhoto(createUserWithCC0License(),
+                Country.builder()
+                        .code("fr")
+                        .name("France")
+                        .overrideLicense("CC1")
+                        .active(true)
+                        .build()))
+                .isEqualTo("CC1");
     }
 
 }

@@ -62,7 +62,7 @@ public class CountriesControllerTest {
 
     @NotNull
     private Country createCountry(final String code) {
-        final var xy = new Country(code, "name-" + code, "email-" + code, "twitter-" + code, "timetable-" + code, "overrideLicense-" + code, true);
+        final var xy = Country.builder().code(code).name("name-" + code).email("email-" + code).twitterTags("twitter-" + code).timetableUrlTemplate("timetable-" + code).overrideLicense("overrideLicense-" + code).active(true).build();
         xy.getProviderApps().add(new ProviderApp("android", "Provider-" + code, "providerAndroidApp-" + code));
         xy.getProviderApps().add(new ProviderApp("ios", "Provider-" + code, "providerIosApp-" + code));
         xy.getProviderApps().add(new ProviderApp("web", "Provider-" + code, "providerWebApp-" + code));
