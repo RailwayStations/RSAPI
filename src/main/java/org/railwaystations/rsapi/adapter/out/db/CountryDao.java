@@ -59,10 +59,11 @@ public interface CountryDao {
 
     class ProviderAppMapper implements RowMapper<ProviderApp> {
         public ProviderApp map(final ResultSet rs, final StatementContext ctx) throws SQLException {
-            return new ProviderApp(rs.getString("p_type"),
-                    rs.getString("p_name"),
-                    rs.getString("p_url")
-            );
+            return ProviderApp.builder()
+                    .type(rs.getString("p_type"))
+                    .name(rs.getString("p_name"))
+                    .url(rs.getString("p_url"))
+                    .build();
         }
     }
 

@@ -1,26 +1,14 @@
 package org.railwaystations.rsapi.core.model;
 
+import lombok.Builder;
+import lombok.Value;
+
+@Value
+@Builder
 public class ProviderApp {
 
-    private final String type;
-    private final String name;
-    private final String url;
+    String type;
+    String name;
+    String url;
 
-    public ProviderApp(final String type, final String name, final String url) {
-        this.type = type;
-        this.name = name;
-        this.url = url;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getUrl() {
-        return url;
-    }
 }

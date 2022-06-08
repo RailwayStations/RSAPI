@@ -62,11 +62,23 @@ public class CountriesControllerTest {
 
     @NotNull
     private Country createCountry(final String code) {
-        final var xy = Country.builder().code(code).name("name-" + code).email("email-" + code).twitterTags("twitter-" + code).timetableUrlTemplate("timetable-" + code).overrideLicense("overrideLicense-" + code).active(true).build();
-        xy.getProviderApps().add(new ProviderApp("android", "Provider-" + code, "providerAndroidApp-" + code));
-        xy.getProviderApps().add(new ProviderApp("ios", "Provider-" + code, "providerIosApp-" + code));
-        xy.getProviderApps().add(new ProviderApp("web", "Provider-" + code, "providerWebApp-" + code));
-        return xy;
+        final var country = Country.builder()
+                .code(code)
+                .name("name-" + code)
+                .email("email-" + code)
+                .twitterTags("twitter-" + code)
+                .timetableUrlTemplate("timetable-" + code)
+                .overrideLicense("overrideLicense-" + code)
+                .active(true)
+                .build();
+        country.getProviderApps().add(createProviderApp("android", code));
+        country.getProviderApps().add(createProviderApp("ios", code));
+        country.getProviderApps().add(createProviderApp("web", code));
+        return country;
+    }
+
+    private ProviderApp createProviderApp(final String type, final String code) {
+        return ProviderApp.builder().type(type).name("Provider-" + code).url(type + "App-" + code).build();
     }
 
     private void assertCountry(final Country country) {
@@ -78,9 +90,9 @@ public class CountriesControllerTest {
         assertThat(country.getProviderApps().size()).isEqualTo(3);
         country.getProviderApps().forEach(app -> {
             switch (app.getType()) {
-                case "android" -> assertThat(app.getUrl()).isEqualTo("providerAndroidApp-" + country.getCode());
-                case "ios" -> assertThat(app.getUrl()).isEqualTo("providerIosApp-" + country.getCode());
-                case "web" -> assertThat(app.getUrl()).isEqualTo("providerWebApp-" + country.getCode());
+                case "android" -> assertThat(app.getUrl()).isEqualTo("androidApp-" + country.getCode());
+                case "ios" -> assertThat(app.getUrl()).isEqualTo("iosApp-" + country.getCode());
+                case "web" -> assertThat(app.getUrl()).isEqualTo("webApp-" + country.getCode());
                 default -> fail("unknown app type");
             }
         });
