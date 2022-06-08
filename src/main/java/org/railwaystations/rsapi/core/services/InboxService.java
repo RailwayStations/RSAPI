@@ -112,35 +112,35 @@ public class InboxService implements ManageInboxUseCase {
     }
 
     private InboxStateQuery mapToInboxStateQuery(final InboxEntry inboxEntry) {
-        final InboxStateQuery query = new InboxStateQuery();
-        query.setId(inboxEntry.getId());
-        query.setState(InboxStateQuery.InboxState.UNKNOWN);
-        query.setId(inboxEntry.getId());
-        query.setRejectedReason(inboxEntry.getRejectReason());
-        query.setCountryCode(inboxEntry.getCountryCode());
-        query.setStationId(inboxEntry.getStationId());
-        query.setCoordinates(inboxEntry.getCoordinates());
-        query.setFilename(inboxEntry.getFilename());
-        query.setInboxUrl(getInboxUrl(inboxEntry.getFilename(), photoStorage.isProcessed(inboxEntry.getFilename())));
-        query.setCrc32(inboxEntry.getCrc32());
+        return InboxStateQuery.builder()
+                .id(inboxEntry.getId())
+                .state(calculateInboxState(inboxEntry))
+                .rejectedReason(inboxEntry.getRejectReason())
+                .countryCode(inboxEntry.getCountryCode())
+                .stationId(inboxEntry.getStationId())
+                .coordinates(inboxEntry.getCoordinates())
+                .filename(inboxEntry.getFilename())
+                .inboxUrl(getInboxUrl(inboxEntry.getFilename(), photoStorage.isProcessed(inboxEntry.getFilename())))
+                .crc32(inboxEntry.getCrc32())
+                .build();
+    }
 
-
+    private InboxStateQuery.InboxState calculateInboxState(final InboxEntry inboxEntry) {
         if (inboxEntry.isDone()) {
             if (inboxEntry.getRejectReason() == null) {
-                query.setState(InboxStateQuery.InboxState.ACCEPTED);
+                return InboxStateQuery.InboxState.ACCEPTED;
             } else {
-                query.setState(InboxStateQuery.InboxState.REJECTED);
+                return InboxStateQuery.InboxState.REJECTED;
             }
         } else {
             if (hasConflict(inboxEntry.getId(),
-                    findStationByCountryAndId(query.getCountryCode(), query.getStationId()).orElse(null))
+                    findStationByCountryAndId(inboxEntry.getCountryCode(), inboxEntry.getStationId()).orElse(null))
                     || (inboxEntry.getStationId() == null && hasConflict(inboxEntry.getId(), inboxEntry.getCoordinates()))) {
-                query.setState(InboxStateQuery.InboxState.CONFLICT);
+                return InboxStateQuery.InboxState.CONFLICT;
             } else {
-                query.setState(InboxStateQuery.InboxState.REVIEW);
+                return InboxStateQuery.InboxState.REVIEW;
             }
         }
-        return query;
     }
 
     @Override
