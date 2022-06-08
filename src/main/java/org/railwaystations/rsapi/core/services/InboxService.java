@@ -68,23 +68,23 @@ public class InboxService implements ManageInboxUseCase {
     public InboxResponse reportProblem(final ProblemReport problemReport, final User user, final String clientInfo) {
         if (!user.isEmailVerified()) {
             LOG.info("New problem report failed for user {}, email {} not verified", user.getName(), user.getEmail());
-            return new InboxResponse(InboxResponse.InboxResponseState.UNAUTHORIZED, "Email not verified");
+            return InboxResponse.of(InboxResponse.InboxResponseState.UNAUTHORIZED, "Email not verified");
         }
 
         LOG.info("New problem report: Nickname: {}; Country: {}; Station-Id: {}",
                 user.getName(), problemReport.getCountryCode(), problemReport.getStationId());
         final var station = findStationByCountryAndId(problemReport.getCountryCode(), problemReport.getStationId());
         if (station.isEmpty()) {
-            return new InboxResponse(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA, "Station not found");
+            return InboxResponse.of(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA, "Station not found");
         }
         if (StringUtils.isBlank(problemReport.getComment())) {
-            return new InboxResponse(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA, "Comment is mandatory");
+            return InboxResponse.of(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA, "Comment is mandatory");
         }
         if (problemReport.getType() == null) {
-            return new InboxResponse(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA, "Problem type is mandatory");
+            return InboxResponse.of(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA, "Problem type is mandatory");
         }
         if (problemReport.getType().needsPhoto() && !station.get().hasPhoto()) {
-            return new InboxResponse(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA, "Problem type is only applicable to station with photo");
+            return InboxResponse.of(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA, "Problem type is only applicable to station with photo");
         }
         final var inboxEntry = new InboxEntry(problemReport.getCountryCode(), problemReport.getStationId(),
                 null, problemReport.getCoordinates(), user.getId(), null, problemReport.getComment(),
@@ -92,7 +92,7 @@ public class InboxService implements ManageInboxUseCase {
         monitor.sendMessage(String.format("New problem report for %s - %s:%s%n%s: %s%nby %s%nvia %s",
                 station.get().getTitle(), station.get().getKey().getCountry(), station.get().getKey().getId(), problemReport.getType(),
                 StringUtils.trimToEmpty(problemReport.getComment()), user.getName(), clientInfo));
-        return new InboxResponse(InboxResponse.InboxResponseState.REVIEW, inboxDao.insert(inboxEntry));
+        return InboxResponse.of(InboxResponse.InboxResponseState.REVIEW, inboxDao.insert(inboxEntry));
     }
 
     @Override
@@ -390,7 +390,7 @@ public class InboxService implements ManageInboxUseCase {
                                      final Boolean active, final User user) {
         if (!user.isEmailVerified()) {
             LOG.info("Photo upload failed for user {}, email not verified", user.getName());
-            return new InboxResponse(InboxResponse.InboxResponseState.UNAUTHORIZED,"Email not verified");
+            return InboxResponse.of(InboxResponse.InboxResponseState.UNAUTHORIZED,"Email not verified");
         }
 
         final var station = findStationByCountryAndId(country, stationId);
@@ -399,12 +399,12 @@ public class InboxService implements ManageInboxUseCase {
             LOG.warn("Station not found");
             if (StringUtils.isBlank(stationTitle) || latitude == null || longitude == null) {
                 LOG.warn("Not enough data for missing station: title={}, latitude={}, longitude={}", stationTitle, latitude, longitude);
-                return new InboxResponse(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA, "Not enough data: either 'country' and 'stationId' or 'title', 'latitude' and 'longitude' have to be provided");
+                return InboxResponse.of(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA, "Not enough data: either 'country' and 'stationId' or 'title', 'latitude' and 'longitude' have to be provided");
             }
             coordinates = new Coordinates(latitude, longitude);
             if (!coordinates.isValid()) {
                 LOG.warn("Lat/Lon out of range: latitude={}, longitude={}", latitude, longitude);
-                return new InboxResponse(InboxResponse.InboxResponseState.LAT_LON_OUT_OF_RANGE, "'latitude' and/or 'longitude' out of range");
+                return InboxResponse.of(InboxResponse.InboxResponseState.LAT_LON_OUT_OF_RANGE, "'latitude' and/or 'longitude' out of range");
             }
         } else {
             coordinates = null;
@@ -413,7 +413,7 @@ public class InboxService implements ManageInboxUseCase {
         final var extension = ImageUtil.mimeToExtension(contentType);
         if (extension == null) {
             LOG.warn("Unknown contentType '{}'", contentType);
-            return new InboxResponse(InboxResponse.InboxResponseState.UNSUPPORTED_CONTENT_TYPE, "unsupported content type (only jpg and png are supported)");
+            return InboxResponse.of(InboxResponse.InboxResponseState.UNSUPPORTED_CONTENT_TYPE, "unsupported content type (only jpg and png are supported)");
         }
 
         final boolean conflict = hasConflict(null, station.orElse(null)) || hasConflict(null, coordinates);
@@ -443,13 +443,19 @@ public class InboxService implements ManageInboxUseCase {
                         StringUtils.trimToEmpty(comment), inboxUrl, duplicateInfo, user.getName(), clientInfo), photoStorage.getUploadFile(filename));
             }
         } catch (final PhotoStorage.PhotoTooLargeException e) {
-            return new InboxResponse(InboxResponse.InboxResponseState.PHOTO_TOO_LARGE, "Photo too large, max " + e.getMaxSize() + " bytes allowed");
+            return InboxResponse.of(InboxResponse.InboxResponseState.PHOTO_TOO_LARGE, "Photo too large, max " + e.getMaxSize() + " bytes allowed");
         } catch (final IOException e) {
             LOG.error("Error uploading photo", e);
-            return new InboxResponse(InboxResponse.InboxResponseState.ERROR, "Internal Error");
+            return InboxResponse.of(InboxResponse.InboxResponseState.ERROR, "Internal Error");
         }
 
-        return new InboxResponse(conflict ? InboxResponse.InboxResponseState.CONFLICT : InboxResponse.InboxResponseState.REVIEW, id, filename, inboxUrl, crc32);
+        return InboxResponse.builder()
+                .state(conflict ? InboxResponse.InboxResponseState.CONFLICT : InboxResponse.InboxResponseState.REVIEW)
+                .id(id)
+                .filename(filename)
+                .inboxUrl(inboxUrl)
+                .crc32(crc32)
+                .build();
     }
 
     private boolean hasConflict(final Long id, final Station station) {
