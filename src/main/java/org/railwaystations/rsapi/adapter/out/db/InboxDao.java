@@ -87,10 +87,6 @@ public interface InboxDao {
     @SqlUpdate("UPDATE inbox SET crc32 = :crc32 WHERE id = :id")
     void updateCrc32(@Bind(ID) Long id, @Bind("crc32") Long crc32);
 
-    @SqlQuery(JOIN_QUERY + " WHERE u.countryCode = :countryCode AND u.stationId = stationId AND u.photographerId = :photographerId AND done = false ORDER BY id desc")
-    @RegisterRowMapper(InboxEntryMapper.class)
-    InboxEntry findNewestPendingByCountryAndStationIdAndPhotographerId(@Bind(COUNTRY_CODE) String countryCode, @Bind(STATION_ID) String stationId, @Bind(PHOTOGRAPHER_ID) int photographerId);
-
     @SqlQuery(JOIN_QUERY + " WHERE u.done = true AND u.notified = false")
     @RegisterRowMapper(InboxEntryMapper.class)
     List<InboxEntry> findInboxEntriesToNotify();
@@ -115,13 +111,27 @@ public interface InboxDao {
             if (rs.wasNull()) {
                 crc32 = null;
             }
-            return new InboxEntry(id, rs.getString(COUNTRY_CODE), rs.getString(STATION_ID), title,
-                    coordinates, rs.getInt(PHOTOGRAPHER_ID), rs.getString("photographerNickname"), rs.getString("photographerEmail"),
-                    extension, rs.getString("comment"), rs.getString("rejectReason"),
-                    rs.getTimestamp("createdAt").toInstant(), done, null, rs.getString("urlPath") != null,
-                    rs.getInt("conflict") > 0,
-                    problemReportType != null ? ProblemReportType.valueOf(problemReportType) : null, active,
-                    crc32, rs.getBoolean("notified"));
+            return InboxEntry.builder()
+                    .id(id)
+                    .countryCode(rs.getString(COUNTRY_CODE))
+                    .stationId(rs.getString(STATION_ID))
+                    .title(title)
+                    .coordinates(coordinates)
+                    .photographerId(rs.getInt(PHOTOGRAPHER_ID))
+                    .photographerNickname(rs.getString("photographerNickname"))
+                    .photographerEmail(rs.getString("photographerEmail"))
+                    .extension(extension)
+                    .comment(rs.getString("comment"))
+                    .rejectReason(rs.getString("rejectReason"))
+                    .createdAt(rs.getTimestamp("createdAt").toInstant())
+                    .done(done)
+                    .hasPhoto(rs.getString("urlPath") != null)
+                    .conflict(rs.getInt("conflict") > 0)
+                    .problemReportType(problemReportType != null ? ProblemReportType.valueOf(problemReportType) : null)
+                    .active(active)
+                    .crc32(crc32)
+                    .notified(rs.getBoolean("notified"))
+                    .build();
         }
 
     }
@@ -129,7 +139,12 @@ public interface InboxDao {
     class PublicInboxEntryMapper implements RowMapper<PublicInboxEntry> {
 
         public PublicInboxEntry map(final ResultSet rs, final StatementContext ctx) throws SQLException {
-            return new PublicInboxEntry(rs.getString(COUNTRY_CODE), rs.getString(STATION_ID), getTitle(rs), getCoordinates(rs));
+            return PublicInboxEntry.builder()
+                    .countryCode(rs.getString(COUNTRY_CODE))
+                    .stationId(rs.getString(STATION_ID))
+                    .title(getTitle(rs))
+                    .coordinates(getCoordinates(rs))
+                    .build();
         }
 
     }

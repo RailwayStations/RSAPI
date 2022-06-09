@@ -35,8 +35,9 @@ class MastodonBotHttpClientTest {
         final var user = new User(0, "name", "url", User.CC0, "email", true, false, "key", false, null, null, null, true);
         final var photo = new Photo(key, "urlPath", user, Instant.now(), User.CC0);
         final var station = new Station(key, "title", new Coordinates(), photo, true);
-        final var inboxEntry = new InboxEntry();
-        inboxEntry.setComment("comment");
+        final var inboxEntry = InboxEntry.builder()
+                        .comment("comment")
+                        .build();
         client.tootNewPhoto(station, inboxEntry);
 
         verify(postRequestedFor(urlEqualTo("/api/v1/statuses"))

@@ -231,11 +231,17 @@ class WebDavSyncTaskTest {
 
     @NotNull
     InboxEntry createInboxEntry() {
-        return new InboxEntry(1, "de", "stationId", "title", new Coordinates(),
-                1, "nickname", null,
-                "jpg", null, null, Instant.now(),
-                false, null, false, false,
-                null, true, 0L, false);
+        return InboxEntry.builder()
+                .id(1)
+                .countryCode("de")
+                .stationId("stationId")
+                .title("title")
+                .coordinates(new Coordinates())
+                .photographerId(1)
+                .photographerNickname("nickname")
+                .extension("jpg")
+                .createdAt(Instant.now())
+                .build();
     }
 
     @NotNull

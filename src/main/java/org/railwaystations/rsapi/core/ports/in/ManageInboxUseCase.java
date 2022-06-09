@@ -30,5 +30,5 @@ public interface ManageInboxUseCase {
     InboxResponse uploadPhoto(String clientInfo, InputStream body, String stationId,
                               String country, String contentType, String stationTitle,
                               Double latitude, Double longitude, String comment,
-                              Boolean active, User user);
+                              boolean active, User user);
 }

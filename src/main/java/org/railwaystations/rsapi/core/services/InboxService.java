@@ -86,9 +86,15 @@ public class InboxService implements ManageInboxUseCase {
         if (problemReport.getType().needsPhoto() && !station.get().hasPhoto()) {
             return InboxResponse.of(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA, "Problem type is only applicable to station with photo");
         }
-        final var inboxEntry = new InboxEntry(problemReport.getCountryCode(), problemReport.getStationId(),
-                null, problemReport.getCoordinates(), user.getId(), null, problemReport.getComment(),
-                problemReport.getType(), null);
+        final var inboxEntry = InboxEntry.builder()
+                .countryCode(problemReport.getCountryCode())
+                .stationId(problemReport.getStationId())
+                .coordinates(problemReport.getCoordinates())
+                .photographerId(user.getId())
+                .comment(problemReport.getComment())
+                .problemReportType(problemReport.getType())
+                .createdAt(Instant.now())
+                .build();
         monitor.sendMessage(String.format("New problem report for %s - %s:%s%n%s: %s%nby %s%nvia %s",
                 station.get().getTitle(), station.get().getKey().getCountry(), station.get().getKey().getId(), problemReport.getType(),
                 StringUtils.trimToEmpty(problemReport.getComment()), user.getName(), clientInfo));
@@ -153,7 +159,7 @@ public class InboxService implements ManageInboxUseCase {
 
     private void updateInboxEntry(final InboxEntry inboxEntry) {
         final var filename = inboxEntry.getFilename();
-        inboxEntry.isProcessed(photoStorage.isProcessed(filename));
+        inboxEntry.setProcessed(photoStorage.isProcessed(filename));
         if (!inboxEntry.isProblemReport()) {
             inboxEntry.setInboxUrl(getInboxUrl(filename, inboxEntry.isProcessed()));
         }
@@ -281,10 +287,10 @@ public class InboxService implements ManageInboxUseCase {
 
         final var station = findOrCreateStation(inboxEntry, command);
 
-        if (station.hasPhoto() && !command.ignoreConflict()) {
+        if (station.hasPhoto() && !command.getIgnoreConflict()) {
             throw new IllegalArgumentException("Station already has a photo");
         }
-        if (hasConflict(inboxEntry.getId(), station) && !command.ignoreConflict()) {
+        if (hasConflict(inboxEntry.getId(), station) && !command.getIgnoreConflict()) {
             throw new IllegalArgumentException("There is a conflict with another upload");
         }
 
@@ -329,13 +335,13 @@ public class InboxService implements ManageInboxUseCase {
 
     private Station findOrCreateStation(final InboxEntry inboxEntry, final InboxEntry command) {
         var station = findStationByCountryAndId(inboxEntry.getCountryCode(), inboxEntry.getStationId());
-        if (station.isEmpty() && command.createStation()) {
+        if (station.isEmpty() && command.getCreateStation()) {
             station = findStationByCountryAndId(command.getCountryCode(), command.getStationId());
             station.ifPresent(s -> LOG.info("Importing missing station upload {} to existing station {}", inboxEntry.getId(), s.getKey()));
         }
 
         return station.orElseGet(()-> {
-            if (!command.createStation() || StringUtils.isNotBlank(inboxEntry.getStationId())) {
+            if (!command.getCreateStation() || StringUtils.isNotBlank(inboxEntry.getStationId())) {
                 throw new IllegalArgumentException("Station not found");
             }
 
@@ -347,7 +353,7 @@ public class InboxService implements ManageInboxUseCase {
             if (StringUtils.isBlank(command.getStationId())) {
                 throw new IllegalArgumentException("Station ID can't be empty");
             }
-            if (hasConflict(inboxEntry.getId(), inboxEntry.getCoordinates()) && !command.ignoreConflict()) {
+            if (hasConflict(inboxEntry.getId(), inboxEntry.getCoordinates()) && !command.getIgnoreConflict()) {
                 throw new IllegalArgumentException("There is a conflict with a nearby station");
             }
             if (command.hasCoords() && !command.getCoordinates().isValid()) {
@@ -387,7 +393,7 @@ public class InboxService implements ManageInboxUseCase {
     public InboxResponse uploadPhoto(final String clientInfo, final InputStream body, final String stationId,
                                      final String country, final String contentType, final String stationTitle,
                                      final Double latitude, final Double longitude, final String comment,
-                                     final Boolean active, final User user) {
+                                     final boolean active, final User user) {
         if (!user.isEmailVerified()) {
             LOG.info("Photo upload failed for user {}, email not verified", user.getName());
             return InboxResponse.of(InboxResponse.InboxResponseState.UNAUTHORIZED,"Email not verified");
@@ -423,11 +429,23 @@ public class InboxService implements ManageInboxUseCase {
         final Long id;
         final Long crc32;
         try {
-            id = station.map(s -> inboxDao.insert(new InboxEntry(s.getKey().getCountry(), s.getKey().getId(), stationTitle,
-                        null, user.getId(), extension, comment, null, active)))
-                    .orElseGet(() -> inboxDao.insert(new InboxEntry(country, null, stationTitle,
-                        coordinates, user.getId(), extension, comment, null, active)));
-            filename = InboxEntry.getFilename(id, extension);
+            final var inboxEntry = InboxEntry.builder()
+                    .countryCode(country)
+                    .title(stationTitle)
+                    .coordinates(coordinates)
+                    .photographerId(user.getId())
+                    .extension(extension)
+                    .comment(comment)
+                    .active(active)
+                    .createdAt(Instant.now())
+                    .build();
+
+            station.ifPresent(s -> {
+                inboxEntry.setCountryCode(s.getKey().getCountry());
+                inboxEntry.setStationId(s.getKey().getId());
+            });
+            id = inboxDao.insert(inboxEntry);
+            filename = InboxEntry.createFilename(id, extension);
             crc32 = photoStorage.storeUpload(body, filename);
             inboxDao.updateCrc32(id, crc32);
 

@@ -91,7 +91,16 @@ class NotifyUsersServiceTest {
 
     @NotNull
     private InboxEntry createInboxEntry(final int id, final String stationId, final String title, final String rejectReason) {
-        return new InboxEntry(id, "de", stationId, title, null, 1, "nickname", "nickname@example.com", null, null, rejectReason, null, true, null, false, false, null, true, null, false);
+        return InboxEntry.builder()
+                .id(id)
+                .countryCode("de")
+                .stationId(stationId)
+                .title(title)
+                .photographerId(1)
+                .photographerNickname("nickname")
+                .photographerEmail("nickname@example.com")
+                .rejectReason(rejectReason)
+                .build();
     }
 
 }

@@ -342,10 +342,10 @@ public class PhotoInboxEntryControllerTest {
     public void testUserInbox() throws Exception {
         final var user = User.builder().name("nickname").license("CC0").id(42).email("nickname@example.com").build();
 
-        when(inboxDao.findById(1)).thenReturn(new InboxEntry(1, "de", "4711", "Station 4711", new Coordinates(50.1,9.2), user.getId(), user.getName(), null, "jpg", null, null, Instant.now(), false, null, false, false, null, null, null, false));
-        when(inboxDao.findById(2)).thenReturn(new InboxEntry(2, "de", "1234", "Station 1234", new Coordinates(50.1,9.2), user.getId(), user.getName(), null, "jpg", null, null, Instant.now(), true, null, false, false, null, null, null, false));
-        when(inboxDao.findById(3)).thenReturn(new InboxEntry(3, "de", "5678", "Station 5678", new Coordinates(50.1,9.2), user.getId(), user.getName(), null, "jpg", null, "rejected", Instant.now(), true, null, false, false, null, null, null, false));
-        when(inboxDao.findById(4)).thenReturn(new InboxEntry(4, "ch", "0815", "Station 0815", new Coordinates(50.1,9.2), user.getId(), user.getName(), null, "jpg", null, null, Instant.now(), false, null, false, false, null, null, null, false));
+        when(inboxDao.findById(1)).thenReturn(createInboxEntry(user, 1, "de", "4711", null, false));
+        when(inboxDao.findById(2)).thenReturn(createInboxEntry(user, 2, "de", "1234", null, true));
+        when(inboxDao.findById(3)).thenReturn(createInboxEntry(user, 3, "de", "5678", "rejected", true));
+        when(inboxDao.findById(4)).thenReturn(createInboxEntry(user, 4, "ch", "0815", null, false));
 
         final var inboxStateQueries = """
                 [
@@ -369,6 +369,22 @@ public class PhotoInboxEntryControllerTest {
                 .andExpect(jsonPath("$.[1].state").value("ACCEPTED"))
                 .andExpect(jsonPath("$.[2].state").value("REJECTED"))
                 .andExpect(jsonPath("$.[3].state").value("CONFLICT"));
+    }
+
+    private InboxEntry createInboxEntry(final User user, final int id, final String countryCode, final String stationId, final String rejectReason, final boolean done) {
+        return InboxEntry.builder()
+                .id(id)
+                .countryCode(countryCode)
+                .stationId(stationId)
+                .title("Station " +  stationId)
+                .coordinates(new Coordinates(50.1, 9.2))
+                .photographerId(user.getId())
+                .photographerNickname(user.getName())
+                .extension("jpg")
+                .done(done)
+                .rejectReason(rejectReason)
+                .createdAt(Instant.now())
+                .build();
     }
 
     private void assertFileWithContentExistsInInbox(final String content, final String filename) throws IOException {

@@ -289,8 +289,8 @@ public class InboxController {
                 .createdAt(inboxEntry.getCreatedAt().toEpochMilli())
                 .done(inboxEntry.isDone())
                 .filename(inboxEntry.getFilename())
-                .hasConflict(inboxEntry.hasConflict())
-                .hasPhoto(inboxEntry.hasPhoto())
+                .hasConflict(inboxEntry.isConflict())
+                .hasPhoto(inboxEntry.isHasPhoto())
                 .isProcessed(inboxEntry.isProcessed())
                 .photographerEmail(inboxEntry.getPhotographerEmail())
                 .photographerNickname(inboxEntry.getPhotographerNickname())
@@ -327,8 +327,17 @@ public class InboxController {
     }
 
     private InboxEntry toDomain(final InboxCommandDto command) {
-        return new InboxEntry(command.getId(), command.getCountryCode(), command.getStationId(), command.getRejectReason(),
-                toDomain(command.getCommand()), command.getDS100(), command.getActive(), command.getIgnoreConflict(), command.getCreateStation());
+        return InboxEntry.builder()
+                .id(command.getId())
+                .countryCode(command.getCountryCode())
+                .stationId(command.getStationId())
+                .rejectReason(command.getRejectReason())
+                .command(toDomain(command.getCommand()))
+                .ds100(command.getDS100())
+                .active(command.getActive() != null ? command.getActive() : true)
+                .ignoreConflict(command.getIgnoreConflict())
+                .createStation(command.getCreateStation())
+                .build();
     }
 
     private InboxEntry.Command toDomain(final InboxCommandDto.CommandEnum command) {
@@ -363,7 +372,7 @@ public class InboxController {
                                       final Boolean active, final AuthUser user) {
         final InboxResponse inboxResponse = manageInboxUseCase.uploadPhoto(userAgent, body, StringUtils.trimToNull(stationId), StringUtils.trimToNull(countryCode),
                 StringUtils.trimToEmpty(contentType).split(";")[0], stationTitle,
-                latitude, longitude, comment, active, user.getUser());
+                latitude, longitude, comment, active != null ? active : true, user.getUser());
         return consumeBodyAndReturn(body, toDto(inboxResponse));
     }
 
