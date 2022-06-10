@@ -3,7 +3,6 @@ package org.railwaystations.rsapi.utils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -19,21 +18,21 @@ public class ImageUtil {
     public static final String JPEG = "jpeg";
     public static final String PNG = "png";
 
-    public static byte[] scalePhoto(final Path photo, final Integer width) throws IOException {
-        final ByteArrayOutputStream os = new ByteArrayOutputStream();
-        final BufferedImage inputImage = ImageIO.read(photo.toFile());
-        final String extension = getExtension(photo.getFileName().toString());
+    public static byte[] scalePhoto(Path photo, Integer width) throws IOException {
+        var os = new ByteArrayOutputStream();
+        var inputImage = ImageIO.read(photo.toFile());
+        var extension = getExtension(photo.getFileName().toString());
         assert extension != null;
         if (width != null && width > 0 && width < inputImage.getWidth()) {
-            final double scale = (double) width / (double) inputImage.getWidth();
-            final int height = (int) (inputImage.getHeight() * scale);
+            double scale = (double) width / (double) inputImage.getWidth();
+            int height = (int) (inputImage.getHeight() * scale);
 
             // creates output image
-            final BufferedImage outputImage = new BufferedImage(width,
+            var outputImage = new BufferedImage(width,
                     height, inputImage.getType());
 
             // scales the input image to the output image
-            final Graphics2D g2d = outputImage.createGraphics();
+            var g2d = outputImage.createGraphics();
             g2d.drawImage(inputImage, 0, 0, width, height, null);
             g2d.dispose();
 
@@ -45,18 +44,18 @@ public class ImageUtil {
         return os.toByteArray();
     }
 
-    public static String getExtension(final String filename) {
+    public static String getExtension(String filename) {
         if (StringUtils.isBlank(filename)) {
             return null;
         }
-        final int pos = filename.lastIndexOf(".");
-        if (pos > -1 && pos < filename.length()) {
+        int pos = filename.lastIndexOf(".");
+        if (pos > -1) {
             return filename.toLowerCase(Locale.ROOT).substring(pos + 1);
         }
         return null;
     }
 
-    public static String mimeToExtension(final String contentType) {
+    public static String mimeToExtension(String contentType) {
         if (StringUtils.isBlank(contentType)) {
             return null;
         }
@@ -67,7 +66,7 @@ public class ImageUtil {
         };
     }
 
-    public static String extensionToMimeType(final String extension) {
+    public static String extensionToMimeType(String extension) {
         if (StringUtils.isBlank(extension)) {
             throw new IllegalArgumentException("Unsupported null extension");
         }

@@ -23,14 +23,14 @@ public class PhotoStationsService implements FindPhotoStationsUseCase {
     private final StationDao stationDao;
     private final String photoBaseUrl;
 
-    public PhotoStationsService(final StationDao stationDao, @Value("${photoBaseUrl}") final String photoBaseUrl) {
+    public PhotoStationsService(StationDao stationDao, @Value("${photoBaseUrl}") String photoBaseUrl) {
         super();
         this.stationDao = stationDao;
         this.photoBaseUrl = photoBaseUrl;
     }
 
-    public Map<Station.Key, Station> getStationsByCountry(final Set<String> countryCodes) {
-        final Set<Station> stations;
+    public Map<Station.Key, Station> getStationsByCountry(Set<String> countryCodes) {
+        Set<Station> stations;
         if (countryCodes == null || countryCodes.isEmpty()) {
             stations = stationDao.all();
         } else {
@@ -39,35 +39,35 @@ public class PhotoStationsService implements FindPhotoStationsUseCase {
         return stations.stream().map(this::injectPhotoBaseUrl).collect(toMap(Station::getKey, Function.identity()));
     }
 
-    private Station injectPhotoBaseUrl(final Station station) {
+    private Station injectPhotoBaseUrl(Station station) {
         station.prependPhotoBaseUrl(photoBaseUrl);
         return station;
     }
 
-    public Optional<Station> findByCountryAndId(final String country, final String stationId) {
+    public Optional<Station> findByCountryAndId(String country, String stationId) {
         if (StringUtils.isBlank(stationId)) {
             return Optional.empty();
         }
         if (StringUtils.isNotBlank(country)) {
             return findByKey(new Station.Key(country, stationId));
         }
-        final Set<Station> stations = stationDao.findById(stationId);
+        Set<Station> stations = stationDao.findById(stationId);
         if (stations.size() > 1) {
             return Optional.empty(); // id is not unique
         }
         return stations.stream().findFirst().map(this::injectPhotoBaseUrl);
     }
 
-    public Optional<Station> findByKey(final Station.Key key) {
+    public Optional<Station> findByKey(Station.Key key) {
         return stationDao.findByKey(key.getCountry(), key.getId()).stream().findFirst().map(this::injectPhotoBaseUrl);
     }
 
-    public List<Station> findRecentImports(final Instant since) {
+    public List<Station> findRecentImports(Instant since) {
         return stationDao.findRecentImports(since).stream().map(this::injectPhotoBaseUrl).toList();
     }
 
-    public List<Station> findStationsBy(final Set<String> countries, final Boolean hasPhoto, final String photographer,
-                                        final Integer maxDistance, final Double lat, final Double lon, final Boolean active) {
+    public List<Station> findStationsBy(Set<String> countries, Boolean hasPhoto, String photographer,
+                                        Integer maxDistance, Double lat, Double lon, Boolean active) {
         // TODO: can we search this on the DB?
         return getStationsByCountry(countries)
                 .values().stream().filter(station -> station.appliesTo(hasPhoto, photographer, maxDistance, lat, lon, active)).collect(Collectors.toList());

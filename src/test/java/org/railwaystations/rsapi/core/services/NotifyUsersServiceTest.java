@@ -32,7 +32,7 @@ class NotifyUsersServiceTest {
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @ParameterizedTest
     @MethodSource("provideUsersToNotNotify")
-    public void doNotSendEmail(final Optional<User> user) {
+    void doNotSendEmail(Optional<User> user) {
         when(inboxDao.findInboxEntriesToNotify()).thenReturn(createInboxEntriesToNotify());
         when(userDao.findById(1)).thenReturn(user);
         service.notifyUsers();
@@ -40,7 +40,7 @@ class NotifyUsersServiceTest {
     }
 
     @Test
-    public void sendEmail() {
+    void sendEmail() {
         when(inboxDao.findInboxEntriesToNotify()).thenReturn(createInboxEntriesToNotify());
         when(userDao.findById(1)).thenReturn(createUser("nickname@example.com", EMAIL_VERIFIED, true));
         service.notifyUsers();
@@ -77,7 +77,7 @@ class NotifyUsersServiceTest {
         );
     }
 
-    private static Optional<User> createUser(final String email, final String emailVerification, final boolean sendNotifications) {
+    private static Optional<User> createUser(String email, String emailVerification, boolean sendNotifications) {
         return Optional.of(User.builder().name("nickname").id(1).email(email).ownPhotos(true).anonymous(false).admin(false).emailVerification(emailVerification).sendNotifications(sendNotifications).build());
     }
 
@@ -90,7 +90,7 @@ class NotifyUsersServiceTest {
     }
 
     @NotNull
-    private InboxEntry createInboxEntry(final int id, final String stationId, final String title, final String rejectReason) {
+    private InboxEntry createInboxEntry(int id, String stationId, String title, String rejectReason) {
         return InboxEntry.builder()
                 .id(id)
                 .countryCode("de")

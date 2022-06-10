@@ -12,12 +12,12 @@ public class CountryService implements ListCountriesUseCase {
 
     private final CountryDao countryDao;
 
-    public CountryService(final CountryDao countryDao) {
+    public CountryService(CountryDao countryDao) {
         this.countryDao = countryDao;
     }
 
     @Override
-    public Collection<Country> list(final Boolean onlyActive) {
+    public Collection<Country> list(Boolean onlyActive) {
         return countryDao.list(onlyActive == null || onlyActive);
     }
 

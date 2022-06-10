@@ -87,33 +87,33 @@ public class InboxController {
      */
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE + ";charset=UTF-8"}, value = "/photoUpload", produces = MediaType.TEXT_HTML_VALUE)
     @ResponseBody
-    public ModelAndView photoUploadIframe(@RequestHeader(value = HttpHeaders.USER_AGENT, required = false) final String userAgent,
-                                          @RequestParam(EMAIL) final String email,
-                                          @RequestParam(UPLOAD_TOKEN) final String uploadToken,
-                                          @RequestParam(value = STATION_ID, required = false) final String stationId,
-                                          @RequestParam(value = COUNTRY_CODE, required = false) final String countryCode,
-                                          @RequestParam(value = STATION_TITLE, required = false) final String stationTitle,
-                                          @RequestParam(value = LATITUDE, required = false) final Double latitude,
-                                          @RequestParam(value = LONGITUDE, required = false) final Double longitude,
-                                          @RequestParam(value = COMMENT, required = false) final String comment,
-                                          @RequestParam(value = ACTIVE, required = false) final Boolean active,
-                                          @RequestParam(value = FILE) final MultipartFile file,
-                                          @RequestHeader(value = HttpHeaders.REFERER) final String referer) throws JsonProcessingException {
+    public ModelAndView photoUploadIframe(@RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
+                                          @RequestParam(EMAIL) String email,
+                                          @RequestParam(UPLOAD_TOKEN) String uploadToken,
+                                          @RequestParam(value = STATION_ID, required = false) String stationId,
+                                          @RequestParam(value = COUNTRY_CODE, required = false) String countryCode,
+                                          @RequestParam(value = STATION_TITLE, required = false) String stationTitle,
+                                          @RequestParam(value = LATITUDE, required = false) Double latitude,
+                                          @RequestParam(value = LONGITUDE, required = false) Double longitude,
+                                          @RequestParam(value = COMMENT, required = false) String comment,
+                                          @RequestParam(value = ACTIVE, required = false) Boolean active,
+                                          @RequestParam(value = FILE) MultipartFile file,
+                                          @RequestHeader(value = HttpHeaders.REFERER) String referer) throws JsonProcessingException {
         log.info("MultipartFormData: email={}, station={}, country={}, file={}", email, stationId, countryCode, file.getName());
-        final var refererUri = URI.create(referer);
+        var refererUri = URI.create(referer);
 
         try {
-            final var authentication = authenticator.authenticate(new UsernamePasswordAuthenticationToken(email, uploadToken));
+            var authentication = authenticator.authenticate(new UsernamePasswordAuthenticationToken(email, uploadToken));
             if (authentication == null || !authentication.isAuthenticated()) {
                 return createIFrameAnswer(consumeBodyAndReturn(file.getInputStream(),
                                 new InboxResponseDto().state(InboxResponseDto.StateEnum.UNAUTHORIZED)),
                                 refererUri);
             }
 
-            final var response = uploadPhoto(userAgent, file.getInputStream(), StringUtils.trimToNull(stationId),
+            var response = uploadPhoto(userAgent, file.getInputStream(), StringUtils.trimToNull(stationId),
                     countryCode, file.getContentType(), stationTitle, latitude, longitude, comment, active, userDetailsService.loadUserByUsername(email));
             return createIFrameAnswer(response, refererUri);
-        } catch (final Exception e) {
+        } catch (Exception e) {
             log.error("FormUpload error", e);
             return createIFrameAnswer(new InboxResponseDto().state(InboxResponseDto.StateEnum.ERROR), refererUri);
         }
@@ -121,25 +121,25 @@ public class InboxController {
 
     @PostMapping(consumes = MediaType.ALL_VALUE ,produces = MediaType.APPLICATION_JSON_VALUE, value = "/photoUpload")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<InboxResponseDto> photoUpload(final HttpServletRequest request,
-                                                        @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) final String userAgent,
-                                                        @RequestHeader(value = "Station-Id", required = false) final String stationId,
-                                                        @RequestHeader(value = "Country", required = false) final String country,
-                                                        @RequestHeader(value = HttpHeaders.CONTENT_TYPE) final String contentType,
-                                                        @RequestHeader(value = "Station-Title", required = false) final String encStationTitle,
-                                                        @RequestHeader(value = "Latitude", required = false) final Double latitude,
-                                                        @RequestHeader(value = "Longitude", required = false) final Double longitude,
-                                                        @RequestHeader(value = "Comment", required = false) final String encComment,
-                                                        @RequestHeader(value = "Active", required = false) final Boolean active,
-                                                        @AuthenticationPrincipal final AuthUser user) throws IOException {
-        final var stationTitle = encStationTitle != null ? URLDecoder.decode(encStationTitle, StandardCharsets.UTF_8) : null;
-        final var comment = encComment != null ? URLDecoder.decode(encComment, StandardCharsets.UTF_8) : null;
-        final var inboxResponse = uploadPhoto(userAgent, request.getInputStream(), stationId,
+    public ResponseEntity<InboxResponseDto> photoUpload(HttpServletRequest request,
+                                                        @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
+                                                        @RequestHeader(value = "Station-Id", required = false) String stationId,
+                                                        @RequestHeader(value = "Country", required = false) String country,
+                                                        @RequestHeader(value = HttpHeaders.CONTENT_TYPE) String contentType,
+                                                        @RequestHeader(value = "Station-Title", required = false) String encStationTitle,
+                                                        @RequestHeader(value = "Latitude", required = false) Double latitude,
+                                                        @RequestHeader(value = "Longitude", required = false) Double longitude,
+                                                        @RequestHeader(value = "Comment", required = false) String encComment,
+                                                        @RequestHeader(value = "Active", required = false) Boolean active,
+                                                        @AuthenticationPrincipal AuthUser user) throws IOException {
+        var stationTitle = encStationTitle != null ? URLDecoder.decode(encStationTitle, StandardCharsets.UTF_8) : null;
+        var comment = encComment != null ? URLDecoder.decode(encComment, StandardCharsets.UTF_8) : null;
+        var inboxResponse = uploadPhoto(userAgent, request.getInputStream(), stationId,
                 country, contentType, stationTitle, latitude, longitude, comment, active, user);
         return new ResponseEntity<>(inboxResponse, toHttpStatus(inboxResponse.getState()));
     }
 
-    private InboxResponseDto toDto(final InboxResponse inboxResponse) {
+    private InboxResponseDto toDto(InboxResponse inboxResponse) {
         return new InboxResponseDto()
                 .id(inboxResponse.getId())
                 .crc32(inboxResponse.getCrc32())
@@ -149,7 +149,7 @@ public class InboxController {
                 .message(inboxResponse.getMessage());
     }
 
-    private InboxResponseDto.StateEnum toDto(final InboxResponse.InboxResponseState inboxResponseState) {
+    private InboxResponseDto.StateEnum toDto(InboxResponse.InboxResponseState inboxResponseState) {
         return switch (inboxResponseState) {
             case ERROR -> InboxResponseDto.StateEnum.ERROR;
             case CONFLICT -> InboxResponseDto.StateEnum.CONFLICT;
@@ -164,14 +164,14 @@ public class InboxController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE, value = "/reportProblem")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<InboxResponseDto> reportProblem(@RequestHeader(HttpHeaders.USER_AGENT) final String userAgent,
-                                       @RequestBody @NotNull() final ProblemReportDto problemReport,
-                                       @AuthenticationPrincipal final AuthUser user) {
-        final InboxResponseDto inboxResponse = toDto(manageInboxUseCase.reportProblem(toDomain(problemReport), user.getUser(), userAgent));
+    public ResponseEntity<InboxResponseDto> reportProblem(@RequestHeader(HttpHeaders.USER_AGENT) String userAgent,
+                                       @RequestBody @NotNull() ProblemReportDto problemReport,
+                                       @AuthenticationPrincipal AuthUser user) {
+        InboxResponseDto inboxResponse = toDto(manageInboxUseCase.reportProblem(toDomain(problemReport), user.getUser(), userAgent));
         return new ResponseEntity<>(inboxResponse, toHttpStatus(inboxResponse.getState()));
     }
 
-    private ProblemReport toDomain(final ProblemReportDto problemReport) {
+    private ProblemReport toDomain(ProblemReportDto problemReport) {
         return ProblemReport.builder()
                 .countryCode(problemReport.getCountryCode())
                 .stationId(problemReport.getStationId())
@@ -181,7 +181,7 @@ public class InboxController {
                 .build();
     }
 
-    private ProblemReportType toDomain(final ProblemReportDto.TypeEnum dtoType) {
+    private ProblemReportType toDomain(ProblemReportDto.TypeEnum dtoType) {
         return switch (dtoType) {
             case OTHER -> ProblemReportType.OTHER;
             case WRONG_NAME -> ProblemReportType.WRONG_NAME;
@@ -194,7 +194,7 @@ public class InboxController {
         };
     }
 
-    private Coordinates mapCoordinates(final Double lat, final Double lon) {
+    private Coordinates mapCoordinates(Double lat, Double lon) {
         if (lat == null || lon == null) {
             return null;
         }
@@ -206,13 +206,13 @@ public class InboxController {
         return toPublicInboxEntryDto(manageInboxUseCase.publicInbox());
     }
 
-    private List<PublicInboxEntryDto> toPublicInboxEntryDto(final List<PublicInboxEntry> publicInboxEntries) {
+    private List<PublicInboxEntryDto> toPublicInboxEntryDto(List<PublicInboxEntry> publicInboxEntries) {
         return publicInboxEntries.stream()
                 .map(this::toDto)
                 .toList();
     }
 
-    private PublicInboxEntryDto toDto(final PublicInboxEntry publicInboxEntry) {
+    private PublicInboxEntryDto toDto(PublicInboxEntry publicInboxEntry) {
         return new PublicInboxEntryDto()
                 .countryCode(publicInboxEntry.getCountryCode())
                 .stationId(publicInboxEntry.getStationId())
@@ -223,23 +223,23 @@ public class InboxController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE, value = "/userInbox")
     @PreAuthorize("isAuthenticated()")
-    public List<InboxStateQueryResponseDto> userInbox(@AuthenticationPrincipal final AuthUser user, @RequestBody @NotNull final List<InboxStateQueryRequestDto> inboxStateQueryRequestDtos) {
+    public List<InboxStateQueryResponseDto> userInbox(@AuthenticationPrincipal AuthUser user, @RequestBody @NotNull List<InboxStateQueryRequestDto> inboxStateQueryRequestDtos) {
         return toInboxStateQueryDto(manageInboxUseCase.userInbox(user.getUser(), toIdList(inboxStateQueryRequestDtos)));
     }
 
-    private List<Long> toIdList(final List<InboxStateQueryRequestDto> inboxStateQueryRequestDtos) {
+    private List<Long> toIdList(List<InboxStateQueryRequestDto> inboxStateQueryRequestDtos) {
         return inboxStateQueryRequestDtos.stream()
                 .map(InboxStateQueryRequestDto::getId)
                 .toList();
     }
 
-    private List<InboxStateQueryResponseDto> toInboxStateQueryDto(final List<InboxStateQuery> inboxStateQueries) {
+    private List<InboxStateQueryResponseDto> toInboxStateQueryDto(List<InboxStateQuery> inboxStateQueries) {
         return inboxStateQueries.stream()
                 .map(this::toDto)
                 .toList();
     }
 
-    private InboxStateQueryResponseDto toDto(final InboxStateQuery inboxStateQuery) {
+    private InboxStateQueryResponseDto toDto(InboxStateQuery inboxStateQuery) {
         return new InboxStateQueryResponseDto()
                 .id(inboxStateQuery.getId())
                 .countryCode(inboxStateQuery.getCountryCode())
@@ -253,7 +253,7 @@ public class InboxController {
                 .state(toDto(inboxStateQuery.getState()));
     }
 
-    public InboxStateQueryResponseDto.StateEnum toDto(final InboxStateQuery.InboxState inboxState) {
+    public InboxStateQueryResponseDto.StateEnum toDto(InboxStateQuery.InboxState inboxState) {
         return switch (inboxState) {
             case REVIEW -> InboxStateQueryResponseDto.StateEnum.REVIEW;
             case ACCEPTED -> InboxStateQueryResponseDto.StateEnum.ACCEPTED;
@@ -265,17 +265,17 @@ public class InboxController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/adminInbox")
     @PreAuthorize("hasRole('ADMIN')")
-    public List<InboxEntryDto> adminInbox(@AuthenticationPrincipal final AuthUser user) {
+    public List<InboxEntryDto> adminInbox(@AuthenticationPrincipal AuthUser user) {
         return toInboxEntryDto(manageInboxUseCase.listAdminInbox(user.getUser()));
     }
 
-    private List<InboxEntryDto> toInboxEntryDto(final List<InboxEntry> inboxEntries) {
+    private List<InboxEntryDto> toInboxEntryDto(List<InboxEntry> inboxEntries) {
         return inboxEntries.stream()
                 .map(this::toDto)
                 .toList();
     }
 
-    private InboxEntryDto toDto(final InboxEntry inboxEntry) {
+    private InboxEntryDto toDto(InboxEntry inboxEntry) {
         return new InboxEntryDto()
                 .id(inboxEntry.getId())
                 .countryCode(inboxEntry.getCountryCode())
@@ -297,7 +297,7 @@ public class InboxController {
                 .problemReportType(toDto(inboxEntry.getProblemReportType()));
     }
 
-    private InboxEntryDto.ProblemReportTypeEnum toDto(final ProblemReportType problemReportType) {
+    private InboxEntryDto.ProblemReportTypeEnum toDto(ProblemReportType problemReportType) {
         if (problemReportType == null) {
             return null;
         }
@@ -315,10 +315,10 @@ public class InboxController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, value = "/adminInbox", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<AdminInboxCommandResponseDto> adminInbox(@AuthenticationPrincipal final AuthUser user, @RequestBody final InboxCommandDto command) {
+    public ResponseEntity<AdminInboxCommandResponseDto> adminInbox(@AuthenticationPrincipal AuthUser user, @RequestBody InboxCommandDto command) {
         try {
             manageInboxUseCase.processAdminInboxCommand(user.getUser(), toDomain(command));
-        } catch (final IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             log.warn("adminInbox command {} failed", command, e);
             return new ResponseEntity<>(new AdminInboxCommandResponseDto().status(HttpStatus.BAD_REQUEST.value()).message(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
@@ -326,7 +326,7 @@ public class InboxController {
         return new ResponseEntity<>(new AdminInboxCommandResponseDto().status(HttpStatus.OK.value()).message("ok"), HttpStatus.OK);
     }
 
-    private InboxEntry toDomain(final InboxCommandDto command) {
+    private InboxEntry toDomain(InboxCommandDto command) {
         return InboxEntry.builder()
                 .id(command.getId())
                 .countryCode(command.getCountryCode())
@@ -340,7 +340,7 @@ public class InboxController {
                 .build();
     }
 
-    private InboxEntry.Command toDomain(final InboxCommandDto.CommandEnum command) {
+    private InboxEntry.Command toDomain(InboxCommandDto.CommandEnum command) {
         return switch (command) {
             case PHOTO_OUTDATED -> InboxEntry.Command.PHOTO_OUTDATED;
             case IMPORT -> InboxEntry.Command.IMPORT;
@@ -357,7 +357,7 @@ public class InboxController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/adminInboxCount")
     @PreAuthorize("hasRole('ADMIN')")
-    public InboxCountResponseDto adminInboxCount(@AuthenticationPrincipal final AuthUser user) {
+    public InboxCountResponseDto adminInboxCount(@AuthenticationPrincipal AuthUser user) {
         return new InboxCountResponseDto().pendingInboxEntries(manageInboxUseCase.countPendingInboxEntries());
     }
 
@@ -366,17 +366,17 @@ public class InboxController {
         return new NextZResponseDto().nextZ(manageInboxUseCase.getNextZ());
     }
 
-    private InboxResponseDto uploadPhoto(final String userAgent, final InputStream body, final String stationId,
-                                      final String countryCode, final String contentType, final String stationTitle,
-                                      final Double latitude, final Double longitude, final String comment,
-                                      final Boolean active, final AuthUser user) {
-        final InboxResponse inboxResponse = manageInboxUseCase.uploadPhoto(userAgent, body, StringUtils.trimToNull(stationId), StringUtils.trimToNull(countryCode),
+    private InboxResponseDto uploadPhoto(String userAgent, InputStream body, String stationId,
+                                      String countryCode, String contentType, String stationTitle,
+                                      Double latitude, Double longitude, String comment,
+                                      Boolean active, AuthUser user) {
+        InboxResponse inboxResponse = manageInboxUseCase.uploadPhoto(userAgent, body, StringUtils.trimToNull(stationId), StringUtils.trimToNull(countryCode),
                 StringUtils.trimToEmpty(contentType).split(";")[0], stationTitle,
                 latitude, longitude, comment, active != null ? active : true, user.getUser());
         return consumeBodyAndReturn(body, toDto(inboxResponse));
     }
 
-    private HttpStatus toHttpStatus(final InboxResponseDto.StateEnum state) {
+    private HttpStatus toHttpStatus(InboxResponseDto.StateEnum state) {
         return switch (state) {
             case REVIEW -> HttpStatus.ACCEPTED;
             case LAT_LON_OUT_OF_RANGE, NOT_ENOUGH_DATA, UNSUPPORTED_CONTENT_TYPE -> HttpStatus.BAD_REQUEST;
@@ -387,19 +387,19 @@ public class InboxController {
         };
     }
 
-    private ModelAndView createIFrameAnswer(final InboxResponseDto response, final URI referer) throws JsonProcessingException {
-        final ModelAndView modelAndView = new ModelAndView();
+    private ModelAndView createIFrameAnswer(InboxResponseDto response, URI referer) throws JsonProcessingException {
+        ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("iframe");
         modelAndView.getModel().put("response", mapper.writeValueAsString(response));
         modelAndView.getModel().put("referer", referer);
         return modelAndView;
     }
 
-    private InboxResponseDto consumeBodyAndReturn(final InputStream body, final InboxResponseDto response) {
+    private InboxResponseDto consumeBodyAndReturn(InputStream body, InboxResponseDto response) {
         if (body != null) {
             try {
                 IOUtils.copy(body, NullOutputStream.NULL_OUTPUT_STREAM);
-            } catch (final IOException e) {
+            } catch (IOException e) {
                 log.warn("Unable to consume body", e);
             }
         }

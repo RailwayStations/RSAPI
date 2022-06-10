@@ -1,5 +1,6 @@
 package org.railwaystations.rsapi.core.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.railwaystations.rsapi.adapter.out.db.UserDao;
@@ -7,8 +8,6 @@ import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.ports.in.ManageProfileUseCase;
 import org.railwaystations.rsapi.core.ports.out.Mailer;
 import org.railwaystations.rsapi.core.ports.out.Monitor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,9 +17,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class ProfileService implements ManageProfileUseCase {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ProfileService.class);
 
     private final Monitor monitor;
     private final Mailer mailer;
@@ -28,7 +26,7 @@ public class ProfileService implements ManageProfileUseCase {
     private final String eMailVerificationUrl;
     private final PasswordEncoder passwordEncoder;
 
-    public ProfileService(final Monitor monitor, final Mailer mailer, final UserDao userDao, @Value("${mailVerificationUrl}") final String eMailVerificationUrl, final PasswordEncoder passwordEncoder) {
+    public ProfileService(Monitor monitor, Mailer mailer, UserDao userDao, @Value("${mailVerificationUrl}") String eMailVerificationUrl, PasswordEncoder passwordEncoder) {
         this.monitor = monitor;
         this.mailer = mailer;
         this.userDao = userDao;
@@ -37,9 +35,9 @@ public class ProfileService implements ManageProfileUseCase {
     }
 
     @Override
-    public void changePassword(final User user, final String newPassword) {
-        LOG.info("Password change for '{}'", user.getEmail());
-        final String trimmedPassword = StringUtils.trimToEmpty(newPassword);
+    public void changePassword(User user, String newPassword) {
+        log.info("Password change for '{}'", user.getEmail());
+        var trimmedPassword = StringUtils.trimToEmpty(newPassword);
         if (trimmedPassword.length() < 8 ) {
             throw new IllegalArgumentException("Password too short");
         }
@@ -47,9 +45,9 @@ public class ProfileService implements ManageProfileUseCase {
     }
 
     @Override
-    public User resetPassword(final String nameOrEmail, final String clientInfo) {
-        LOG.info("Password reset requested for '{}'", nameOrEmail);
-        final User user = userDao.findByEmail(User.normalizeEmail(nameOrEmail))
+    public User resetPassword(String nameOrEmail, String clientInfo) {
+        log.info("Password reset requested for '{}'", nameOrEmail);
+        var user = userDao.findByEmail(User.normalizeEmail(nameOrEmail))
                 .orElse(userDao.findByNormalizedName(User.normalizeName(nameOrEmail)).orElse(null));
 
         if (user == null) {
@@ -77,14 +75,14 @@ public class ProfileService implements ManageProfileUseCase {
     }
 
     @Override
-    public void register(final User newUser, final String clientInfo) throws ProfileConflictException {
-        LOG.info("New registration for '{}' with '{}'", newUser.getName(), newUser.getEmail());
+    public void register(User newUser, String clientInfo) throws ProfileConflictException {
+        log.info("New registration for '{}' with '{}'", newUser.getName(), newUser.getEmail());
 
         if (!newUser.isValidForRegistration()) {
             throw new IllegalArgumentException("Invalid data");
         }
 
-        final Optional<User> existingName = userDao.findByNormalizedName(newUser.getNormalizedName());
+        Optional<User> existingName = userDao.findByNormalizedName(newUser.getNormalizedName());
         if (existingName.isPresent() && !newUser.getEmail().equals(existingName.get().getEmail())) {
             monitor.sendMessage(
                     String.format("Registration for user '%s' with eMail '%s' failed, name is already taken by different eMail '%s'%nvia %s",
@@ -99,7 +97,7 @@ public class ProfileService implements ManageProfileUseCase {
             throw new ProfileConflictException();
         }
 
-        final boolean passwordProvided = StringUtils.isNotBlank(newUser.getNewPassword());
+        boolean passwordProvided = StringUtils.isNotBlank(newUser.getNewPassword());
         if (!passwordProvided) {
             newUser.setNewPassword(createNewPassword());
             newUser.setEmailVerification(User.EMAIL_VERIFIED_AT_NEXT_LOGIN);
@@ -126,22 +124,22 @@ public class ProfileService implements ManageProfileUseCase {
         return RandomStringUtils.randomAlphanumeric(12);
     }
 
-    private void encryptPassword(@NotNull final User user) {
+    private void encryptPassword(@NotNull User user) {
         user.setKey(passwordEncoder.encode(user.getNewPassword()));
     }
 
     @Override
-    public void updateProfile(final User user, final User newProfile, final String clientInfo) throws ProfileConflictException {
-        LOG.info("Update profile for '{}'", user.getEmail());
+    public void updateProfile(User user, User newProfile, String clientInfo) throws ProfileConflictException {
+        log.info("Update profile for '{}'", user.getEmail());
 
         if (!newProfile.isValid()) {
-            LOG.info("Update Profile failed: User invalid {}", newProfile);
+            log.info("Update Profile failed: User invalid {}", newProfile);
             throw new IllegalArgumentException();
         }
 
         if (!newProfile.getNormalizedName().equals(user.getNormalizedName())) {
             if (userDao.findByNormalizedName(newProfile.getNormalizedName()).isPresent()) {
-                LOG.info("Name conflict '{}'", newProfile.getName());
+                log.info("Name conflict '{}'", newProfile.getName());
                 throw new ProfileConflictException();
             }
             monitor.sendMessage(
@@ -151,7 +149,7 @@ public class ProfileService implements ManageProfileUseCase {
 
         if (!newProfile.getEmail().equals(user.getEmail())) {
             if (userDao.findByEmail(newProfile.getEmail()).isPresent()) {
-                LOG.info("Email conflict '{}'", newProfile.getEmail());
+                log.info("Email conflict '{}'", newProfile.getEmail());
                 throw new ProfileConflictException();
             }
             newProfile.setEmailVerificationToken(UUID.randomUUID().toString());
@@ -169,18 +167,18 @@ public class ProfileService implements ManageProfileUseCase {
     }
 
     @Override
-    public void resendEmailVerification(final User user) {
-        LOG.info("Resend EmailVerification for '{}'", user.getEmail());
+    public void resendEmailVerification(User user) {
+        log.info("Resend EmailVerification for '{}'", user.getEmail());
         user.setEmailVerificationToken(UUID.randomUUID().toString());
         userDao.updateEmailVerification(user.getId(), user.getEmailVerification());
         sendEmailVerification(user);
     }
 
     @Override
-    public Optional<User> emailVerification(final String token) {
-        final Optional<User> userByToken = userDao.findByEmailVerification(User.EMAIL_VERIFICATION_TOKEN + token);
+    public Optional<User> emailVerification(String token) {
+        var userByToken = userDao.findByEmailVerification(User.EMAIL_VERIFICATION_TOKEN + token);
         if (userByToken.isPresent()) {
-            final User user = userByToken.get();
+            User user = userByToken.get();
             userDao.updateEmailVerification(user.getId(), User.EMAIL_VERIFIED);
             monitor.sendMessage(
                     String.format("Email verified {nickname='%s', email='%s'}", user.getName(), user.getEmail()));
@@ -188,8 +186,8 @@ public class ProfileService implements ManageProfileUseCase {
         return userByToken;
     }
 
-    private void sendPasswordMail(@NotNull final User user) {
-        final String text = String.format("""
+    private void sendPasswordMail(@NotNull User user) {
+        var text = String.format("""
                         Hello,
                         
                         your new password is: %1$s
@@ -205,12 +203,12 @@ public class ProfileService implements ManageProfileUseCase {
                         Viele Grüße
                         Dein Bahnhofsfoto-Team""", user.getNewPassword());
         mailer.send(user.getEmail(), "Railway-Stations.org new password", text);
-        LOG.info("Password sent to {}", user.getEmail());
+        log.info("Password sent to {}", user.getEmail());
     }
 
-    private void sendEmailVerification(@NotNull final User user) {
-        final String url = eMailVerificationUrl + user.getEmailVerificationToken();
-        final String text = String.format("""
+    private void sendEmailVerification(@NotNull User user) {
+        var url = eMailVerificationUrl + user.getEmailVerificationToken();
+        var text = String.format("""
                         Hello,
                         
                         please click on %1$s to verify your eMail-Address.
@@ -226,12 +224,12 @@ public class ProfileService implements ManageProfileUseCase {
                         Viele Grüße
                         Dein Bahnhofsfoto-Team""", url);
         mailer.send(user.getEmail(), "Railway-Stations.org eMail verification", text);
-        LOG.info("Email verification sent to {}", user.getEmail());
+        log.info("Email verification sent to {}", user.getEmail());
     }
 
-    private void saveRegistration(final User registration) {
-        final Integer id = userDao.insert(registration);
-        LOG.info("User '{}' created with id {}", registration.getName(), id);
+    private void saveRegistration(User registration) {
+        var id = userDao.insert(registration);
+        log.info("User '{}' created with id {}", registration.getName(), id);
     }
 
 }

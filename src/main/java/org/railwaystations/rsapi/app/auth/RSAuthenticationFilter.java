@@ -20,17 +20,17 @@ public class RSAuthenticationFilter extends OncePerRequestFilter {
     private final BasicAuthenticationConverter authenticationConverter = new BasicAuthenticationConverter();
 
     @Override
-    protected void doFilterInternal(final HttpServletRequest request, @NonNull final HttpServletResponse response, @NonNull final FilterChain chain)
+    protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain)
             throws ServletException, IOException {
-        final String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+        var authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
         UsernamePasswordAuthenticationToken token = null;
         if (StringUtils.isNotBlank(authorization)) {
             token = authenticationConverter.convert(request);
         }
 
         if (token == null) {
-            final String email = request.getHeader("Email");
-            final String uploadToken = request.getHeader("Upload-Token");
+            var email = request.getHeader("Email");
+            var uploadToken = request.getHeader("Upload-Token");
             if (StringUtils.isNotBlank(email) && StringUtils.isNotBlank(uploadToken)) {
                 token = new UsernamePasswordAuthenticationToken(email, uploadToken);
             }

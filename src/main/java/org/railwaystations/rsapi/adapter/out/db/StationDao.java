@@ -38,7 +38,7 @@ public interface StationDao {
 
     @SqlQuery(JOIN_QUERY + " WHERE c.active = true AND s.countryCode IN (<countryCodes>)")
     @RegisterRowMapper(StationMapper.class)
-    Set<Station> findByCountryCodes(@BindList("countryCodes") final Set<String> countryCodes);
+    Set<Station> findByCountryCodes(@BindList("countryCodes") Set<String> countryCodes);
 
     @SqlQuery(JOIN_QUERY + " WHERE c.active = true")
     @RegisterRowMapper(StationMapper.class)
@@ -46,11 +46,11 @@ public interface StationDao {
 
     @SqlQuery(JOIN_QUERY + " WHERE (s.countryCode = :countryCode OR :countryCode IS NULL) AND s.id = :id")
     @RegisterRowMapper(StationMapper.class)
-    Set<Station> findByKey(@Bind("countryCode") final String countryCode, @Bind("id") final String id);
+    Set<Station> findByKey(@Bind("countryCode") String countryCode, @Bind("id") String id);
 
     @SqlQuery(JOIN_QUERY + " WHERE s.id = :id")
     @RegisterRowMapper(StationMapper.class)
-    Set<Station> findById(@Bind("id") final String id);
+    Set<Station> findById(@Bind("id") String id);
 
     @SqlQuery("""
         SELECT :countryCode countryCode, COUNT(*) stations, COUNT(p.urlPath) photos, COUNT(distinct p.photographerId) photographers
@@ -60,7 +60,7 @@ public interface StationDao {
         """)
     @RegisterRowMapper(StatisticMapper.class)
     @SingleValue
-    Statistic getStatistic(@Bind("countryCode") final String countryCode);
+    Statistic getStatistic(@Bind("countryCode") String countryCode);
 
     @SqlQuery("""
         SELECT u.name photographer, COUNT(*) photocount
@@ -73,44 +73,44 @@ public interface StationDao {
         """)
     @KeyColumn("photographer")
     @ValueColumn("photocount")
-    Map<String, Long> getPhotographerMap(@Bind("countryCode") final String countryCode);
+    Map<String, Long> getPhotographerMap(@Bind("countryCode") String countryCode);
 
     @SqlUpdate("INSERT INTO stations (countryCode, id, title, lat, lon, ds100, active) VALUES (:key.country, :key.id, :title, :coordinates?.lat, :coordinates?.lon, :DS100, :active)")
-    void insert(@BindBean final Station station);
+    void insert(@BindBean Station station);
 
     @SqlUpdate("DELETE FROM stations WHERE countryCode = :country AND id = :id")
-    void delete(@BindBean final Station.Key key);
+    void delete(@BindBean Station.Key key);
 
     @SqlUpdate("UPDATE stations SET active = :active WHERE countryCode = :key.country AND id = :key.id")
-    void updateActive(@BindBean("key") final Station.Key key, @Bind("active") final boolean active);
+    void updateActive(@BindBean("key") Station.Key key, @Bind("active") boolean active);
 
     @SqlQuery(JOIN_QUERY + " WHERE createdAt > :since ORDER BY createdAt DESC")
     @RegisterRowMapper(StationMapper.class)
-    List<Station> findRecentImports(@Bind("since") final Instant since);
+    List<Station> findRecentImports(@Bind("since") Instant since);
 
     /**
      * Count nearby stations using simple pythagoras (only valid for a few km)
      */
     @SqlQuery("SELECT COUNT(*) FROM stations WHERE SQRT(POWER(71.5 * (lon - :lon),2) + POWER(111.3 * (lat - :lat),2)) < 0.5")
-    int countNearbyCoordinates(@BindBean final Coordinates coordinates);
+    int countNearbyCoordinates(@BindBean Coordinates coordinates);
 
     @SqlQuery("SELECT MAX(CAST(substring(id,2) AS INT)) FROM stations WHERE id LIKE 'Z%'")
     int getMaxZ();
 
     @SqlUpdate("UPDATE stations SET title = :new_title WHERE countryCode = :key.country AND id = :key.id")
-    void changeStationTitle(@BindBean final Station station, @Bind("new_title") final String newTitle);
+    void changeStationTitle(@BindBean Station station, @Bind("new_title") String newTitle);
 
     @SqlUpdate("UPDATE stations SET lat = :coords.lat, lon = :coords.lon WHERE countryCode = :key.country AND id = :key.id")
-    void updateLocation(@BindBean("key") final Station.Key key, @BindBean("coords") final Coordinates coordinates);
+    void updateLocation(@BindBean("key") Station.Key key, @BindBean("coords") Coordinates coordinates);
 
     class StationMapper implements RowMapper<Station> {
 
-        public Station map(final ResultSet rs, final StatementContext ctx) throws SQLException {
-            final var key = new Station.Key(rs.getString("countryCode"), rs.getString("id"));
-            final var photoUrlPath = rs.getString("urlPath");
+        public Station map(ResultSet rs, StatementContext ctx) throws SQLException {
+            var key = new Station.Key(rs.getString("countryCode"), rs.getString("id"));
+            var photoUrlPath = rs.getString("urlPath");
             Photo photo = null;
             if (photoUrlPath != null) {
-                final var photographer = User.builder()
+                var photographer = User.builder()
                         .name(rs.getString("name"))
                         .url(rs.getString("photographerUrl"))
                         .license(rs.getString("photographerLicense"))
@@ -128,7 +128,7 @@ public interface StationDao {
 
     class StatisticMapper implements RowMapper<Statistic> {
         @Override
-        public Statistic map(final ResultSet rs, final StatementContext ctx) throws SQLException {
+        public Statistic map(ResultSet rs, StatementContext ctx) throws SQLException {
             return new Statistic(rs.getString("countryCode"), rs.getLong("stations"), rs.getLong("photos"), rs.getLong("photographers"));
         }
     }

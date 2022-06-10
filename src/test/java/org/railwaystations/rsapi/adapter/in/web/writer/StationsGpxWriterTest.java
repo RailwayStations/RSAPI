@@ -11,18 +11,18 @@ import java.util.ArrayList;
 import static org.xmlunit.assertj3.XmlAssert.assertThat;
 import static org.xmlunit.builder.Input.fromString;
 
-public class StationsGpxWriterTest {
+class StationsGpxWriterTest {
 
 	@Test
-	public void testWriteTo() throws IOException {
-		final var stations = new ArrayList<StationDto>();
+	void testWriteTo() throws IOException {
+		var stations = new ArrayList<StationDto>();
 		stations.add(new StationDto().country("de").idStr("4711").title("Test").lat(50d).lon(9d));
 		stations.add(new StationDto().country("de").idStr("4712").title("Foo").lat(51d).lon(8d));
 
-		final var outputMessage = new MockHttpOutputMessage();
+		var outputMessage = new MockHttpOutputMessage();
 		new StationsGpxWriter().writeInternal(stations, outputMessage);
 
-		final var gpx = outputMessage.getBodyAsString(StandardCharsets.UTF_8);
+		var gpx = outputMessage.getBodyAsString(StandardCharsets.UTF_8);
 		assertThat(gpx)
 				.and(fromString("""
 									<?xml version="1.0" encoding="UTF-8"?>

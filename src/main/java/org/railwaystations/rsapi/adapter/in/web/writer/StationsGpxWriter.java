@@ -36,18 +36,18 @@ public class StationsGpxWriter extends AbstractHttpMessageConverter<List<Station
     }
 
     @Override
-    protected boolean supports(@NonNull final Class<?> clazz) {
+    protected boolean supports(@NonNull Class<?> clazz) {
         return List.class.isAssignableFrom(clazz);
     }
 
     @Override
-    protected @NonNull List<StationDto> readInternal(@NonNull final Class<? extends List<StationDto>> clazz, @NonNull final HttpInputMessage inputMessage) throws HttpMessageNotReadableException {
+    protected @NonNull List<StationDto> readInternal(@NonNull Class<? extends List<StationDto>> clazz, @NonNull HttpInputMessage inputMessage) throws HttpMessageNotReadableException {
         throw new HttpMessageNotReadableException("read not supported", inputMessage);
     }
 
     @Override
-    protected void writeInternal(final List<StationDto> stations, final HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
-        final XMLStreamWriter xmlw;
+    protected void writeInternal(List<StationDto> stations, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
+        XMLStreamWriter xmlw;
         try {
             xmlw = XMLOutputFactory.newInstance().createXMLStreamWriter(outputMessage.getBody(), StationsGpxWriter.UTF_8);
             xmlw.writeStartDocument(StationsGpxWriter.UTF_8, "1.0");
@@ -59,12 +59,12 @@ public class StationsGpxWriter extends AbstractHttpMessageConverter<List<Station
             stations.forEach(station -> stationToXml(xmlw, station));
             xmlw.writeEndElement();
             xmlw.flush();
-        } catch (final XMLStreamException e) {
+        } catch (XMLStreamException e) {
             throw new HttpMessageNotWritableException("Error converting a Station to gpx", e);
         }
     }
 
-    private static void stationToXml(final XMLStreamWriter xmlw, final StationDto station) {
+    private static void stationToXml(XMLStreamWriter xmlw, StationDto station) {
         try {
             xmlw.writeStartElement(StationsGpxWriter.WPT_ELEMENT);
             xmlw.writeAttribute(StationsGpxWriter.LAT_ELEMENT, Double.toString(station.getLat()));
@@ -74,7 +74,7 @@ public class StationsGpxWriter extends AbstractHttpMessageConverter<List<Station
             xmlw.writeEndElement();
             xmlw.writeEndElement();
             xmlw.writeCharacters("\n");
-        } catch (final XMLStreamException e) {
+        } catch (XMLStreamException e) {
             throw new HttpMessageNotWritableException("Error converting a Station to gpx", e);
         }
     }

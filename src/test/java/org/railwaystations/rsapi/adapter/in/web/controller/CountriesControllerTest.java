@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = CountriesController.class)
 @ContextConfiguration(classes={WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class, CountryService.class})
 @AutoConfigureMockMvc(addFilters = false)
-public class CountriesControllerTest {
+class CountriesControllerTest {
 
     @Autowired
     private MockMvc mvc;
@@ -42,15 +42,15 @@ public class CountriesControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"/countries", "/countries.json"})
-    public void testList(final String urlTemplate) throws Exception {
+    void testList(String urlTemplate) throws Exception {
         when(countryDao.list(true)).thenReturn(createCountryList());
 
-        final var contentAsString = mvc.perform(get(urlTemplate))
+        var contentAsString = mvc.perform(get(urlTemplate))
                 .andExpect(status().isOk())
                 .andExpect(openApi().isValid("static/openapi.yaml"))
                 .andReturn().getResponse().getContentAsString();
 
-        final List<Country> countries = objectMapper.readerForListOf(Country.class).readValue(contentAsString);
+        List<Country> countries = objectMapper.readerForListOf(Country.class).readValue(contentAsString);
         assertThat(countries.size()).isEqualTo(2);
         countries.forEach(this::assertCountry);
     }
@@ -61,8 +61,8 @@ public class CountriesControllerTest {
     }
 
     @NotNull
-    private Country createCountry(final String code) {
-        final var country = Country.builder()
+    private Country createCountry(String code) {
+        var country = Country.builder()
                 .code(code)
                 .name("name-" + code)
                 .email("email-" + code)
@@ -77,11 +77,11 @@ public class CountriesControllerTest {
         return country;
     }
 
-    private ProviderApp createProviderApp(final String type, final String code) {
+    private ProviderApp createProviderApp(String type, String code) {
         return ProviderApp.builder().type(type).name("Provider-" + code).url(type + "App-" + code).build();
     }
 
-    private void assertCountry(final Country country) {
+    private void assertCountry(Country country) {
         assertThat(country.getName()).isEqualTo("name-" + country.getCode());
         assertThat(country.getEmail()).isEqualTo("email-" + country.getCode());
         assertThat(country.getTwitterTags()).isEqualTo("twitter-" + country.getCode());

@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 public class RsapiApplication {
 
-	public static void main(final String[] args) {
+	public static void main(String[] args) {
 		SpringApplication.run(RsapiApplication.class, args);
 	}
 

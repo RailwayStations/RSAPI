@@ -44,7 +44,7 @@ public interface InboxDao {
 
     @SqlQuery(JOIN_QUERY + " WHERE u.id = :id")
     @RegisterRowMapper(InboxEntryMapper.class)
-    InboxEntry findById(@Bind(ID) final long id);
+    InboxEntry findById(@Bind(ID) long id);
 
     @SqlQuery(JOIN_QUERY + " WHERE u.done = false ORDER BY id")
     @RegisterRowMapper(InboxEntryMapper.class)
@@ -64,16 +64,16 @@ public interface InboxDao {
                     VALUES (:countryCode, :stationId, :title, :lat, :lon, :photographerId, :extension, :comment, :done, :createdAt, :problemReportType, :active)
             """)
     @GetGeneratedKeys(ID)
-    Long insert(@BindBean final InboxEntry inboxEntry);
+    Long insert(@BindBean InboxEntry inboxEntry);
 
     @SqlUpdate("UPDATE inbox SET rejectReason = :rejectReason, done = true WHERE id = :id")
-    void reject(@Bind(ID) final long id, @Bind("rejectReason") final String rejectReason);
+    void reject(@Bind(ID) long id, @Bind("rejectReason") String rejectReason);
 
     @SqlUpdate("UPDATE inbox SET done = true WHERE id = :id")
     void done(@Bind(ID) long id);
 
     @SqlQuery("SELECT COUNT(*) FROM inbox WHERE countryCode = :countryCode AND stationId = :stationId AND done = false AND (:id IS NULL OR id <> :id)")
-    int countPendingInboxEntriesForStation(@Bind(ID) final Long id, @Bind(COUNTRY_CODE) final String countryCode, @Bind(STATION_ID) final String stationId);
+    int countPendingInboxEntriesForStation(@Bind(ID) Long id, @Bind(COUNTRY_CODE) String countryCode, @Bind(STATION_ID) String stationId);
 
     @SqlQuery("SELECT COUNT(*) FROM inbox WHERE done = false")
     long countPendingInboxEntries();
@@ -82,7 +82,7 @@ public interface InboxDao {
      * Count nearby pending uploads using simple pythagoras (only valid for a few km)
      */
     @SqlQuery("SELECT COUNT(*) FROM inbox WHERE SQRT(POWER(71.5 * (lon - :coords.lon),2) + POWER(111.3 * (lat - :coords.lat),2)) < 0.5 AND done = false AND (:id IS NULL OR id <> :id)")
-    int countPendingInboxEntriesForNearbyCoordinates(@Bind(ID) final Long id, @BindBean(COORDS) final Coordinates coordinates);
+    int countPendingInboxEntriesForNearbyCoordinates(@Bind(ID) Long id, @BindBean(COORDS) Coordinates coordinates);
 
     @SqlUpdate("UPDATE inbox SET crc32 = :crc32 WHERE id = :id")
     void updateCrc32(@Bind(ID) Long id, @Bind("crc32") Long crc32);
@@ -92,17 +92,17 @@ public interface InboxDao {
     List<InboxEntry> findInboxEntriesToNotify();
 
     @SqlUpdate("UPDATE inbox SET notified = true WHERE id IN (<ids>)")
-    void updateNotified(@BindList("ids") final List<Long> ids);
+    void updateNotified(@BindList("ids") List<Long> ids);
 
     class InboxEntryMapper implements RowMapper<InboxEntry> {
 
-        public InboxEntry map(final ResultSet rs, final StatementContext ctx) throws SQLException {
-            final var id = rs.getLong(ID);
-            final var coordinates = getCoordinates(rs);
-            final var title = getTitle(rs);
-            final var done = rs.getBoolean("done");
-            final var problemReportType = rs.getString("problemReportType");
-            final var extension = rs.getString("extension");
+        public InboxEntry map(ResultSet rs, StatementContext ctx) throws SQLException {
+            var id = rs.getLong(ID);
+            var coordinates = getCoordinates(rs);
+            var title = getTitle(rs);
+            var done = rs.getBoolean("done");
+            var problemReportType = rs.getString("problemReportType");
+            var extension = rs.getString("extension");
             Boolean active = rs.getBoolean("active");
             if (rs.wasNull()) {
                 active = null;
@@ -138,7 +138,7 @@ public interface InboxDao {
 
     class PublicInboxEntryMapper implements RowMapper<PublicInboxEntry> {
 
-        public PublicInboxEntry map(final ResultSet rs, final StatementContext ctx) throws SQLException {
+        public PublicInboxEntry map(ResultSet rs, StatementContext ctx) throws SQLException {
             return PublicInboxEntry.builder()
                     .countryCode(rs.getString(COUNTRY_CODE))
                     .stationId(rs.getString(STATION_ID))
@@ -152,7 +152,7 @@ public interface InboxDao {
     /**
      * Gets the uploaded title, if not present returns the station title
      */
-    static String getTitle(final ResultSet rs) throws SQLException {
+    static String getTitle(ResultSet rs) throws SQLException {
         var title = rs.getString("u_title");
         if (StringUtils.isBlank(title)) {
             title = rs.getString("s_title");
@@ -163,7 +163,7 @@ public interface InboxDao {
     /**
      * Get the uploaded coordinates, if not present or not valid gets the station coordinates
      */
-    static Coordinates getCoordinates(final ResultSet rs) throws SQLException {
+    static Coordinates getCoordinates(ResultSet rs) throws SQLException {
         var coordinates = new Coordinates(rs.getDouble("u_lat"), rs.getDouble("u_lon"));
         if (!coordinates.isValid()) {
             coordinates = new Coordinates(rs.getDouble("s_lat"), rs.getDouble("s_lon"));

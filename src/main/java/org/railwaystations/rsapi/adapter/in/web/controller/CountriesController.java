@@ -23,11 +23,11 @@ public class CountriesController {
     private ListCountriesUseCase listCountriesUseCase;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = {"/countries", "/countries.json"})
-    public Collection<CountryDto> list(@RequestParam(value = ONLY_ACTIVE, required = false) final Boolean onlyActive) {
+    public Collection<CountryDto> list(@RequestParam(value = ONLY_ACTIVE, required = false) Boolean onlyActive) {
         return listCountriesUseCase.list(onlyActive).stream().map(this::toDto).toList();
     }
 
-    private CountryDto toDto(final Country country) {
+    private CountryDto toDto(Country country) {
         return new CountryDto()
                 .code(country.getCode())
                 .name(country.getName())
@@ -39,7 +39,7 @@ public class CountriesController {
                 .providerApps(toDto(country.getProviderApps()));
     }
 
-    private List<ProviderAppDto> toDto(final List<ProviderApp> providerApps) {
+    private List<ProviderAppDto> toDto(List<ProviderApp> providerApps) {
         return providerApps.stream()
                 .map(p -> new ProviderAppDto().name(p.getName()).type(ProviderAppDto.TypeEnum.fromValue(p.getType())).url(p.getUrl()))
                 .toList();

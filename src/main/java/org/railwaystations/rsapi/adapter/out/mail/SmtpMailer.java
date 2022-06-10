@@ -23,10 +23,10 @@ public class SmtpMailer implements Mailer {
 
     private Session session;
 
-    public SmtpMailer(final MailerConfig config) {
+    public SmtpMailer(MailerConfig config) {
         this.config = config;
         if (StringUtils.isNoneBlank(config.host())) {
-            final var properties = System.getProperties();
+            var properties = System.getProperties();
             properties.setProperty("mail.smtp.host", config.host());
             properties.setProperty("mail.smtp.auth", "true");
             properties.setProperty("mail.smtp.port", config.port());
@@ -39,28 +39,28 @@ public class SmtpMailer implements Mailer {
     }
 
     @Override
-    public void send(final String to, final String subject, final String text) {
+    public void send(String to, String subject, String text) {
         if (session == null) {
             log.info("Mailer not initialized, can't send mail to {} with subject {} and body {}", to, subject, text);
             return;
         }
         try {
             log.info("Sending mail to {}", to);
-            final var message = new MimeMessage(session);
+            var message = new MimeMessage(session);
             message.setFrom(new InternetAddress(config.from()));
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
             message.setSubject(subject);
 
-            final var multipart = new MimeMultipart();
+            var multipart = new MimeMultipart();
 
-            final var textBodyPart = new MimeBodyPart();
+            var textBodyPart = new MimeBodyPart();
             textBodyPart.setText(text);
             multipart.addBodyPart(textBodyPart);
 
             message.setContent(multipart);
             Transport.send(message);
             log.info("Mail sent");
-        } catch (final Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException("Unable to send mail", e);
         }
     }
@@ -69,7 +69,7 @@ public class SmtpMailer implements Mailer {
         private final String user;
         private final String passwd;
 
-        private UsernamePasswordAuthenticator(final String user, final String passwd) {
+        private UsernamePasswordAuthenticator(String user, String passwd) {
             this.user = user;
             this.passwd = passwd;
         }

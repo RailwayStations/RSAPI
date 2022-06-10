@@ -30,29 +30,29 @@ public class PhotographersController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE,
             value = {"/photographers", "/photographers.json"})
-    public Map<String, Long> get(@RequestParam(value = COUNTRY, required = false) @Size(min = 2, max = 2) final String country) {
+    public Map<String, Long> get(@RequestParam(value = COUNTRY, required = false) @Size(min = 2, max = 2) String country) {
         return getWithCountry(country);
     }
 
     @GetMapping(produces = MediaType.TEXT_PLAIN_VALUE, value = "/photographers.txt")
-    public ResponseEntity<StreamingResponseBody> getAsText(@RequestParam(value = COUNTRY, required = false) @Size(min = 2, max = 2) final String country) {
+    public ResponseEntity<StreamingResponseBody> getAsText(@RequestParam(value = COUNTRY, required = false) @Size(min = 2, max = 2) String country) {
         return toCsv(getWithCountry(country));
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE,
             value = {"/{country}/photographers", "/{country}/photographers.json"})
-    public Map<String, Long> getWithCountry(@PathVariable(value = COUNTRY, required = false) @Size(min = 2, max = 2) final String country) {
+    public Map<String, Long> getWithCountry(@PathVariable(value = COUNTRY, required = false) @Size(min = 2, max = 2) String country) {
         return loadPhotographersUseCase.getPhotographersPhotocountMap(country);
     }
 
     @GetMapping(produces = MediaType.TEXT_PLAIN_VALUE, value = "/{country}/photographers.txt")
-    public ResponseEntity<StreamingResponseBody> getWithCountryAsText(@PathVariable(value = COUNTRY, required = false) @Size(min = 2, max = 2) final String country) {
+    public ResponseEntity<StreamingResponseBody> getWithCountryAsText(@PathVariable(value = COUNTRY, required = false) @Size(min = 2, max = 2) String country) {
         return toCsv(loadPhotographersUseCase.getPhotographersPhotocountMap(country));
     }
 
-    private ResponseEntity<StreamingResponseBody> toCsv(final Map<String, Long> stringLongMap) {
-        final StreamingResponseBody stream = output -> {
-            final Writer writer = new BufferedWriter(new OutputStreamWriter(output));
+    private ResponseEntity<StreamingResponseBody> toCsv(Map<String, Long> stringLongMap) {
+        StreamingResponseBody stream = output -> {
+            Writer writer = new BufferedWriter(new OutputStreamWriter(output));
             writer.write("count\tphotographer\n" +
                     stringLongMap.entrySet().stream()
                             .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
@@ -66,7 +66,7 @@ public class PhotographersController {
                 .body(stream);
     }
 
-    private String photographerToCsv(final Map.Entry<String, Long> photographer) {
+    private String photographerToCsv(Map.Entry<String, Long> photographer) {
         return String.join("\t", Long.toString(photographer.getValue()), photographer.getKey());
     }
 

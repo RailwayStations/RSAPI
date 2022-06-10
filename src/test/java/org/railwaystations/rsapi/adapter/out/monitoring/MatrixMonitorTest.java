@@ -42,8 +42,8 @@ class MatrixMonitorTest {
     static final String ANY_CONTENT_URI = "/contentUri";
 
     @Test
-    void sendTextMessage(final WireMockRuntimeInfo wmRuntimeInfo) {
-        final var client = createMatrixMonitor(wmRuntimeInfo);
+    void sendTextMessage(WireMockRuntimeInfo wmRuntimeInfo) {
+        var client = createMatrixMonitor(wmRuntimeInfo);
         stubFor(post(urlPathEqualTo(ROOM_URL_PATH))
                 .withQueryParam(ACCESS_TOKEN_PARAM, equalTo(ANY_ACCESS_TOKEN))
                 .willReturn(ok()));
@@ -63,8 +63,8 @@ class MatrixMonitorTest {
 
 
     @Test
-    void sendPhotoMessage(final WireMockRuntimeInfo wmRuntimeInfo) throws URISyntaxException {
-        final var client = createMatrixMonitor(wmRuntimeInfo);
+    void sendPhotoMessage(WireMockRuntimeInfo wmRuntimeInfo) throws URISyntaxException {
+        var client = createMatrixMonitor(wmRuntimeInfo);
         stubFor(post(urlPathEqualTo(ROOM_URL_PATH))
                 .withQueryParam(ACCESS_TOKEN_PARAM, equalTo(ANY_ACCESS_TOKEN))
                 .willReturn(ok()));
@@ -77,7 +77,7 @@ class MatrixMonitorTest {
                             """.formatted(ANY_CONTENT_URI)
                 )));
 
-        final var imagePath = Path.of(Objects.requireNonNull(getClass().getClassLoader().getResource(ANY_FILENAME)).toURI());
+        var imagePath = Path.of(Objects.requireNonNull(getClass().getClassLoader().getResource(ANY_FILENAME)).toURI());
         client.sendMessage(ANY_PHOTO_MESSAGE, imagePath);
 
         verify(postRequestedFor(urlPathEqualTo(ROOM_URL_PATH))
@@ -109,21 +109,21 @@ class MatrixMonitorTest {
     }
 
     @NotNull
-    MatrixMonitor createMatrixMonitor(final WireMockRuntimeInfo wmRuntimeInfo) {
-        final var config = new MatrixMonitorConfig(wmRuntimeInfo.getHttpBaseUrl() + ROOM_URL_PATH, wmRuntimeInfo.getHttpBaseUrl() + UPLOAD_URL_PATH, ANY_ACCESS_TOKEN);
+    MatrixMonitor createMatrixMonitor(WireMockRuntimeInfo wmRuntimeInfo) {
+        var config = new MatrixMonitorConfig(wmRuntimeInfo.getHttpBaseUrl() + ROOM_URL_PATH, wmRuntimeInfo.getHttpBaseUrl() + UPLOAD_URL_PATH, ANY_ACCESS_TOKEN);
         return new MatrixMonitor(config, new ObjectMapper());
     }
 
     static class ValidImageContentPattern extends RequestMatcherExtension {
         @Override
-        public MatchResult match(final Request request, final Parameters parameters) {
+        public MatchResult match(Request request, Parameters parameters) {
             try {
-                final var image = ImageIO.read(new ByteArrayInputStream(request.getBody()));
+                var image = ImageIO.read(new ByteArrayInputStream(request.getBody()));
                 if (image == null) {
                     return MatchResult.noMatch();
                 }
                 return MatchResult.of(image.getWidth() <= 300);
-            } catch (final IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace(System.err);
             }
             return MatchResult.noMatch();

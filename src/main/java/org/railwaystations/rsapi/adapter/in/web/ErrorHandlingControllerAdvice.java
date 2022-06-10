@@ -14,19 +14,19 @@ public class ErrorHandlingControllerAdvice {
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    ResponseEntity<String> handleConstraintViolationException(final ConstraintViolationException e) {
+    ResponseEntity<String> handleConstraintViolationException(ConstraintViolationException e) {
         return ResponseEntity.badRequest().body("Validation error: " + e.getMessage());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    ResponseEntity<String> handleIllegalArgumentException(final IllegalArgumentException e) {
+    ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 
     @ExceptionHandler(ProfileService.ProfileConflictException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    ResponseEntity<String> handleProfileConflictException(final ProfileService.ProfileConflictException e) {
+    ResponseEntity<String> handleProfileConflictException(ProfileService.ProfileConflictException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 

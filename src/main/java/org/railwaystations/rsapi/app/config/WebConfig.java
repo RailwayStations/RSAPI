@@ -24,17 +24,17 @@ public class WebConfig implements WebMvcConfigurer {
 
 
     @Override
-    public void configureMessageConverters(final List<HttpMessageConverter<?>> converters) {
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         converters.add(new StationsGpxWriter());
         converters.add(new StatisticTxtWriter());
-        final Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
+        var builder = new Jackson2ObjectMapperBuilder();
         builder.serializationInclusion(JsonInclude.Include.NON_NULL);
         converters.add(new MappingJackson2HttpMessageConverter(builder.build()));
         converters.add(byteArrayHttpMessageConverter());
     }
 
     @Override
-    public void addCorsMappings(final CorsRegistry registry) {
+    public void addCorsMappings(CorsRegistry registry) {
         registry
                 .addMapping("/**")
                 .allowedHeaders("X-Requested-With","Content-Type","Accept","Origin","Authorization","Comment","Country","Station-Id","NameOrEmail","New-Password")
@@ -44,7 +44,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Bean
     public ByteArrayHttpMessageConverter byteArrayHttpMessageConverter() {
-        final ByteArrayHttpMessageConverter arrayHttpMessageConverter = new ByteArrayHttpMessageConverter();
+        var arrayHttpMessageConverter = new ByteArrayHttpMessageConverter();
         arrayHttpMessageConverter.setSupportedMediaTypes(getSupportedMediaTypes());
         return arrayHttpMessageConverter;
     }
@@ -54,12 +54,12 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     @Override
-    public void addViewControllers(final ViewControllerRegistry registry) {
+    public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("forward:/index.html");
     }
 
     @Override
-    public void addResourceHandlers(final ResourceHandlerRegistry registry) {
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
     }
 

@@ -40,11 +40,11 @@ public class Station {
         this(new Key("", "0"), null, new Coordinates(0.0, 0.0), null, true);
     }
 
-    public Station(final Key key, final String title, final Coordinates coordinates, final Photo photo, final boolean active) {
+    public Station(Key key, String title, Coordinates coordinates, Photo photo, boolean active) {
         this(key, title, coordinates, null, photo, active);
     }
 
-    public Station(final Key key, final String title, final Coordinates coordinates, final String ds100, final Photo photo, final boolean active) {
+    public Station(Key key, String title, Coordinates coordinates, String ds100, Photo photo, boolean active) {
         super();
         this.key = key;
         this.title = title;
@@ -54,9 +54,9 @@ public class Station {
         setPhoto(photo);
     }
 
-    public void setPhoto(final Photo photo) {
+    public void setPhoto(Photo photo) {
         if (photo != null) {
-            final User user = photo.getPhotographer();
+            User user = photo.getPhotographer();
             if (user != null) {
                 this.photographerId = user.getId();
                 this.photographer = user.getDisplayName();
@@ -109,17 +109,17 @@ public class Station {
      *
      * @returns Distance in km
      */
-    public double distanceTo(final double latitude, final double longitude) {
-        final double latDistance = Math.toRadians(latitude - this.coordinates.getLat());
-        final double lonDistance = Math.toRadians(longitude - this.coordinates.getLon());
-        final double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+    public double distanceTo(double latitude, double longitude) {
+        double latDistance = Math.toRadians(latitude - this.coordinates.getLat());
+        double lonDistance = Math.toRadians(longitude - this.coordinates.getLon());
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
                 + Math.cos(Math.toRadians(this.coordinates.getLat())) * Math.cos(Math.toRadians(latitude))
                 * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
-        final double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return Station.EARTH_RADIUS * c;
     }
 
-    public boolean appliesTo(final Boolean hasPhoto, final String photographer, final Integer maxDistance, final Double lat, final Double lon, final Boolean active) {
+    public boolean appliesTo(Boolean hasPhoto, String photographer, Integer maxDistance, Double lat, Double lon, Boolean active) {
         boolean result = true;
         if (hasPhoto != null) {
             result = this.hasPhoto() == hasPhoto;
@@ -164,7 +164,7 @@ public class Station {
         return createdAt != null ? createdAt.toEpochMilli() : null;
     }
 
-    private void setCreatedAtEpochMilli(final Long time) {
+    private void setCreatedAtEpochMilli(Long time) {
         this.createdAt = time != null ? Instant.ofEpochMilli(time) : null;
     }
 
@@ -176,19 +176,19 @@ public class Station {
         return photographerId;
     }
 
-    public void setTitle(final String title) {
+    public void setTitle(String title) {
         this.title = title;
     }
 
-    public void setActive(final Boolean active) {
+    public void setActive(Boolean active) {
         this.active = active;
     }
 
-    public void setCoordinates(final Coordinates coordinates) {
+    public void setCoordinates(Coordinates coordinates) {
         this.coordinates = coordinates;
     }
 
-    public void prependPhotoBaseUrl(final String photoBaseUrl) {
+    public void prependPhotoBaseUrl(String photoBaseUrl) {
         if (photoUrl != null) {
             photoUrl = photoBaseUrl + photoUrl;
         }
@@ -198,7 +198,7 @@ public class Station {
         return outdated;
     }
 
-    public void setOutdated(final Boolean outdated) {
+    public void setOutdated(Boolean outdated) {
         this.outdated = outdated;
     }
 
@@ -211,11 +211,11 @@ public class Station {
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof final Station other)) {
+        if (!(o instanceof Station other)) {
             return false;
         }
         return Objects.equals(key, other.getKey());

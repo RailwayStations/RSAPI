@@ -13,12 +13,12 @@ import java.nio.file.Path;
 public class LoggingMonitor implements Monitor {
 
     @Override
-    public void sendMessage(final String message) {
+    public void sendMessage(String message) {
         log.info(message);
     }
 
     @Override
-    public void sendMessage(final String message, final Path file) {
+    public void sendMessage(String message, Path file) {
         log.info(message + " - " + file);
     }
 

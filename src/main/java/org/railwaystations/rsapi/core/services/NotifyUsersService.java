@@ -23,7 +23,7 @@ public class NotifyUsersService implements NotifyUsersUseCase {
     private final InboxDao inboxDao;
     private final Mailer mailer;
 
-    public NotifyUsersService(final UserDao userDao, final InboxDao inboxDao, final Mailer mailer) {
+    public NotifyUsersService(UserDao userDao, InboxDao inboxDao, Mailer mailer) {
         super();
         this.userDao = userDao;
         this.inboxDao = inboxDao;
@@ -32,7 +32,7 @@ public class NotifyUsersService implements NotifyUsersUseCase {
 
     @Override
     public void notifyUsers() {
-        final var entries = inboxDao.findInboxEntriesToNotify();
+        var entries = inboxDao.findInboxEntriesToNotify();
         entries.stream()
                 .collect(groupingBy(InboxEntry::getPhotographerId))
                 .forEach((userId, entriesForUser) -> userDao.findById(userId).ifPresent(user -> {
@@ -40,7 +40,7 @@ public class NotifyUsersService implements NotifyUsersUseCase {
                         sendEmailNotification(user, entriesForUser);
                     }
                 }));
-        final var ids = entries.stream()
+        var ids = entries.stream()
                 .map(InboxEntry::getId)
                 .collect(Collectors.toList());
         if (!ids.isEmpty()) {
@@ -48,15 +48,15 @@ public class NotifyUsersService implements NotifyUsersUseCase {
         }
     }
 
-    private void sendEmailNotification(@NotNull final User user, final List<InboxEntry> entriesForUser) {
-        final var report = new StringBuilder();
+    private void sendEmailNotification(@NotNull User user, List<InboxEntry> entriesForUser) {
+        var report = new StringBuilder();
         entriesForUser.forEach(entry -> report.append(entry.getId()).append(". ").append(entry.getTitle())
                 .append(entry.isProblemReport() ? " (" + entry.getProblemReportType() + ")" : "")
                 .append(": ")
                 .append(entry.getRejectReason() == null ? "accepted" : "rejected - " + entry.getRejectReason())
                 .append("\n"));
 
-        final var text = String.format("""
+        var text = String.format("""
                 Hello %1$s,
                 
                 thank you for your contributions.

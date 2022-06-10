@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = StationsController.class)
 @ContextConfiguration(classes={WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class})
 @AutoConfigureMockMvc(addFilters = false)
-public class StationsControllerTest {
+class StationsControllerTest {
 
     @Autowired
     private MockMvc mvc;
@@ -39,14 +39,14 @@ public class StationsControllerTest {
     private PhotoStationsService photoStationsService;
 
     @BeforeEach
-    public void setUp() {
-        final var key5 = new Station.Key("xy", "5");
-        final var stationXY = new Station(key5, "Lummerland", new Coordinates(50.0, 9.0), "XYZ", new Photo(key5, "/fotos/xy/5.jpg", createTestPhotographer("Jim Knopf", "photographerUrl", "CC0"), null, "CC0"), false);
+    void setUp() {
+        var key5 = new Station.Key("xy", "5");
+        var stationXY = new Station(key5, "Lummerland", new Coordinates(50.0, 9.0), "XYZ", new Photo(key5, "/fotos/xy/5.jpg", createTestPhotographer("Jim Knopf", "photographerUrl", "CC0"), null, "CC0"), false);
 
-        final var key3 = new Station.Key("ab", "3");
-        final var stationAB = new Station(key3, "Nimmerland", new Coordinates(40.0, 6.0), "ABC", new Photo(key3, "/fotos/ab/3.jpg", createTestPhotographer("Peter Pan", "photographerUrl2", "CC0 by SA"), null, "CC0 by SA"), true);
+        var key3 = new Station.Key("ab", "3");
+        var stationAB = new Station(key3, "Nimmerland", new Coordinates(40.0, 6.0), "ABC", new Photo(key3, "/fotos/ab/3.jpg", createTestPhotographer("Peter Pan", "photographerUrl2", "CC0 by SA"), null, "CC0 by SA"), true);
 
-        final var stationsAll = List.of(stationAB, stationXY);
+        var stationsAll = List.of(stationAB, stationXY);
 
         when(photoStationsService.findStationsBy(Collections.singleton("xy"), null, null, null, null, null, null)).thenReturn(List.of(stationXY));
         when(photoStationsService.findStationsBy(Collections.singleton("ab"), null, null, null, null, null, null)).thenReturn(List.of(stationAB));
@@ -60,7 +60,7 @@ public class StationsControllerTest {
     }
 
     @Test
-    public void testGetXY() throws Exception {
+    void testGetXY() throws Exception {
         mvc.perform(get("/stations?country=xy"))
                 .andExpect(status().isOk())
                 .andExpect(validOpenApi())
@@ -78,7 +78,7 @@ public class StationsControllerTest {
     }
 
     @Test
-    public void testGetXYWithFilterActive() throws Exception {
+    void testGetXYWithFilterActive() throws Exception {
         mvc.perform(get("/stations?country=xy&active=true"))
                 .andExpect(status().isOk())
                 .andExpect(validOpenApi())
@@ -91,7 +91,7 @@ public class StationsControllerTest {
     }
 
     @Test
-    public void testGetAB() throws Exception {
+    void testGetAB() throws Exception {
         mvc.perform(get("/stations?country=ab"))
                 .andExpect(status().isOk())
                 .andExpect(validOpenApi())
@@ -109,7 +109,7 @@ public class StationsControllerTest {
     }
 
     @Test
-    public void testGetById() throws Exception {
+    void testGetById() throws Exception {
         mvc.perform(get("/ab/stations/3"))
                 .andExpect(status().isOk())
                 .andExpect(validOpenApi())
@@ -127,7 +127,7 @@ public class StationsControllerTest {
     }
 
     @Test
-    public void testGetABXY() throws Exception {
+    void testGetABXY() throws Exception {
         mvc.perform(get("/stations?country=ab&country=xy"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0]").isNotEmpty())
@@ -136,7 +136,7 @@ public class StationsControllerTest {
     }
 
     @Test
-    public void testGetAll() throws Exception {
+    void testGetAll() throws Exception {
         mvc.perform(get("/stations"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0]").isNotEmpty())
@@ -144,7 +144,7 @@ public class StationsControllerTest {
                 .andExpect(jsonPath("$.[2]").doesNotExist());
     }
 
-    private User createTestPhotographer(final String name, final String url, final String license) {
+    private User createTestPhotographer(String name, String url, String license) {
         return User.builder()
                 .id(0)
                 .name(name)

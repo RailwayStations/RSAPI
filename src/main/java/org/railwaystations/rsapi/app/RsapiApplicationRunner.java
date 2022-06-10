@@ -16,7 +16,7 @@ public class RsapiApplicationRunner implements CommandLineRunner {
     private GetStatisticUseCase getStatisticUseCase;
 
     @Override
-    public void run(final String... args) {
+    public void run(String... args) {
         monitor.sendMessage(getStatisticUseCase.getCountryStatisticMessage());
     }
 

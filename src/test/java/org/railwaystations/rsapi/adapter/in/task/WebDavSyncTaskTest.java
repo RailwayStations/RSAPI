@@ -53,7 +53,7 @@ class WebDavSyncTaskTest {
     static final String PROCESSED_PATH_FILE = PROCESSED_PATH + "/" + FILENAME;
     static final String USERNAME = "username";
     static final String PASSWORD = "password";
-    public static final String PROPFIND_METHOD = "PROPFIND";
+    static final String PROPFIND_METHOD = "PROPFIND";
 
     Path tempdir;
     PhotoStorage photoStorage;
@@ -68,9 +68,9 @@ class WebDavSyncTaskTest {
     }
 
     @Test
-    void shouldAuthenticate(final WireMockRuntimeInfo wmRuntimeInfo) throws IOException {
-        final var task = createWebDavSyncTask(wmRuntimeInfo);
-        final var toProcessPath = createFile(tempdir);
+    void shouldAuthenticate(WireMockRuntimeInfo wmRuntimeInfo) throws IOException {
+        var task = createWebDavSyncTask(wmRuntimeInfo);
+        var toProcessPath = createFile(tempdir);
         when(photoStorage.getInboxToProcessFile(FILENAME)).thenReturn(toProcessPath);
         when(photoStorage.getInboxProcessedFile(FILENAME)).thenReturn(tempdir.resolve(FILENAME));
 
@@ -93,9 +93,9 @@ class WebDavSyncTaskTest {
     }
 
     @Test
-    void shouldUploadToProcessFile(final WireMockRuntimeInfo wmRuntimeInfo) throws IOException {
-        final var task = createWebDavSyncTask(wmRuntimeInfo);
-        final var toProcessPath1 = createFile(tempdir);
+    void shouldUploadToProcessFile(WireMockRuntimeInfo wmRuntimeInfo) throws IOException {
+        var task = createWebDavSyncTask(wmRuntimeInfo);
+        var toProcessPath1 = createFile(tempdir);
         when(photoStorage.getInboxToProcessFile(FILENAME)).thenReturn(toProcessPath1);
         when(photoStorage.getInboxProcessedFile(FILENAME)).thenReturn(tempdir.resolve(FILENAME));
 
@@ -111,9 +111,9 @@ class WebDavSyncTaskTest {
     }
 
     @Test
-    void shouldKeepFileIfUploadFails(final WireMockRuntimeInfo wmRuntimeInfo) throws IOException {
-        final var task = createWebDavSyncTask(wmRuntimeInfo);
-        final var toProcessPath = createFile(tempdir);
+    void shouldKeepFileIfUploadFails(WireMockRuntimeInfo wmRuntimeInfo) throws IOException {
+        var task = createWebDavSyncTask(wmRuntimeInfo);
+        var toProcessPath = createFile(tempdir);
         when(photoStorage.getInboxToProcessFile(FILENAME)).thenReturn(toProcessPath);
         when(photoStorage.getInboxProcessedFile(FILENAME)).thenReturn(tempdir.resolve(FILENAME));
 
@@ -130,10 +130,10 @@ class WebDavSyncTaskTest {
     }
 
     @Test
-    void shouldDownloadProcessedFile(final WireMockRuntimeInfo wmRuntimeInfo) {
-        final var task = createWebDavSyncTask(wmRuntimeInfo);
+    void shouldDownloadProcessedFile(WireMockRuntimeInfo wmRuntimeInfo) {
+        var task = createWebDavSyncTask(wmRuntimeInfo);
         when(photoStorage.getInboxToProcessFile(FILENAME)).thenReturn(tempdir.resolve(FILENAME));
-        final var processedPath = tempdir.resolve(FILENAME);
+        var processedPath = tempdir.resolve(FILENAME);
         when(photoStorage.getInboxProcessedFile(FILENAME)).thenReturn(processedPath);
 
         stubPropfind(createMultistatusResponseForFile());
@@ -157,7 +157,7 @@ class WebDavSyncTaskTest {
         stubPropfind("");
     }
 
-    private void stubPropfind(final String multistatusResponse) {
+    private void stubPropfind(String multistatusResponse) {
         stubFor(request(PROPFIND_METHOD, urlPathEqualTo(PROCESSED_PATH)).willReturn(
                 aResponse().withStatus(207).withBody("""
                         <?xml version="1.0"?>
@@ -203,10 +203,10 @@ class WebDavSyncTaskTest {
     }
 
     @Test
-    void shouldNotSendDeleteIfDownloadFailed(final WireMockRuntimeInfo wmRuntimeInfo) {
-        final var task = createWebDavSyncTask(wmRuntimeInfo);
+    void shouldNotSendDeleteIfDownloadFailed(WireMockRuntimeInfo wmRuntimeInfo) {
+        var task = createWebDavSyncTask(wmRuntimeInfo);
         when(photoStorage.getInboxToProcessFile(FILENAME)).thenReturn(tempdir.resolve(FILENAME));
-        final var processedPath = tempdir.resolve(FILENAME);
+        var processedPath = tempdir.resolve(FILENAME);
         when(photoStorage.getInboxProcessedFile(FILENAME)).thenReturn(processedPath);
 
         stubPropfind(createMultistatusResponseForFile());
@@ -223,8 +223,8 @@ class WebDavSyncTaskTest {
     }
 
     @NotNull
-    WebDavSyncTask createWebDavSyncTask(final WireMockRuntimeInfo wmRuntimeInfo) {
-        final var config = new WebDavSyncConfig(wmRuntimeInfo.getHttpBaseUrl() + TO_PROCESS_PATH,
+    WebDavSyncTask createWebDavSyncTask(WireMockRuntimeInfo wmRuntimeInfo) {
+        var config = new WebDavSyncConfig(wmRuntimeInfo.getHttpBaseUrl() + TO_PROCESS_PATH,
                 wmRuntimeInfo.getHttpBaseUrl() + PROCESSED_PATH, USERNAME, PASSWORD);
         return new WebDavSyncTask(config, photoStorage, inboxDao);
     }
@@ -245,8 +245,8 @@ class WebDavSyncTaskTest {
     }
 
     @NotNull
-    Path createFile(final Path dir) throws IOException {
-        final var path = dir.resolve(WebDavSyncTaskTest.FILENAME);
+    Path createFile(Path dir) throws IOException {
+        var path = dir.resolve(WebDavSyncTaskTest.FILENAME);
         Files.writeString(path, WebDavSyncTaskTest.FILENAME);
         return path;
     }

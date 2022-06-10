@@ -23,42 +23,42 @@ public interface UserDao {
 
     @SqlQuery("SELECT * FROM users WHERE normalizedName = :normalizedName")
     @RegisterRowMapper(UserMapper.class)
-    Optional<User> findByNormalizedName(@Bind("normalizedName") final String normalizedName);
+    Optional<User> findByNormalizedName(@Bind("normalizedName") String normalizedName);
 
     @SqlQuery("SELECT * FROM users WHERE id = :id")
     @RegisterRowMapper(UserMapper.class)
-    Optional<User> findById(@Bind("id") final int id);
+    Optional<User> findById(@Bind("id") int id);
 
     @SqlQuery("SELECT * FROM users WHERE email = :email")
     @RegisterRowMapper(UserMapper.class)
-    Optional<User> findByEmail(@Bind("email") final String email);
+    Optional<User> findByEmail(@Bind("email") String email);
 
     @SqlUpdate("UPDATE users SET `key` = :key WHERE id = :id")
-    void updateCredentials(@Bind("id") final int id, @Bind("key") final String key);
+    void updateCredentials(@Bind("id") int id, @Bind("key") String key);
 
     @SqlUpdate("""
             INSERT INTO users (id, name, url, license, email, normalizedName, ownPhotos, anonymous, `key`, emailVerification, sendNotifications)
                 VALUES (:id, :name, :url, :license, :email, :normalizedName, :ownPhotos, :anonymous, :key, :emailVerification, :sendNotifications)
             """)
     @GetGeneratedKeys("id")
-    Integer insert(@BindBean final User user);
+    Integer insert(@BindBean User user);
 
     @SqlUpdate("""
             UPDATE users SET name = :name, url = :url, license = :license, email = :email, normalizedName = :normalizedName, ownPhotos = :ownPhotos,
                             anonymous = :anonymous, emailVerification = :emailVerification, sendNotifications = :sendNotifications
             WHERE id = :id
             """)
-    void update(@BindBean final User user);
+    void update(@BindBean User user);
 
     @SqlQuery("SELECT * FROM users WHERE emailVerification = :emailVerification")
     @RegisterRowMapper(UserMapper.class)
-    Optional<User> findByEmailVerification(@Bind("emailVerification") final String emailVerification);
+    Optional<User> findByEmailVerification(@Bind("emailVerification") String emailVerification);
 
     @SqlUpdate("UPDATE users SET emailVerification = :emailVerification WHERE id = :id")
-    void updateEmailVerification(@Bind("id") final int id, @Bind("emailVerification") final String emailVerification);
+    void updateEmailVerification(@Bind("id") int id, @Bind("emailVerification") String emailVerification);
 
     class UserMapper implements RowMapper<User> {
-        public User map(final ResultSet rs, final StatementContext ctx) throws SQLException {
+        public User map(ResultSet rs, StatementContext ctx) throws SQLException {
             return User.builder()
                     .id(rs.getInt("id"))
                     .name(rs.getString("name"))

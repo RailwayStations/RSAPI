@@ -37,7 +37,7 @@ class PhotographersControllerTest {
     @ValueSource(strings = {"/x/photographers", "/xyz/photographers", "/photographers?country=x", "/photographers?country=xyz",
             "/x/photographers.json", "/xyz/photographers.json",  "/photographers.json?country=x", "/photographers.json?country=xyz",
             "/x/photographers.txt", "/xyz/photographers.txt", "/photographers.txt?country=x", "/photographers.txt?country=xyz"})
-    void whenCountryIsInvalidThenReturnsStatus400(final String urlTemplate) throws Exception {
+    void whenCountryIsInvalidThenReturnsStatus400(String urlTemplate) throws Exception {
         mvc.perform(get(urlTemplate))
                 .andExpect(validOpenApi())
                 .andExpect(status().isBadRequest());
@@ -49,7 +49,7 @@ class PhotographersControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"/de/photographers.json", "/de/photographers", "/photographers?country=de", "/photographers.json?country=de"})
-    public void photographersDeJson(final String urlTemplate) throws Exception {
+    void photographersDeJson(String urlTemplate) throws Exception {
         when(loadPhotographersUseCase.getPhotographersPhotocountMap("de")).thenReturn(createPhotographersResponse());
 
         mvc.perform(get(urlTemplate))
@@ -63,7 +63,7 @@ class PhotographersControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"/photographers.json", "/photographers"})
-    public void photographersAllJson(final String urlTemplate) throws Exception {
+    void photographersAllJson(String urlTemplate) throws Exception {
         when(loadPhotographersUseCase.getPhotographersPhotocountMap(null)).thenReturn(createPhotographersResponse());
 
         mvc.perform(get(urlTemplate))
@@ -77,7 +77,7 @@ class PhotographersControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"/de/photographers.txt", "/de/photographers.txt?country=de"})
-    public void photographersDeTxt(final String urlTemplate) throws Exception {
+    void photographersDeTxt(String urlTemplate) throws Exception {
         when(loadPhotographersUseCase.getPhotographersPhotocountMap("de")).thenReturn(createPhotographersResponse());
 
         mvc.perform(get(urlTemplate))

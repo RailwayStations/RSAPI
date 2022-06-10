@@ -33,7 +33,7 @@ public interface PhotoStorage {
     class PhotoTooLargeException extends Exception {
         private final long maxSize;
 
-        public PhotoTooLargeException(final long maxSize) {
+        public PhotoTooLargeException(long maxSize) {
             this.maxSize = maxSize;
         }
 

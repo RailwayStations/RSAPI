@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class InboxServiceTest {
 
     @Test
-    public void getLicenseNoOverride() {
+    void getLicenseNoOverride() {
         assertThat(InboxService.getLicenseForPhoto(createUserWithCC0License(),
                 Country.builder()
                         .code("de")
@@ -24,7 +24,7 @@ class InboxServiceTest {
     }
 
     @Test
-    public void getLicenseOverride() {
+    void getLicenseOverride() {
         assertThat(InboxService.getLicenseForPhoto(createUserWithCC0License(),
                 Country.builder()
                         .code("fr")

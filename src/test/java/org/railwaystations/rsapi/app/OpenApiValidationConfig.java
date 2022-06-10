@@ -28,12 +28,12 @@ public class OpenApiValidationConfig {
     }
 
     @Bean
-    public WebMvcConfigurer addOpenApiValidationInterceptor(@Value("classpath:static/openapi.yaml") final Resource openApiSpecification) throws IOException {
-        final EncodedResource specResource = new EncodedResource(openApiSpecification, StandardCharsets.UTF_8);
-        final OpenApiValidationInterceptor openApiValidationInterceptor = new OpenApiValidationInterceptor(specResource);
+    public WebMvcConfigurer addOpenApiValidationInterceptor(@Value("classpath:static/openapi.yaml") Resource openApiSpecification) throws IOException {
+        var specResource = new EncodedResource(openApiSpecification, StandardCharsets.UTF_8);
+        var openApiValidationInterceptor = new OpenApiValidationInterceptor(specResource);
         return new WebMvcConfigurer() {
             @Override
-            public void addInterceptors(final @NotNull InterceptorRegistry registry) {
+            public void addInterceptors(@NotNull InterceptorRegistry registry) {
                 registry.addInterceptor(openApiValidationInterceptor);
             }
         };

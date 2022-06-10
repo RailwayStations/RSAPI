@@ -51,7 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes={WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class, MockMvcTestConfiguration.class, WebSecurityConfig.class})
 @Import({ProfileService.class, RSUserDetailsService.class, RSAuthenticationProvider.class, LazySodiumPasswordEncoder.class})
 @ActiveProfiles("mockMvcTest")
-public class ProfileControllerTest {
+class ProfileControllerTest {
 
     @Autowired
     private MockMvc mvc;
@@ -71,21 +71,21 @@ public class ProfileControllerTest {
     }
 
     @Test
-    public void testRegisterInvalidData() throws Exception {
-        final var givenUserProfileWithoutEmail = """
+    void testRegisterInvalidData() throws Exception {
+        var givenUserProfileWithoutEmail = """
                     { "nickname": "nickname", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """;
         postRegistration(givenUserProfileWithoutEmail).andExpect(status().isBadRequest());
     }
 
     @NotNull
-    private ResultActions postRegistrationWithApiValidation(final String userProfileJson) throws Exception {
+    private ResultActions postRegistrationWithApiValidation(String userProfileJson) throws Exception {
         return postRegistration(userProfileJson)
                 .andExpect(validOpenApi());
     }
 
     @NotNull
-    private ResultActions postRegistration(final String userProfileJson) throws Exception {
+    private ResultActions postRegistration(String userProfileJson) throws Exception {
         return mvc.perform(post("/registration")
                 .header("User-Agent", "UserAgent")
                 .contentType("application/json")
@@ -94,8 +94,8 @@ public class ProfileControllerTest {
     }
 
     @Test
-    public void testRegisterNewUser() throws Exception {
-        final var givenUserProfile = """
+    void testRegisterNewUser() throws Exception {
+        var givenUserProfile = """
                     { "nickname": "nickname", "email": "nickname@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """;
         postRegistrationWithApiValidation(givenUserProfile).andExpect(status().isAccepted());
@@ -132,8 +132,8 @@ public class ProfileControllerTest {
     }
 
     @Test
-    public void testRegisterNewUserWithPassword() throws Exception {
-        final var givenUserProfileWithPassword = """
+    void testRegisterNewUserWithPassword() throws Exception {
+        var givenUserProfileWithPassword = """
                     { "nickname": "nickname", "email": "nickname@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true, "newPassword": "verySecretPassword" }
                 """;
         postRegistrationWithApiValidation(givenUserProfileWithPassword).andExpect(status().isAccepted());
@@ -170,8 +170,8 @@ public class ProfileControllerTest {
     }
 
     @Test
-    public void testRegisterNewUserAnonymous() throws Exception {
-        final var givenAnonymousUserProfile = """
+    void testRegisterNewUserAnonymous() throws Exception {
+        var givenAnonymousUserProfile = """
                     { "nickname": "nickname", "email": "nickname@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
                 """;
         postRegistrationWithApiValidation(givenAnonymousUserProfile).andExpect(status().isAccepted());
@@ -180,18 +180,18 @@ public class ProfileControllerTest {
     }
 
     @Test
-    public void testRegisterUserNameTaken() throws Exception {
+    void testRegisterUserNameTaken() throws Exception {
         givenExistingUser();
-        final var givenUserProfileWithSameName = """
+        var givenUserProfileWithSameName = """
                     { "nickname": "existing", "email": "other@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """;
         postRegistrationWithApiValidation(givenUserProfileWithSameName).andExpect(status().isConflict());
     }
 
     @Test
-    public void testRegisterExistingUserEmailTaken() throws Exception {
+    void testRegisterExistingUserEmailTaken() throws Exception {
         givenExistingUser();
-        final var givenUserProfileWithSameEmail = """
+        var givenUserProfileWithSameEmail = """
                     { "nickname": "othername", "email": "existing@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """;
         postRegistrationWithApiValidation(givenUserProfileWithSameEmail).andExpect(status().isConflict());
@@ -200,16 +200,16 @@ public class ProfileControllerTest {
     }
 
     @Test
-    public void testRegisterExistingUserEmptyName() throws Exception {
+    void testRegisterExistingUserEmptyName() throws Exception {
         givenExistingUser();
-        final var givenUserProfileWithEmptyName = """
+        var givenUserProfileWithEmptyName = """
                     { "nickname": "", "email": "existing@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """;
         postRegistrationWithApiValidation(givenUserProfileWithEmptyName).andExpect(status().isBadRequest());
     }
 
     @Test
-    public void testGetMyProfile() throws Exception {
+    void testGetMyProfile() throws Exception {
         givenExistingUser();
 
         mvc.perform(get("/myProfile")
@@ -224,8 +224,8 @@ public class ProfileControllerTest {
     }
 
     private void givenExistingUser() {
-        final var key = "246172676F6E32696424763D3139246D3D36353533362C743D322C703D3124426D4F637165757646794E44754132726B566A6A3177246A7568362F6E6C2F49437A4B475570446E6B674171754A304F7A486A62694F587442542F2B62584D49476300000000000000000000000000000000000000000000000000000000000000";
-        final var user = User.builder()
+        var key = "246172676F6E32696424763D3139246D3D36353533362C743D322C703D3124426D4F637165757646794E44754132726B566A6A3177246A7568362F6E6C2F49437A4B475570446E6B674171754A304F7A486A62694F587442542F2B62584D49476300000000000000000000000000000000000000000000000000000000000000";
+        var user = User.builder()
                 .name("existing")
                 .license("CC0")
                 .id(42)
@@ -245,7 +245,7 @@ public class ProfileControllerTest {
     }
 
     @Test
-    public void testChangePasswordTooShortHeader() throws Exception {
+    void testChangePasswordTooShortHeader() throws Exception {
         givenExistingUser();
 
         postChangePassword("secret", "")
@@ -255,7 +255,7 @@ public class ProfileControllerTest {
     }
 
     @NotNull
-    private ResultActions postChangePassword(final String newPasswordHeader, final String newPasswordBody) throws Exception {
+    private ResultActions postChangePassword(String newPasswordHeader, String newPasswordBody) throws Exception {
         return mvc.perform(post("/changePassword")
                         .header("User-Agent", "UserAgent")
                         .header("New-Password", newPasswordHeader)
@@ -268,7 +268,7 @@ public class ProfileControllerTest {
     }
 
     @Test
-    public void testChangePasswordTooShortBody() throws Exception {
+    void testChangePasswordTooShortBody() throws Exception {
         givenExistingUser();
 
         postChangePassword("", "{\"newPassword\": \"secret\"}")
@@ -279,14 +279,14 @@ public class ProfileControllerTest {
     }
 
     @Test
-    public void testChangePasswordHeader() throws Exception {
+    void testChangePasswordHeader() throws Exception {
         givenExistingUser();
 
         postChangePassword("secretlong", "")
                 .andExpect(status().isOk());
 
-        final var idCaptor = ArgumentCaptor.forClass(Integer.class);
-        final var keyCaptor = ArgumentCaptor.forClass(String.class);
+        var idCaptor = ArgumentCaptor.forClass(Integer.class);
+        var keyCaptor = ArgumentCaptor.forClass(String.class);
         verify(userDao).updateCredentials(idCaptor.capture(), keyCaptor.capture());
 
         assertThat(idCaptor.getValue()).isEqualTo(42);
@@ -294,14 +294,14 @@ public class ProfileControllerTest {
     }
 
     @Test
-    public void testChangePasswordBody() throws Exception {
+    void testChangePasswordBody() throws Exception {
         givenExistingUser();
 
         postChangePassword("", "{\"newPassword\": \"secretlong\"}")
                 .andExpect(status().isOk());
 
-        final var idCaptor = ArgumentCaptor.forClass(Integer.class);
-        final var keyCaptor = ArgumentCaptor.forClass(String.class);
+        var idCaptor = ArgumentCaptor.forClass(Integer.class);
+        var keyCaptor = ArgumentCaptor.forClass(String.class);
         verify(userDao).updateCredentials(idCaptor.capture(), keyCaptor.capture());
 
         assertThat(idCaptor.getValue()).isEqualTo(42);
@@ -309,14 +309,14 @@ public class ProfileControllerTest {
     }
 
     @Test
-    public void testChangePasswordHeaderAndBody() throws Exception {
+    void testChangePasswordHeaderAndBody() throws Exception {
         givenExistingUser();
 
         postChangePassword("secretheader", "{\"newPassword\": \"secretbody\"}")
                 .andExpect(status().isOk());
 
-        final var idCaptor = ArgumentCaptor.forClass(Integer.class);
-        final var keyCaptor = ArgumentCaptor.forClass(String.class);
+        var idCaptor = ArgumentCaptor.forClass(Integer.class);
+        var keyCaptor = ArgumentCaptor.forClass(String.class);
         verify(userDao).updateCredentials(idCaptor.capture(), keyCaptor.capture());
 
         assertThat(idCaptor.getValue()).isEqualTo(42);
@@ -324,16 +324,16 @@ public class ProfileControllerTest {
     }
 
     @Test
-    public void testUpdateMyProfile() throws Exception {
+    void testUpdateMyProfile() throws Exception {
         when(userDao.findByNormalizedName("newname")).thenReturn(Optional.empty());
         givenExistingUser();
-        final var newProfileJson = """
+        var newProfileJson = """
                     { "nickname": "new_name", "email": "existing@example.com", "link": "http://twitter.com/", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
                 """;
 
         postMyProfile(newProfileJson).andExpect(status().isOk());
 
-        final var user = User.builder()
+        var user = User.builder()
                 .name("new_name")
                 .license("CC0")
                 .email("existing@example.com")
@@ -345,7 +345,7 @@ public class ProfileControllerTest {
     }
 
     @NotNull
-    private ResultActions postMyProfile(final String newProfileJson) throws Exception {
+    private ResultActions postMyProfile(String newProfileJson) throws Exception {
         return mvc.perform(post("/myProfile")
                         .header("User-Agent", "UserAgent")
                         .contentType("application/json")
@@ -357,14 +357,14 @@ public class ProfileControllerTest {
     }
 
     @Test
-    public void testUpdateMyProfileConflict() throws Exception {
-        final var user = User.builder()
+    void testUpdateMyProfileConflict() throws Exception {
+        var user = User.builder()
                 .name("@New name")
                 .email("newname@example.com")
                 .sendNotifications(true).build();
         when(userDao.findByNormalizedName("newname")).thenReturn(Optional.of(user));
         givenExistingUser();
-        final var newProfileJson = """
+        var newProfileJson = """
                     { "nickname": "new_name", "email": "existing@example.com", "link": "http://twitter.com/", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
                 """;
 
@@ -374,17 +374,17 @@ public class ProfileControllerTest {
     }
 
     @Test
-    public void testUpdateMyProfileNewMail() throws Exception {
+    void testUpdateMyProfileNewMail() throws Exception {
         when(userDao.findByEmail("newname@example.com")).thenReturn(Optional.empty());
         givenExistingUser();
-        final var newProfileJson = """
+        var newProfileJson = """
                     { "nickname": "existing", "email": "newname@example.com", "link": "http://twitter.com/", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
                 """;
 
         postMyProfile(newProfileJson).andExpect(status().isOk());
 
         assertVerificationEmail();
-        final var user = User.builder()
+        var user = User.builder()
                 .name("existing")
                 .license("CC0")
                 .email("newname@example.com")
@@ -396,8 +396,8 @@ public class ProfileControllerTest {
     }
 
     @Test
-    public void testNewUploadTokenViaEmail() throws Exception {
-        final var user = User.builder()
+    void testNewUploadTokenViaEmail() throws Exception {
+        var user = User.builder()
                 .name("existing")
                 .license("CC0")
                 .email("existing@example.com")
@@ -419,8 +419,8 @@ public class ProfileControllerTest {
     }
 
     @Test
-    public void testResetPasswordViaEmail() throws Exception {
-        final var user = User.builder()
+    void testResetPasswordViaEmail() throws Exception {
+        var user = User.builder()
                 .name("existing")
                 .license("CC0")
                 .email("existing@example.com")
@@ -437,7 +437,7 @@ public class ProfileControllerTest {
     }
 
     @NotNull
-    private ResultActions postResetPassword(final String nameOrEmail) throws Exception {
+    private ResultActions postResetPassword(String nameOrEmail) throws Exception {
         return mvc.perform(post("/resetPassword")
                         .header("User-Agent", "UserAgent")
                         .header("NameOrEmail", nameOrEmail)
@@ -446,8 +446,8 @@ public class ProfileControllerTest {
     }
 
     @Test
-    public void testResetPasswordViaName() throws Exception {
-        final var user = User.builder()
+    void testResetPasswordViaName() throws Exception {
+        var user = User.builder()
                 .name("existing")
                 .license("CC0")
                 .email("existing@example.com")
@@ -464,13 +464,13 @@ public class ProfileControllerTest {
     }
 
     @Test
-    public void testResetPasswordUserNotFound() throws Exception {
+    void testResetPasswordUserNotFound() throws Exception {
         postResetPassword("doesnt-exist").andExpect(status().isNotFound());
     }
 
     @Test
-    public void testResetPasswordEmailMissing() throws Exception {
-        final var user = User.builder()
+    void testResetPasswordEmailMissing() throws Exception {
+        var user = User.builder()
                 .name("existing")
                 .build();
         when(userDao.findByNormalizedName(user.getName())).thenReturn(Optional.of(user));
@@ -481,9 +481,9 @@ public class ProfileControllerTest {
     }
 
     @Test
-    public void testVerifyEmailSuccess() throws Exception {
-        final var token = "verification";
-        final var user = User.builder()
+    void testVerifyEmailSuccess() throws Exception {
+        var token = "verification";
+        var user = User.builder()
                 .id(42)
                 .name("existing")
                 .license("CC0")
@@ -503,7 +503,7 @@ public class ProfileControllerTest {
     }
 
     @NotNull
-    private ResultActions getEmailVerification(final String token) throws Exception {
+    private ResultActions getEmailVerification(String token) throws Exception {
         return mvc.perform(get("/emailVerification/" + token)
                         .header("User-Agent", "UserAgent")
                         .with(csrf()))
@@ -511,10 +511,10 @@ public class ProfileControllerTest {
     }
 
     @Test
-    public void testVerifyEmailFailed() throws Exception {
-        final var token = "verification";
-        final var emailVerification = User.EMAIL_VERIFICATION_TOKEN + token;
-        final var user = User.builder()
+    void testVerifyEmailFailed() throws Exception {
+        var token = "verification";
+        var emailVerification = User.EMAIL_VERIFICATION_TOKEN + token;
+        var user = User.builder()
                 .id(42)
                 .name("existing")
                 .license("CC0")
@@ -533,7 +533,7 @@ public class ProfileControllerTest {
     }
 
     @Test
-    public void testResendEmailVerification() throws Exception {
+    void testResendEmailVerification() throws Exception {
         givenExistingUser();
         mvc.perform(post("/resendEmailVerification")
                         .header("User-Agent", "UserAgent")

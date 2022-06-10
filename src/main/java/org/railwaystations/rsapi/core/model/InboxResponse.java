@@ -13,11 +13,11 @@ public class InboxResponse {
     String inboxUrl;
     Long crc32;
 
-    public static InboxResponse of(final InboxResponseState state, final String message) {
+    public static InboxResponse of(InboxResponseState state, String message) {
         return InboxResponse.builder().state(state).message(message).build();
     }
 
-    public static InboxResponse of(final InboxResponseState state, final Long id) {
+    public static InboxResponse of(InboxResponseState state, Long id) {
         return InboxResponse.builder().state(state).id(id).build();
     }
 

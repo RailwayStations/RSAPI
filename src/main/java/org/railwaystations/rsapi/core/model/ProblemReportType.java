@@ -12,7 +12,7 @@ public enum ProblemReportType {
 
     private final boolean needsPhoto;
 
-    ProblemReportType(final boolean needsPhoto) {
+    ProblemReportType(boolean needsPhoto) {
         this.needsPhoto = needsPhoto;
     }
 

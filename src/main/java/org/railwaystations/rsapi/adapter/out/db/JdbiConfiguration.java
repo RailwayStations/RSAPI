@@ -14,35 +14,35 @@ public class JdbiConfiguration {
 
 
     @Bean
-    public Jdbi jdbi(final DataSource ds) {
-        final var proxy = new TransactionAwareDataSourceProxy(ds);
+    public Jdbi jdbi(DataSource ds) {
+        var proxy = new TransactionAwareDataSourceProxy(ds);
         return Jdbi.create(proxy)
                 .installPlugin(new H2DatabasePlugin())
                 .installPlugin(new SqlObjectPlugin());
     }
 
     @Bean
-    public CountryDao countryDao(final Jdbi jdbi) {
+    public CountryDao countryDao(Jdbi jdbi) {
         return jdbi.onDemand(CountryDao.class);
     }
 
     @Bean
-    public InboxDao inboxDao(final Jdbi jdbi) {
+    public InboxDao inboxDao(Jdbi jdbi) {
         return jdbi.onDemand(InboxDao.class);
     }
 
     @Bean
-    public PhotoDao photoDao(final Jdbi jdbi) {
+    public PhotoDao photoDao(Jdbi jdbi) {
         return jdbi.onDemand(PhotoDao.class);
     }
 
     @Bean
-    public StationDao stationDao(final Jdbi jdbi) {
+    public StationDao stationDao(Jdbi jdbi) {
         return jdbi.onDemand(StationDao.class);
     }
 
     @Bean
-    public UserDao userDao(final Jdbi jdbi) {
+    public UserDao userDao(Jdbi jdbi) {
         return jdbi.onDemand(UserDao.class);
     }
 

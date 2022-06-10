@@ -37,7 +37,7 @@ public class WebDavSyncTask {
     private final InboxDao inboxDao;
     private final HttpClient client;
 
-    public WebDavSyncTask(final WebDavSyncConfig config, final PhotoStorage photoStorage, final InboxDao inboxDao) {
+    public WebDavSyncTask(WebDavSyncConfig config, PhotoStorage photoStorage, InboxDao inboxDao) {
         super();
         this.config = config;
         this.photoStorage = photoStorage;
@@ -57,12 +57,12 @@ public class WebDavSyncTask {
     @Scheduled(fixedRate = 60_000)
     public void syncWebDav() {
         log.info("Starting WebDavSync");
-        final var pendingInboxEntries = inboxDao.findPendingInboxEntries();
+        var pendingInboxEntries = inboxDao.findPendingInboxEntries();
         if (pendingInboxEntries.isEmpty()) {
             return; // nothing to do
         }
 
-        final var processedFiles = listProcessedFiles();
+        var processedFiles = listProcessedFiles();
         pendingInboxEntries.stream()
                 .filter(InboxEntry::isPhotoUpload)
                 .forEach(inboxEntry -> checkWebDav(inboxEntry, processedFiles));
@@ -70,7 +70,7 @@ public class WebDavSyncTask {
 
     private List<MultistatusResponse> listProcessedFiles() {
         log.info("ListProcessedFiles");
-        final var request = HttpRequest.newBuilder()
+        var request = HttpRequest.newBuilder()
                 .uri(URI.create(config.processedUrl()))
                 .timeout(Duration.of(1, ChronoUnit.MINUTES))
                 .method("PROPFIND", HttpRequest.BodyPublishers.ofString("""
@@ -80,7 +80,7 @@ public class WebDavSyncTask {
                         </a:propfind>"""))
                 .header("Depth", "1")
                 .build();
-        final HttpResponse<String> response;
+        HttpResponse<String> response;
         try {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
             log.info("ListProcessedFiles response " + response.statusCode());
@@ -88,68 +88,68 @@ public class WebDavSyncTask {
                 throw new RuntimeException("Failed to list processed files, statusCode=" + response.statusCode());
             }
             return new XmlMapper().readValue(response.body(), Multistatus.class).getResponses();
-        } catch (final IOException | InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Failed to list processed files", e);
         }
     }
 
-    private void checkWebDav(final InboxEntry inboxEntry, final List<MultistatusResponse> processedFiles) {
-        final var toProcessPath = photoStorage.getInboxToProcessFile(inboxEntry.getFilename());
+    private void checkWebDav(InboxEntry inboxEntry, List<MultistatusResponse> processedFiles) {
+        var toProcessPath = photoStorage.getInboxToProcessFile(inboxEntry.getFilename());
         if (Files.exists(toProcessPath)) {
             try {
                 uploadToProcess(toProcessPath);
                 Files.delete(toProcessPath);
-            } catch (final Exception e) {
+            } catch (Exception e) {
                 log.error("Unable to upload toProcess {}", toProcessPath, e);
             }
         }
-        final var processedPath = photoStorage.getInboxProcessedFile(inboxEntry.getFilename());
+        var processedPath = photoStorage.getInboxProcessedFile(inboxEntry.getFilename());
         if (checkIfDownloadProcessedNeeded(processedPath, processedFiles)) {
             try {
                 downloadProcessed(processedPath);
-            } catch (final Exception e) {
+            } catch (Exception e) {
                 log.error("Unable to download of {}", processedPath, e);
             }
         }
     }
 
-    private void downloadProcessed(final Path processedPath) throws IOException, InterruptedException {
+    private void downloadProcessed(Path processedPath) throws IOException, InterruptedException {
         log.info("Downloading processed file of {}", processedPath);
-        final var processedUri = URI.create(config.processedUrl() + "/" + processedPath.getFileName().toString());
-        final var getRequest = HttpRequest.newBuilder()
+        var processedUri = URI.create(config.processedUrl() + "/" + processedPath.getFileName().toString());
+        var getRequest = HttpRequest.newBuilder()
                 .uri(processedUri)
                 .timeout(Duration.of(1, ChronoUnit.MINUTES))
                 .GET()
                 .build();
-        final var getResponse = client.send(getRequest, HttpResponse.BodyHandlers.ofFile(processedPath));
+        var getResponse = client.send(getRequest, HttpResponse.BodyHandlers.ofFile(processedPath));
         log.info("Download getResponse {}, bytes {}", getResponse.statusCode(), Files.size(processedPath));
 
         if (getResponse.statusCode() == 200) {
-            final var delRequest = HttpRequest.newBuilder()
+            var delRequest = HttpRequest.newBuilder()
                     .uri(processedUri)
                     .timeout(Duration.of(1, ChronoUnit.MINUTES))
                     .DELETE()
                     .build();
-            final var delResponse = client.send(delRequest, HttpResponse.BodyHandlers.ofFile(processedPath));
+            var delResponse = client.send(delRequest, HttpResponse.BodyHandlers.ofFile(processedPath));
             log.info("Deleted {}, status {}", delRequest.uri(), delResponse.statusCode());
         } else {
             Files.deleteIfExists(processedPath);
         }
     }
 
-    private boolean checkIfDownloadProcessedNeeded(final Path processedPath, final List<MultistatusResponse> processedFiles) {
+    private boolean checkIfDownloadProcessedNeeded(Path processedPath, List<MultistatusResponse> processedFiles) {
         return processedFiles.stream()
                 .anyMatch(multistatusResponse -> multistatusResponse.getHref().endsWith(processedPath.getFileName().toString()));
     }
 
-    private void uploadToProcess(final Path toProcessPath) throws IOException, InterruptedException {
+    private void uploadToProcess(Path toProcessPath) throws IOException, InterruptedException {
         log.info("Uploading " + toProcessPath);
-        final var request = HttpRequest.newBuilder()
+        var request = HttpRequest.newBuilder()
                 .uri(URI.create(config.toProcessUrl() + "/" + toProcessPath.getFileName().toString()))
                 .timeout(Duration.of(1, ChronoUnit.MINUTES))
                 .PUT(HttpRequest.BodyPublishers.ofFile(toProcessPath))
                 .build();
-        final var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        var response = client.send(request, HttpResponse.BodyHandlers.ofString());
         log.info("Upload response " + response.statusCode());
         if (response.statusCode() != 201) {
             throw new RuntimeException("Failed Upload, statusCode=" + response.statusCode());

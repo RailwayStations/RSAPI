@@ -9,7 +9,7 @@ public class NotifyUsersTask {
 
     private final NotifyUsersService notifyUsersService;
 
-    public NotifyUsersTask(final NotifyUsersService notifyUsersService) {
+    public NotifyUsersTask(NotifyUsersService notifyUsersService) {
         super();
         this.notifyUsersService = notifyUsersService;
     }

@@ -25,17 +25,17 @@ import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 class MastodonBotHttpClientTest {
 
     @Test
-    void tootNewPhoto(final WireMockRuntimeInfo wmRuntimeInfo) {
-        final var config = new MastodonBotConfig("token", "https://station.url", wmRuntimeInfo.getHttpBaseUrl());
-        final var client = new MastodonBotHttpClient(config, new ObjectMapper());
+    void tootNewPhoto(WireMockRuntimeInfo wmRuntimeInfo) {
+        var config = new MastodonBotConfig("token", "https://station.url", wmRuntimeInfo.getHttpBaseUrl());
+        var client = new MastodonBotHttpClient(config, new ObjectMapper());
         stubFor(post("/api/v1/statuses")
                 .willReturn(ok()));
 
-        final var key = new Station.Key("de", "1234");
-        final var user = new User(0, "name", "url", User.CC0, "email", true, false, "key", false, null, null, null, true);
-        final var photo = new Photo(key, "urlPath", user, Instant.now(), User.CC0);
-        final var station = new Station(key, "title", new Coordinates(), photo, true);
-        final var inboxEntry = InboxEntry.builder()
+        var key = new Station.Key("de", "1234");
+        var user = new User(0, "name", "url", User.CC0, "email", true, false, "key", false, null, null, null, true);
+        var photo = new Photo(key, "urlPath", user, Instant.now(), User.CC0);
+        var station = new Station(key, "title", new Coordinates(), photo, true);
+        var inboxEntry = InboxEntry.builder()
                         .comment("comment")
                         .build();
         client.tootNewPhoto(station, inboxEntry);

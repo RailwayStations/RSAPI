@@ -39,7 +39,7 @@ class StatisticControllerTest {
     }
 
     @Test
-    public void statisticAllJson() throws Exception {
+    void statisticAllJson() throws Exception {
         when(getStatisticUseCase.getStatistic(null)).thenReturn(new Statistic(null, 954, 91, 6));
 
         mvc.perform(get("/stats.json"))
@@ -57,7 +57,7 @@ class StatisticControllerTest {
     }
 
     @Test
-    public void statisticDeJson() throws Exception {
+    void statisticDeJson() throws Exception {
         when(getStatisticUseCase.getStatistic("de")).thenReturn(new Statistic("de", 729, 84, 4));
 
         mvc.perform(get("/de/stats.json"))
@@ -71,7 +71,7 @@ class StatisticControllerTest {
     }
 
     @Test
-    public void statisticDeTxt() throws Exception {
+    void statisticDeTxt() throws Exception {
         when(getStatisticUseCase.getStatistic("de")).thenReturn(new Statistic("de", 729, 84, 4));
 
         mvc.perform(get("/de/stats.txt"))

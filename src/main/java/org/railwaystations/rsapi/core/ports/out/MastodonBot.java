@@ -5,6 +5,6 @@ import org.railwaystations.rsapi.core.model.Station;
 
 public interface MastodonBot {
 
-    void tootNewPhoto(final Station station, final InboxEntry inboxEntry);
+    void tootNewPhoto(Station station, InboxEntry inboxEntry);
 
 }

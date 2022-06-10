@@ -21,19 +21,19 @@ public class StatisticTxtWriter extends AbstractHttpMessageConverter<StatisticDt
     }
 
     @Override
-    protected boolean supports(@NonNull final Class<?> clazz) {
+    protected boolean supports(@NonNull Class<?> clazz) {
         return StatisticDto.class.isAssignableFrom(clazz);
     }
 
     @Override
     @NonNull
-    protected StatisticDto readInternal(@NonNull final Class<? extends StatisticDto> clazz, @NonNull final HttpInputMessage inputMessage) throws HttpMessageNotReadableException {
+    protected StatisticDto readInternal(@NonNull Class<? extends StatisticDto> clazz, @NonNull HttpInputMessage inputMessage) throws HttpMessageNotReadableException {
         throw new HttpMessageNotReadableException("read not supported", inputMessage);
     }
 
     @Override
-    protected void writeInternal(final StatisticDto statistic, final HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
-        try (final PrintWriter pw = new PrintWriter(new OutputStreamWriter(outputMessage.getBody(), StandardCharsets.UTF_8))) {
+    protected void writeInternal(StatisticDto statistic, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
+        try (PrintWriter pw = new PrintWriter(new OutputStreamWriter(outputMessage.getBody(), StandardCharsets.UTF_8))) {
             pw.println("name\tvalue");
             statisticToCsv(pw, "total", statistic.getTotal());
             statisticToCsv(pw, "withPhoto", statistic.getWithPhoto());
@@ -44,7 +44,7 @@ public class StatisticTxtWriter extends AbstractHttpMessageConverter<StatisticDt
         }
     }
 
-    private static void statisticToCsv(final PrintWriter pw, final String name, final long value) {
+    private static void statisticToCsv(PrintWriter pw, String name, long value) {
         pw.println(String.format("%s\t%s", name, value));
     }
 

@@ -23,13 +23,13 @@ class PhotoFileStorageTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"done", "rejected"})
-    void cleanupOldCopies(final String subdirName) throws IOException {
-        final var tempdir = Files.createTempDirectory("rsapi");
-        final var keepFileCopiesInDays = 90;
-        final var storage = new PhotoFileStorage(new WorkDir(tempdir.toString(), keepFileCopiesInDays));
-        final var subdir = tempdir.resolve("inbox").resolve(subdirName);
-        final var newFile = createFileWithLastModifiedInPast(subdir, "newFile.txt", keepFileCopiesInDays - 1);
-        final var oldFile = createFileWithLastModifiedInPast(subdir, "oldFile.txt", keepFileCopiesInDays + 1);
+    void cleanupOldCopies(String subdirName) throws IOException {
+        var tempdir = Files.createTempDirectory("rsapi");
+        var keepFileCopiesInDays = 90;
+        var storage = new PhotoFileStorage(new WorkDir(tempdir.toString(), keepFileCopiesInDays));
+        var subdir = tempdir.resolve("inbox").resolve(subdirName);
+        var newFile = createFileWithLastModifiedInPast(subdir, "newFile.txt", keepFileCopiesInDays - 1);
+        var oldFile = createFileWithLastModifiedInPast(subdir, "oldFile.txt", keepFileCopiesInDays + 1);
 
         storage.cleanupOldCopies();
 
@@ -38,8 +38,8 @@ class PhotoFileStorageTest {
     }
 
     @NotNull
-    private Path createFileWithLastModifiedInPast(final Path subdir, final String filename, final int lastModifiedDaysInPast) throws IOException {
-        final var path = subdir.resolve(filename);
+    private Path createFileWithLastModifiedInPast(Path subdir, String filename, int lastModifiedDaysInPast) throws IOException {
+        var path = subdir.resolve(filename);
         Files.writeString(path, filename);
         Files.setLastModifiedTime(path, FileTime.from(Instant.now().minus(lastModifiedDaysInPast, ChronoUnit.DAYS)));
         return path;

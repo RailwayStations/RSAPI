@@ -38,22 +38,22 @@ public class ProfileController {
 
     @PostMapping("/changePassword")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> changePassword(@AuthenticationPrincipal final AuthUser authUser,
-                                                 @RequestHeader(value = "New-Password", required = false) final String newPassword,
-                                                 @RequestBody(required = false) final ChangePasswordDto changePasswordDto) {
+    public ResponseEntity<String> changePassword(@AuthenticationPrincipal AuthUser authUser,
+                                                 @RequestHeader(value = "New-Password", required = false) String newPassword,
+                                                 @RequestBody(required = false) ChangePasswordDto changePasswordDto) {
         manageProfileUseCase.changePassword(authUser.getUser(), changePasswordDto != null ? changePasswordDto.getNewPassword() : newPassword);
         return ResponseEntity.ok("Password changed");
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,value = "/newUploadToken")
-    public ResponseEntity<String> newUploadToken(@RequestHeader(HttpHeaders.USER_AGENT) final String userAgent,
-                                                 @NotNull @RequestHeader("Email") final String email) {
+    public ResponseEntity<String> newUploadToken(@RequestHeader(HttpHeaders.USER_AGENT) String userAgent,
+                                                 @NotNull @RequestHeader("Email") String email) {
         return resetPassword(userAgent, email);
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,value = "/resetPassword")
-    public ResponseEntity<String> resetPassword(@RequestHeader(HttpHeaders.USER_AGENT) final String userAgent,
-                                                @NotNull @RequestHeader("NameOrEmail") final String nameOrEmail) {
+    public ResponseEntity<String> resetPassword(@RequestHeader(HttpHeaders.USER_AGENT) String userAgent,
+                                                @NotNull @RequestHeader("NameOrEmail") String nameOrEmail) {
         if (manageProfileUseCase.resetPassword(nameOrEmail, userAgent) == null) {
             return ResponseEntity.notFound().build();
         }
@@ -62,14 +62,14 @@ public class ProfileController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, value = "/registration")
-    public ResponseEntity<String> register(@RequestHeader(HttpHeaders.USER_AGENT) final String userAgent,
-                                           @RequestBody @NotNull final RegisterProfileDto registerProfileDto) {
+    public ResponseEntity<String> register(@RequestHeader(HttpHeaders.USER_AGENT) String userAgent,
+                                           @RequestBody @NotNull RegisterProfileDto registerProfileDto) {
         manageProfileUseCase.register(toUser(registerProfileDto), userAgent);
 
         return ResponseEntity.accepted().build();
     }
 
-    private User toUser(final RegisterProfileDto registerProfileDto) {
+    private User toUser(RegisterProfileDto registerProfileDto) {
         return User.builder()
                 .name(registerProfileDto.getNickname())
                 .email(registerProfileDto.getEmail())
@@ -84,13 +84,13 @@ public class ProfileController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/myProfile")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ProfileDto> getMyProfile(@AuthenticationPrincipal final AuthUser authUser) {
-        final User user = authUser.getUser();
+    public ResponseEntity<ProfileDto> getMyProfile(@AuthenticationPrincipal AuthUser authUser) {
+        User user = authUser.getUser();
         log.info("Get profile for '{}'", user.getEmail());
         return ResponseEntity.ok(toProfileDto(user));
     }
 
-    private ProfileDto toProfileDto(final User user) {
+    private ProfileDto toProfileDto(User user) {
         return new ProfileDto()
                 .admin(user.isAdmin())
                 .email(user.getEmail())
@@ -105,15 +105,15 @@ public class ProfileController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, value = "/myProfile")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> updateMyProfile(@RequestHeader(HttpHeaders.USER_AGENT) final String userAgent,
-                                                  @RequestBody @NotNull final UpdateProfileDto updateProfileDto,
-                                                  @AuthenticationPrincipal final AuthUser authUser) {
+    public ResponseEntity<String> updateMyProfile(@RequestHeader(HttpHeaders.USER_AGENT) String userAgent,
+                                                  @RequestBody @NotNull UpdateProfileDto updateProfileDto,
+                                                  @AuthenticationPrincipal AuthUser authUser) {
         manageProfileUseCase.updateProfile(authUser.getUser(), toUser(updateProfileDto), userAgent);
 
         return ResponseEntity.ok("Profile updated");
     }
 
-    private User toUser(final UpdateProfileDto updateProfileDto) {
+    private User toUser(UpdateProfileDto updateProfileDto) {
         return User.builder()
                 .name(updateProfileDto.getNickname())
                 .email(updateProfileDto.getEmail())
@@ -125,7 +125,7 @@ public class ProfileController {
                 .build();
     }
 
-    private String mapLicense(final LicenseDto license) {
+    private String mapLicense(LicenseDto license) {
         return switch (license) {
             case CC0 -> CC0_1_0_UNIVERSELL_CC0_1_0_.getValue();
             case CC4 -> CC_BY_SA_4_0.getValue();
@@ -135,13 +135,13 @@ public class ProfileController {
 
     @PostMapping("/resendEmailVerification")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Void> resendEmailVerification(@AuthenticationPrincipal final AuthUser authUser) {
+    public ResponseEntity<Void> resendEmailVerification(@AuthenticationPrincipal AuthUser authUser) {
         manageProfileUseCase.resendEmailVerification(authUser.getUser());
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/emailVerification/{token}")
-    public ResponseEntity<String> emailVerification(@PathVariable("token") final String token) {
+    public ResponseEntity<String> emailVerification(@PathVariable("token") String token) {
         return manageProfileUseCase.emailVerification(token)
                 .map(u -> new ResponseEntity<>("Email successfully verified!", HttpStatus.OK))
                 .orElse(ResponseEntity.notFound().build());

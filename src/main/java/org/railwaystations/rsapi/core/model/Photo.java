@@ -24,7 +24,7 @@ public class Photo {
     private final String licenseUrl;
     private final boolean outdated;
 
-    public Photo(final Station.Key stationKey, final String urlPath, final User photographer, final Instant createdAt, final String license, final boolean outdated) {
+    public Photo(Station.Key stationKey, String urlPath, User photographer, Instant createdAt, String license, boolean outdated) {
         this.stationKey = stationKey;
         this.urlPath = urlPath;
         this.photographer = photographer;
@@ -34,7 +34,7 @@ public class Photo {
         this.outdated = outdated;
     }
 
-    public Photo(final Station.Key stationKey, final String urlPath, final User photographer, final Instant createdAt, final String license) {
+    public Photo(Station.Key stationKey, String urlPath, User photographer, Instant createdAt, String license) {
         this(stationKey, urlPath, photographer, createdAt, license, false);
     }
 

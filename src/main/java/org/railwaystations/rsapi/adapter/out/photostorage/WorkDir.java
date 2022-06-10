@@ -20,7 +20,7 @@ public class WorkDir {
     private final Path inboxRejectedDir;
     private final int keepFileCopiesInDays;
 
-    public WorkDir(@Value("${workDir}") final String workDir, @Value("${keepFileCopiesInDays}") final Integer keepFileCopiesInDays) {
+    public WorkDir(@Value("${workDir}") String workDir, @Value("${keepFileCopiesInDays}") Integer keepFileCopiesInDays) {
         try {
             this.photosDir = Files.createDirectories(Path.of(workDir, "photos"));
             this.inboxDir = Path.of(workDir, "inbox");
@@ -28,7 +28,7 @@ public class WorkDir {
             this.inboxToProcessDir = Files.createDirectories(inboxDir.resolve("toprocess"));
             this.inboxDoneDir = Files.createDirectories(inboxDir.resolve("done"));
             this.inboxRejectedDir = Files.createDirectories(inboxDir.resolve("rejected"));
-        } catch (final IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException("Unable to create working directories", e);
         }
         this.keepFileCopiesInDays = Objects.requireNonNullElse(keepFileCopiesInDays, KEEP_FILE_COPIES_IN_DAYS_DEFAULT);

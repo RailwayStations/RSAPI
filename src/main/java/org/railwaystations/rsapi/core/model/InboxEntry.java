@@ -85,7 +85,7 @@ public class InboxEntry {
         return createFilename(getId(), getExtension());
     }
 
-    public static String createFilename(final Long id, final String extension) {
+    public static String createFilename(Long id, String extension) {
         if (id == null || extension == null) {
             return null;
         }

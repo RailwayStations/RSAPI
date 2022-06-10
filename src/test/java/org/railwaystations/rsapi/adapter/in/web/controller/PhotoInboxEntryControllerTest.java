@@ -64,7 +64,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes={WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class, MockMvcTestConfiguration.class, WebSecurityConfig.class})
 @Import({InboxService.class, PhotoFileStorage.class, RSUserDetailsService.class})
 @ActiveProfiles("mockMvcTest")
-public class PhotoInboxEntryControllerTest {
+class PhotoInboxEntryControllerTest {
 
     public static final String IMAGE_CONTENT = "image-content";
 
@@ -96,19 +96,19 @@ public class PhotoInboxEntryControllerTest {
     private PhotoDao photoDao;
 
     @BeforeEach
-    public void setUp() {
-        final Station.Key key0815 = new Station.Key("ch", "0815");
-        final Station station0815 = new Station(key0815, "Station 0815", new Coordinates(40.1, 7.0), "LAL", new Photo(key0815, "URL", createUser("Jim Knopf", 18), null, "CC0"), true);
-        final Station.Key key4711 = new Station.Key("de", "4711");
-        final Station station4711 = new Station(key4711, "Lummerland", new Coordinates(50.0, 9.0), "XYZ", null, true);
-        final Station.Key key1234 = new Station.Key("de", "1234");
-        final Station station1234 = new Station(key1234, "Neverland", new Coordinates(51.0, 10.0), "ABC", new Photo(key1234, "URL", createUser("Jim Knopf"), null, "CC0"), true);
-        final Station.Key key5678 = new Station.Key("de", "5678");
-        final Station station5678 = new Station(key5678, "Phantasia", new Coordinates(51.0, 10.0), "DEF", new Photo(key5678, "URL", createUser("nickname"), null, "CC0"), true);
-        final Station.Key key9876 = new Station.Key("de", "9876");
-        final Station station9876 = new Station(key9876, "Station 9876", new Coordinates(52.0, 8.0), "EFF", new Photo(key9876, "URL", createUser("nickname", 42), null, "CC0"), true);
+    void setUp() {
+        var key0815 = new Station.Key("ch", "0815");
+        var station0815 = new Station(key0815, "Station 0815", new Coordinates(40.1, 7.0), "LAL", new Photo(key0815, "URL", createUser("Jim Knopf", 18), null, "CC0"), true);
+        var key4711 = new Station.Key("de", "4711");
+        var station4711 = new Station(key4711, "Lummerland", new Coordinates(50.0, 9.0), "XYZ", null, true);
+        var key1234 = new Station.Key("de", "1234");
+        var station1234 = new Station(key1234, "Neverland", new Coordinates(51.0, 10.0), "ABC", new Photo(key1234, "URL", createUser("Jim Knopf"), null, "CC0"), true);
+        var key5678 = new Station.Key("de", "5678");
+        var station5678 = new Station(key5678, "Phantasia", new Coordinates(51.0, 10.0), "DEF", new Photo(key5678, "URL", createUser("nickname"), null, "CC0"), true);
+        var key9876 = new Station.Key("de", "9876");
+        var station9876 = new Station(key9876, "Station 9876", new Coordinates(52.0, 8.0), "EFF", new Photo(key9876, "URL", createUser("nickname", 42), null, "CC0"), true);
 
-        final User userNickname = User.builder()
+        var userNickname = User.builder()
                 .name("nickname")
                 .license("CC0")
                 .id(42)
@@ -120,7 +120,7 @@ public class PhotoInboxEntryControllerTest {
                 .sendNotifications(false)
                 .build();
         when(userDao.findByEmail("nickname@example.com")).thenReturn(Optional.of(userNickname));
-        final User userSomeuser = User.builder()
+        var userSomeuser = User.builder()
                 .name("someuser")
                 .license("CC0")
                 .email("someuser@example.com")
@@ -136,16 +136,16 @@ public class PhotoInboxEntryControllerTest {
         monitor.getMessages().clear();
     }
 
-    private ResultActions whenPostImage(final String nickname, final int userId, final String email, final String stationId, final String country,
-                                        final String stationTitle, final Double latitude, final Double longitude, final String comment) throws Exception {
+    private ResultActions whenPostImage(String nickname, int userId, String email, String stationId, String country,
+                                        String stationTitle, Double latitude, Double longitude, String comment) throws Exception {
         return whenPostImage(nickname, userId, email, stationId, country, stationTitle, latitude, longitude, comment, User.EMAIL_VERIFIED);
     }
 
-    private ResultActions whenPostImage(final String nickname, final int userId, final String email, final String stationId, final String country,
-                                        final String stationTitle, final Double latitude, final Double longitude, final String comment, final String emailVerification) throws Exception {
-        final byte[] inputBytes = "image-content".getBytes(Charset.defaultCharset());
+    private ResultActions whenPostImage(String nickname, int userId, String email, String stationId, String country,
+                                        String stationTitle, Double latitude, Double longitude, String comment, String emailVerification) throws Exception {
+        var inputBytes = "image-content".getBytes(Charset.defaultCharset());
 
-        final HttpHeaders headers = new HttpHeaders();
+        var headers = new HttpHeaders();
         if (country != null) {
             headers.add("Country", country);
         }
@@ -180,10 +180,10 @@ public class PhotoInboxEntryControllerTest {
     }
 
     @Test
-    public void testPostIframeUnauthorized() throws Exception {
+    void testPostIframeUnauthorized() throws Exception {
         when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("unknown@example.com", "secretUploadToken"))).thenReturn(null);
         when(inboxDao.insert(any())).thenReturn(1L);
-        final String response = whenPostImageIframe("unknown@example.com", "http://localhost/uploadPage.php");
+        var response = whenPostImageIframe("unknown@example.com", "http://localhost/uploadPage.php");
 
         assertThat(response).contains("UNAUTHORIZED");
         verify(inboxDao, never()).insert(any());
@@ -191,10 +191,10 @@ public class PhotoInboxEntryControllerTest {
     }
 
     @Test
-    public void testPostIframeEmailNotVerified() throws Exception {
+    void testPostIframeEmailNotVerified() throws Exception {
         when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("someuser@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("","", Collections.emptyList()));
         when(inboxDao.insert(any())).thenReturn(1L);
-        final String response = whenPostImageIframe("someuser@example.com", "http://localhost/uploadPage.php");
+        var response = whenPostImageIframe("someuser@example.com", "http://localhost/uploadPage.php");
 
         assertThat(response).contains("UNAUTHORIZED");
         assertThat(response).contains("Email not verified");
@@ -203,11 +203,11 @@ public class PhotoInboxEntryControllerTest {
     }
 
     @Test
-    public void testPostIframeMaliciousReferer() throws Exception {
+    void testPostIframeMaliciousReferer() throws Exception {
         when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("nickname@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("","", Collections.emptyList()));
         when(inboxDao.insert(any())).thenReturn(1L);
         
-        final var response = whenPostImageIframe("nickname@example.com", "http://localhost/uploadPage.php<script>alert('FooBar!');</script>");
+        var response = whenPostImageIframe("nickname@example.com", "http://localhost/uploadPage.php<script>alert('FooBar!');</script>");
 
         assertThat(response).isEqualTo("Illegal character in path at index 31: http://localhost/uploadPage.php<script>alert('FooBar!');</script>");
         verify(inboxDao, never()).insert(any());
@@ -215,11 +215,11 @@ public class PhotoInboxEntryControllerTest {
     }
 
     @Test
-    public void testPostIframe() throws Exception {
-        final var uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
+    void testPostIframe() throws Exception {
+        var uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
         when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("nickname@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("","", Collections.emptyList()));
         when(inboxDao.insert(any())).thenReturn(1L);
-        final var response = whenPostImageIframe("nickname@example.com", "http://localhost/uploadPage.php");
+        var response = whenPostImageIframe("nickname@example.com", "http://localhost/uploadPage.php");
 
         assertThat(response).contains("REVIEW");
         assertFileWithContentExistsInInbox("image-content", "1.jpg");
@@ -229,8 +229,8 @@ public class PhotoInboxEntryControllerTest {
         assertThat(monitor.getMessages().get(0)).isEqualTo("New photo upload for Lummerland - de:4711\nSome Comment\nhttp://inbox.railway-stations.org/1.jpg\nby nickname\nvia UserAgent");
     }
 
-    private String whenPostImageIframe(final String email,
-                                       final String referer) throws Exception {
+    private String whenPostImageIframe(String email,
+                                       String referer) throws Exception {
         return mvc.perform(multipart("/photoUpload")
                         .file(new MockMultipartFile("file", "1.jpg", "image/jpeg", "image-content".getBytes(Charset.defaultCharset())))
                         .param("email", email)
@@ -246,8 +246,8 @@ public class PhotoInboxEntryControllerTest {
     }
 
     @Test
-    public void testUploadPhoto() throws Exception {
-        final var uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
+    void testUploadPhoto() throws Exception {
+        var uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
         when(inboxDao.insert(any())).thenReturn(1L);
 
         whenPostImage("@nick name", 42, "nickname@example.com","4711", "de", null, null, null, "Some Comment")
@@ -263,7 +263,7 @@ public class PhotoInboxEntryControllerTest {
         assertThat(monitor.getMessages().get(0)).isEqualTo("New photo upload for Lummerland - de:4711\nSome Comment\nhttp://inbox.railway-stations.org/1.jpg\nby @nick name\nvia UserAgent");
     }
 
-    private void assertUpload(final InboxEntry inboxEntry, final String countryCode, final String stationId, final String title, final Coordinates coordinates) {
+    private void assertUpload(InboxEntry inboxEntry, String countryCode, String stationId, String title, Coordinates coordinates) {
         assertThat(inboxEntry.getCountryCode()).isEqualTo(countryCode);
         assertThat(inboxEntry.getStationId()).isEqualTo(stationId);
         assertThat(inboxEntry.getTitle()).isEqualTo(title);
@@ -279,9 +279,9 @@ public class PhotoInboxEntryControllerTest {
     }
 
     @Test
-    public void testPostMissingStation() throws Exception {
+    void testPostMissingStation() throws Exception {
         when(inboxDao.insert(any())).thenReturn(4L);
-        final var uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
+        var uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
 
         whenPostImage("@nick name", 42, "nickname@example.com",null, null, "Missing Station", 50.9876d, 9.1234d, "Some Comment")
                 .andExpect(status().isAccepted())
@@ -302,7 +302,7 @@ public class PhotoInboxEntryControllerTest {
                 "50.9876d, -181d",
                 "50.9876d, 181d",
     })
-    public void testPostMissingStationLatLonOutOfRange(final Double latitude, final Double longitude) throws Exception {
+    void testPostMissingStationLatLonOutOfRange(Double latitude, Double longitude) throws Exception {
         whenPostImage("@nick name", 42, "nickname@example.com",null, null, "Missing Station", latitude, longitude, null)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.state").value("LAT_LON_OUT_OF_RANGE"))
@@ -311,7 +311,7 @@ public class PhotoInboxEntryControllerTest {
     }
 
     @Test
-    public void testPostSomeUserWithTokenSalt() throws Exception {
+    void testPostSomeUserWithTokenSalt() throws Exception {
         when(inboxDao.insert(any())).thenReturn(3L);
         whenPostImage("@someuser", 11, "someuser@example.com","4711", "de", null, null, null, null)
                 .andExpect(status().isAccepted())
@@ -324,7 +324,7 @@ public class PhotoInboxEntryControllerTest {
     }
 
     @Test
-    public void testPostDuplicateInbox() throws Exception {
+    void testPostDuplicateInbox() throws Exception {
         when(inboxDao.insert(any())).thenReturn(2L);
         when(inboxDao.countPendingInboxEntriesForStation(null, "de", "4711")).thenReturn(1);
 
@@ -339,15 +339,15 @@ public class PhotoInboxEntryControllerTest {
     }
 
     @Test
-    public void testUserInbox() throws Exception {
-        final var user = User.builder().name("nickname").license("CC0").id(42).email("nickname@example.com").build();
+    void testUserInbox() throws Exception {
+        var user = User.builder().name("nickname").license("CC0").id(42).email("nickname@example.com").build();
 
         when(inboxDao.findById(1)).thenReturn(createInboxEntry(user, 1, "de", "4711", null, false));
         when(inboxDao.findById(2)).thenReturn(createInboxEntry(user, 2, "de", "1234", null, true));
         when(inboxDao.findById(3)).thenReturn(createInboxEntry(user, 3, "de", "5678", "rejected", true));
         when(inboxDao.findById(4)).thenReturn(createInboxEntry(user, 4, "ch", "0815", null, false));
 
-        final var inboxStateQueries = """
+        var inboxStateQueries = """
                 [
                     {"id": 1},
                     {"id": 2},
@@ -371,7 +371,7 @@ public class PhotoInboxEntryControllerTest {
                 .andExpect(jsonPath("$.[3].state").value("CONFLICT"));
     }
 
-    private InboxEntry createInboxEntry(final User user, final int id, final String countryCode, final String stationId, final String rejectReason, final boolean done) {
+    private InboxEntry createInboxEntry(User user, int id, String countryCode, String stationId, String rejectReason, boolean done) {
         return InboxEntry.builder()
                 .id(id)
                 .countryCode(countryCode)
@@ -387,18 +387,18 @@ public class PhotoInboxEntryControllerTest {
                 .build();
     }
 
-    private void assertFileWithContentExistsInInbox(final String content, final String filename) throws IOException {
-        final var image = workDir.getInboxDir().resolve(filename);
+    private void assertFileWithContentExistsInInbox(String content, String filename) throws IOException {
+        var image = workDir.getInboxDir().resolve(filename);
         assertThat(Files.exists(image)).isTrue();
 
-        final var inputBytes = content.getBytes(Charset.defaultCharset());
-        final var outputBytes = new byte[inputBytes.length];
+        var inputBytes = content.getBytes(Charset.defaultCharset());
+        var outputBytes = new byte[inputBytes.length];
         IOUtils.readFully(Files.newInputStream(image), outputBytes);
         assertThat(outputBytes).isEqualTo(inputBytes);
     }
 
     @Test
-    public void testPostDuplicate() throws Exception {
+    void testPostDuplicate() throws Exception {
         when(inboxDao.insert(any())).thenReturn(5L);
         whenPostImage("@nick name", 42, "nickname@example.com","1234", "de", null, null, null, null)
                 .andExpect(status().isConflict())
@@ -411,7 +411,7 @@ public class PhotoInboxEntryControllerTest {
     }
 
     @Test
-    public void testPostEmailNotVerified() throws Exception {
+    void testPostEmailNotVerified() throws Exception {
         whenPostImage("@nick name", 42, "nickname@example.com","1234", "de", null, null, null, null, User.EMAIL_VERIFICATION_TOKEN + "blahblah")
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.state").value("UNAUTHORIZED"))
@@ -420,7 +420,7 @@ public class PhotoInboxEntryControllerTest {
     }
 
     @Test
-    public void testPostInvalidCountry() throws Exception {
+    void testPostInvalidCountry() throws Exception {
         whenPostImage("nickname", 42, "nickname@example.com", "4711", "xy", null, null, null, null)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.state").value("NOT_ENOUGH_DATA"))
@@ -428,8 +428,8 @@ public class PhotoInboxEntryControllerTest {
                 .andExpect(jsonPath("$.filename").doesNotExist());
     }
 
-    private ResultActions whenPostProblemReport(final String emailVerification) throws Exception {
-        final var problemReportJson = """
+    private ResultActions whenPostProblemReport(String emailVerification) throws Exception {
+        var problemReportJson = """
                     { "countryCode": "de", "stationId": "1234", "type": "OTHER", "comment": "something is wrong" }
                 """;
         return mvc.perform(post("/reportProblem")
@@ -442,7 +442,7 @@ public class PhotoInboxEntryControllerTest {
     }
 
     @Test
-    public void testPostProblemReport() throws Exception {
+    void testPostProblemReport() throws Exception {
         when(inboxDao.insert(any())).thenReturn(6L);
 
         whenPostProblemReport(User.EMAIL_VERIFIED)
@@ -455,7 +455,7 @@ public class PhotoInboxEntryControllerTest {
     }
 
     @Test
-    public void testPostProblemReportEmailNotVerified() throws Exception {
+    void testPostProblemReportEmailNotVerified() throws Exception {
         whenPostProblemReport(User.EMAIL_VERIFICATION_TOKEN + "blah")
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.state").value("UNAUTHORIZED"))
@@ -463,11 +463,11 @@ public class PhotoInboxEntryControllerTest {
                 .andExpect(jsonPath("$.filename").doesNotExist());
     }
 
-    private User createUser(final String name) {
+    private User createUser(String name) {
         return createUser(name, 0);
     }
 
-    private User createUser(final String name, final int id) {
+    private User createUser(String name, int id) {
         return User.builder().name(name).url("photographerUrl").license("CC0").id(id).ownPhotos(true).anonymous(false).admin(false).emailVerification(User.EMAIL_VERIFIED).sendNotifications(true).build();
     }
 

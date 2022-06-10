@@ -17,16 +17,16 @@ public class LazySodiumPasswordEncoder implements PasswordEncoder {
     private static final PwHash.Lazy PW_HASH_LAZY = LAZY_SODIUM;
 
     @Override
-    public String encode(final CharSequence rawPassword) {
+    public String encode(CharSequence rawPassword) {
         try {
             return PW_HASH_LAZY.cryptoPwHashStr(String.valueOf(rawPassword), PwHash.OPSLIMIT_INTERACTIVE, PwHash.MEMLIMIT_INTERACTIVE);
-        } catch (final SodiumException ex) {
+        } catch (SodiumException ex) {
             throw new RuntimeException("Exception encountered in hashPassword()", ex);
         }
     }
 
     @Override
-    public boolean matches(final CharSequence rawPassword, final String encodedPassword) {
+    public boolean matches(CharSequence rawPassword, String encodedPassword) {
         if (StringUtils.isBlank(rawPassword) || StringUtils.isBlank(encodedPassword)) {
             return false;
         }

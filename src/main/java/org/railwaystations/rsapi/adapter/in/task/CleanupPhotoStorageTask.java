@@ -9,7 +9,7 @@ public class CleanupPhotoStorageTask {
 
     private final PhotoStorage photoStorage;
 
-    public CleanupPhotoStorageTask(final PhotoStorage photoStorage) {
+    public CleanupPhotoStorageTask(PhotoStorage photoStorage) {
         super();
         this.photoStorage = photoStorage;
     }

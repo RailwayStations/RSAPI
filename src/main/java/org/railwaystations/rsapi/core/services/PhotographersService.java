@@ -11,13 +11,13 @@ public class PhotographersService implements LoadPhotographersUseCase {
 
     private final StationDao stationDao;
 
-    public PhotographersService(final StationDao stationDao) {
+    public PhotographersService(StationDao stationDao) {
         super();
         this.stationDao = stationDao;
     }
 
     @Override
-    public Map<String, Long> getPhotographersPhotocountMap(final String country) {
+    public Map<String, Long> getPhotographersPhotocountMap(String country) {
         return stationDao.getPhotographerMap(country);
     }
 

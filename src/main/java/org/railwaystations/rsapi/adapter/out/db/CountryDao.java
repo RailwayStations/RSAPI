@@ -29,7 +29,7 @@ public interface CountryDao {
     @UseRowReducer(CountryProviderAppReducer.class)
     @RegisterRowMapper(CountryMapper.class)
     @RegisterRowMapper(ProviderAppMapper.class)
-    Optional<Country> findById(@Bind("id") final String id);
+    Optional<Country> findById(@Bind("id") String id);
 
     @SqlQuery("""
             SELECT c.id c_id, c.name c_name, c.email c_email, c.twitterTags c_twitterTags, c.timetableUrlTemplate c_timetableUrlTemplate,
@@ -41,10 +41,10 @@ public interface CountryDao {
     @UseRowReducer(CountryProviderAppReducer.class)
     @RegisterRowMapper(CountryMapper.class)
     @RegisterRowMapper(ProviderAppMapper.class)
-    Set<Country> list(@Bind("onlyActive")  final boolean onlyActive);
+    Set<Country> list(@Bind("onlyActive")  boolean onlyActive);
 
     class CountryMapper implements RowMapper<Country> {
-        public Country map(final ResultSet rs, final StatementContext ctx) throws SQLException {
+        public Country map(ResultSet rs, StatementContext ctx) throws SQLException {
             return Country.builder()
                     .code(rs.getString("c_id"))
                     .name(rs.getString("c_name"))
@@ -58,7 +58,7 @@ public interface CountryDao {
     }
 
     class ProviderAppMapper implements RowMapper<ProviderApp> {
-        public ProviderApp map(final ResultSet rs, final StatementContext ctx) throws SQLException {
+        public ProviderApp map(ResultSet rs, StatementContext ctx) throws SQLException {
             return ProviderApp.builder()
                     .type(rs.getString("p_type"))
                     .name(rs.getString("p_name"))
@@ -69,8 +69,8 @@ public interface CountryDao {
 
     class CountryProviderAppReducer implements LinkedHashMapRowReducer<String, Country> {
         @Override
-        public void accumulate(final Map<String, Country> map, final RowView rowView) {
-            final var country = map.computeIfAbsent(rowView.getColumn("c_id", String.class),
+        public void accumulate(Map<String, Country> map, RowView rowView) {
+            var country = map.computeIfAbsent(rowView.getColumn("c_id", String.class),
                     id -> rowView.getRow(Country.class));
 
             if (rowView.getColumn("p_type", String.class) != null) {

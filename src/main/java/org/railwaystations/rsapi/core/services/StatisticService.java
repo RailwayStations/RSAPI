@@ -13,7 +13,7 @@ public class StatisticService implements org.railwaystations.rsapi.core.ports.in
     private final CountryDao countryDao;
     private final StationDao stationDao;
 
-    public StatisticService(final CountryDao countryDao, final StationDao stationDao) {
+    public StatisticService(CountryDao countryDao, StationDao stationDao) {
         super();
         this.countryDao = countryDao;
         this.stationDao = stationDao;
@@ -28,7 +28,7 @@ public class StatisticService implements org.railwaystations.rsapi.core.ports.in
     }
 
     @Override
-    public Statistic getStatistic(final String country) {
+    public Statistic getStatistic(String country) {
         return stationDao.getStatistic(country);
     }
 

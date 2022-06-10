@@ -64,12 +64,12 @@ public class User {
         return normalizeEmail(email);
     }
 
-    public static String normalizeName(final String name) {
+    public static String normalizeName(String name) {
         return StringUtils.trimToEmpty(name).toLowerCase(Locale.ENGLISH).replaceAll("[^a-z0-9]","");
     }
 
-    public static String normalizeEmail(final String email) {
-        final String trimmedEmail = StringUtils.trimToNull(email);
+    public static String normalizeEmail(String email) {
+        var trimmedEmail = StringUtils.trimToNull(email);
         return trimmedEmail != null ? trimmedEmail.toLowerCase(Locale.ENGLISH) : null;
     }
 
@@ -95,10 +95,10 @@ public class User {
             return false;
         }
         if (StringUtils.isNotBlank(url)) {
-            final URL validatedUrl;
+            URL validatedUrl;
             try {
                 validatedUrl = new URL( url );
-            } catch (final MalformedURLException e) {
+            } catch (MalformedURLException e) {
                 return false;
             }
             if (!validatedUrl.getProtocol().matches("https?")) {
@@ -121,13 +121,13 @@ public class User {
         return EMAIL_VERIFIED_AT_NEXT_LOGIN.equals(emailVerification);
     }
 
-    public void setEmailVerificationToken(final String emailVerificationToken) {
+    public void setEmailVerificationToken(String emailVerificationToken) {
         this.emailVerificationToken = emailVerificationToken;
         this.emailVerification = EMAIL_VERIFICATION_TOKEN + emailVerificationToken;
     }
 
     public Set<String> getRoles() {
-        final HashSet<String> roles = new HashSet<>();
+        var roles = new HashSet<String>();
         roles.add(ROLE_USER);
         if (isAdmin()) {
             roles.add(ROLE_ADMIN);

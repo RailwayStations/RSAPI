@@ -29,21 +29,21 @@ public class PhotoDownloadController {
     private PhotoStorage photoStorage;
 
     @GetMapping(value = "/fotos/{countryCode}/{filename}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
-    public ResponseEntity<byte[]> fotos(@PathVariable(COUNTRY_CODE) final String countryCode,
-                                 @PathVariable(FILENAME) final String filename,
-                                 @RequestParam(value = WIDTH, required = false) final Integer width) throws IOException {
+    public ResponseEntity<byte[]> fotos(@PathVariable(COUNTRY_CODE) String countryCode,
+                                 @PathVariable(FILENAME) String filename,
+                                 @RequestParam(value = WIDTH, required = false) Integer width) throws IOException {
         return photos(countryCode, filename, width);
     }
 
     @GetMapping(value = "/photos/{countryCode}/{filename}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
-    public ResponseEntity<byte[]> photos(@PathVariable(COUNTRY_CODE) final String countryCode,
-                                  @PathVariable(FILENAME) final String filename,
-                                  @RequestParam(value = WIDTH, required = false) final Integer width) throws IOException {
+    public ResponseEntity<byte[]> photos(@PathVariable(COUNTRY_CODE) String countryCode,
+                                  @PathVariable(FILENAME) String filename,
+                                  @RequestParam(value = WIDTH, required = false) Integer width) throws IOException {
         log.info("Download photo country={}, file={}", countryCode, filename);
         return downloadPhoto(photoStorage.getPhotoFile(countryCode, filename), width);
     }
 
-    private static ResponseEntity<byte[]> downloadPhoto(final Path photo, final Integer width) throws IOException {
+    private static ResponseEntity<byte[]> downloadPhoto(Path photo, Integer width) throws IOException {
         if (!Files.exists(photo) || !Files.isReadable(photo)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
@@ -52,15 +52,15 @@ public class PhotoDownloadController {
     }
 
     @GetMapping(value = "/inbox/{filename}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
-    public ResponseEntity<byte[]> inbox(@PathVariable(FILENAME) final String filename,
-                                 @RequestParam(value = WIDTH, required = false) final Integer width) throws IOException {
+    public ResponseEntity<byte[]> inbox(@PathVariable(FILENAME) String filename,
+                                 @RequestParam(value = WIDTH, required = false) Integer width) throws IOException {
         log.info("Download inbox file={}", filename);
         return downloadPhoto(photoStorage.getInboxFile(filename), width);
     }
 
     @GetMapping(value = "/inbox/processed/{filename}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
-    public ResponseEntity<byte[]> inboxProcessed(@PathVariable(FILENAME) final String filename,
-                                          @RequestParam(value = WIDTH, required = false) final Integer width) throws IOException {
+    public ResponseEntity<byte[]> inboxProcessed(@PathVariable(FILENAME) String filename,
+                                          @RequestParam(value = WIDTH, required = false) Integer width) throws IOException {
         log.info("Download inbox file={}", filename);
         return downloadPhoto(photoStorage.getInboxProcessedFile(filename), width);
     }

@@ -11,12 +11,12 @@ public class MockMonitor implements Monitor {
     private final List<String> messages = new ArrayList<>();
 
     @Override
-    public void sendMessage(final String message) {
+    public void sendMessage(String message) {
         messages.add(message);
     }
 
     @Override
-    public void sendMessage(final String message, final Path file) {
+    public void sendMessage(String message, Path file) {
         messages.add(message);
     }
 

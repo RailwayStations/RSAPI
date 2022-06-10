@@ -18,7 +18,7 @@ import java.nio.file.Files;
 public class MockMvcTestConfiguration {
 
     @Bean
-    MastodonBot mastodonBot(final ObjectMapper objectMapper) {
+    MastodonBot mastodonBot(ObjectMapper objectMapper) {
         return new MastodonBotHttpClient(new MastodonBotConfig(null, null, null), objectMapper);
     }
 
