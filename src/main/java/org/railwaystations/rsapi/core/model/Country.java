@@ -25,7 +25,7 @@ public class Country {
 
     String timetableUrlTemplate;
 
-    String overrideLicense;
+    License overrideLicense;
 
     boolean active;
 

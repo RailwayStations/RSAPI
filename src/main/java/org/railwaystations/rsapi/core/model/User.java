@@ -20,9 +20,6 @@ import java.util.Set;
 public class User {
 
 
-    /** the one and only valid license */
-    public static final String CC0 = "CC0 1.0 Universell (CC0 1.0)";
-
     public static final String EMAIL_VERIFIED = "VERIFIED";
     public static final String EMAIL_VERIFIED_AT_NEXT_LOGIN = "NEXT_LOGIN";
     public static final String EMAIL_VERIFICATION_TOKEN = "TOKEN:";
@@ -36,7 +33,7 @@ public class User {
 
     private final String url;
 
-    private final String license;
+    private final License license;
 
     private final String email;
 
@@ -110,7 +107,7 @@ public class User {
             return false;
         }
 
-        return CC0.equals(license);
+        return License.CC0_10.equals(license);
     }
 
     public boolean isEmailVerified() {

@@ -9,6 +9,7 @@ import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.UseRowReducer;
 import org.railwaystations.rsapi.core.model.Country;
+import org.railwaystations.rsapi.core.model.License;
 import org.railwaystations.rsapi.core.model.ProviderApp;
 
 import java.sql.ResultSet;
@@ -45,13 +46,14 @@ public interface CountryDao {
 
     class CountryMapper implements RowMapper<Country> {
         public Country map(ResultSet rs, StatementContext ctx) throws SQLException {
+            String overrideLicense = rs.getString("c_overrideLicense");
             return Country.builder()
                     .code(rs.getString("c_id"))
                     .name(rs.getString("c_name"))
                     .email(rs.getString("c_email"))
                     .twitterTags(rs.getString("c_twitterTags"))
                     .timetableUrlTemplate(rs.getString("c_timetableUrlTemplate"))
-                    .overrideLicense(rs.getString("c_overrideLicense"))
+                    .overrideLicense(overrideLicense != null ? License.valueOf(overrideLicense) : null)
                     .active(rs.getBoolean("c_active"))
                     .build();
         }

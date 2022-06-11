@@ -2,6 +2,7 @@ package org.railwaystations.rsapi.core.services;
 
 import org.junit.jupiter.api.Test;
 import org.railwaystations.rsapi.core.model.Country;
+import org.railwaystations.rsapi.core.model.License;
 import org.railwaystations.rsapi.core.model.User;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -14,12 +15,12 @@ class InboxServiceTest {
                 Country.builder()
                         .code("de")
                         .build()))
-                .isEqualTo("CC0");
+                .isEqualTo(License.CC0_10);
     }
 
     private User createUserWithCC0License() {
         return User.builder()
-                .license("CC0")
+                .license(License.CC0_10)
                 .build();
     }
 
@@ -28,11 +29,9 @@ class InboxServiceTest {
         assertThat(InboxService.getLicenseForPhoto(createUserWithCC0License(),
                 Country.builder()
                         .code("fr")
-                        .name("France")
-                        .overrideLicense("CC1")
-                        .active(true)
+                        .overrideLicense(License.CC_BY_NC_SA_30_DE)
                         .build()))
-                .isEqualTo("CC1");
+                .isEqualTo(License.CC_BY_NC_SA_30_DE);
     }
 
 }

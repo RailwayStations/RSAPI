@@ -5,8 +5,10 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.railwaystations.rsapi.adapter.in.web.ErrorHandlingControllerAdvice;
+import org.railwaystations.rsapi.adapter.in.web.model.CountryDto;
 import org.railwaystations.rsapi.adapter.out.db.CountryDao;
 import org.railwaystations.rsapi.core.model.Country;
+import org.railwaystations.rsapi.core.model.License;
 import org.railwaystations.rsapi.core.model.ProviderApp;
 import org.railwaystations.rsapi.core.services.CountryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +52,7 @@ class CountriesControllerTest {
                 .andExpect(openApi().isValid("static/openapi.yaml"))
                 .andReturn().getResponse().getContentAsString();
 
-        List<Country> countries = objectMapper.readerForListOf(Country.class).readValue(contentAsString);
+        List<CountryDto> countries = objectMapper.readerForListOf(CountryDto.class).readValue(contentAsString);
         assertThat(countries.size()).isEqualTo(2);
         countries.forEach(this::assertCountry);
     }
@@ -68,7 +70,7 @@ class CountriesControllerTest {
                 .email("email-" + code)
                 .twitterTags("twitter-" + code)
                 .timetableUrlTemplate("timetable-" + code)
-                .overrideLicense("overrideLicense-" + code)
+                .overrideLicense(License.CC_BY_NC_40_INT)
                 .active(true)
                 .build();
         country.getProviderApps().add(createProviderApp("android", code));
@@ -81,18 +83,18 @@ class CountriesControllerTest {
         return ProviderApp.builder().type(type).name("Provider-" + code).url(type + "App-" + code).build();
     }
 
-    private void assertCountry(Country country) {
+    private void assertCountry(CountryDto country) {
         assertThat(country.getName()).isEqualTo("name-" + country.getCode());
         assertThat(country.getEmail()).isEqualTo("email-" + country.getCode());
         assertThat(country.getTwitterTags()).isEqualTo("twitter-" + country.getCode());
         assertThat(country.getTimetableUrlTemplate()).isEqualTo("timetable-" + country.getCode());
-        assertThat(country.getOverrideLicense()).isEqualTo("overrideLicense-" + country.getCode());
+        assertThat(country.getOverrideLicense()).isEqualTo(License.CC_BY_NC_40_INT.getDisplayName());
         assertThat(country.getProviderApps().size()).isEqualTo(3);
         country.getProviderApps().forEach(app -> {
             switch (app.getType()) {
-                case "android" -> assertThat(app.getUrl()).isEqualTo("androidApp-" + country.getCode());
-                case "ios" -> assertThat(app.getUrl()).isEqualTo("iosApp-" + country.getCode());
-                case "web" -> assertThat(app.getUrl()).isEqualTo("webApp-" + country.getCode());
+                case ANDROID -> assertThat(app.getUrl()).isEqualTo("androidApp-" + country.getCode());
+                case IOS -> assertThat(app.getUrl()).isEqualTo("iosApp-" + country.getCode());
+                case WEB -> assertThat(app.getUrl()).isEqualTo("webApp-" + country.getCode());
                 default -> fail("unknown app type");
             }
         });

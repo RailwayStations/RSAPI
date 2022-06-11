@@ -8,6 +8,7 @@ import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
+import org.railwaystations.rsapi.core.model.License;
 import org.railwaystations.rsapi.core.model.User;
 
 import java.sql.ResultSet;
@@ -63,7 +64,7 @@ public interface UserDao {
                     .id(rs.getInt("id"))
                     .name(rs.getString("name"))
                     .url(rs.getString("url"))
-                    .license(rs.getString("license"))
+                    .license(License.valueOf(rs.getString("license")))
                     .email(rs.getString("email"))
                     .ownPhotos(rs.getBoolean("ownPhotos"))
                     .anonymous(rs.getBoolean("anonymous"))

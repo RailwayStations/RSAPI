@@ -7,7 +7,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20220424.1700"
+  version: "20220611.2120"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -1361,6 +1361,7 @@ components:
       description: Provider App information
     License:
       type: string
+      description: the only accepted type is "CC0 1.0 Universell (CC0 1.0)", the others are listed for backward compatibility
       enum:
         - CC0
         - CC0 1.0 Universell (CC0 1.0)

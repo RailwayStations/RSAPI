@@ -123,7 +123,8 @@ public class StationsController {
                 .id(legacyStationId(station.getKey().getId()))
                 .title(station.getTitle())
                 .DS100(station.getDS100())
-                .license(station.getLicense())
+                .license(station.getLicense() != null ? station.getLicense().getDisplayName() : null)
+                .licenseUrl(station.getLicense() != null ? station.getLicense().getUrl() : null)
                 .active(station.isActive())
                 .lat(station.getCoordinates().getLat())
                 .lon(station.getCoordinates().getLon())
@@ -131,8 +132,7 @@ public class StationsController {
                 .photographer(station.getPhotographer())
                 .photographerUrl(station.getPhotographerUrl())
                 .createdAt(station.getCreatedAt() != null ? station.getCreatedAt().toEpochMilli() : null)
-                .outdated(station.getOutdated())
-                .licenseUrl(station.getLicenseUrl());
+                .outdated(station.getOutdated());
     }
 
     public long legacyStationId(String stationId) {

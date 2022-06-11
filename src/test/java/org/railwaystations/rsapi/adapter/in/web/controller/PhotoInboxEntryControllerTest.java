@@ -21,6 +21,7 @@ import org.railwaystations.rsapi.app.auth.RSUserDetailsService;
 import org.railwaystations.rsapi.app.auth.WebSecurityConfig;
 import org.railwaystations.rsapi.core.model.Coordinates;
 import org.railwaystations.rsapi.core.model.InboxEntry;
+import org.railwaystations.rsapi.core.model.License;
 import org.railwaystations.rsapi.core.model.Photo;
 import org.railwaystations.rsapi.core.model.Station;
 import org.railwaystations.rsapi.core.model.User;
@@ -98,19 +99,19 @@ class PhotoInboxEntryControllerTest {
     @BeforeEach
     void setUp() {
         var key0815 = new Station.Key("ch", "0815");
-        var station0815 = new Station(key0815, "Station 0815", new Coordinates(40.1, 7.0), "LAL", new Photo(key0815, "URL", createUser("Jim Knopf", 18), null, "CC0"), true);
+        var station0815 = new Station(key0815, "Station 0815", new Coordinates(40.1, 7.0), "LAL", createPhoto(key0815, createUser("Jim Knopf", 18)), true);
         var key4711 = new Station.Key("de", "4711");
         var station4711 = new Station(key4711, "Lummerland", new Coordinates(50.0, 9.0), "XYZ", null, true);
         var key1234 = new Station.Key("de", "1234");
-        var station1234 = new Station(key1234, "Neverland", new Coordinates(51.0, 10.0), "ABC", new Photo(key1234, "URL", createUser("Jim Knopf"), null, "CC0"), true);
+        var station1234 = new Station(key1234, "Neverland", new Coordinates(51.0, 10.0), "ABC", createPhoto(key1234, createUser("Jim Knopf")), true);
         var key5678 = new Station.Key("de", "5678");
-        var station5678 = new Station(key5678, "Phantasia", new Coordinates(51.0, 10.0), "DEF", new Photo(key5678, "URL", createUser("nickname"), null, "CC0"), true);
+        var station5678 = new Station(key5678, "Phantasia", new Coordinates(51.0, 10.0), "DEF", createPhoto(key5678, createUser("nickname")), true);
         var key9876 = new Station.Key("de", "9876");
-        var station9876 = new Station(key9876, "Station 9876", new Coordinates(52.0, 8.0), "EFF", new Photo(key9876, "URL", createUser("nickname", 42), null, "CC0"), true);
+        var station9876 = new Station(key9876, "Station 9876", new Coordinates(52.0, 8.0), "EFF", createPhoto(key9876, createUser("nickname", 42)), true);
 
         var userNickname = User.builder()
                 .name("nickname")
-                .license("CC0")
+                .license(License.CC0_10)
                 .id(42)
                 .email("nickname@example.com")
                 .ownPhotos(true)
@@ -122,7 +123,7 @@ class PhotoInboxEntryControllerTest {
         when(userDao.findByEmail("nickname@example.com")).thenReturn(Optional.of(userNickname));
         var userSomeuser = User.builder()
                 .name("someuser")
-                .license("CC0")
+                .license(License.CC0_10)
                 .email("someuser@example.com")
                 .build();
         when(userDao.findByEmail("someuser@example.com")).thenReturn(Optional.of(userSomeuser));
@@ -134,6 +135,15 @@ class PhotoInboxEntryControllerTest {
         when(stationDao.findByKey(key9876.getCountry(), key9876.getId())).thenReturn(Set.of(station9876));
 
         monitor.getMessages().clear();
+    }
+
+    private Photo createPhoto(Station.Key key0815, User Jim_Knopf) {
+        return Photo.builder()
+                .stationKey(key0815)
+                .urlPath("URL")
+                .photographer(Jim_Knopf)
+                .license(License.CC0_10)
+                .build();
     }
 
     private ResultActions whenPostImage(String nickname, int userId, String email, String stationId, String country,
@@ -170,7 +180,7 @@ class PhotoInboxEntryControllerTest {
         return mvc.perform(post("/photoUpload")
                         .headers(headers)
                         .content(inputBytes)
-                        .with(user(new AuthUser(User.builder().name(nickname).license("CC0").id(userId).email(email).emailVerification(emailVerification).build(),Collections.emptyList())))
+                        .with(user(new AuthUser(User.builder().name(nickname).license(License.CC0_10).id(userId).email(email).emailVerification(emailVerification).build(),Collections.emptyList())))
                         .with(csrf()))
                 .andExpect(validOpenApi());
     }
@@ -340,7 +350,7 @@ class PhotoInboxEntryControllerTest {
 
     @Test
     void testUserInbox() throws Exception {
-        var user = User.builder().name("nickname").license("CC0").id(42).email("nickname@example.com").build();
+        var user = User.builder().name("nickname").license(License.CC0_10).id(42).email("nickname@example.com").build();
 
         when(inboxDao.findById(1)).thenReturn(createInboxEntry(user, 1, "de", "4711", null, false));
         when(inboxDao.findById(2)).thenReturn(createInboxEntry(user, 2, "de", "1234", null, true));
@@ -360,7 +370,7 @@ class PhotoInboxEntryControllerTest {
                         .header("User-Agent", "UserAgent")
                         .contentType("application/json")
                         .content(inboxStateQueries)
-                        .with(user(new AuthUser(User.builder().name("nickname").license("CC0").id(42).email("nickname@example.com").emailVerification(User.EMAIL_VERIFIED).build(), Collections.emptyList())))
+                        .with(user(new AuthUser(User.builder().name("nickname").license(License.CC0_10).id(42).email("nickname@example.com").emailVerification(User.EMAIL_VERIFIED).build(), Collections.emptyList())))
                         .with(csrf()))
                 .andExpect(validOpenApi())
                 .andExpect(status().isOk())
@@ -436,7 +446,7 @@ class PhotoInboxEntryControllerTest {
                         .header("User-Agent", "UserAgent")
                         .contentType("application/json")
                         .content(problemReportJson)
-                        .with(user(new AuthUser(User.builder().name("@nick name").license("CC0").id(42).email("nickname@example.com").ownPhotos(true).anonymous(false).emailVerification(emailVerification).build(), Collections.emptyList())))
+                        .with(user(new AuthUser(User.builder().name("@nick name").license(License.CC0_10).id(42).email("nickname@example.com").ownPhotos(true).anonymous(false).emailVerification(emailVerification).build(), Collections.emptyList())))
                         .with(csrf()))
                 .andExpect(validOpenApi());
     }
@@ -468,7 +478,7 @@ class PhotoInboxEntryControllerTest {
     }
 
     private User createUser(String name, int id) {
-        return User.builder().name(name).url("photographerUrl").license("CC0").id(id).ownPhotos(true).anonymous(false).admin(false).emailVerification(User.EMAIL_VERIFIED).sendNotifications(true).build();
+        return User.builder().name(name).url("photographerUrl").license(License.CC0_10).id(id).ownPhotos(true).anonymous(false).admin(false).emailVerification(User.EMAIL_VERIFIED).sendNotifications(true).build();
     }
 
 

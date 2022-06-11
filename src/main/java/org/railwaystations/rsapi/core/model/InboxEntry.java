@@ -1,12 +1,12 @@
 package org.railwaystations.rsapi.core.model;
 
+import lombok.Builder;
 import lombok.Data;
-import lombok.experimental.SuperBuilder;
 
 import java.time.Instant;
 
 @Data
-@SuperBuilder
+@Builder
 public class InboxEntry {
 
     long id;

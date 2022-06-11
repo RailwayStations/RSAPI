@@ -32,8 +32,8 @@ class UserTest {
                  "nickname, email@example.com, CC0 1.0 Universell (CC0 1.0), false,                   , false",
                  "nickname, email@example.com, CC4,                          true,                    , false",
                  "        , email@example.com, CC0 1.0 Universell (CC0 1.0), false,                   , false"})
-    void testIsValid(String name, String email, String license, boolean photoOwner, String link, boolean expected) {
-        assertThat(User.builder().name(name).email(email).license(license).ownPhotos(photoOwner).url(link).anonymous(false).sendNotifications(true).build().isValid()).isEqualTo(expected);
+    void testIsValid(String name, String email, String licenseDisplayName, boolean photoOwner, String link, boolean expected) {
+        assertThat(User.builder().name(name).email(email).license(License.ofDisplayName(licenseDisplayName)).ownPhotos(photoOwner).url(link).anonymous(false).sendNotifications(true).build().isValid()).isEqualTo(expected);
     }
 
     @Test
