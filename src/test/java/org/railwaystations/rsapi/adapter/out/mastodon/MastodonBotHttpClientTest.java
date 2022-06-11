@@ -6,6 +6,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import org.junit.jupiter.api.Test;
 import org.railwaystations.rsapi.core.model.Coordinates;
 import org.railwaystations.rsapi.core.model.InboxEntry;
+import org.railwaystations.rsapi.core.model.License;
 import org.railwaystations.rsapi.core.model.Photo;
 import org.railwaystations.rsapi.core.model.Station;
 import org.railwaystations.rsapi.core.model.User;
@@ -32,8 +33,14 @@ class MastodonBotHttpClientTest {
                 .willReturn(ok()));
 
         var key = new Station.Key("de", "1234");
-        var user = new User(0, "name", "url", User.CC0, "email", true, false, "key", false, null, null, null, true);
-        var photo = new Photo(key, "urlPath", user, Instant.now(), User.CC0);
+        var user = new User(0, "name", "url", License.CC0_10, "email", true, false, "key", false, null, null, null, true);
+        var photo = Photo.builder()
+                .stationKey(key)
+                .urlPath("urlPath")
+                .photographer(user)
+                .createdAt(Instant.now())
+                .license(License.CC0_10)
+                .build();
         var station = new Station(key, "title", new Coordinates(), photo, true);
         var inboxEntry = InboxEntry.builder()
                         .comment("comment")

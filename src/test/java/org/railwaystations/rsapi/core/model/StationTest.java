@@ -25,7 +25,7 @@ class StationTest {
 
     @Test
     void appliesToPhotographer() {
-        var station = new Station(TEST_KEY, "", new Coordinates(0.0, 0.0), new Photo(TEST_KEY, "URL", createTestPhotographer(), null, "CC0"), true);
+        var station = new Station(TEST_KEY, "", new Coordinates(0.0, 0.0), createTestPhoto(), true);
         assertThat(station.appliesTo(null, "test", null, null, null, null)).isEqualTo(true);
         assertThat(station.appliesTo(false, null, null, null, null, null)).isEqualTo(false);
         assertThat(station.appliesTo(true, null, null, null, null, null)).isEqualTo(true);
@@ -40,24 +40,36 @@ class StationTest {
 
     @Test
     void appliesToDistanceAndPhotographer() {
-        var station = new Station(TEST_KEY, "", new Coordinates(50.554550, 9.683787), new Photo(TEST_KEY, "URL", createTestPhotographer(), null, "CC0"), true);
+        var station = new Station(TEST_KEY, "", new Coordinates(50.554550, 9.683787), createTestPhoto(), true);
         assertThat(station.appliesTo(null, "test", 50, 50.8, 9.8, null)).isEqualTo(true);
     }
 
     @Test
     void appliesToActive() {
-        var station = new Station(TEST_KEY, "", new Coordinates(50.554550, 9.683787), new Photo(TEST_KEY, "URL", createTestPhotographer(), null, "CC0"), true);
+        var station = new Station(TEST_KEY, "", new Coordinates(50.554550, 9.683787), createTestPhoto(), true);
         assertThat(station.appliesTo(null, "test", null, null, null, true)).isEqualTo(true);
     }
 
     @Test
     void appliesToInactive() {
-        var station = new Station(TEST_KEY, "", new Coordinates(50.554550, 9.683787), new Photo(TEST_KEY, "URL", createTestPhotographer(), null, "CC0"), false);
+        var station = new Station(TEST_KEY, "", new Coordinates(50.554550, 9.683787), createTestPhoto(), false);
         assertThat(station.appliesTo(null, "test", null, null, null, false)).isEqualTo(true);
     }
 
-    private User createTestPhotographer() {
-        return User.builder().name("test").url("photographerUrl").license("CC0").id(0).ownPhotos(true).sendNotifications(true).build();
+    private Photo createTestPhoto() {
+        return Photo.builder()
+                .stationKey(TEST_KEY)
+                .urlPath("URL")
+                .photographer(User.builder()
+                        .id(0)
+                        .name("test")
+                        .url("photographerUrl")
+                        .license(License.CC0_10)
+                        .ownPhotos(true)
+                        .sendNotifications(true)
+                        .build())
+                .license(License.CC0_10)
+                .build();
     }
 
 }

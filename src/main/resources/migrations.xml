@@ -612,4 +612,41 @@
         </update>
     </changeSet>
 
+    <changeSet id="38" author="pstorch">
+        <update tableName="users">
+            <column name="license" value="CC0_10"/>
+            <where>license = 'CC0 1.0 Universell (CC0 1.0)'</where>
+        </update>
+        <update tableName="users">
+            <column name="license" value="CC_BY_SA_40"/>
+            <where>license = 'CC BY-SA 4.0'</where>
+        </update>
+
+        <update tableName="countries">
+            <column name="overrideLicense" value="CC_BY_NC_40_INT"/>
+            <where>overrideLicense = 'CC BY-NC 4.0 International'</where>
+        </update>
+
+        <update tableName="photos">
+            <column name="license" value="CC0_10"/>
+            <where>license = 'CC0 1.0 Universell (CC0 1.0)'</where>
+        </update>
+        <update tableName="photos">
+            <column name="license" value="CC_BY_SA_40"/>
+            <where>license = 'CC BY-SA 4.0'</where>
+        </update>
+        <update tableName="photos">
+            <column name="license" value="CC_BY_NC_40_INT"/>
+            <where>license = 'CC BY-NC 4.0 International'</where>
+        </update>
+        <update tableName="photos">
+            <column name="license" value="CC_BY_30"/>
+            <where>license = 'CC BY 3.0'</where>
+        </update>
+        <update tableName="photos">
+            <column name="license" value="CC_BY_NC_SA_30_DE"/>
+            <where>license = 'CC BY-NC-SA 3.0 DE'</where>
+        </update>
+    </changeSet>
+
 </databaseChangeLog>

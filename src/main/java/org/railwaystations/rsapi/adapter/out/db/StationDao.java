@@ -12,6 +12,7 @@ import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.railwaystations.rsapi.core.model.Coordinates;
+import org.railwaystations.rsapi.core.model.License;
 import org.railwaystations.rsapi.core.model.Photo;
 import org.railwaystations.rsapi.core.model.Station;
 import org.railwaystations.rsapi.core.model.Statistic;
@@ -113,11 +114,18 @@ public interface StationDao {
                 var photographer = User.builder()
                         .name(rs.getString("name"))
                         .url(rs.getString("photographerUrl"))
-                        .license(rs.getString("photographerLicense"))
+                        .license(License.valueOf(rs.getString("photographerLicense")))
                         .id(rs.getInt("photographerId"))
                         .anonymous(rs.getBoolean("anonymous"))
                         .build();
-                photo = new Photo(key, photoUrlPath, photographer, rs.getTimestamp("createdAt").toInstant(), rs.getString("license"), rs.getBoolean("outdated"));
+                photo = Photo.builder()
+                        .stationKey(key)
+                        .urlPath(photoUrlPath)
+                        .photographer(photographer)
+                        .createdAt(rs.getTimestamp("createdAt").toInstant())
+                        .license(License.valueOf(rs.getString("license")))
+                        .outdated(rs.getBoolean("outdated"))
+                        .build();
             }
             return new Station(key, rs.getString("title"),
                     new Coordinates(rs.getDouble("lat"), rs.getDouble("lon")),

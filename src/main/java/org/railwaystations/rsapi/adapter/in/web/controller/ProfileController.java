@@ -8,6 +8,7 @@ import org.railwaystations.rsapi.adapter.in.web.model.ProfileDto;
 import org.railwaystations.rsapi.adapter.in.web.model.RegisterProfileDto;
 import org.railwaystations.rsapi.adapter.in.web.model.UpdateProfileDto;
 import org.railwaystations.rsapi.app.auth.AuthUser;
+import org.railwaystations.rsapi.core.model.License;
 import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.ports.in.ManageProfileUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +26,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotNull;
-
-import static org.railwaystations.rsapi.adapter.in.web.model.LicenseDto.CC0_1_0_UNIVERSELL_CC0_1_0_;
-import static org.railwaystations.rsapi.adapter.in.web.model.LicenseDto.CC_BY_SA_4_0;
 
 @RestController
 @Slf4j
@@ -76,10 +74,20 @@ public class ProfileController {
                 .url(StringUtils.trimToEmpty(registerProfileDto.getLink()))
                 .ownPhotos(registerProfileDto.getPhotoOwner())
                 .anonymous(registerProfileDto.getAnonymous() != null && registerProfileDto.getAnonymous())
-                .license(mapLicense(registerProfileDto.getLicense()))
+                .license(toLicense(registerProfileDto.getLicense()))
                 .sendNotifications(registerProfileDto.getSendNotifications() == null || registerProfileDto.getSendNotifications())
                 .newPassword(registerProfileDto.getNewPassword())
                 .build();
+    }
+
+    private License toLicense(LicenseDto license) {
+        if (license == null) {
+            return null;
+        }
+        return switch (license) {
+            case CC0_1_0_UNIVERSELL_CC0_1_0_, CC0 -> License.CC0_10;
+            case CC_BY_SA_4_0, CC4 -> License.CC_BY_SA_40;
+        };
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/myProfile")
@@ -97,10 +105,21 @@ public class ProfileController {
                 .anonymous(user.isAnonymous())
                 .emailVerified(user.isEmailVerified())
                 .sendNotifications(user.isSendNotifications())
-                .license(LicenseDto.fromValue(user.getLicense()))
+                .license(toLicenseDto(user.getLicense()))
                 .link(user.getUrl())
                 .nickname(user.getName())
                 .photoOwner(user.isOwnPhotos());
+    }
+
+    private LicenseDto toLicenseDto(License license) {
+        if (license == null) {
+            return null;
+        }
+        return switch (license) {
+            case CC0_10 -> LicenseDto.CC0_1_0_UNIVERSELL_CC0_1_0_;
+            case CC_BY_SA_40 -> LicenseDto.CC_BY_SA_4_0;
+            default -> null;
+        };
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, value = "/myProfile")
@@ -120,17 +139,9 @@ public class ProfileController {
                 .url(StringUtils.trimToEmpty(updateProfileDto.getLink()))
                 .ownPhotos(updateProfileDto.getPhotoOwner())
                 .anonymous(updateProfileDto.getAnonymous() != null && updateProfileDto.getAnonymous())
-                .license(mapLicense(updateProfileDto.getLicense()))
+                .license(toLicense(updateProfileDto.getLicense()))
                 .sendNotifications(updateProfileDto.getSendNotifications() == null || updateProfileDto.getSendNotifications())
                 .build();
-    }
-
-    private String mapLicense(LicenseDto license) {
-        return switch (license) {
-            case CC0 -> CC0_1_0_UNIVERSELL_CC0_1_0_.getValue();
-            case CC4 -> CC_BY_SA_4_0.getValue();
-            default -> license.getValue();
-        };
     }
 
     @PostMapping("/resendEmailVerification")

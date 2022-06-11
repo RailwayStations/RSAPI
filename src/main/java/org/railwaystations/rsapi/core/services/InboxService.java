@@ -12,6 +12,7 @@ import org.railwaystations.rsapi.core.model.Country;
 import org.railwaystations.rsapi.core.model.InboxEntry;
 import org.railwaystations.rsapi.core.model.InboxResponse;
 import org.railwaystations.rsapi.core.model.InboxStateQuery;
+import org.railwaystations.rsapi.core.model.License;
 import org.railwaystations.rsapi.core.model.Photo;
 import org.railwaystations.rsapi.core.model.ProblemReport;
 import org.railwaystations.rsapi.core.model.PublicInboxEntry;
@@ -297,8 +298,13 @@ public class InboxService implements ManageInboxUseCase {
                 .orElseThrow(() -> new IllegalArgumentException("Country not found"));
 
         try {
-            var photo = new Photo(station.getKey(), getPhotoUrlPath(inboxEntry, station, country),
-                    photographer, Instant.now(), getLicenseForPhoto(photographer, country));
+            var photo = Photo.builder()
+                    .stationKey(station.getKey())
+                    .urlPath(getPhotoUrlPath(inboxEntry, station, country))
+                    .photographer(photographer)
+                    .createdAt(Instant.now())
+                    .license(getLicenseForPhoto(photographer, country))
+                    .build();
             if (station.hasPhoto()) {
                 photoDao.update(photo);
             } else {
@@ -324,12 +330,12 @@ public class InboxService implements ManageInboxUseCase {
      * Gets the applicable license for the given country.
      * We need to override the license for some countries, because of limitations of the "Freedom of panorama".
      */
-    protected static String getLicenseForPhoto(User photographer, Country country) {
-        if (country != null && StringUtils.isNotBlank(country.getOverrideLicense())) {
+    protected static License getLicenseForPhoto(User photographer, Country country) {
+        if (country != null && country.getOverrideLicense() != null) {
             return country.getOverrideLicense();
         }
         return photographer.getLicense();
-    }    
+    }
 
     private Station findOrCreateStation(InboxEntry inboxEntry, InboxEntry command) {
         var station = findStationByCountryAndId(inboxEntry.getCountryCode(), inboxEntry.getStationId());

@@ -26,9 +26,7 @@ public class Station {
 
     private String photoUrl;
 
-    private String license;
-
-    private String licenseUrl;
+    private License license;
 
     private Instant createdAt;
 
@@ -69,7 +67,6 @@ public class Station {
 
             this.photoUrl = photo.getUrlPath();
             this.license = photo.getLicense();
-            this.licenseUrl = photo.getLicenseUrl();
             this.photographerUrl = photo.getPhotographer().getDisplayUrl();
             this.createdAt = photo.getCreatedAt();
             this.outdated = photo.isOutdated();
@@ -78,7 +75,6 @@ public class Station {
             this.photographer = null;
             this.photoUrl = null;
             this.license = null;
-            this.licenseUrl = null;
             this.photographerUrl = null;
             this.createdAt = null;
             this.outdated = null;
@@ -144,12 +140,8 @@ public class Station {
         return photoUrl;
     }
 
-    public String getLicense() {
+    public License getLicense() {
         return license;
-    }
-
-    public String getLicenseUrl() {
-        return licenseUrl;
     }
 
     public String getPhotographerUrl() {

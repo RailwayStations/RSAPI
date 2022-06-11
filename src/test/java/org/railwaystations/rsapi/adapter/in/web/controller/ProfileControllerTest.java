@@ -11,6 +11,7 @@ import org.railwaystations.rsapi.app.auth.LazySodiumPasswordEncoder;
 import org.railwaystations.rsapi.app.auth.RSAuthenticationProvider;
 import org.railwaystations.rsapi.app.auth.RSUserDetailsService;
 import org.railwaystations.rsapi.app.auth.WebSecurityConfig;
+import org.railwaystations.rsapi.core.model.License;
 import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.ports.out.Mailer;
 import org.railwaystations.rsapi.core.services.ProfileService;
@@ -227,7 +228,7 @@ class ProfileControllerTest {
         var key = "246172676F6E32696424763D3139246D3D36353533362C743D322C703D3124426D4F637165757646794E44754132726B566A6A3177246A7568362F6E6C2F49437A4B475570446E6B674171754A304F7A486A62694F587442542F2B62584D49476300000000000000000000000000000000000000000000000000000000000000";
         var user = User.builder()
                 .name("existing")
-                .license("CC0")
+                .license(License.CC0_10)
                 .id(42)
                 .email("existing@example.com")
                 .ownPhotos(true)
@@ -335,7 +336,7 @@ class ProfileControllerTest {
 
         var user = User.builder()
                 .name("new_name")
-                .license("CC0")
+                .license(License.CC0_10)
                 .email("existing@example.com")
                 .ownPhotos(true)
                 .url("http://twitter.com/")
@@ -386,7 +387,7 @@ class ProfileControllerTest {
         assertVerificationEmail();
         var user = User.builder()
                 .name("existing")
-                .license("CC0")
+                .license(License.CC0_10)
                 .email("newname@example.com")
                 .ownPhotos(true)
                 .anonymous(false)
@@ -399,7 +400,7 @@ class ProfileControllerTest {
     void testNewUploadTokenViaEmail() throws Exception {
         var user = User.builder()
                 .name("existing")
-                .license("CC0")
+                .license(License.CC0_10)
                 .email("existing@example.com")
                 .ownPhotos(true)
                 .anonymous(false)
@@ -422,7 +423,7 @@ class ProfileControllerTest {
     void testResetPasswordViaEmail() throws Exception {
         var user = User.builder()
                 .name("existing")
-                .license("CC0")
+                .license(License.CC0_10)
                 .email("existing@example.com")
                 .ownPhotos(true)
                 .anonymous(false)
@@ -449,7 +450,7 @@ class ProfileControllerTest {
     void testResetPasswordViaName() throws Exception {
         var user = User.builder()
                 .name("existing")
-                .license("CC0")
+                .license(License.CC0_10)
                 .email("existing@example.com")
                 .ownPhotos(true)
                 .anonymous(false)
@@ -486,7 +487,7 @@ class ProfileControllerTest {
         var user = User.builder()
                 .id(42)
                 .name("existing")
-                .license("CC0")
+                .license(License.CC0_10)
                 .email("existing@example.com")
                 .ownPhotos(true)
                 .anonymous(false)
@@ -517,7 +518,7 @@ class ProfileControllerTest {
         var user = User.builder()
                 .id(42)
                 .name("existing")
-                .license("CC0")
+                .license(License.CC0_10)
                 .email("existing@example.com")
                 .ownPhotos(true)
                 .anonymous(false)

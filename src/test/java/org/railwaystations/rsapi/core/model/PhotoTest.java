@@ -1,8 +1,7 @@
 package org.railwaystations.rsapi.core.model;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,26 +13,19 @@ class PhotoTest {
      * Tests if the mapping of the known license names to the license URLs works as expected.
      */
     @ParameterizedTest
-    @CsvSource({ "CC BY-NC 4.0 International, https://creativecommons.org/licenses/by-nc/4.0/",
-        "CC BY-NC-SA 3.0 DE, https://creativecommons.org/licenses/by-nc-sa/3.0/de/",
-        "CC BY-SA 4.0, https://creativecommons.org/licenses/by-sa/4.0/",
-        "CC0 1.0 Universell (CC0 1.0), https://creativecommons.org/publicdomain/zero/1.0/" })
-    void license2LicenseUrlMapping(String license, String licenseUrl) {
-        var photo = new Photo(TEST_KEY, "url", createTestPhotographer(license), null, license);
-        assertThat(licenseUrl).isEqualTo(photo.getLicenseUrl());
+    @EnumSource(License.class)
+    void license2LicenseUrlMapping(License license) {
+        var photo = Photo.builder()
+                .stationKey(TEST_KEY)
+                .urlPath("url")
+                .photographer(createTestPhotographer(license))
+                .license(license)
+                .build();
+        assertThat(license).isEqualTo(photo.getLicense());
     }
 
-    private User createTestPhotographer(String license) {
+    private User createTestPhotographer(License license) {
         return User.builder().name("photographer").url("photographerUrl").license(license).id(0).ownPhotos(true).anonymous(false).admin(false).build();
-    }
-
-    /**
-     * Tests if the license URL is <code>null</code> for an unknown license.
-     */
-    @Test
-    void license2LicenseUrlMappingUnknownLicense() {
-        var photo = new Photo(TEST_KEY, "url", createTestPhotographer(null), null, "unknown license name");
-        assertThat(photo.getLicenseUrl()).isNull();
     }
 
 }

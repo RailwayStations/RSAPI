@@ -33,7 +33,7 @@ public class CountriesController {
                 .name(country.getName())
                 .active(country.isActive())
                 .email(country.getEmail())
-                .overrideLicense(country.getOverrideLicense())
+                .overrideLicense(country.getOverrideLicense() != null ? country.getOverrideLicense().getDisplayName() : null)
                 .timetableUrlTemplate(country.getTimetableUrlTemplate())
                 .twitterTags(country.getTwitterTags())
                 .providerApps(toDto(country.getProviderApps()));
