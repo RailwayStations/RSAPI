@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import org.junit.jupiter.api.Test;
-import org.railwaystations.rsapi.core.model.Coordinates;
 import org.railwaystations.rsapi.core.model.InboxEntry;
 import org.railwaystations.rsapi.core.model.License;
 import org.railwaystations.rsapi.core.model.Photo;
@@ -33,7 +32,14 @@ class MastodonBotHttpClientTest {
                 .willReturn(ok()));
 
         var key = new Station.Key("de", "1234");
-        var user = new User(0, "name", "url", License.CC0_10, "email", true, false, "key", false, null, null, null, true);
+        var user = User.builder()
+                .id(0)
+                .name("name")
+                .url("url")
+                .license(License.CC0_10)
+                .email("email")
+                .anonymous(false)
+                .build();
         var photo = Photo.builder()
                 .stationKey(key)
                 .urlPath("urlPath")
@@ -41,11 +47,15 @@ class MastodonBotHttpClientTest {
                 .createdAt(Instant.now())
                 .license(License.CC0_10)
                 .build();
-        var station = new Station(key, "title", new Coordinates(), photo, true);
+        var station = Station.builder()
+                .key(key)
+                .title("title")
+                .photo(photo)
+                .build();
         var inboxEntry = InboxEntry.builder()
                         .comment("comment")
                         .build();
-        client.tootNewPhoto(station, inboxEntry);
+        client.tootNewPhoto(station, inboxEntry, photo);
 
         verify(postRequestedFor(urlEqualTo("/api/v1/statuses"))
                 .withHeader("Authorization", equalTo("Bearer token"))

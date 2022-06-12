@@ -5,6 +5,7 @@ import org.railwaystations.rsapi.adapter.in.web.writer.StationsGpxWriter;
 import org.railwaystations.rsapi.core.model.Station;
 import org.railwaystations.rsapi.core.ports.in.FindPhotoStationsUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +35,9 @@ public class StationsController {
 
     @Autowired
     private FindPhotoStationsUseCase findPhotoStationsUseCase;
+
+    @Value("${photoBaseUrl}")
+    private String photoBaseUrl;
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8", StationsGpxWriter.GPX_MEDIA_TYPE_VALUE}, value = "/stations")
     public List<StationDto> get(@RequestParam(value = COUNTRY, required = false) Set<String> countries,
@@ -117,22 +121,29 @@ public class StationsController {
     }
 
     private StationDto toDto(Station station) {
-        return new StationDto()
+        var stationDto = new StationDto()
                 .country(station.getKey().getCountry())
                 .idStr(station.getKey().getId())
                 .id(legacyStationId(station.getKey().getId()))
                 .title(station.getTitle())
-                .DS100(station.getDS100())
-                .license(station.getLicense() != null ? station.getLicense().getDisplayName() : null)
-                .licenseUrl(station.getLicense() != null ? station.getLicense().getUrl() : null)
+                .DS100(station.getDs100())
                 .active(station.isActive())
                 .lat(station.getCoordinates().getLat())
-                .lon(station.getCoordinates().getLon())
-                .photoUrl(station.getPhotoUrl())
-                .photographer(station.getPhotographer())
-                .photographerUrl(station.getPhotographerUrl())
-                .createdAt(station.getCreatedAt() != null ? station.getCreatedAt().toEpochMilli() : null)
-                .outdated(station.getOutdated());
+                .lon(station.getCoordinates().getLon());
+
+        if (station.hasPhoto()) {
+            var photo = station.getPhoto();
+            var license = photo.getLicense();
+            stationDto.license(license != null ? license.getDisplayName() : null)
+                    .licenseUrl(license != null ? license.getUrl() : null)
+                    .photoUrl(photoBaseUrl + photo.getUrlPath())
+                    .photographer(photo.getPhotographer().getDisplayName())
+                    .photographerUrl(photo.getPhotographer().getUrl())
+                    .createdAt(photo.getCreatedAt() != null ? photo.getCreatedAt().toEpochMilli() : null)
+                    .outdated(photo.isOutdated());
+
+        }
+        return stationDto;
     }
 
     public long legacyStationId(String stationId) {

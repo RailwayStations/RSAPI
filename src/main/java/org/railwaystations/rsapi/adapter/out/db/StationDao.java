@@ -76,7 +76,7 @@ public interface StationDao {
     @ValueColumn("photocount")
     Map<String, Long> getPhotographerMap(@Bind("countryCode") String countryCode);
 
-    @SqlUpdate("INSERT INTO stations (countryCode, id, title, lat, lon, ds100, active) VALUES (:key.country, :key.id, :title, :coordinates?.lat, :coordinates?.lon, :DS100, :active)")
+    @SqlUpdate("INSERT INTO stations (countryCode, id, title, lat, lon, ds100, active) VALUES (:key.country, :key.id, :title, :coordinates?.lat, :coordinates?.lon, :ds100, :active)")
     void insert(@BindBean Station station);
 
     @SqlUpdate("DELETE FROM stations WHERE countryCode = :country AND id = :id")
@@ -127,9 +127,14 @@ public interface StationDao {
                         .outdated(rs.getBoolean("outdated"))
                         .build();
             }
-            return new Station(key, rs.getString("title"),
-                    new Coordinates(rs.getDouble("lat"), rs.getDouble("lon")),
-                    rs.getString("DS100"), photo, rs.getBoolean("active"));
+            return Station.builder()
+                    .key(key)
+                    .title(rs.getString("title"))
+                    .coordinates(new Coordinates(rs.getDouble("lat"), rs.getDouble("lon")))
+                    .ds100(rs.getString("DS100"))
+                    .photo(photo)
+                    .active(rs.getBoolean("active"))
+                    .build();
         }
 
     }

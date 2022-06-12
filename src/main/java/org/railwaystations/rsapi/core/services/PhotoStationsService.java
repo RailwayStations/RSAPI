@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.railwaystations.rsapi.adapter.out.db.StationDao;
 import org.railwaystations.rsapi.core.model.Station;
 import org.railwaystations.rsapi.core.ports.in.FindPhotoStationsUseCase;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -21,12 +20,10 @@ import static java.util.stream.Collectors.toMap;
 public class PhotoStationsService implements FindPhotoStationsUseCase {
 
     private final StationDao stationDao;
-    private final String photoBaseUrl;
 
-    public PhotoStationsService(StationDao stationDao, @Value("${photoBaseUrl}") String photoBaseUrl) {
+    public PhotoStationsService(StationDao stationDao) {
         super();
         this.stationDao = stationDao;
-        this.photoBaseUrl = photoBaseUrl;
     }
 
     public Map<Station.Key, Station> getStationsByCountry(Set<String> countryCodes) {
@@ -36,12 +33,7 @@ public class PhotoStationsService implements FindPhotoStationsUseCase {
         } else {
             stations = stationDao.findByCountryCodes(countryCodes);
         }
-        return stations.stream().map(this::injectPhotoBaseUrl).collect(toMap(Station::getKey, Function.identity()));
-    }
-
-    private Station injectPhotoBaseUrl(Station station) {
-        station.prependPhotoBaseUrl(photoBaseUrl);
-        return station;
+        return stations.stream().collect(toMap(Station::getKey, Function.identity()));
     }
 
     public Optional<Station> findByCountryAndId(String country, String stationId) {
@@ -55,15 +47,15 @@ public class PhotoStationsService implements FindPhotoStationsUseCase {
         if (stations.size() > 1) {
             return Optional.empty(); // id is not unique
         }
-        return stations.stream().findFirst().map(this::injectPhotoBaseUrl);
+        return stations.stream().findFirst();
     }
 
     public Optional<Station> findByKey(Station.Key key) {
-        return stationDao.findByKey(key.getCountry(), key.getId()).stream().findFirst().map(this::injectPhotoBaseUrl);
+        return stationDao.findByKey(key.getCountry(), key.getId()).stream().findFirst();
     }
 
     public List<Station> findRecentImports(Instant since) {
-        return stationDao.findRecentImports(since).stream().map(this::injectPhotoBaseUrl).toList();
+        return stationDao.findRecentImports(since);
     }
 
     public List<Station> findStationsBy(Set<String> countries, Boolean hasPhoto, String photographer,

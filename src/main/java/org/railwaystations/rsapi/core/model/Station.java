@@ -1,103 +1,35 @@
 package org.railwaystations.rsapi.core.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Value;
 
-import java.time.Instant;
 import java.util.Objects;
 
+@Value
+@Builder
 public class Station {
 
     private static final int EARTH_RADIUS = 6371;
 
-    private final Key key;
+    @Builder.Default
+    Key key = new Key("", "0");
 
-    private String title;
+    String title;
 
-    private Coordinates coordinates;
+    @Builder.Default
+    Coordinates coordinates = new Coordinates(0.0, 0.0);
 
-    private int photographerId;
+    String ds100;
 
-    private String photographer;
+    Photo photo;
 
-    private String photographerUrl;
-
-    private final String ds100;
-
-    private String photoUrl;
-
-    private License license;
-
-    private Instant createdAt;
-
-    private boolean active;
-
-    private Boolean outdated;
-
-    public Station() {
-        this(new Key("", "0"), null, new Coordinates(0.0, 0.0), null, true);
-    }
-
-    public Station(Key key, String title, Coordinates coordinates, Photo photo, boolean active) {
-        this(key, title, coordinates, null, photo, active);
-    }
-
-    public Station(Key key, String title, Coordinates coordinates, String ds100, Photo photo, boolean active) {
-        super();
-        this.key = key;
-        this.title = title;
-        this.coordinates = coordinates;
-        this.ds100 = ds100;
-        this.active = active;
-        setPhoto(photo);
-    }
-
-    public void setPhoto(Photo photo) {
-        if (photo != null) {
-            User user = photo.getPhotographer();
-            if (user != null) {
-                this.photographerId = user.getId();
-                this.photographer = user.getDisplayName();
-                this.photographerUrl = user.getDisplayUrl();
-            } else {
-                this.photographerId = 0;
-                this.photographer = "-";
-                this.photographerUrl = "";
-            }
-
-            this.photoUrl = photo.getUrlPath();
-            this.license = photo.getLicense();
-            this.photographerUrl = photo.getPhotographer().getDisplayUrl();
-            this.createdAt = photo.getCreatedAt();
-            this.outdated = photo.isOutdated();
-        } else {
-            this.photographerId = 0;
-            this.photographer = null;
-            this.photoUrl = null;
-            this.license = null;
-            this.photographerUrl = null;
-            this.createdAt = null;
-            this.outdated = null;
-        }
-    }
-
-    public Key getKey() {
-        return this.key;
-    }
-
-    public String getTitle() {
-        return this.title;
-    }
-
-    public Coordinates getCoordinates() {
-        return this.coordinates;
-    }
+    @Builder.Default
+    boolean active = true;
 
     public boolean hasPhoto() {
-        return this.photographer != null;
+        return this.photo != null;
     }
-
-    public String getPhotographer() { return this.photographer; }
 
     /*
      * Calculate distance in km between this objects position and the given latitude and longitude.
@@ -121,7 +53,7 @@ public class Station {
             result = this.hasPhoto() == hasPhoto;
         }
         if (photographer != null) {
-            result &= photographer.equals(this.getPhotographer());
+            result &= hasPhoto() && photographer.equals(photo.getPhotographer().getDisplayName());
         }
         if (maxDistance != null && lat != null && lon != null) {
             result &= this.distanceTo(lat, lon) < maxDistance;
@@ -131,69 +63,6 @@ public class Station {
         }
         return result;
     }
-
-    public String getDS100() {
-        return ds100;
-    }
-
-    public String getPhotoUrl() {
-        return photoUrl;
-    }
-
-    public License getLicense() {
-        return license;
-    }
-
-    public String getPhotographerUrl() {
-        return photographerUrl;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    private Long getCreatedAtEpochMilli() {
-        return createdAt != null ? createdAt.toEpochMilli() : null;
-    }
-
-    private void setCreatedAtEpochMilli(Long time) {
-        this.createdAt = time != null ? Instant.ofEpochMilli(time) : null;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public int getPhotographerId() {
-        return photographerId;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
-    public void setCoordinates(Coordinates coordinates) {
-        this.coordinates = coordinates;
-    }
-
-    public void prependPhotoBaseUrl(String photoBaseUrl) {
-        if (photoUrl != null) {
-            photoUrl = photoBaseUrl + photoUrl;
-        }
-    }
-
-    public Boolean getOutdated() {
-        return outdated;
-    }
-
-    public void setOutdated(Boolean outdated) {
-        this.outdated = outdated;
-    }
-
 
     @Value
     @AllArgsConstructor

@@ -16,4 +16,8 @@ public class Photo {
     License license;
     boolean outdated;
 
+    private Long getCreatedAtEpochMilli() {
+        return createdAt != null ? createdAt.toEpochMilli() : null;
+    }
+
 }

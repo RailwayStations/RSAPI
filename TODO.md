@@ -2,13 +2,6 @@
 
 - reduce amount of integration tests
 
-- test outgoing http adapters with Wiremock
-  - MastodonBotHttpClient
-  - MatrixMonitor
-  - WebDavSyncTask
-
-- introduce Lombok or Java records where useful
-
 - package structure:
   - app vs. application vs. core
   - core/mode vs. domain
@@ -22,3 +15,7 @@
 - harden docker
   - user
   - readonly filesystem
+
+- Parameter Object for MastodonBot.tootNewPhoto?
+
+- User: change @Data to @Value annotation

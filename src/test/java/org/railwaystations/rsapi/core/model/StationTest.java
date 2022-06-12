@@ -8,16 +8,20 @@ import static org.assertj.core.api.Assertions.within;
 class StationTest {
 
     private static final Station.Key TEST_KEY = new Station.Key("", "0");
+    public static final Coordinates TEST_COORDINATES = new Coordinates(50.554550, 9.683787);
 
     @Test
     void distanceTo() {
-        var station = new Station(TEST_KEY, "", new Coordinates(50.554550, 9.683787), null, null, true);
+        var station = createStationTestFixtureBuilder()
+                .coordinates(TEST_COORDINATES)
+                .build();
         assertThat(station.distanceTo(50.196580, 9.189395)).isCloseTo(53.1, within(0.1));
     }
 
     @Test
     void appliesToNullPhotographer() {
-        var station = new Station(TEST_KEY, "", new Coordinates(0.0, 0.0), null, null, true);
+        var station = createStationTestFixtureBuilder()
+                .build();
         assertThat(station.appliesTo(null, "test", null, null, null, null)).isEqualTo(false);
         assertThat(station.appliesTo(false, null, null, null, null, null)).isEqualTo(true);
         assertThat(station.appliesTo(true, null, null, null, null, null)).isEqualTo(false);
@@ -25,7 +29,9 @@ class StationTest {
 
     @Test
     void appliesToPhotographer() {
-        var station = new Station(TEST_KEY, "", new Coordinates(0.0, 0.0), createTestPhoto(), true);
+        var station = createStationTestFixtureBuilder()
+                .photo(createTestPhoto())
+                .build();
         assertThat(station.appliesTo(null, "test", null, null, null, null)).isEqualTo(true);
         assertThat(station.appliesTo(false, null, null, null, null, null)).isEqualTo(false);
         assertThat(station.appliesTo(true, null, null, null, null, null)).isEqualTo(true);
@@ -33,26 +39,44 @@ class StationTest {
 
     @Test
     void appliesToDistance() {
-        var station = new Station(TEST_KEY, "", new Coordinates(50.554550, 9.683787), null, null, true);
+        var station = createStationTestFixtureBuilder()
+                .coordinates(TEST_COORDINATES)
+                .build();
         assertThat(station.appliesTo(null, null, 50, 50.8, 9.8, null)).isEqualTo(true);
         assertThat(station.appliesTo(null, null, 50, 55.0, 8.0, null)).isEqualTo(false);
     }
 
     @Test
     void appliesToDistanceAndPhotographer() {
-        var station = new Station(TEST_KEY, "", new Coordinates(50.554550, 9.683787), createTestPhoto(), true);
+        var station = createStationTestFixtureBuilder()
+                .coordinates(TEST_COORDINATES)
+                .photo(createTestPhoto())
+                .build();
         assertThat(station.appliesTo(null, "test", 50, 50.8, 9.8, null)).isEqualTo(true);
     }
 
     @Test
     void appliesToActive() {
-        var station = new Station(TEST_KEY, "", new Coordinates(50.554550, 9.683787), createTestPhoto(), true);
+        var station = createStationTestFixtureBuilder()
+                .coordinates(TEST_COORDINATES)
+                .photo(createTestPhoto())
+                .build();
         assertThat(station.appliesTo(null, "test", null, null, null, true)).isEqualTo(true);
+    }
+
+    private Station.StationBuilder createStationTestFixtureBuilder() {
+        return Station.builder()
+                .key(TEST_KEY)
+                .title("");
     }
 
     @Test
     void appliesToInactive() {
-        var station = new Station(TEST_KEY, "", new Coordinates(50.554550, 9.683787), createTestPhoto(), false);
+        var station = createStationTestFixtureBuilder()
+                .coordinates(TEST_COORDINATES)
+                .photo(createTestPhoto())
+                .active(false)
+                .build();
         assertThat(station.appliesTo(null, "test", null, null, null, false)).isEqualTo(true);
     }
 

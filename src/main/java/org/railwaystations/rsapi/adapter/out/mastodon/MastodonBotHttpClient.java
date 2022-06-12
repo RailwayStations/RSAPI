@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.railwaystations.rsapi.core.model.InboxEntry;
+import org.railwaystations.rsapi.core.model.Photo;
 import org.railwaystations.rsapi.core.model.Station;
 import org.railwaystations.rsapi.core.ports.out.MastodonBot;
 import org.springframework.http.MediaType;
@@ -39,14 +40,14 @@ public class MastodonBotHttpClient implements MastodonBot {
 
     @Override
     @Async
-    public void tootNewPhoto(Station station, InboxEntry inboxEntry) {
+    public void tootNewPhoto(Station station, InboxEntry inboxEntry, Photo photo) {
         if (StringUtils.isBlank(config.instanceUrl()) || StringUtils.isBlank(config.token()) || StringUtils.isBlank(config.stationUrl())) {
             log.info("New photo for Station {} not tooted, {}", station.getKey(), this);
             return;
         }
         log.info("Sending toot for new photo of: {}", station.getKey());
         try {
-            String json = createStatusJson(station, inboxEntry);
+            String json = createStatusJson(station, inboxEntry, photo);
             var request = HttpRequest.newBuilder()
                     .uri(URI.create(config.instanceUrl() + "/api/v1/statuses"))
                     .header("Content-Type", MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
@@ -68,9 +69,9 @@ public class MastodonBotHttpClient implements MastodonBot {
         }
     }
 
-    private String createStatusJson(Station station, InboxEntry inboxEntry) throws JsonProcessingException {
+    private String createStatusJson(Station station, InboxEntry inboxEntry, Photo photo) throws JsonProcessingException {
         var status = String.format("%s%nby %s%n%s?countryCode=%s&stationId=%s",
-                station.getTitle(), station.getPhotographer(), config.stationUrl(),
+                station.getTitle(), photo.getPhotographer().getDisplayName(), config.stationUrl(),
                 station.getKey().getCountry(), station.getKey().getId());
         if (StringUtils.isNotBlank(inboxEntry.getComment())) {
             status += String.format("%n%s", inboxEntry.getComment());

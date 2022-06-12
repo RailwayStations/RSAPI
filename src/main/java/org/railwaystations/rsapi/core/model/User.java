@@ -62,7 +62,7 @@ public class User {
     }
 
     public static String normalizeName(String name) {
-        return StringUtils.trimToEmpty(name).toLowerCase(Locale.ENGLISH).replaceAll("[^a-z0-9]","");
+        return StringUtils.trimToEmpty(name).toLowerCase(Locale.ENGLISH).replaceAll("[^a-z\\d]","");
     }
 
     public static String normalizeEmail(String email) {

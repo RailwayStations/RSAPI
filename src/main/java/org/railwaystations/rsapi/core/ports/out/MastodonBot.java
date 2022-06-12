@@ -1,10 +1,11 @@
 package org.railwaystations.rsapi.core.ports.out;
 
 import org.railwaystations.rsapi.core.model.InboxEntry;
+import org.railwaystations.rsapi.core.model.Photo;
 import org.railwaystations.rsapi.core.model.Station;
 
 public interface MastodonBot {
 
-    void tootNewPhoto(Station station, InboxEntry inboxEntry);
+    void tootNewPhoto(Station station, InboxEntry inboxEntry, Photo photo);
 
 }

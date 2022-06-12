@@ -42,20 +42,34 @@ class StationsControllerTest {
     @BeforeEach
     void setUp() {
         var key5 = new Station.Key("xy", "5");
-        var stationXY = new Station(key5, "Lummerland", new Coordinates(50.0, 9.0), "XYZ", Photo.builder()
-                .stationKey(key5)
-                .urlPath("/fotos/xy/5.jpg")
-                .photographer(createTestPhotographer("Jim Knopf", "photographerUrl", License.CC0_10))
-                .license(License.CC0_10)
-                .build(), false);
+        var stationXY = Station.builder()
+                .key(key5)
+                .title("Lummerland")
+                .coordinates(new Coordinates(50.0, 9.0))
+                .ds100("XYZ")
+                .photo(Photo.builder()
+                    .stationKey(key5)
+                    .urlPath("/fotos/xy/5.jpg")
+                    .photographer(createTestPhotographer("Jim Knopf", "photographerUrl", License.CC0_10))
+                    .license(License.CC0_10)
+                    .build())
+                .active(false)
+                .build();
 
         var key3 = new Station.Key("ab", "3");
-        var stationAB = new Station(key3, "Nimmerland", new Coordinates(40.0, 6.0), "ABC", Photo.builder()
-                .stationKey(key3)
-                .urlPath("/fotos/ab/3.jpg")
-                .photographer(createTestPhotographer("Peter Pan", "photographerUrl2", License.CC_BY_NC_SA_30_DE))
-                .license(License.CC_BY_NC_40_INT)
-                .build(), true);
+        var stationAB = Station.builder()
+                .key(key3)
+                .title("Nimmerland")
+                .coordinates(new Coordinates(40.0, 6.0))
+                .ds100("ABC")
+                .photo(Photo.builder()
+                    .stationKey(key3)
+                    .urlPath("/fotos/ab/3.jpg")
+                    .photographer(createTestPhotographer("Peter Pan", "photographerUrl2", License.CC_BY_NC_SA_30_DE))
+                    .license(License.CC_BY_NC_40_INT)
+                    .build())
+                .active(true)
+                .build();
 
         var stationsAll = List.of(stationAB, stationXY);
 
@@ -82,7 +96,7 @@ class StationsControllerTest {
                 .andExpect(jsonPath("$.[0].lon").value(9.0))
                 .andExpect(jsonPath("$.[0].photographer").value("Jim Knopf"))
                 .andExpect(jsonPath("$.[0].DS100").value("XYZ"))
-                .andExpect(jsonPath("$.[0].photoUrl").value("/fotos/xy/5.jpg"))
+                .andExpect(jsonPath("$.[0].photoUrl").value("http://localhost:8080/photos/fotos/xy/5.jpg"))
                 .andExpect(jsonPath("$.[0].license").value("CC0 1.0 Universell (CC0 1.0)"))
                 .andExpect(jsonPath("$.[0].photographerUrl").value("photographerUrl"))
                 .andExpect(jsonPath("$.[0].active").value(false));
@@ -113,7 +127,7 @@ class StationsControllerTest {
                 .andExpect(jsonPath("$.[0].lon").value(6.0))
                 .andExpect(jsonPath("$.[0].photographer").value("Peter Pan"))
                 .andExpect(jsonPath("$.[0].DS100").value("ABC"))
-                .andExpect(jsonPath("$.[0].photoUrl").value("/fotos/ab/3.jpg"))
+                .andExpect(jsonPath("$.[0].photoUrl").value("http://localhost:8080/photos/fotos/ab/3.jpg"))
                 .andExpect(jsonPath("$.[0].license").value("CC BY-NC 4.0 International"))
                 .andExpect(jsonPath("$.[0].photographerUrl").value("photographerUrl2"))
                 .andExpect(jsonPath("$.[0].active").value(true));
@@ -131,7 +145,7 @@ class StationsControllerTest {
                 .andExpect(jsonPath("$.lon").value(6.0))
                 .andExpect(jsonPath("$.photographer").value("Peter Pan"))
                 .andExpect(jsonPath("$.DS100").value("ABC"))
-                .andExpect(jsonPath("$.photoUrl").value("/fotos/ab/3.jpg"))
+                .andExpect(jsonPath("$.photoUrl").value("http://localhost:8080/photos/fotos/ab/3.jpg"))
                 .andExpect(jsonPath("$.license").value("CC BY-NC 4.0 International"))
                 .andExpect(jsonPath("$.photographerUrl").value("photographerUrl2"))
                 .andExpect(jsonPath("$.active").value(true));

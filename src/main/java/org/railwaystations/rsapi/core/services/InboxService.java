@@ -230,8 +230,7 @@ public class InboxService implements ManageInboxUseCase {
 
     private void updateStationActiveState(InboxEntry inboxEntry, boolean active) {
         var station = assertStationExists(inboxEntry);
-        station.setActive(active);
-        stationDao.updateActive(station.getKey(), station.isActive());
+        stationDao.updateActive(station.getKey(), active);
         inboxDao.done(inboxEntry.getId());
         log.info("Problem report {} station {} set active to {}", inboxEntry.getId(), station.getKey(), active);
     }
@@ -310,12 +309,11 @@ public class InboxService implements ManageInboxUseCase {
             } else {
                 photoDao.insert(photo);
             }
-            station.setPhoto(photo);
 
             photoStorage.importPhoto(inboxEntry, country, station);
             inboxDao.done(inboxEntry.getId());
             log.info("Upload {} accepted: {}", inboxEntry.getId(), inboxEntry.getFilename());
-            mastodonBot.tootNewPhoto(station, inboxEntry);
+            mastodonBot.tootNewPhoto(station, inboxEntry, photo);
         } catch (Exception e) {
             log.error("Error importing upload {} photo {}", inboxEntry.getId(), inboxEntry.getFilename());
             throw new RuntimeException("Error moving file", e);
@@ -371,7 +369,13 @@ public class InboxService implements ManageInboxUseCase {
 
             var title = command.getTitle() != null ? command.getTitle() : inboxEntry.getTitle();
 
-            var newStation = new Station(new Station.Key(command.getCountryCode(), command.getStationId()), title, coordinates, command.getDs100(), null, command.getActive());
+            var newStation = Station.builder()
+                    .key(new Station.Key(command.getCountryCode(), command.getStationId()))
+                    .title(title)
+                    .coordinates(coordinates)
+                    .ds100(command.getDs100())
+                    .active(command.getActive())
+                    .build();
             stationDao.insert(newStation);
             return newStation;
         });

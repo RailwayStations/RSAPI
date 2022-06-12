@@ -99,15 +99,15 @@ class PhotoInboxEntryControllerTest {
     @BeforeEach
     void setUp() {
         var key0815 = new Station.Key("ch", "0815");
-        var station0815 = new Station(key0815, "Station 0815", new Coordinates(40.1, 7.0), "LAL", createPhoto(key0815, createUser("Jim Knopf", 18)), true);
+        var station0815 = createStation(key0815, new Coordinates(40.1, 7.0), "LAL", createPhoto(key0815, createUser("Jim Knopf", 18)));
         var key4711 = new Station.Key("de", "4711");
-        var station4711 = new Station(key4711, "Lummerland", new Coordinates(50.0, 9.0), "XYZ", null, true);
+        var station4711 = createStation(key4711, new Coordinates(50.0, 9.0), "XYZ", null);
         var key1234 = new Station.Key("de", "1234");
-        var station1234 = new Station(key1234, "Neverland", new Coordinates(51.0, 10.0), "ABC", createPhoto(key1234, createUser("Jim Knopf")), true);
+        var station1234 = createStation(key1234, new Coordinates(40.1, 7.0), "LAL", createPhoto(key1234, createUser("Jim Knopf")));
         var key5678 = new Station.Key("de", "5678");
-        var station5678 = new Station(key5678, "Phantasia", new Coordinates(51.0, 10.0), "DEF", createPhoto(key5678, createUser("nickname")), true);
+        var station5678 = createStation(key5678, new Coordinates(51.0, 10.0), "DEF", createPhoto(key5678, createUser("nickname")));
         var key9876 = new Station.Key("de", "9876");
-        var station9876 = new Station(key9876, "Station 9876", new Coordinates(52.0, 8.0), "EFF", createPhoto(key9876, createUser("nickname", 42)), true);
+        var station9876 = createStation(key9876, new Coordinates(52.0, 8.0), "EFF", createPhoto(key9876, createUser("nickname", 42)));
 
         var userNickname = User.builder()
                 .name("nickname")
@@ -135,6 +135,16 @@ class PhotoInboxEntryControllerTest {
         when(stationDao.findByKey(key9876.getCountry(), key9876.getId())).thenReturn(Set.of(station9876));
 
         monitor.getMessages().clear();
+    }
+
+    private Station createStation(Station.Key key, Coordinates coordinates, String ds100, Photo photo) {
+        return Station.builder()
+                .key(key)
+                .title("Station" + key.getId())
+                .coordinates(coordinates)
+                .ds100(ds100)
+                .photo(photo)
+                .build();
     }
 
     private Photo createPhoto(Station.Key key0815, User Jim_Knopf) {
@@ -236,7 +246,7 @@ class PhotoInboxEntryControllerTest {
         verify(inboxDao).insert(uploadCaptor.capture());
         assertUpload(uploadCaptor.getValue(), "de","4711", null, null);
 
-        assertThat(monitor.getMessages().get(0)).isEqualTo("New photo upload for Lummerland - de:4711\nSome Comment\nhttp://inbox.railway-stations.org/1.jpg\nby nickname\nvia UserAgent");
+        assertThat(monitor.getMessages().get(0)).isEqualTo("New photo upload for Station4711 - de:4711\nSome Comment\nhttp://inbox.railway-stations.org/1.jpg\nby nickname\nvia UserAgent");
     }
 
     private String whenPostImageIframe(String email,
@@ -270,7 +280,7 @@ class PhotoInboxEntryControllerTest {
         assertFileWithContentExistsInInbox("image-content", "1.jpg");
         verify(inboxDao).insert(uploadCaptor.capture());
         assertUpload(uploadCaptor.getValue(), "de","4711", null, null);
-        assertThat(monitor.getMessages().get(0)).isEqualTo("New photo upload for Lummerland - de:4711\nSome Comment\nhttp://inbox.railway-stations.org/1.jpg\nby @nick name\nvia UserAgent");
+        assertThat(monitor.getMessages().get(0)).isEqualTo("New photo upload for Station4711 - de:4711\nSome Comment\nhttp://inbox.railway-stations.org/1.jpg\nby @nick name\nvia UserAgent");
     }
 
     private void assertUpload(InboxEntry inboxEntry, String countryCode, String stationId, String title, Coordinates coordinates) {
@@ -330,7 +340,7 @@ class PhotoInboxEntryControllerTest {
                 .andExpect(jsonPath("$.filename").value("3.jpg"));
 
         assertFileWithContentExistsInInbox(IMAGE_CONTENT, "3.jpg");
-        assertThat(monitor.getMessages().get(0)).isEqualTo("New photo upload for Lummerland - de:4711\n\nhttp://inbox.railway-stations.org/3.jpg\nby @someuser\nvia UserAgent");
+        assertThat(monitor.getMessages().get(0)).isEqualTo("New photo upload for Station4711 - de:4711\n\nhttp://inbox.railway-stations.org/3.jpg\nby @someuser\nvia UserAgent");
     }
 
     @Test
@@ -345,7 +355,7 @@ class PhotoInboxEntryControllerTest {
                 .andExpect(jsonPath("$.filename").value("2.jpg"));
 
         assertFileWithContentExistsInInbox(IMAGE_CONTENT, "2.jpg");
-        assertThat(monitor.getMessages().get(0)).isEqualTo("New photo upload for Lummerland - de:4711\n\nhttp://inbox.railway-stations.org/2.jpg (possible duplicate!)\nby @nick name\nvia UserAgent");
+        assertThat(monitor.getMessages().get(0)).isEqualTo("New photo upload for Station4711 - de:4711\n\nhttp://inbox.railway-stations.org/2.jpg (possible duplicate!)\nby @nick name\nvia UserAgent");
     }
 
     @Test
@@ -417,7 +427,7 @@ class PhotoInboxEntryControllerTest {
                 .andExpect(jsonPath("$.filename").value("5.jpg"));
 
         assertFileWithContentExistsInInbox(IMAGE_CONTENT, "5.jpg");
-        assertThat(monitor.getMessages().get(0)).isEqualTo("New photo upload for Neverland - de:1234\n\nhttp://inbox.railway-stations.org/5.jpg (possible duplicate!)\nby @nick name\nvia UserAgent");
+        assertThat(monitor.getMessages().get(0)).isEqualTo("New photo upload for Station1234 - de:1234\n\nhttp://inbox.railway-stations.org/5.jpg (possible duplicate!)\nby @nick name\nvia UserAgent");
     }
 
     @Test
@@ -461,7 +471,7 @@ class PhotoInboxEntryControllerTest {
                 .andExpect(jsonPath("$.id").value(6))
                 .andExpect(jsonPath("$.filename").doesNotExist());
 
-        assertThat(monitor.getMessages().get(0)).isEqualTo("New problem report for Neverland - de:1234\nOTHER: something is wrong\nby @nick name\nvia UserAgent");
+        assertThat(monitor.getMessages().get(0)).isEqualTo("New problem report for Station1234 - de:1234\nOTHER: something is wrong\nby @nick name\nvia UserAgent");
     }
 
     @Test
