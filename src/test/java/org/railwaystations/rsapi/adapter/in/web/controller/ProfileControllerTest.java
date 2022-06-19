@@ -334,6 +334,7 @@ class ProfileControllerTest {
         postMyProfile(newProfileJson).andExpect(status().isOk());
 
         var user = User.builder()
+                .id(42)
                 .name("new_name")
                 .license(License.CC0_10)
                 .email("existing@example.com")
@@ -370,7 +371,7 @@ class ProfileControllerTest {
 
         postMyProfile(newProfileJson).andExpect(status().isConflict());
 
-        verify(userDao, never()).update(user.getId(), any(User.class));
+        verify(userDao, never()).update(eq(user.getId()), any(User.class));
     }
 
     @Test
@@ -385,6 +386,7 @@ class ProfileControllerTest {
 
         assertVerificationEmail();
         var user = User.builder()
+                .id(42)
                 .name("existing")
                 .license(License.CC0_10)
                 .email("newname@example.com")
@@ -465,7 +467,7 @@ class ProfileControllerTest {
 
     @Test
     void testResetPasswordUserNotFound() throws Exception {
-        postResetPassword("doesnt-exist").andExpect(status().isNotFound());
+        postResetPassword("doesnt-exist").andExpect(status().isBadRequest());
     }
 
     @Test
