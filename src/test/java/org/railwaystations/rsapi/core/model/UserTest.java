@@ -54,4 +54,19 @@ class UserTest {
         assertThat(roles.contains(User.ROLE_ADMIN)).isEqualTo(true);
     }
 
+    @ParameterizedTest
+    @CsvSource({ "https://example.com/user10, false, https://example.com/user10",
+            "https://example.com/user10, true, https://railway-stations.org",
+            ", false, https://railway-stations.org"})
+    void testDisplayUrl(String url, boolean anonymous, String expectedDisplayUrl) {
+        assertThat(User.builder().name("user10").anonymous(anonymous).url(url).build().getDisplayUrl()).isEqualTo(expectedDisplayUrl);
+    }
+
+    @ParameterizedTest
+    @CsvSource({ "user10, false, user10",
+            "user10, true, Anonym"})
+    void testDisplayName(String name, boolean anonymous, String expectedDisplayName) {
+        assertThat(User.builder().name(name).anonymous(anonymous).build().getDisplayName()).isEqualTo(expectedDisplayName);
+    }
+
 }

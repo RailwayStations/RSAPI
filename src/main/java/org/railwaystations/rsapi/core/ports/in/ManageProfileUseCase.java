@@ -8,7 +8,7 @@ public interface ManageProfileUseCase {
 
     void changePassword(User user, String newPassword);
 
-    User resetPassword(String nameOrEmail, String clientInfo);
+    void resetPassword(String nameOrEmail, String clientInfo);
 
     void register(User newUser, String clientInfo) throws ProfileConflictException;
 

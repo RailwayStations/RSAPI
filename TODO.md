@@ -18,4 +18,4 @@
 
 - Parameter Object for MastodonBot.tootNewPhoto?
 
-- User: change @Data to @Value annotation
+- InboxEntry: change @Data to @Value annotation

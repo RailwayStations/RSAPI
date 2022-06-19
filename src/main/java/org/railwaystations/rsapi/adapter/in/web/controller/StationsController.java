@@ -138,7 +138,7 @@ public class StationsController {
                     .licenseUrl(license != null ? license.getUrl() : null)
                     .photoUrl(photoBaseUrl + photo.getUrlPath())
                     .photographer(photo.getPhotographer().getDisplayName())
-                    .photographerUrl(photo.getPhotographer().getUrl())
+                    .photographerUrl(photo.getPhotographer().getDisplayUrl())
                     .createdAt(photo.getCreatedAt() != null ? photo.getCreatedAt().toEpochMilli() : null)
                     .outdated(photo.isOutdated());
 

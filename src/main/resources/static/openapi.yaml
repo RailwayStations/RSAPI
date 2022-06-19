@@ -7,7 +7,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20220611.2120"
+  version: "20220619.1250"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -950,9 +950,6 @@ paths:
             text/plain:
               schema:
                 type: string
-        404:
-          description: User not found
-          content: {}
   /newUploadToken:
     post:
       summary: Requests a new Upload-Token (now password) only

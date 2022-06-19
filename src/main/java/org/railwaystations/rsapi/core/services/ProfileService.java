@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.NotNull;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -45,13 +44,13 @@ public class ProfileService implements ManageProfileUseCase {
     }
 
     @Override
-    public User resetPassword(String nameOrEmail, String clientInfo) {
+    public void resetPassword(String nameOrEmail, String clientInfo) {
         log.info("Password reset requested for '{}'", nameOrEmail);
         var user = userDao.findByEmail(User.normalizeEmail(nameOrEmail))
                 .orElse(userDao.findByNormalizedName(User.normalizeName(nameOrEmail)).orElse(null));
 
         if (user == null) {
-            return null;
+            throw new IllegalArgumentException("Can't reset password for unknown user");
         }
 
         if (StringUtils.isBlank(user.getEmail())) {
@@ -61,17 +60,16 @@ public class ProfileService implements ManageProfileUseCase {
             throw new IllegalArgumentException(String.format("Email '%s' is empty", user.getEmail()));
         }
 
-        user.setNewPassword(createNewPassword());
-        encryptPassword(user);
-        userDao.updateCredentials(user.getId(), user.getKey());
+        var newPassword = createNewPassword();
+        var key = encryptPassword(newPassword);
+        userDao.updateCredentials(user.getId(), key);
         monitor.sendMessage(String.format("Reset Password for '%s', email='%s'", user.getName(), user.getEmail()));
 
-        sendPasswordMail(user);
+        sendPasswordMail(user.getEmail(), newPassword);
         if (!user.isEmailVerified()) {
             // if the email is not yet verified, we can verify it with the next login
             userDao.updateEmailVerification(user.getId(), User.EMAIL_VERIFIED_AT_NEXT_LOGIN);
         }
-        return user;
     }
 
     @Override
@@ -97,21 +95,21 @@ public class ProfileService implements ManageProfileUseCase {
             throw new ProfileConflictException();
         }
 
-        boolean passwordProvided = StringUtils.isNotBlank(newUser.getNewPassword());
+        var password = newUser.getNewPassword();
+        var emailVerificationToken = User.createNewEmailVerificationToken();
+        boolean passwordProvided = StringUtils.isNotBlank(password);
         if (!passwordProvided) {
-            newUser.setNewPassword(createNewPassword());
-            newUser.setEmailVerification(User.EMAIL_VERIFIED_AT_NEXT_LOGIN);
-        } else {
-            newUser.setEmailVerificationToken(UUID.randomUUID().toString());
+            password = createNewPassword();
+            emailVerificationToken = User.EMAIL_VERIFIED_AT_NEXT_LOGIN;
         }
 
-        encryptPassword(newUser);
-        saveRegistration(newUser);
+        var key = encryptPassword(password);
+        saveRegistration(newUser, key, emailVerificationToken);
 
         if (passwordProvided) {
-            sendEmailVerification(newUser);
+            sendEmailVerification(newUser.getEmail(), emailVerificationToken);
         } else {
-            sendPasswordMail(newUser);
+            sendPasswordMail(newUser.getEmail(), password);
         }
 
         monitor.sendMessage(
@@ -124,8 +122,8 @@ public class ProfileService implements ManageProfileUseCase {
         return RandomStringUtils.randomAlphanumeric(12);
     }
 
-    private void encryptPassword(@NotNull User user) {
-        user.setKey(passwordEncoder.encode(user.getNewPassword()));
+    private String encryptPassword(String password) {
+        return passwordEncoder.encode(password);
     }
 
     @Override
@@ -152,31 +150,28 @@ public class ProfileService implements ManageProfileUseCase {
                 log.info("Email conflict '{}'", newProfile.getEmail());
                 throw new ProfileConflictException();
             }
-            newProfile.setEmailVerificationToken(UUID.randomUUID().toString());
             monitor.sendMessage(
                     String.format("Update email for user '%s' from email '%s' to '%s'%nvia%s",
                             user.getName(), user.getEmail(), newProfile.getEmail(), clientInfo));
-            sendEmailVerification(newProfile);
-        } else {
-            // keep email verification status
-            newProfile.setEmailVerification(user.getEmailVerification());
+            var emailVerificationToken = UUID.randomUUID().toString();
+            sendEmailVerification(newProfile.getEmail(), emailVerificationToken);
+            userDao.updateEmailVerification(user.getId(), emailVerificationToken);
         }
 
-        newProfile.setId(user.getId());
-        userDao.update(newProfile);
+        userDao.update(user.getId(), newProfile);
     }
 
     @Override
     public void resendEmailVerification(User user) {
         log.info("Resend EmailVerification for '{}'", user.getEmail());
-        user.setEmailVerificationToken(UUID.randomUUID().toString());
-        userDao.updateEmailVerification(user.getId(), user.getEmailVerification());
-        sendEmailVerification(user);
+        var emailVerificationToken = UUID.randomUUID().toString();
+        userDao.updateEmailVerification(user.getId(), emailVerificationToken);
+        sendEmailVerification(user.getEmail(), emailVerificationToken);
     }
 
     @Override
     public Optional<User> emailVerification(String token) {
-        var userByToken = userDao.findByEmailVerification(User.EMAIL_VERIFICATION_TOKEN + token);
+        var userByToken = userDao.findByEmailVerification(token);
         if (userByToken.isPresent()) {
             User user = userByToken.get();
             userDao.updateEmailVerification(user.getId(), User.EMAIL_VERIFIED);
@@ -186,7 +181,7 @@ public class ProfileService implements ManageProfileUseCase {
         return userByToken;
     }
 
-    private void sendPasswordMail(@NotNull User user) {
+    private void sendPasswordMail(String email, String newPassword) {
         var text = String.format("""
                         Hello,
                         
@@ -201,13 +196,13 @@ public class ProfileService implements ManageProfileUseCase {
                         Dein neues Passwort lautet: %1$s
                         
                         Viele Grüße
-                        Dein Bahnhofsfoto-Team""", user.getNewPassword());
-        mailer.send(user.getEmail(), "Railway-Stations.org new password", text);
-        log.info("Password sent to {}", user.getEmail());
+                        Dein Bahnhofsfoto-Team""", newPassword);
+        mailer.send(email, "Railway-Stations.org new password", text);
+        log.info("Password sent to {}", email);
     }
 
-    private void sendEmailVerification(@NotNull User user) {
-        var url = eMailVerificationUrl + user.getEmailVerificationToken();
+    private void sendEmailVerification(String email, String emailVerificationToken) {
+        var url = eMailVerificationUrl + emailVerificationToken;
         var text = String.format("""
                         Hello,
                         
@@ -223,12 +218,12 @@ public class ProfileService implements ManageProfileUseCase {
                         
                         Viele Grüße
                         Dein Bahnhofsfoto-Team""", url);
-        mailer.send(user.getEmail(), "Railway-Stations.org eMail verification", text);
-        log.info("Email verification sent to {}", user.getEmail());
+        mailer.send(email, "Railway-Stations.org eMail verification", text);
+        log.info("Email verification sent to {}", email);
     }
 
-    private void saveRegistration(User registration) {
-        var id = userDao.insert(registration);
+    private void saveRegistration(User registration, String key, String emailVerification) {
+        var id = userDao.insert(registration, key, emailVerification);
         log.info("User '{}' created with id {}", registration.getName(), id);
     }
 

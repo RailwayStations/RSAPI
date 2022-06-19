@@ -2,8 +2,8 @@ package org.railwaystations.rsapi.core.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Value;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
 
@@ -12,8 +12,9 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.UUID;
 
-@Data
+@Value
 @Builder
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -22,36 +23,33 @@ public class User {
 
     public static final String EMAIL_VERIFIED = "VERIFIED";
     public static final String EMAIL_VERIFIED_AT_NEXT_LOGIN = "NEXT_LOGIN";
-    public static final String EMAIL_VERIFICATION_TOKEN = "TOKEN:";
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
     public static final String ROLE_USER = "ROLE_USER";
 
-    private int id;
+    int id;
 
     @EqualsAndHashCode.Include
-    private final String name;
+    String name;
 
-    private final String url;
+    String url;
 
-    private final License license;
+    License license;
 
-    private final String email;
+    String email;
 
-    private final boolean ownPhotos;
+    boolean ownPhotos;
 
-    private final boolean anonymous;
+    boolean anonymous;
 
-    private String key;
+    String key;
 
-    private final boolean admin;
+    boolean admin;
 
-    private String emailVerification;
+    String emailVerification;
 
-    private String emailVerificationToken;
+    String newPassword;
 
-    private String newPassword;
-
-    private boolean sendNotifications;
+    boolean sendNotifications;
 
     public String getNormalizedName() {
         return normalizeName(name);
@@ -118,9 +116,8 @@ public class User {
         return EMAIL_VERIFIED_AT_NEXT_LOGIN.equals(emailVerification);
     }
 
-    public void setEmailVerificationToken(String emailVerificationToken) {
-        this.emailVerificationToken = emailVerificationToken;
-        this.emailVerification = EMAIL_VERIFICATION_TOKEN + emailVerificationToken;
+    public static String createNewEmailVerificationToken() {
+        return UUID.randomUUID().toString();
     }
 
     public Set<String> getRoles() {

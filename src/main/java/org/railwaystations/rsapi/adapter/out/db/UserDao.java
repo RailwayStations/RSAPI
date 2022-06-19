@@ -42,14 +42,14 @@ public interface UserDao {
                 VALUES (:id, :name, :url, :license, :email, :normalizedName, :ownPhotos, :anonymous, :key, :emailVerification, :sendNotifications)
             """)
     @GetGeneratedKeys("id")
-    Integer insert(@BindBean User user);
+    Integer insert(@BindBean User user, @Bind("key") String key, @Bind("emailVerification") String emailVerification);
 
     @SqlUpdate("""
             UPDATE users SET name = :name, url = :url, license = :license, email = :email, normalizedName = :normalizedName, ownPhotos = :ownPhotos,
-                            anonymous = :anonymous, emailVerification = :emailVerification, sendNotifications = :sendNotifications
+                            anonymous = :anonymous, sendNotifications = :sendNotifications
             WHERE id = :id
             """)
-    void update(@BindBean User user);
+    void update(@Bind("id") int id, @BindBean User user);
 
     @SqlQuery("SELECT * FROM users WHERE emailVerification = :emailVerification")
     @RegisterRowMapper(UserMapper.class)

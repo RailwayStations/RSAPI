@@ -432,7 +432,7 @@ class PhotoInboxEntryControllerTest {
 
     @Test
     void testPostEmailNotVerified() throws Exception {
-        whenPostImage("@nick name", 42, "nickname@example.com","1234", "de", null, null, null, null, User.EMAIL_VERIFICATION_TOKEN + "blahblah")
+        whenPostImage("@nick name", 42, "nickname@example.com","1234", "de", null, null, null, null, "blahblah")
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.state").value("UNAUTHORIZED"))
                 .andExpect(jsonPath("$.id").doesNotExist())
@@ -476,7 +476,7 @@ class PhotoInboxEntryControllerTest {
 
     @Test
     void testPostProblemReportEmailNotVerified() throws Exception {
-        whenPostProblemReport(User.EMAIL_VERIFICATION_TOKEN + "blah")
+        whenPostProblemReport("blah")
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.state").value("UNAUTHORIZED"))
                 .andExpect(jsonPath("$.id").doesNotExist())

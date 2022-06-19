@@ -52,10 +52,7 @@ public class ProfileController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,value = "/resetPassword")
     public ResponseEntity<String> resetPassword(@RequestHeader(HttpHeaders.USER_AGENT) String userAgent,
                                                 @NotNull @RequestHeader("NameOrEmail") String nameOrEmail) {
-        if (manageProfileUseCase.resetPassword(nameOrEmail, userAgent) == null) {
-            return ResponseEntity.notFound().build();
-        }
-
+        manageProfileUseCase.resetPassword(nameOrEmail, userAgent);
         return ResponseEntity.accepted().build();
     }
 

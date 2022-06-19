@@ -35,7 +35,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.matches;
-import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -103,7 +102,7 @@ class ProfileControllerTest {
 
         verify(userDao).findByNormalizedName("nickname");
         verify(userDao).findByEmail("nickname@example.com");
-        verify(userDao).insert(any(User.class));
+        verify(userDao).insert(any(User.class), anyString(), anyString());
         verify(userDao, never()).updateCredentials(anyInt(), anyString());
 
         assertThat(monitor.getMessages().get(0)).isEqualTo("New registration{nickname='nickname', email='nickname@example.com', license='CC0 1.0 Universell (CC0 1.0)', photoOwner=true, link='https://link@example.com', anonymous=false}\nvia UserAgent");
@@ -141,7 +140,7 @@ class ProfileControllerTest {
 
         verify(userDao).findByNormalizedName("nickname");
         verify(userDao).findByEmail("nickname@example.com");
-        verify(userDao).insert(any(User.class));
+        verify(userDao).insert(any(User.class), anyString(), anyString());
         verify(userDao, never()).updateCredentials(anyInt(), anyString());
 
         assertThat(monitor.getMessages().get(0)).isEqualTo("New registration{nickname='nickname', email='nickname@example.com', license='CC0 1.0 Universell (CC0 1.0)', photoOwner=true, link='https://link@example.com', anonymous=false}\nvia UserAgent");
@@ -342,7 +341,7 @@ class ProfileControllerTest {
                 .url("http://twitter.com/")
                 .anonymous(true)
                 .sendNotifications(true).build();
-        verify(userDao).update(user);
+        verify(userDao).update(user.getId(), user);
     }
 
     @NotNull
@@ -371,7 +370,7 @@ class ProfileControllerTest {
 
         postMyProfile(newProfileJson).andExpect(status().isConflict());
 
-        verify(userDao, never()).update(any(User.class));
+        verify(userDao, never()).update(user.getId(), any(User.class));
     }
 
     @Test
@@ -393,7 +392,7 @@ class ProfileControllerTest {
                 .anonymous(false)
                 .url("http://twitter.com/")
                 .sendNotifications(true).build();
-        verify(userDao).update(user);
+        verify(userDao).update(user.getId(), user);
     }
 
     @Test
@@ -492,9 +491,9 @@ class ProfileControllerTest {
                 .ownPhotos(true)
                 .anonymous(false)
                 .url("https://link@example.com")
-                .emailVerificationToken(User.EMAIL_VERIFICATION_TOKEN + token)
+                .emailVerification(token)
                 .sendNotifications(true).build();
-        when(userDao.findByEmailVerification(User.EMAIL_VERIFICATION_TOKEN + token)).thenReturn(Optional.of(user));
+        when(userDao.findByEmailVerification(token)).thenReturn(Optional.of(user));
 
         getEmailVerification(token)
                 .andExpect(status().isOk());
@@ -514,7 +513,6 @@ class ProfileControllerTest {
     @Test
     void testVerifyEmailFailed() throws Exception {
         var token = "verification";
-        var emailVerification = User.EMAIL_VERIFICATION_TOKEN + token;
         var user = User.builder()
                 .id(42)
                 .name("existing")
@@ -523,9 +521,9 @@ class ProfileControllerTest {
                 .ownPhotos(true)
                 .anonymous(false)
                 .url("https://link@example.com")
-                .emailVerificationToken(emailVerification)
+                .emailVerification(token)
                 .sendNotifications(true).build();
-        when(userDao.findByEmailVerification(emailVerification)).thenReturn(Optional.of(user));
+        when(userDao.findByEmailVerification(token)).thenReturn(Optional.of(user));
 
         getEmailVerification("wrong_token").andExpect(status().isNotFound());
 
@@ -545,7 +543,7 @@ class ProfileControllerTest {
                 .andExpect(status().isOk());
 
         assertVerificationEmail();
-        verify(userDao).updateEmailVerification(eq(42), startsWith(User.EMAIL_VERIFICATION_TOKEN));
+        verify(userDao).updateEmailVerification(eq(42), anyString());
     }
 
     private ResultMatcher validOpenApi() {

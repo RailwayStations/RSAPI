@@ -649,4 +649,11 @@
         </update>
     </changeSet>
 
+    <changeSet id="39" author="pstorch">
+        <update tableName="users">
+            <column name="license" valueComputed="substring(emailVerification, 7, length(emailVerification))"/>
+            <where>emailVerification like 'TOKEN:%'</where>
+        </update>
+    </changeSet>
+
 </databaseChangeLog>
