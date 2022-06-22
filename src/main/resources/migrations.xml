@@ -656,4 +656,15 @@
         </update>
     </changeSet>
 
+    <changeSet id="40" author="pstorch">
+        <update tableName="users">
+            <column name="license" value="CC0_10"/>
+            <where>license NOT like 'CC%'</where>
+        </update>
+        <update tableName="users">
+            <column name="emailVerification" valueComputed="substring(emailVerification, 7, length(emailVerification))"/>
+            <where>emailVerification like 'TOKEN:%'</where>
+        </update>
+    </changeSet>
+
 </databaseChangeLog>
