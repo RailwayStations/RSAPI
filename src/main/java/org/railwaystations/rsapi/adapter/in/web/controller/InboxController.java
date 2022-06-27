@@ -331,6 +331,7 @@ public class InboxController {
                 .id(command.getId())
                 .countryCode(command.getCountryCode())
                 .stationId(command.getStationId())
+                .title(command.getTitle())
                 .rejectReason(command.getRejectReason())
                 .command(toDomain(command.getCommand()))
                 .ds100(command.getDS100())

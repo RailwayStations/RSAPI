@@ -7,7 +7,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20220619.1250"
+  version: "20220627.1900"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -1609,6 +1609,8 @@ components:
         stationId:
           type: string
           description: ID of a new station
+        title:
+          type: string
         rejectReason:
           type: string
           description: explanation of a rejection

@@ -1,17 +1,20 @@
 package org.railwaystations.rsapi.adapter.in.web.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.annotation.Generated;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
  * AdminInboxCommandResponseDto
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-04-25T21:59:47.380653632+02:00[Europe/Berlin]")
-public class AdminInboxCommandResponseDto   {
+@JsonTypeName("AdminInboxCommandResponse")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-06-27T19:01:27.797025753+02:00[Europe/Berlin]")
+public class AdminInboxCommandResponseDto {
 
   @JsonProperty("status")
   private Integer status;
@@ -28,8 +31,8 @@ public class AdminInboxCommandResponseDto   {
    * Get status
    * @return status
   */
-  
-  @Schema(name = "status", required = false)
+  @NotNull 
+  @Schema(name = "status", required = true)
   public Integer getStatus() {
     return status;
   }
@@ -47,8 +50,8 @@ public class AdminInboxCommandResponseDto   {
    * Get message
    * @return message
   */
-  
-  @Schema(name = "message", required = false)
+  @NotNull 
+  @Schema(name = "message", required = true)
   public String getMessage() {
     return message;
   }

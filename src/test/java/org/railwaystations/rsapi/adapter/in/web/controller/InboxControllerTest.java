@@ -65,7 +65,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes={WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class, MockMvcTestConfiguration.class, WebSecurityConfig.class})
 @Import({InboxService.class, PhotoFileStorage.class, RSUserDetailsService.class})
 @ActiveProfiles("mockMvcTest")
-class PhotoInboxEntryControllerTest {
+class InboxControllerTest {
 
     public static final String IMAGE_CONTENT = "image-content";
 

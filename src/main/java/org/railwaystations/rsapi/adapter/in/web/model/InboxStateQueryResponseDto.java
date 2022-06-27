@@ -2,6 +2,7 @@ package org.railwaystations.rsapi.adapter.in.web.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -14,8 +15,9 @@ import java.util.Objects;
  */
 
 @Schema(name = "InboxStateQueryResponse", description = "Inbox state query")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-05-01T18:10:17.233905176+02:00[Europe/Berlin]")
-public class InboxStateQueryResponseDto   {
+@JsonTypeName("InboxStateQueryResponse")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-06-27T19:01:27.797025753+02:00[Europe/Berlin]")
+public class InboxStateQueryResponseDto {
 
   @JsonProperty("id")
   private Long id;

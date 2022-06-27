@@ -237,7 +237,7 @@ public class InboxService implements ManageInboxUseCase {
 
     private void changeStationTitle(InboxEntry inboxEntry, String newTitle) {
         var station = assertStationExists(inboxEntry);
-        stationDao.changeStationTitle(station, newTitle);
+        stationDao.changeStationTitle(station.getKey(), newTitle);
         inboxDao.done(inboxEntry.getId());
         log.info("Problem report {} station {} change name to {}", inboxEntry.getId(), station.getKey(), newTitle);
     }

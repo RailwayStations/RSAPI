@@ -1,25 +1,25 @@
 package org.railwaystations.rsapi.adapter.in.web.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.annotation.Generated;
-import javax.validation.Valid;
-import java.math.BigDecimal;
 import java.util.Objects;
 
 /**
  * GeneralErrorMessageDto
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-04-25T21:59:47.380653632+02:00[Europe/Berlin]")
-public class GeneralErrorMessageDto   {
+@JsonTypeName("GeneralErrorMessage")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-06-27T19:01:27.797025753+02:00[Europe/Berlin]")
+public class GeneralErrorMessageDto {
 
   @JsonProperty("timestamp")
-  private BigDecimal timestamp;
+  private Long timestamp;
 
   @JsonProperty("status")
-  private BigDecimal status;
+  private Integer status;
 
   @JsonProperty("error")
   private String error;
@@ -30,7 +30,7 @@ public class GeneralErrorMessageDto   {
   @JsonProperty("path")
   private String path;
 
-  public GeneralErrorMessageDto timestamp(BigDecimal timestamp) {
+  public GeneralErrorMessageDto timestamp(Long timestamp) {
     this.timestamp = timestamp;
     return this;
   }
@@ -39,17 +39,17 @@ public class GeneralErrorMessageDto   {
    * Get timestamp
    * @return timestamp
   */
-  @Valid 
+  
   @Schema(name = "timestamp", required = false)
-  public BigDecimal getTimestamp() {
+  public Long getTimestamp() {
     return timestamp;
   }
 
-  public void setTimestamp(BigDecimal timestamp) {
+  public void setTimestamp(Long timestamp) {
     this.timestamp = timestamp;
   }
 
-  public GeneralErrorMessageDto status(BigDecimal status) {
+  public GeneralErrorMessageDto status(Integer status) {
     this.status = status;
     return this;
   }
@@ -58,13 +58,13 @@ public class GeneralErrorMessageDto   {
    * Get status
    * @return status
   */
-  @Valid 
+  
   @Schema(name = "status", required = false)
-  public BigDecimal getStatus() {
+  public Integer getStatus() {
     return status;
   }
 
-  public void setStatus(BigDecimal status) {
+  public void setStatus(Integer status) {
     this.status = status;
   }
 

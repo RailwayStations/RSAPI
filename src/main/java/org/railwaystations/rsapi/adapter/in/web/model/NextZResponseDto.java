@@ -1,6 +1,7 @@
 package org.railwaystations.rsapi.adapter.in.web.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.annotation.Generated;
@@ -11,8 +12,9 @@ import java.util.Objects;
  * NextZResponseDto
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-05-01T17:58:43.387298988+02:00[Europe/Berlin]")
-public class NextZResponseDto   {
+@JsonTypeName("NextZResponse")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-06-27T19:01:27.797025753+02:00[Europe/Berlin]")
+public class NextZResponseDto {
 
   @JsonProperty("nextZ")
   private String nextZ;

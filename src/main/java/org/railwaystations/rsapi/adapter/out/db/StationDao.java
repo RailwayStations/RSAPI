@@ -99,7 +99,7 @@ public interface StationDao {
     int getMaxZ();
 
     @SqlUpdate("UPDATE stations SET title = :new_title WHERE countryCode = :key.country AND id = :key.id")
-    void changeStationTitle(@BindBean Station station, @Bind("new_title") String newTitle);
+    void changeStationTitle(@BindBean("key") Station.Key key, @Bind("new_title") String newTitle);
 
     @SqlUpdate("UPDATE stations SET lat = :coords.lat, lon = :coords.lon WHERE countryCode = :key.country AND id = :key.id")
     void updateLocation(@BindBean("key") Station.Key key, @BindBean("coords") Coordinates coordinates);

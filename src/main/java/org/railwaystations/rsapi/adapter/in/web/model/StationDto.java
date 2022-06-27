@@ -1,6 +1,7 @@
 package org.railwaystations.rsapi.adapter.in.web.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.annotation.Generated;
@@ -10,8 +11,9 @@ import java.util.Objects;
  * StationDto
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-04-25T21:59:47.380653632+02:00[Europe/Berlin]")
-public class StationDto   {
+@JsonTypeName("Station")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-06-27T19:01:27.797025753+02:00[Europe/Berlin]")
+public class StationDto {
 
   @JsonProperty("idStr")
   private String idStr;
@@ -286,8 +288,8 @@ public class StationDto   {
     this.createdAt = createdAt;
   }
 
-  public StationDto DS100(String DS100) {
-    this.ds100 = DS100;
+  public StationDto DS100(String ds100) {
+    this.ds100 = ds100;
     return this;
   }
 

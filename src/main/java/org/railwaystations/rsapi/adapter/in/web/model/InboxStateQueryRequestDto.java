@@ -1,6 +1,7 @@
 package org.railwaystations.rsapi.adapter.in.web.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.annotation.Generated;
@@ -11,8 +12,9 @@ import java.util.Objects;
  * InboxStateQueryRequestDto
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-05-01T18:10:17.233905176+02:00[Europe/Berlin]")
-public class InboxStateQueryRequestDto   {
+@JsonTypeName("InboxStateQueryRequest")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-06-27T19:01:27.797025753+02:00[Europe/Berlin]")
+public class InboxStateQueryRequestDto {
 
   @JsonProperty("id")
   private Long id;

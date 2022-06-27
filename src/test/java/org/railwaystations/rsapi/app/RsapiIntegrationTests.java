@@ -413,6 +413,27 @@ class RsapiIntegrationTests {
 	}
 
 	@Test
+	void problemReportWithWrongStationName() throws JsonProcessingException {
+		var stationBefore = loadStationByKey("de", "6815");
+		assertThat(stationBefore).isNotNull();
+		assertThat(stationBefore.getTitle()).isEqualTo("Wippra");
+
+		var problemReportJson = """
+				{
+					"countryCode": "de",
+					"stationId": "6815",
+					"type": "WRONG_NAME",
+					"comment": "Correct Name is 'New Name'"
+				}""";
+		var id = sendProblemReport(problemReportJson);
+		sendInboxCommand("{\"id\": " + id + ", \"command\": \"CHANGE_NAME\", \"title\": \"Admin New Name\"}");
+
+		var stationAfter = loadStationByKey("de", "6815");
+		assertThat(stationAfter).isNotNull();
+		assertThat(stationAfter.getTitle()).isEqualTo("Admin New Name");
+	}
+
+	@Test
 	void problemReportWithOutdatedPhoto() throws JsonProcessingException {
 		assertOutdatedPhotoOfStation7065(false);
 

@@ -1,6 +1,7 @@
 package org.railwaystations.rsapi.adapter.in.web.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.annotation.Generated;
@@ -14,8 +15,9 @@ import java.util.Objects;
  */
 
 @Schema(name = "UpdateProfile", description = "User profile information")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-04-25T21:59:47.380653632+02:00[Europe/Berlin]")
-public class UpdateProfileDto   {
+@JsonTypeName("UpdateProfile")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-06-27T19:01:27.797025753+02:00[Europe/Berlin]")
+public class UpdateProfileDto {
 
   @JsonProperty("nickname")
   private String nickname;
@@ -142,8 +144,8 @@ public class UpdateProfileDto   {
    * Get anonymous
    * @return anonymous
   */
-  @NotNull 
-  @Schema(name = "anonymous", required = true)
+  
+  @Schema(name = "anonymous", required = false)
   public Boolean getAnonymous() {
     return anonymous;
   }
