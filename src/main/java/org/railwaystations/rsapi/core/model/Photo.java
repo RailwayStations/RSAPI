@@ -9,6 +9,7 @@ import java.time.Instant;
 @Builder
 public class Photo {
 
+    int id;
     Station.Key stationKey;
     String urlPath;
     User photographer;

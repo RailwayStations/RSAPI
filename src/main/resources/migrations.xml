@@ -667,4 +667,9 @@
         </update>
     </changeSet>
 
+    <changeSet id="41" author="pstorch">
+        <renameColumn tableName="users" oldColumnName="id" newColumnName="stationId"/>
+
+    </changeSet>
+
 </databaseChangeLog>
