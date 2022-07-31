@@ -8,11 +8,11 @@ import org.railwaystations.rsapi.core.model.Photo;
 
 public interface PhotoDao {
 
-    @SqlUpdate("INSERT INTO photos (id, countryCode, stationId, primary, urlPath, license, photographerId, createdAt) VALUES (:id, :stationKey.country, :stationKey.id, :primary, :urlPath, :license, :photographer.id, :createdAt)")
+    @SqlUpdate("INSERT INTO photos (id, countryCode, stationId, `primary`, urlPath, license, photographerId, createdAt) VALUES (:id, :stationKey.country, :stationKey.id, :primary, :urlPath, :license, :photographer.id, :createdAt)")
     @GetGeneratedKeys("id")
     long insert(@BindBean Photo photo);
 
-    @SqlUpdate("UPDATE photos SET primary = :primary, urlPath = :urlPath, license = :license, photographerId = :photographer.id, createdAt = :createdAt, outdated = :outdated WHERE id = :id")
+    @SqlUpdate("UPDATE photos SET `primary` = :primary, urlPath = :urlPath, license = :license, photographerId = :photographer.id, createdAt = :createdAt, outdated = :outdated WHERE id = :id")
     void update(@BindBean Photo photo);
 
     @SqlUpdate("DELETE FROM photos WHERE id = :id")
