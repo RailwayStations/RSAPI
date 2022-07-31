@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.annotation.Generated;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
@@ -15,7 +16,7 @@ import java.util.Objects;
 
 @Schema(name = "ProviderApp", description = "Provider App information")
 @JsonTypeName("ProviderApp")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-06-27T19:01:27.797025753+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-07-31T17:56:01.771577161+02:00[Europe/Berlin]")
 public class ProviderAppDto {
 
   /**
@@ -73,8 +74,8 @@ public class ProviderAppDto {
    * Get type
    * @return type
   */
-  
-  @Schema(name = "type", required = false)
+  @NotNull 
+  @Schema(name = "type", required = true)
   public TypeEnum getType() {
     return type;
   }
@@ -92,8 +93,8 @@ public class ProviderAppDto {
    * Get name
    * @return name
   */
-  
-  @Schema(name = "name", required = false)
+  @NotNull 
+  @Schema(name = "name", required = true)
   public String getName() {
     return name;
   }
@@ -111,8 +112,8 @@ public class ProviderAppDto {
    * Get url
    * @return url
   */
-  
-  @Schema(name = "url", required = false)
+  @NotNull 
+  @Schema(name = "url", required = true)
   public String getUrl() {
     return url;
   }

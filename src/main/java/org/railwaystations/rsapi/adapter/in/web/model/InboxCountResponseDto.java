@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.annotation.Generated;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Objects;
 
 @Schema(name = "InboxCountResponse", description = "counts the pending inbox entries")
 @JsonTypeName("InboxCountResponse")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-06-27T19:01:27.797025753+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-07-31T17:56:01.771577161+02:00[Europe/Berlin]")
 public class InboxCountResponseDto {
 
   @JsonProperty("pendingInboxEntries")
@@ -28,8 +29,8 @@ public class InboxCountResponseDto {
    * Get pendingInboxEntries
    * @return pendingInboxEntries
   */
-  
-  @Schema(name = "pendingInboxEntries", required = false)
+  @NotNull 
+  @Schema(name = "pendingInboxEntries", required = true)
   public Long getPendingInboxEntries() {
     return pendingInboxEntries;
   }

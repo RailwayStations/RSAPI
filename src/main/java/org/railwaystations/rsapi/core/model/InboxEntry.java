@@ -53,7 +53,7 @@ public class InboxEntry {
 
     Boolean active;
 
-    Boolean ignoreConflict;
+    ConflictResolution conflictResolution;
 
     Boolean createStation;
 
@@ -103,6 +103,30 @@ public class InboxEntry {
         CHANGE_NAME,
         UPDATE_LOCATION,
         PHOTO_OUTDATED
+    }
+
+    public enum ConflictResolution {
+        DO_NOTHING(false, false),
+        OVERWRITE_EXISTING_PHOTO(true, false),
+        IMPORT_AS_NEW_PRIMARY_PHOTO(true, false),
+        IMPORT_AS_NEW_SECONDARY_PHOTO(true, false),
+        CREATE_NEW_STATION(false, true);
+
+        private final boolean solvesPhotoConflict;
+        private final boolean solvesStationConflict;
+
+        ConflictResolution(boolean solvesPhotoConflict, boolean solvesStationConflict) {
+            this.solvesPhotoConflict = solvesPhotoConflict;
+            this.solvesStationConflict = solvesStationConflict;
+        }
+
+        public boolean solvesPhotoConflict() {
+            return solvesPhotoConflict;
+        }
+
+        public boolean solvesStationConflict() {
+            return solvesStationConflict;
+        }
     }
 
 }

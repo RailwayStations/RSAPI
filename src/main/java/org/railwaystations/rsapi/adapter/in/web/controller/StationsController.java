@@ -137,6 +137,7 @@ public class StationsController {
             stationDto.license(license != null ? license.getDisplayName() : null)
                     .licenseUrl(license != null ? license.getUrl() : null)
                     .photoUrl(photoBaseUrl + photo.getUrlPath())
+                    .photoId(photo.getId())
                     .photographer(photo.getPhotographer().getDisplayName())
                     .photographerUrl(photo.getPhotographer().getDisplayUrl())
                     .createdAt(photo.getCreatedAt() != null ? photo.getCreatedAt().toEpochMilli() : null)

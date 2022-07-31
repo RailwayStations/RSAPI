@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.annotation.Generated;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Objects;
 
 @Schema(name = "Statistic", description = "Statistic of number of stations with and without photos")
 @JsonTypeName("Statistic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-06-27T19:01:27.797025753+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-07-31T17:56:01.771577161+02:00[Europe/Berlin]")
 public class StatisticDto {
 
   @JsonProperty("total")
@@ -40,8 +41,8 @@ public class StatisticDto {
    * Get total
    * @return total
   */
-  
-  @Schema(name = "total", required = false)
+  @NotNull 
+  @Schema(name = "total", required = true)
   public Long getTotal() {
     return total;
   }
@@ -59,8 +60,8 @@ public class StatisticDto {
    * Get withPhoto
    * @return withPhoto
   */
-  
-  @Schema(name = "withPhoto", required = false)
+  @NotNull 
+  @Schema(name = "withPhoto", required = true)
   public Long getWithPhoto() {
     return withPhoto;
   }
@@ -78,8 +79,8 @@ public class StatisticDto {
    * Get withoutPhoto
    * @return withoutPhoto
   */
-  
-  @Schema(name = "withoutPhoto", required = false)
+  @NotNull 
+  @Schema(name = "withoutPhoto", required = true)
   public Long getWithoutPhoto() {
     return withoutPhoto;
   }
@@ -97,8 +98,8 @@ public class StatisticDto {
    * Get photographers
    * @return photographers
   */
-  
-  @Schema(name = "photographers", required = false)
+  @NotNull 
+  @Schema(name = "photographers", required = true)
   public Long getPhotographers() {
     return photographers;
   }
@@ -116,8 +117,8 @@ public class StatisticDto {
    * Get countryCode
    * @return countryCode
   */
-  
-  @Schema(name = "countryCode", required = false)
+  @NotNull 
+  @Schema(name = "countryCode", required = true)
   public String getCountryCode() {
     return countryCode;
   }

@@ -286,10 +286,10 @@ public class InboxService implements ManageInboxUseCase {
 
         var station = findOrCreateStation(inboxEntry, command);
 
-        if (station.hasPhoto() && !command.getIgnoreConflict()) {
+        if (station.hasPhoto() && !command.getConflictResolution().solvesPhotoConflict()) {
             throw new IllegalArgumentException("Station already has a photo");
         }
-        if (hasConflict(inboxEntry.getId(), station) && !command.getIgnoreConflict()) {
+        if (hasConflict(inboxEntry.getId(), station) && !command.getConflictResolution().solvesPhotoConflict()) {
             throw new IllegalArgumentException("There is a conflict with another upload");
         }
 
@@ -359,7 +359,7 @@ public class InboxService implements ManageInboxUseCase {
             if (StringUtils.isBlank(command.getStationId())) {
                 throw new IllegalArgumentException("Station ID can't be empty");
             }
-            if (hasConflict(inboxEntry.getId(), inboxEntry.getCoordinates()) && !command.getIgnoreConflict()) {
+            if (hasConflict(inboxEntry.getId(), inboxEntry.getCoordinates()) && !command.getConflictResolution().solvesStationConflict()) {
                 throw new IllegalArgumentException("There is a conflict with a nearby station");
             }
             if (command.hasCoords() && !command.getCoordinates().isValid()) {

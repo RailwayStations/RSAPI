@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.annotation.Generated;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
@@ -12,7 +13,7 @@ import java.util.Objects;
  */
 
 @JsonTypeName("ChangePassword")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-06-27T19:01:27.797025753+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-07-31T17:56:01.771577161+02:00[Europe/Berlin]")
 public class ChangePasswordDto {
 
   @JsonProperty("newPassword")
@@ -27,8 +28,8 @@ public class ChangePasswordDto {
    * Get newPassword
    * @return newPassword
   */
-  
-  @Schema(name = "newPassword", required = false)
+  @NotNull 
+  @Schema(name = "newPassword", required = true)
   public String getNewPassword() {
     return newPassword;
   }

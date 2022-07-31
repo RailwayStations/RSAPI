@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.annotation.Generated;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
@@ -15,7 +16,7 @@ import java.util.Objects;
 
 @Schema(name = "InboxResponse", description = "Response status of photo uploads and problem reports")
 @JsonTypeName("InboxResponse")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-06-27T19:01:27.797025753+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-07-31T17:56:01.771577161+02:00[Europe/Berlin]")
 public class InboxResponseDto {
 
   /**
@@ -92,8 +93,8 @@ public class InboxResponseDto {
    * Get state
    * @return state
   */
-  
-  @Schema(name = "state", required = false)
+  @NotNull 
+  @Schema(name = "state", required = true)
   public StateEnum getState() {
     return state;
   }
@@ -111,8 +112,8 @@ public class InboxResponseDto {
    * Get message
    * @return message
   */
-  
-  @Schema(name = "message", required = false)
+  @NotNull 
+  @Schema(name = "message", required = true)
   public String getMessage() {
     return message;
   }
@@ -130,8 +131,8 @@ public class InboxResponseDto {
    * Get id
    * @return id
   */
-  
-  @Schema(name = "id", required = false)
+  @NotNull 
+  @Schema(name = "id", required = true)
   public Long getId() {
     return id;
   }

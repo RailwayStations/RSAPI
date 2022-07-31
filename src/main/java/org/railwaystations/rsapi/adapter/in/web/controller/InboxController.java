@@ -336,7 +336,7 @@ public class InboxController {
                 .command(toDomain(command.getCommand()))
                 .ds100(command.getDS100())
                 .active(command.getActive() != null ? command.getActive() : true)
-                .ignoreConflict(command.getIgnoreConflict())
+                .conflictResolution(toDomain(command.getConflictResolution()))
                 .createStation(command.getCreateStation())
                 .build();
     }
@@ -353,6 +353,19 @@ public class InboxController {
             case UPDATE_LOCATION -> InboxEntry.Command.UPDATE_LOCATION;
             case ACTIVATE_STATION -> InboxEntry.Command.ACTIVATE_STATION;
             case DEACTIVATE_STATION -> InboxEntry.Command.DEACTIVATE_STATION;
+        };
+    }
+
+    private InboxEntry.ConflictResolution toDomain(InboxCommandDto.ConflictResolutionEnum conflictResolution) {
+        if (conflictResolution == null) {
+            return InboxEntry.ConflictResolution.DO_NOTHING;
+        }
+        return switch (conflictResolution) {
+            case DO_NOTHING -> InboxEntry.ConflictResolution.DO_NOTHING;
+            case OVERWRITE_EXISTING_PHOTO -> InboxEntry.ConflictResolution.OVERWRITE_EXISTING_PHOTO;
+            case IMPORT_AS_NEW_PRIMARY_PHOTO -> InboxEntry.ConflictResolution.IMPORT_AS_NEW_PRIMARY_PHOTO;
+            case IMPORT_AS_NEW_SECONDARY_PHOTO -> InboxEntry.ConflictResolution.IMPORT_AS_NEW_SECONDARY_PHOTO;
+            case CREATE_NEW_STATION -> InboxEntry.ConflictResolution.CREATE_NEW_STATION;
         };
     }
 

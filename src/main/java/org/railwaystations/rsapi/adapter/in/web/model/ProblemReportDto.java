@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.annotation.Generated;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
@@ -15,7 +16,7 @@ import java.util.Objects;
 
 @Schema(name = "ProblemReport", description = "Represents a report of a problem with a station")
 @JsonTypeName("ProblemReport")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-06-27T19:01:27.797025753+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-07-31T17:56:01.771577161+02:00[Europe/Berlin]")
 public class ProblemReportDto {
 
   @JsonProperty("countryCode")
@@ -23,6 +24,9 @@ public class ProblemReportDto {
 
   @JsonProperty("stationId")
   private String stationId;
+
+  @JsonProperty("photoId")
+  private Long photoId;
 
   @JsonProperty("comment")
   private String comment;
@@ -92,8 +96,8 @@ public class ProblemReportDto {
    * Get countryCode
    * @return countryCode
   */
-  
-  @Schema(name = "countryCode", required = false)
+  @NotNull 
+  @Schema(name = "countryCode", required = true)
   public String getCountryCode() {
     return countryCode;
   }
@@ -111,14 +115,33 @@ public class ProblemReportDto {
    * Get stationId
    * @return stationId
   */
-  
-  @Schema(name = "stationId", required = false)
+  @NotNull 
+  @Schema(name = "stationId", required = true)
   public String getStationId() {
     return stationId;
   }
 
   public void setStationId(String stationId) {
     this.stationId = stationId;
+  }
+
+  public ProblemReportDto photoId(Long photoId) {
+    this.photoId = photoId;
+    return this;
+  }
+
+  /**
+   * ID of the photo
+   * @return photoId
+  */
+  
+  @Schema(name = "photoId", description = "ID of the photo", required = false)
+  public Long getPhotoId() {
+    return photoId;
+  }
+
+  public void setPhotoId(Long photoId) {
+    this.photoId = photoId;
   }
 
   public ProblemReportDto comment(String comment) {
@@ -130,8 +153,8 @@ public class ProblemReportDto {
    * Get comment
    * @return comment
   */
-  
-  @Schema(name = "comment", required = false)
+  @NotNull 
+  @Schema(name = "comment", required = true)
   public String getComment() {
     return comment;
   }
@@ -149,8 +172,8 @@ public class ProblemReportDto {
    * Get type
    * @return type
   */
-  
-  @Schema(name = "type", required = false)
+  @NotNull 
+  @Schema(name = "type", required = true)
   public TypeEnum getType() {
     return type;
   }
@@ -208,6 +231,7 @@ public class ProblemReportDto {
     ProblemReportDto problemReport = (ProblemReportDto) o;
     return Objects.equals(this.countryCode, problemReport.countryCode) &&
         Objects.equals(this.stationId, problemReport.stationId) &&
+        Objects.equals(this.photoId, problemReport.photoId) &&
         Objects.equals(this.comment, problemReport.comment) &&
         Objects.equals(this.type, problemReport.type) &&
         Objects.equals(this.lat, problemReport.lat) &&
@@ -216,7 +240,7 @@ public class ProblemReportDto {
 
   @Override
   public int hashCode() {
-    return Objects.hash(countryCode, stationId, comment, type, lat, lon);
+    return Objects.hash(countryCode, stationId, photoId, comment, type, lat, lon);
   }
 
   @Override
@@ -225,6 +249,7 @@ public class ProblemReportDto {
     sb.append("class ProblemReportDto {\n");
     sb.append("    countryCode: ").append(toIndentedString(countryCode)).append("\n");
     sb.append("    stationId: ").append(toIndentedString(stationId)).append("\n");
+    sb.append("    photoId: ").append(toIndentedString(photoId)).append("\n");
     sb.append("    comment: ").append(toIndentedString(comment)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    lat: ").append(toIndentedString(lat)).append("\n");

@@ -7,7 +7,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20220801.2300"
+  version: "20220802.1100"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -1251,6 +1251,7 @@ paths:
 components:
   schemas:
     Station:
+      description: A railway-station object with location and optional photo
       type: object
       properties:
         idStr:
@@ -1275,6 +1276,10 @@ components:
         photoUrl:
           type: string
           description: URL of the photo
+        photoId:
+          type: integer
+          description: ID of the photo
+          format: int64
         license:
           type: string
           description: License of the photo, clients need to link to an online version
@@ -1303,11 +1308,20 @@ components:
           type: boolean
         outdated:
           type: boolean
+      required:
+        - idStr
+        - country
+        - title
+        - lat
+        - lon
+        - createdAt
+        - active
     Photographers:
-      type: object
       description: JSON Object with photographers nickname as parameter and number
         of photos as their value
+      type: object
     Statistic:
+      description: Statistic of number of stations with and without photos
       type: object
       properties:
         total:
@@ -1325,8 +1339,14 @@ components:
         countryCode:
           type: string
           nullable: true
-      description: Statistic of number of stations with and without photos
+      required:
+        - total
+        - withPhoto
+        - withoutPhoto
+        - photographers
+        - countryCode
     Country:
+      description: Supported Country with its configuration
       type: object
       properties:
         code:
@@ -1356,8 +1376,13 @@ components:
           description: array with links to provider apps
           items:
             $ref: '#/components/schemas/ProviderApp'
-      description: Supported Country with its configuration
+      required:
+        - code
+        - name
+        - overrideLicense
+        - active
     ProviderApp:
+      description: Provider App information
       type: object
       properties:
         type:
@@ -1370,16 +1395,20 @@ components:
           type: string
         url:
           type: string
-      description: Provider App information
+      required:
+        - type
+        - name
+        - url
     License:
-      type: string
       description: the only accepted type is "CC0 1.0 Universell (CC0 1.0)", the others are listed for backward compatibility
+      type: string
       enum:
         - CC0
         - CC0 1.0 Universell (CC0 1.0)
         - CC4
         - CC BY-SA 4.0
     UpdateProfile:
+      description: User profile information
       type: object
       properties:
         nickname:
@@ -1397,13 +1426,13 @@ components:
           type: boolean
         sendNotifications:
           type: boolean
-      description: User profile information
       required:
         - nickname
         - email
         - license
         - photoOwner
     RegisterProfile:
+      description: User profile information
       type: object
       properties:
         nickname:
@@ -1423,13 +1452,13 @@ components:
           type: boolean
         newPassword:
           type: string
-      description: User profile information
       required:
         - nickname
         - email
         - license
         - photoOwner
     Profile:
+      description: User profile information
       type: object
       properties:
         nickname:
@@ -1453,13 +1482,17 @@ components:
           type: boolean
         sendNotifications:
           type: boolean
-      description: User profile information
       required:
         - nickname
         - license
         - photoOwner
     InboxResponse:
+      description: Response status of photo uploads and problem reports
       type: object
+      required:
+        - state
+        - message
+        - id
       properties:
         state:
           type: string
@@ -1487,7 +1520,6 @@ components:
           description: CRC32 checksum of the uploaded photo
           type: integer
           format: int64
-      description: Response status of photo uploads and problem reports
     InboxStateQueryRequest:
       type: object
       properties:
@@ -1497,6 +1529,7 @@ components:
       required:
         - id
     InboxStateQueryResponse:
+      description: Inbox state query
       type: object
       properties:
         id:
@@ -1532,11 +1565,11 @@ components:
             - CONFLICT
             - ACCEPTED
             - REJECTED
-      description: Inbox state query
       required:
         - id
         - state
     PublicInboxEntry:
+      description: Represents an uploaded photo under review
       type: object
       properties:
         countryCode:
@@ -1551,8 +1584,14 @@ components:
         lon:
           type: number
           format: double
-      description: Represents an uploaded photo under review
+      required:
+        - countryCode
+        - stationId
+        - title
+        - lat
+        - lon
     InboxEntry:
+      description: Represents an uploaded photo with processing state
       type: object
       properties:
         id:
@@ -1574,6 +1613,10 @@ components:
           type: string
         photographerEmail:
           type: string
+        photoId:
+          type: integer
+          description: ID of the photo
+          format: int64
         comment:
           type: string
         createdAt:
@@ -1611,8 +1654,15 @@ components:
         active:
           type: boolean
           description: active flag provided by the user
-      description: Represents an uploaded photo with processing state
+      required:
+        - id
+        - photographerNickname
+        - comment
+        - createdAt
+        - done
+        - hasPhoto
     InboxCommand:
+      description: command to import or reject an inbox entry
       type: object
       properties:
         id:
@@ -1635,9 +1685,15 @@ components:
         active:
           type: boolean
           description: active flag of a new station (default true)
-        ignoreConflict:
-          type: boolean
-          description: ignore a conflict
+        conflictResolution:
+          type: string
+          description: how to handle conflicts
+          enum:
+            - DO_NOTHING
+            - OVERWRITE_EXISTING_PHOTO
+            - IMPORT_AS_NEW_PRIMARY_PHOTO
+            - IMPORT_AS_NEW_SECONDARY_PHOTO
+            - CREATE_NEW_STATION
         createStation:
           type: boolean
           description: create the station if it doesn't exist
@@ -1654,14 +1710,18 @@ components:
             - CHANGE_NAME
             - UPDATE_LOCATION
             - PHOTO_OUTDATED
-      description: command to import or reject an inbox entry
+      required:
+        - id
+        - command
     InboxCountResponse:
+      description: counts the pending inbox entries
       type: object
       properties:
         pendingInboxEntries:
           type: integer
           format: int64
-      description: counts the pending inbox entries
+      required:
+        - pendingInboxEntries
     AdminInboxCommandResponse:
       type: object
       properties:
@@ -1681,12 +1741,17 @@ components:
       required:
         - nextZ
     ProblemReport:
+      description: Represents a report of a problem with a station
       type: object
       properties:
         countryCode:
           type: string
         stationId:
           type: string
+        photoId:
+          type: integer
+          description: ID of the photo
+          format: int64
         comment:
           type: string
         type:
@@ -1706,12 +1771,18 @@ components:
         lon:
           type: number
           format: double
-      description: Represents a report of a problem with a station
+      required:
+        - countryCode
+        - stationId
+        - comment
+        - type
     ChangePassword:
       type: object
       properties:
         newPassword:
           type: string
+      required:
+        - newPassword
     GeneralErrorMessage:
       type: object
       properties:
@@ -1727,3 +1798,6 @@ components:
           type: string
         path:
           type: string
+      required:
+        - status
+        - message

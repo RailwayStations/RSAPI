@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.annotation.Generated;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Objects;
 
 @Schema(name = "PublicInboxEntry", description = "Represents an uploaded photo under review")
 @JsonTypeName("PublicInboxEntry")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-06-27T19:01:27.797025753+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-07-31T17:56:01.771577161+02:00[Europe/Berlin]")
 public class PublicInboxEntryDto {
 
   @JsonProperty("countryCode")
@@ -40,8 +41,8 @@ public class PublicInboxEntryDto {
    * Get countryCode
    * @return countryCode
   */
-  
-  @Schema(name = "countryCode", required = false)
+  @NotNull 
+  @Schema(name = "countryCode", required = true)
   public String getCountryCode() {
     return countryCode;
   }
@@ -59,8 +60,8 @@ public class PublicInboxEntryDto {
    * Get stationId
    * @return stationId
   */
-  
-  @Schema(name = "stationId", required = false)
+  @NotNull 
+  @Schema(name = "stationId", required = true)
   public String getStationId() {
     return stationId;
   }
@@ -78,8 +79,8 @@ public class PublicInboxEntryDto {
    * Get title
    * @return title
   */
-  
-  @Schema(name = "title", required = false)
+  @NotNull 
+  @Schema(name = "title", required = true)
   public String getTitle() {
     return title;
   }
@@ -97,8 +98,8 @@ public class PublicInboxEntryDto {
    * Get lat
    * @return lat
   */
-  
-  @Schema(name = "lat", required = false)
+  @NotNull 
+  @Schema(name = "lat", required = true)
   public Double getLat() {
     return lat;
   }
@@ -116,8 +117,8 @@ public class PublicInboxEntryDto {
    * Get lon
    * @return lon
   */
-  
-  @Schema(name = "lon", required = false)
+  @NotNull 
+  @Schema(name = "lon", required = true)
   public Double getLon() {
     return lon;
   }
