@@ -184,7 +184,7 @@ public class InboxService implements ManageInboxUseCase {
             case ACTIVATE_STATION -> updateStationActiveState(inboxEntry, true);
             case DEACTIVATE_STATION -> updateStationActiveState(inboxEntry, false);
             case DELETE_STATION -> deleteStation(inboxEntry);
-            case DELETE_PHOTO -> deletePhoto(inboxEntry);
+            case DELETE_PHOTO -> deletePrimaryPhoto(inboxEntry);
             case MARK_SOLVED -> markProblemReportSolved(inboxEntry);
             case CHANGE_NAME -> {
                 if (StringUtils.isBlank(command.getTitle())) {
@@ -193,14 +193,15 @@ public class InboxService implements ManageInboxUseCase {
                 changeStationTitle(inboxEntry, command.getTitle());
             }
             case UPDATE_LOCATION -> updateLocation(inboxEntry, command);
-            case PHOTO_OUTDATED -> markPhotoOutdated(inboxEntry);
+            case PHOTO_OUTDATED -> markPrimaryPhotoOutdated(inboxEntry);
             default -> throw new IllegalArgumentException("Unexpected command value: " + command.getCommand());
         }
     }
 
-    private void markPhotoOutdated(InboxEntry inboxEntry) {
-        assertStationExistsAndHasPhoto(inboxEntry);
-        photoDao.updatePhotoOutdated(inboxEntry.getCountryCode(), inboxEntry.getStationId());
+    // TODO: extend this function to use photo id
+    private void markPrimaryPhotoOutdated(InboxEntry inboxEntry) {
+        var station = assertStationExistsAndHasPhoto(inboxEntry);
+        photoDao.updatePhotoOutdated(station.getPhoto().getId());
         inboxDao.done(inboxEntry.getId());
     }
 
@@ -244,15 +245,15 @@ public class InboxService implements ManageInboxUseCase {
 
     private void deleteStation(InboxEntry inboxEntry) {
         var station = assertStationExists(inboxEntry);
-        photoDao.delete(station.getKey());
         stationDao.delete(station.getKey());
         inboxDao.done(inboxEntry.getId());
         log.info("Problem report {} station {} deleted", inboxEntry.getId(), station.getKey());
     }
 
-    private void deletePhoto(InboxEntry inboxEntry) {
+    // TODO: extend this function to delete photo by id
+    private void deletePrimaryPhoto(InboxEntry inboxEntry) {
         var station = assertStationExistsAndHasPhoto(inboxEntry);
-        photoDao.delete(station.getKey());
+        photoDao.delete(station.getPhoto().getId());
         inboxDao.done(inboxEntry.getId());
         log.info("Problem report {} photo of station {} deleted", inboxEntry.getId(), station.getKey());
     }
@@ -299,15 +300,18 @@ public class InboxService implements ManageInboxUseCase {
         try {
             var photo = Photo.builder()
                     .stationKey(station.getKey())
+                    .primary(true)
                     .urlPath(getPhotoUrlPath(inboxEntry, station, country))
                     .photographer(photographer)
                     .createdAt(Instant.now())
                     .license(getLicenseForPhoto(photographer, country))
                     .build();
             if (station.hasPhoto()) {
+                // TODO: update old photo to primary = false and insert new photo
                 photoDao.update(photo);
             } else {
-                photoDao.insert(photo);
+                long id = photoDao.insert(photo);
+                // TODO what to do with the photo id?
             }
 
             photoStorage.importPhoto(inboxEntry, country, station);

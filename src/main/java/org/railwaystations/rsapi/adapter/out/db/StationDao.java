@@ -29,11 +29,11 @@ public interface StationDao {
 
     String JOIN_QUERY = """
                 SELECT s.countryCode, s.id, s.DS100, s.title, s.lat, s.lon, s.active,
-                        p.id AS photoId, p.urlPath, p.license, p.createdAt, p.outdated, u.id AS photographerId,
+                        p.id AS photoId, p.primary, p.urlPath, p.license, p.createdAt, p.outdated, u.id AS photographerId,
                         u.name, u.url AS photographerUrl, u.license AS photographerLicense, u.anonymous
                 FROM countries c
                     LEFT JOIN stations s ON c.id = s.countryCode
-                    LEFT JOIN photos p ON p.countryCode = s.countryCode AND p.stationId = s.id
+                    LEFT JOIN photos p ON p.countryCode = s.countryCode AND p.stationId = s.id AND p.primary = true
                     LEFT JOIN users u ON u.id = p.photographerId
                 """;
 
@@ -56,7 +56,7 @@ public interface StationDao {
     @SqlQuery("""
         SELECT :countryCode countryCode, COUNT(*) stations, COUNT(p.urlPath) photos, COUNT(distinct p.photographerId) photographers
         FROM stations s
-            LEFT JOIN photos p ON p.countryCode = s.countryCode AND p.stationId = s.id
+            LEFT JOIN photos p ON p.countryCode = s.countryCode AND p.stationId = s.id AND p.primary = true
         WHERE s.countryCode = :countryCode OR :countryCode IS NULL
         """)
     @RegisterRowMapper(StatisticMapper.class)
@@ -66,7 +66,7 @@ public interface StationDao {
     @SqlQuery("""
         SELECT u.name photographer, COUNT(*) photocount
         FROM stations s
-            JOIN photos p ON p.countryCode = s.countryCode AND p.stationId = s.id
+            JOIN photos p ON p.countryCode = s.countryCode AND p.stationId = s.id AND p.primary = true
             JOIN users u ON u.id = p.photographerId
         WHERE s.countryCode = :countryCode OR :countryCode IS NULL
         GROUP BY u.name
@@ -119,8 +119,9 @@ public interface StationDao {
                         .anonymous(rs.getBoolean("anonymous"))
                         .build();
                 photo = Photo.builder()
-                        .id(rs.getInt("photoId"))
+                        .id(rs.getLong("photoId"))
                         .stationKey(key)
+                        .primary(rs.getBoolean("primary"))
                         .urlPath(photoUrlPath)
                         .photographer(photographer)
                         .createdAt(rs.getTimestamp("createdAt").toInstant())

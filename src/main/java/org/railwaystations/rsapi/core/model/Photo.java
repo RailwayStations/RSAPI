@@ -9,8 +9,9 @@ import java.time.Instant;
 @Builder
 public class Photo {
 
-    int id;
+    long id;
     Station.Key stationKey;
+    boolean primary;
     String urlPath;
     User photographer;
     Instant createdAt;
