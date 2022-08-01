@@ -300,7 +300,7 @@ public class InboxService implements ManageInboxUseCase {
         try {
             var photoBuilder = Photo.builder()
                     .stationKey(station.getKey())
-                    .urlPath(getPhotoUrlPath(inboxEntry, station, country))
+                    .urlPath(getPhotoUrlPath(inboxEntry, station))
                     .photographer(photographer)
                     .createdAt(Instant.now())
                     .license(getLicenseForPhoto(photographer, country));
@@ -331,11 +331,12 @@ public class InboxService implements ManageInboxUseCase {
                 photo = photoBuilder.primary(true).build();
                 photoId = photoDao.insert(photo);
             }
-            // TODO what to do with the photo id?
 
-            photoStorage.importPhoto(inboxEntry, country, station);
+            // TODO: importPhoto needs the photoId
+            photoStorage.importPhoto(inboxEntry, station);
             inboxDao.done(inboxEntry.getId());
             log.info("Upload {} with photoId {} accepted: {}", inboxEntry.getId(), photoId, inboxEntry.getFilename());
+            // TODO: tootNewPhoto needs the photoId
             mastodonBot.tootNewPhoto(station, inboxEntry, photo);
         } catch (Exception e) {
             log.error("Error importing upload {} photo {}", inboxEntry.getId(), inboxEntry.getFilename());
@@ -343,9 +344,9 @@ public class InboxService implements ManageInboxUseCase {
         }
     }
 
-    private String getPhotoUrlPath(InboxEntry inboxEntry, Station station, Country country) {
+    private String getPhotoUrlPath(InboxEntry inboxEntry, Station station) {
         // TODO: add photoId and extract code together with PhotoFileStorage.java#45
-        return "/" + country.getCode() + "/" + station.getKey().getId() + "." + inboxEntry.getExtension();
+        return "/" + station.getKey().getCountry() + "/" + station.getKey().getId() + "." + inboxEntry.getExtension();
     }
 
     /**

@@ -70,6 +70,7 @@ public class MastodonBotHttpClient implements MastodonBot {
     }
 
     private String createStatusJson(Station station, InboxEntry inboxEntry, Photo photo) throws JsonProcessingException {
+        // TODO: add photoId to URL
         var status = String.format("%s%nby %s%n%s?countryCode=%s&stationId=%s",
                 station.getTitle(), photo.getPhotographer().getDisplayName(), config.stationUrl(),
                 station.getKey().getCountry(), station.getKey().getId());

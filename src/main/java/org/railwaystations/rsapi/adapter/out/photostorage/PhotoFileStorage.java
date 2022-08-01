@@ -2,7 +2,6 @@ package org.railwaystations.rsapi.adapter.out.photostorage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
-import org.railwaystations.rsapi.core.model.Country;
 import org.railwaystations.rsapi.core.model.InboxEntry;
 import org.railwaystations.rsapi.core.model.Station;
 import org.railwaystations.rsapi.core.ports.out.PhotoStorage;
@@ -38,12 +37,12 @@ public class PhotoFileStorage implements PhotoStorage {
     }
 
     @Override
-    public void importPhoto(InboxEntry inboxEntry, Country country, Station station) throws IOException {
+    public void importPhoto(InboxEntry inboxEntry, Station station) throws IOException {
         var uploadedFile = getUploadFile(inboxEntry.getFilename());
         var processedFile = workDir.getInboxProcessedDir().resolve(inboxEntry.getFilename());
         // TODO: add photoId to the destinationFile
-        var destinationFile = workDir.getPhotosDir().resolve(country.getCode()).resolve(sanitizeFilename(station.getKey().getId() + "." + inboxEntry.getExtension()));
-        Files.createDirectories(workDir.getPhotosDir().resolve(country.getCode()));
+        var destinationFile = workDir.getPhotosDir().resolve(station.getKey().getCountry()).resolve(sanitizeFilename(station.getKey().getId() + "." + inboxEntry.getExtension()));
+        Files.createDirectories(workDir.getPhotosDir().resolve(station.getKey().getCountry()));
         if (Files.exists(processedFile)) {
             Files.move(processedFile, destinationFile, REPLACE_EXISTING);
         } else {

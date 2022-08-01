@@ -1,6 +1,5 @@
 package org.railwaystations.rsapi.core.ports.out;
 
-import org.railwaystations.rsapi.core.model.Country;
 import org.railwaystations.rsapi.core.model.InboxEntry;
 import org.railwaystations.rsapi.core.model.Station;
 
@@ -12,7 +11,7 @@ public interface PhotoStorage {
 
     boolean isProcessed(String filename);
 
-    void importPhoto(InboxEntry inboxEntry, Country country, Station station) throws IOException;
+    void importPhoto(InboxEntry inboxEntry, Station station) throws IOException;
 
     void reject(InboxEntry inboxEntry) throws IOException;
 
