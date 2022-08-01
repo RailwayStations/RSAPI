@@ -7,7 +7,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20220627.1900"
+  version: "20220801.2300"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -913,7 +913,10 @@ paths:
       responses:
         200:
           description: email successfully verified
-          content: {}
+          content:
+            text/plain:
+              schema:
+                type: string
         404:
           description: token not found, verification failed
           content: {}
@@ -1000,7 +1003,13 @@ paths:
       responses:
         200:
           description: password changed
-          content: {}
+          content:
+            text/plain:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
         400:
           description: Bad Request
           content:
@@ -1077,7 +1086,13 @@ paths:
       responses:
         200:
           description: ok
-          content: {}
+          content:
+            text/plain:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
         400:
           description: Bad Request
           content:

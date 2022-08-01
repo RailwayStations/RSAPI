@@ -43,13 +43,13 @@ public class ProfileController {
         return ResponseEntity.ok("Password changed");
     }
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,value = "/newUploadToken")
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/newUploadToken")
     public ResponseEntity<String> newUploadToken(@RequestHeader(HttpHeaders.USER_AGENT) String userAgent,
                                                  @NotNull @RequestHeader("Email") String email) {
         return resetPassword(userAgent, email);
     }
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,value = "/resetPassword")
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/resetPassword")
     public ResponseEntity<String> resetPassword(@RequestHeader(HttpHeaders.USER_AGENT) String userAgent,
                                                 @NotNull @RequestHeader("NameOrEmail") String nameOrEmail) {
         manageProfileUseCase.resetPassword(nameOrEmail, userAgent);
