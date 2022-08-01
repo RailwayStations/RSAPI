@@ -14,7 +14,7 @@ import java.util.Objects;
 
 @Schema(name = "Station", description = "A railway-station object with location and optional photo")
 @JsonTypeName("Station")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-07-31T17:56:01.771577161+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-08-01T15:41:32.161852543+02:00[Europe/Berlin]")
 public class StationDto {
 
   @JsonProperty("idStr")
@@ -57,7 +57,7 @@ public class StationDto {
   private Long createdAt;
 
   @JsonProperty("DS100")
-  private String DS100;
+  private String ds100;
 
   @JsonProperty("active")
   private Boolean active;
@@ -302,8 +302,8 @@ public class StationDto {
    * Timestamp when the photo was created in the railway-stations database (Milliseconds since 1.1.1970)
    * @return createdAt
   */
-  @NotNull 
-  @Schema(name = "createdAt", description = "Timestamp when the photo was created in the railway-stations database (Milliseconds since 1.1.1970)", required = true)
+  
+  @Schema(name = "createdAt", description = "Timestamp when the photo was created in the railway-stations database (Milliseconds since 1.1.1970)", required = false)
   public Long getCreatedAt() {
     return createdAt;
   }
@@ -312,8 +312,8 @@ public class StationDto {
     this.createdAt = createdAt;
   }
 
-  public StationDto DS100(String DS100) {
-    this.DS100 = DS100;
+  public StationDto DS100(String ds100) {
+    this.ds100 = ds100;
     return this;
   }
 
@@ -323,12 +323,12 @@ public class StationDto {
   */
   
   @Schema(name = "DS100", description = "A short code of the station, depending on the country", required = false)
-  public String getDS100() {
-    return DS100;
+  public String getDs100() {
+    return ds100;
   }
 
-  public void setDS100(String DS100) {
-    this.DS100 = DS100;
+  public void setDs100(String ds100) {
+    this.ds100 = ds100;
   }
 
   public StationDto active(Boolean active) {
@@ -391,14 +391,14 @@ public class StationDto {
         Objects.equals(this.lat, station.lat) &&
         Objects.equals(this.lon, station.lon) &&
         Objects.equals(this.createdAt, station.createdAt) &&
-        Objects.equals(this.DS100, station.DS100) &&
+        Objects.equals(this.ds100, station.ds100) &&
         Objects.equals(this.active, station.active) &&
         Objects.equals(this.outdated, station.outdated);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(idStr, id, country, title, photographer, photographerUrl, photoUrl, photoId, license, licenseUrl, lat, lon, createdAt, DS100, active, outdated);
+    return Objects.hash(idStr, id, country, title, photographer, photographerUrl, photoUrl, photoId, license, licenseUrl, lat, lon, createdAt, ds100, active, outdated);
   }
 
   @Override
@@ -418,7 +418,7 @@ public class StationDto {
     sb.append("    lat: ").append(toIndentedString(lat)).append("\n");
     sb.append("    lon: ").append(toIndentedString(lon)).append("\n");
     sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
-    sb.append("    DS100: ").append(toIndentedString(DS100)).append("\n");
+    sb.append("    DS100: ").append(toIndentedString(ds100)).append("\n");
     sb.append("    active: ").append(toIndentedString(active)).append("\n");
     sb.append("    outdated: ").append(toIndentedString(outdated)).append("\n");
     sb.append("}");

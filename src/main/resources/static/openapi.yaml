@@ -1314,7 +1314,6 @@ components:
         - title
         - lat
         - lon
-        - createdAt
         - active
     Photographers:
       description: JSON Object with photographers nickname as parameter and number
@@ -1344,7 +1343,6 @@ components:
         - withPhoto
         - withoutPhoto
         - photographers
-        - countryCode
     Country:
       description: Supported Country with its configuration
       type: object
@@ -1379,7 +1377,6 @@ components:
       required:
         - code
         - name
-        - overrideLicense
         - active
     ProviderApp:
       description: Provider App information
@@ -1491,8 +1488,6 @@ components:
       type: object
       required:
         - state
-        - message
-        - id
       properties:
         state:
           type: string
