@@ -298,25 +298,44 @@ public class InboxService implements ManageInboxUseCase {
                 .orElseThrow(() -> new IllegalArgumentException("Country not found"));
 
         try {
-            var photo = Photo.builder()
+            var photoBuilder = Photo.builder()
                     .stationKey(station.getKey())
-                    .primary(true)
                     .urlPath(getPhotoUrlPath(inboxEntry, station, country))
                     .photographer(photographer)
                     .createdAt(Instant.now())
-                    .license(getLicenseForPhoto(photographer, country))
-                    .build();
+                    .license(getLicenseForPhoto(photographer, country));
+            Photo photo;
+            long photoId;
             if (station.hasPhoto()) {
-                // TODO: update old photo to primary = false and insert new photo
-                photoDao.update(photo);
+                switch (command.getConflictResolution()) {
+                    case IMPORT_AS_NEW_PRIMARY_PHOTO -> {
+                        photoDao.setAllPhotosForStationSecondary(station.getKey());
+                        photo = photoBuilder.primary(true).build();
+                        photoId = photoDao.insert(photo);
+                    }
+                    case IMPORT_AS_NEW_SECONDARY_PHOTO -> {
+                        photo = photoBuilder.primary(false).build();
+                        photoId = photoDao.insert(photo);
+                    }
+                    case OVERWRITE_EXISTING_PHOTO -> {
+                        photoId = station.getPhoto().getId();
+                        photo = photoBuilder
+                                .id(photoId)
+                                .primary(station.getPhoto().isPrimary())
+                                .build();
+                        photoDao.update(photo);
+                    }
+                    default -> throw new IllegalArgumentException("No suitable conflict resolution provided");
+                }
             } else {
-                long id = photoDao.insert(photo);
-                // TODO what to do with the photo id?
+                photo = photoBuilder.primary(true).build();
+                photoId = photoDao.insert(photo);
             }
+            // TODO what to do with the photo id?
 
             photoStorage.importPhoto(inboxEntry, country, station);
             inboxDao.done(inboxEntry.getId());
-            log.info("Upload {} accepted: {}", inboxEntry.getId(), inboxEntry.getFilename());
+            log.info("Upload {} with photoId {} accepted: {}", inboxEntry.getId(), photoId, inboxEntry.getFilename());
             mastodonBot.tootNewPhoto(station, inboxEntry, photo);
         } catch (Exception e) {
             log.error("Error importing upload {} photo {}", inboxEntry.getId(), inboxEntry.getFilename());
@@ -325,6 +344,7 @@ public class InboxService implements ManageInboxUseCase {
     }
 
     private String getPhotoUrlPath(InboxEntry inboxEntry, Station station, Country country) {
+        // TODO: add photoId and extract code together with PhotoFileStorage.java#45
         return "/" + country.getCode() + "/" + station.getKey().getId() + "." + inboxEntry.getExtension();
     }
 

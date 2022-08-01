@@ -5,10 +5,11 @@ import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.railwaystations.rsapi.core.model.Photo;
+import org.railwaystations.rsapi.core.model.Station;
 
 public interface PhotoDao {
 
-    @SqlUpdate("INSERT INTO photos (id, countryCode, stationId, `primary`, urlPath, license, photographerId, createdAt) VALUES (:id, :stationKey.country, :stationKey.id, :primary, :urlPath, :license, :photographer.id, :createdAt)")
+    @SqlUpdate("INSERT INTO photos (countryCode, stationId, `primary`, urlPath, license, photographerId, createdAt) VALUES (:stationKey.country, :stationKey.id, :primary, :urlPath, :license, :photographer.id, :createdAt)")
     @GetGeneratedKeys("id")
     long insert(@BindBean Photo photo);
 
@@ -20,5 +21,8 @@ public interface PhotoDao {
 
     @SqlUpdate("UPDATE photos SET outdated = true WHERE id = :id")
     void updatePhotoOutdated(@Bind("id")  long id);
+
+    @SqlUpdate("UPDATE photos SET `primary` = false WHERE countryCode = :country and stationId = :id")
+    void setAllPhotosForStationSecondary(@BindBean Station.Key key);
 
 }
