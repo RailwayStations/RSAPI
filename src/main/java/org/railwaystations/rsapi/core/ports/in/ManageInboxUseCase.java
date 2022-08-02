@@ -1,5 +1,6 @@
 package org.railwaystations.rsapi.core.ports.in;
 
+import org.railwaystations.rsapi.core.model.InboxCommand;
 import org.railwaystations.rsapi.core.model.InboxEntry;
 import org.railwaystations.rsapi.core.model.InboxResponse;
 import org.railwaystations.rsapi.core.model.InboxStateQuery;
@@ -30,21 +31,21 @@ public interface ManageInboxUseCase {
                               Double latitude, Double longitude, String comment,
                               boolean active, User user);
 
-    void changeStationTitle(InboxEntry command);
+    void changeStationTitle(InboxCommand command);
 
-    void rejectInboxEntry(InboxEntry command);
+    void rejectInboxEntry(InboxCommand command);
 
-    void importUpload(InboxEntry command);
+    void importUpload(InboxCommand command);
 
-    void updateStationActiveState(InboxEntry command, boolean active);
+    void updateStationActiveState(InboxCommand command, boolean active);
 
-    void deleteStation(InboxEntry command);
+    void deleteStation(InboxCommand command);
 
-    void deletePrimaryPhoto(InboxEntry command);
+    void deletePrimaryPhoto(InboxCommand command);
 
-    void markProblemReportSolved(InboxEntry command);
+    void markProblemReportSolved(InboxCommand command);
 
-    void updateLocation(InboxEntry command);
+    void updateLocation(InboxCommand command);
 
-    void markPrimaryPhotoOutdated(InboxEntry command);
+    void markPrimaryPhotoOutdated(InboxCommand command);
 }

@@ -20,6 +20,7 @@ import org.railwaystations.rsapi.app.auth.AuthUser;
 import org.railwaystations.rsapi.app.auth.RSAuthenticationProvider;
 import org.railwaystations.rsapi.app.auth.RSUserDetailsService;
 import org.railwaystations.rsapi.core.model.Coordinates;
+import org.railwaystations.rsapi.core.model.InboxCommand;
 import org.railwaystations.rsapi.core.model.InboxEntry;
 import org.railwaystations.rsapi.core.model.InboxResponse;
 import org.railwaystations.rsapi.core.model.InboxStateQuery;
@@ -340,8 +341,8 @@ public class InboxController {
         return new ResponseEntity<>(new AdminInboxCommandResponseDto().status(HttpStatus.OK.value()).message("ok"), HttpStatus.OK);
     }
 
-    private InboxEntry toDomain(InboxCommandDto command) {
-        return InboxEntry.builder()
+    private InboxCommand toDomain(InboxCommandDto command) {
+        return InboxCommand.builder()
                 .id(command.getId())
                 .countryCode(command.getCountryCode())
                 .stationId(command.getStationId())
@@ -354,16 +355,16 @@ public class InboxController {
                 .build();
     }
 
-    private InboxEntry.ConflictResolution toDomain(InboxCommandDto.ConflictResolutionEnum conflictResolution) {
+    private InboxCommand.ConflictResolution toDomain(InboxCommandDto.ConflictResolutionEnum conflictResolution) {
         if (conflictResolution == null) {
-            return InboxEntry.ConflictResolution.DO_NOTHING;
+            return InboxCommand.ConflictResolution.DO_NOTHING;
         }
         return switch (conflictResolution) {
-            case DO_NOTHING -> InboxEntry.ConflictResolution.DO_NOTHING;
-            case OVERWRITE_EXISTING_PHOTO -> InboxEntry.ConflictResolution.OVERWRITE_EXISTING_PHOTO;
-            case IMPORT_AS_NEW_PRIMARY_PHOTO -> InboxEntry.ConflictResolution.IMPORT_AS_NEW_PRIMARY_PHOTO;
-            case IMPORT_AS_NEW_SECONDARY_PHOTO -> InboxEntry.ConflictResolution.IMPORT_AS_NEW_SECONDARY_PHOTO;
-            case CREATE_NEW_STATION -> InboxEntry.ConflictResolution.CREATE_NEW_STATION;
+            case DO_NOTHING -> InboxCommand.ConflictResolution.DO_NOTHING;
+            case OVERWRITE_EXISTING_PHOTO -> InboxCommand.ConflictResolution.OVERWRITE_EXISTING_PHOTO;
+            case IMPORT_AS_NEW_PRIMARY_PHOTO -> InboxCommand.ConflictResolution.IMPORT_AS_NEW_PRIMARY_PHOTO;
+            case IMPORT_AS_NEW_SECONDARY_PHOTO -> InboxCommand.ConflictResolution.IMPORT_AS_NEW_SECONDARY_PHOTO;
+            case CREATE_NEW_STATION -> InboxCommand.ConflictResolution.CREATE_NEW_STATION;
         };
     }
 
