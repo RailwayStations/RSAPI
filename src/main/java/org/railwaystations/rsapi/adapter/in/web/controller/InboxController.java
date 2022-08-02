@@ -315,11 +315,25 @@ public class InboxController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, value = "/adminInbox", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<AdminInboxCommandResponseDto> adminInbox(@AuthenticationPrincipal AuthUser user, @RequestBody InboxCommandDto command) {
+    public ResponseEntity<AdminInboxCommandResponseDto> adminInbox(@AuthenticationPrincipal AuthUser user, @RequestBody InboxCommandDto commandDto) {
+        log.info("Executing adminInbox commandDto {} for Nickname: {}", commandDto.getCommand(), user.getUsername());
         try {
-            manageInboxUseCase.processAdminInboxCommand(user.getUser(), toDomain(command));
+            var command = toDomain(commandDto);
+            switch (commandDto.getCommand()) {
+                case REJECT -> manageInboxUseCase.rejectInboxEntry(command);
+                case IMPORT -> manageInboxUseCase.importUpload(command);
+                case ACTIVATE_STATION -> manageInboxUseCase.updateStationActiveState(command, true);
+                case DEACTIVATE_STATION -> manageInboxUseCase.updateStationActiveState(command, false);
+                case DELETE_STATION -> manageInboxUseCase.deleteStation(command);
+                case DELETE_PHOTO -> manageInboxUseCase.deletePrimaryPhoto(command);
+                case MARK_SOLVED -> manageInboxUseCase.markProblemReportSolved(command);
+                case CHANGE_NAME -> manageInboxUseCase.changeStationTitle(command);
+                case UPDATE_LOCATION -> manageInboxUseCase.updateLocation(command);
+                case PHOTO_OUTDATED -> manageInboxUseCase.markPrimaryPhotoOutdated(command);
+                default -> throw new IllegalArgumentException("Unexpected commandDto value: " + commandDto.getCommand());
+            }
         } catch (IllegalArgumentException e) {
-            log.warn("adminInbox command {} failed", command, e);
+            log.warn("adminInbox commandDto {} failed", commandDto, e);
             return new ResponseEntity<>(new AdminInboxCommandResponseDto().status(HttpStatus.BAD_REQUEST.value()).message(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
 
@@ -333,27 +347,11 @@ public class InboxController {
                 .stationId(command.getStationId())
                 .title(command.getTitle())
                 .rejectReason(command.getRejectReason())
-                .command(toDomain(command.getCommand()))
                 .ds100(command.getDS100())
                 .active(command.getActive() != null ? command.getActive() : true)
                 .conflictResolution(toDomain(command.getConflictResolution()))
                 .createStation(command.getCreateStation())
                 .build();
-    }
-
-    private InboxEntry.Command toDomain(InboxCommandDto.CommandEnum command) {
-        return switch (command) {
-            case PHOTO_OUTDATED -> InboxEntry.Command.PHOTO_OUTDATED;
-            case IMPORT -> InboxEntry.Command.IMPORT;
-            case REJECT -> InboxEntry.Command.REJECT;
-            case CHANGE_NAME -> InboxEntry.Command.CHANGE_NAME;
-            case MARK_SOLVED -> InboxEntry.Command.MARK_SOLVED;
-            case DELETE_PHOTO -> InboxEntry.Command.DELETE_PHOTO;
-            case DELETE_STATION -> InboxEntry.Command.DELETE_STATION;
-            case UPDATE_LOCATION -> InboxEntry.Command.UPDATE_LOCATION;
-            case ACTIVATE_STATION -> InboxEntry.Command.ACTIVATE_STATION;
-            case DEACTIVATE_STATION -> InboxEntry.Command.DEACTIVATE_STATION;
-        };
     }
 
     private InboxEntry.ConflictResolution toDomain(InboxCommandDto.ConflictResolutionEnum conflictResolution) {

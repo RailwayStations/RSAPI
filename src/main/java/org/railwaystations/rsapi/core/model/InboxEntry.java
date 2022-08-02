@@ -35,8 +35,6 @@ public class InboxEntry {
 
     boolean done;
 
-    Command command;
-
     boolean hasPhoto;
 
     Long crc32;
@@ -90,19 +88,6 @@ public class InboxEntry {
             return null;
         }
         return String.format("%d.%s", id, extension);
-    }
-
-    public enum Command {
-        IMPORT,
-        ACTIVATE_STATION,
-        DEACTIVATE_STATION,
-        DELETE_STATION,
-        DELETE_PHOTO,
-        MARK_SOLVED,
-        REJECT,
-        CHANGE_NAME,
-        UPDATE_LOCATION,
-        PHOTO_OUTDATED
     }
 
     public enum ConflictResolution {

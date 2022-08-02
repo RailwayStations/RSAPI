@@ -171,47 +171,22 @@ public class InboxService implements ManageInboxUseCase {
         return inboxBaseUrl + (processed ? "/processed/" : "/") + filename;
     }
 
-    @Override
-    public void processAdminInboxCommand(@NotNull User user, @NotNull InboxEntry command) {
-        log.info("Executing adminInbox command {} for Nickname: {}", command.getCommand(), user.getName());
-        var inboxEntry = inboxDao.findById(command.getId());
-        if (inboxEntry == null || inboxEntry.isDone()) {
-            throw new IllegalArgumentException("No pending inbox entry found");
-        }
-        switch (command.getCommand()) {
-            case REJECT -> rejectInboxEntry(inboxEntry, command.getRejectReason());
-            case IMPORT -> importUpload(inboxEntry, command);
-            case ACTIVATE_STATION -> updateStationActiveState(inboxEntry, true);
-            case DEACTIVATE_STATION -> updateStationActiveState(inboxEntry, false);
-            case DELETE_STATION -> deleteStation(inboxEntry);
-            case DELETE_PHOTO -> deletePrimaryPhoto(inboxEntry);
-            case MARK_SOLVED -> markProblemReportSolved(inboxEntry);
-            case CHANGE_NAME -> {
-                if (StringUtils.isBlank(command.getTitle())) {
-                    throw new IllegalArgumentException("Empty new title: " + command.getTitle());
-                }
-                changeStationTitle(inboxEntry, command.getTitle());
-            }
-            case UPDATE_LOCATION -> updateLocation(inboxEntry, command);
-            case PHOTO_OUTDATED -> markPrimaryPhotoOutdated(inboxEntry);
-            default -> throw new IllegalArgumentException("Unexpected command value: " + command.getCommand());
-        }
-    }
-
     // TODO: extend this function to use photo id
-    private void markPrimaryPhotoOutdated(InboxEntry inboxEntry) {
+    public void markPrimaryPhotoOutdated(InboxEntry command) {
+        var inboxEntry = assertPendingInboxEntryExists(command);
         var station = assertStationExistsAndHasPhoto(inboxEntry);
         photoDao.updatePhotoOutdated(station.getPhoto().getId());
         inboxDao.done(inboxEntry.getId());
     }
 
-    private void updateLocation(InboxEntry inboxEntry, InboxEntry command) {
+    public void updateLocation(InboxEntry command) {
+        var inboxEntry = assertPendingInboxEntryExists(command);
         var coordinates = inboxEntry.getCoordinates();
         if (command.hasCoords()) {
             coordinates = command.getCoordinates();
         }
         if (coordinates == null || !coordinates.isValid()) {
-            throw new IllegalArgumentException("Can't update location, coordinates: " + command.getCommand());
+            throw new IllegalArgumentException("Can't update location, coordinates: " + command.getCoordinates());
         }
 
         var station = assertStationExists(inboxEntry);
@@ -229,21 +204,35 @@ public class InboxService implements ManageInboxUseCase {
         return "Z" + (stationDao.getMaxZ() + 1);
     }
 
-    private void updateStationActiveState(InboxEntry inboxEntry, boolean active) {
+    public void updateStationActiveState(InboxEntry command, boolean active) {
+        var inboxEntry = assertPendingInboxEntryExists(command);
         var station = assertStationExists(inboxEntry);
         stationDao.updateActive(station.getKey(), active);
         inboxDao.done(inboxEntry.getId());
         log.info("Problem report {} station {} set active to {}", inboxEntry.getId(), station.getKey(), active);
     }
 
-    private void changeStationTitle(InboxEntry inboxEntry, String newTitle) {
+    public void changeStationTitle(InboxEntry command) {
+        var inboxEntry = assertPendingInboxEntryExists(command);
+        if (StringUtils.isBlank(command.getTitle())) {
+            throw new IllegalArgumentException("Empty new title: " + command.getTitle());
+        }
         var station = assertStationExists(inboxEntry);
-        stationDao.changeStationTitle(station.getKey(), newTitle);
+        stationDao.changeStationTitle(station.getKey(), command.getTitle());
         inboxDao.done(inboxEntry.getId());
-        log.info("Problem report {} station {} change name to {}", inboxEntry.getId(), station.getKey(), newTitle);
+        log.info("Problem report {} station {} changed name to {}", inboxEntry.getId(), station.getKey(), command.getTitle());
     }
 
-    private void deleteStation(InboxEntry inboxEntry) {
+    private InboxEntry assertPendingInboxEntryExists(InboxEntry command) {
+        var inboxEntry = inboxDao.findById(command.getId());
+        if (inboxEntry == null || inboxEntry.isDone()) {
+            throw new IllegalArgumentException("No pending inbox entry found");
+        }
+        return inboxEntry;
+    }
+
+    public void deleteStation(InboxEntry command) {
+        var inboxEntry = assertPendingInboxEntryExists(command);
         var station = assertStationExists(inboxEntry);
         stationDao.delete(station.getKey());
         inboxDao.done(inboxEntry.getId());
@@ -251,17 +240,18 @@ public class InboxService implements ManageInboxUseCase {
     }
 
     // TODO: extend this function to delete photo by id
-    private void deletePrimaryPhoto(InboxEntry inboxEntry) {
+    public void deletePrimaryPhoto(InboxEntry command) {
+        var inboxEntry = assertPendingInboxEntryExists(command);
         var station = assertStationExistsAndHasPhoto(inboxEntry);
         photoDao.delete(station.getPhoto().getId());
         inboxDao.done(inboxEntry.getId());
         log.info("Problem report {} photo of station {} deleted", inboxEntry.getId(), station.getKey());
     }
 
-    private void markProblemReportSolved(InboxEntry inboxEntry) {
-        assertStationExists(inboxEntry);
+    public void markProblemReportSolved(InboxEntry command) {
+        var inboxEntry = assertPendingInboxEntryExists(command);
         inboxDao.done(inboxEntry.getId());
-        log.info("Problem report {} accepted", inboxEntry.getId());
+        log.info("Problem report {} resolved", inboxEntry.getId());
     }
 
     private Station assertStationExists(InboxEntry inboxEntry) {
@@ -277,7 +267,8 @@ public class InboxService implements ManageInboxUseCase {
         return station;
     }
 
-    private void importUpload(InboxEntry inboxEntry, InboxEntry command) {
+    public void importUpload(InboxEntry command) {
+        var inboxEntry = assertPendingInboxEntryExists(command);
         log.info("Importing upload {}, {}", inboxEntry.getId(), inboxEntry.getFilename());
 
         if (inboxEntry.isProblemReport()) {
@@ -406,14 +397,15 @@ public class InboxService implements ManageInboxUseCase {
         });
     }
 
-    private void rejectInboxEntry(InboxEntry inboxEntry, String rejectReason) {
-        inboxDao.reject(inboxEntry.getId(), rejectReason);
+    public void rejectInboxEntry(InboxEntry command) {
+        var inboxEntry = assertPendingInboxEntryExists(command);
+        inboxDao.reject(inboxEntry.getId(), command.getRejectReason());
         if (inboxEntry.isProblemReport()) {
-            log.info("Rejecting problem report {}, {}", inboxEntry.getId(), rejectReason);
+            log.info("Rejecting problem report {}, {}", inboxEntry.getId(), command.getRejectReason());
             return;
         }
 
-        log.info("Rejecting upload {}, {}, {}", inboxEntry.getId(), rejectReason, inboxEntry.getFilename());
+        log.info("Rejecting upload {}, {}, {}", inboxEntry.getId(), command.getRejectReason(), inboxEntry.getFilename());
 
         try {
             photoStorage.reject(inboxEntry);
