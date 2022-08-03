@@ -46,7 +46,6 @@ class InboxServiceTest {
             .name("nickname")
             .license(License.CC0_10)
             .build();
-
     InboxService inboxService;
 
     @Mock
@@ -101,6 +100,9 @@ class InboxServiceTest {
     @Nested
     class ImportUpload {
 
+        static final long IMPORTED_PHOTO_ID = 1L;
+        static final String IMPORTED_PHOTO_URL_PATH = "/de/1.jpg";
+
         @Test
         void importPhotoSuccessfully() throws IOException {
             var command = createInboxCommand1().build();
@@ -110,14 +112,15 @@ class InboxServiceTest {
             when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), STATION_KEY_DE_1.getId())).thenReturn(Set.of(station));
             when(userDao.findById(PHOTOGRAPHER.getId())).thenReturn(Optional.of(PHOTOGRAPHER));
             when(countryDao.findById(DE.getCode())).thenReturn(Optional.of(DE));
-            when(photoDao.insert(photoCaptor.capture())).thenReturn(1L);
+            when(photoDao.insert(photoCaptor.capture())).thenReturn(IMPORTED_PHOTO_ID);
+            when(photoStorage.importPhoto(inboxEntry, station)).thenReturn(IMPORTED_PHOTO_URL_PATH);
 
             inboxService.importUpload(command);
 
             assertThat(photoCaptor.getValue()).usingRecursiveComparison().ignoringFields("createdAt")
                     .isEqualTo(Photo.builder()
                     .stationKey(STATION_KEY_DE_1)
-                    .urlPath("/de/1.jpg")
+                    .urlPath(IMPORTED_PHOTO_URL_PATH)
                     .photographer(PHOTOGRAPHER)
                     .createdAt(Instant.now())
                     .license(PHOTOGRAPHER.getLicense())
@@ -125,7 +128,7 @@ class InboxServiceTest {
                     .build());
             verify(photoStorage).importPhoto(inboxEntry, station);
             verify(inboxDao).done(inboxEntry.getId());
-            verify(mastodonBot).tootNewPhoto(station, inboxEntry, photoCaptor.getValue());
+            verify(mastodonBot).tootNewPhoto(station, inboxEntry, photoCaptor.getValue(), IMPORTED_PHOTO_ID);
         }
 
         @Test

@@ -11,7 +11,7 @@ public interface PhotoStorage {
 
     boolean isProcessed(String filename);
 
-    void importPhoto(InboxEntry inboxEntry, Station station) throws IOException;
+    String importPhoto(InboxEntry inboxEntry, Station station) throws IOException;
 
     void reject(InboxEntry inboxEntry) throws IOException;
 

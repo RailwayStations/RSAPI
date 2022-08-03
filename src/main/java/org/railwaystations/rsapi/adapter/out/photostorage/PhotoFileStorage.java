@@ -37,12 +37,12 @@ public class PhotoFileStorage implements PhotoStorage {
     }
 
     @Override
-    public void importPhoto(InboxEntry inboxEntry, Station station) throws IOException {
+    public String importPhoto(InboxEntry inboxEntry, Station station) throws IOException {
         var uploadedFile = getUploadFile(inboxEntry.getFilename());
         var processedFile = workDir.getInboxProcessedDir().resolve(inboxEntry.getFilename());
-        // TODO: add photoId to the destinationFile
-        var destinationFile = workDir.getPhotosDir().resolve(station.getKey().getCountry()).resolve(sanitizeFilename(station.getKey().getId() + "." + inboxEntry.getExtension()));
-        Files.createDirectories(workDir.getPhotosDir().resolve(station.getKey().getCountry()));
+        var destinationDir = workDir.getPhotosDir().resolve(station.getKey().getCountry());
+        Files.createDirectories(destinationDir);
+        var destinationFile = getDestinationFile(destinationDir, station.getKey().getId(), inboxEntry.getExtension());
         if (Files.exists(processedFile)) {
             Files.move(processedFile, destinationFile, REPLACE_EXISTING);
         } else {
@@ -53,6 +53,17 @@ public class PhotoFileStorage implements PhotoStorage {
         } catch (Exception e) {
             log.warn("Couldn't move original file {} to done dir", uploadedFile, e);
         }
+        return String.format("/%s/%s", destinationDir.getFileName(), destinationFile.getFileName());
+    }
+
+    private Path getDestinationFile(Path destinationDir, String stationId, String extension) {
+        for (int sequence = 1; sequence < 100; sequence ++) {
+            var destinationFile = destinationDir.resolve(sanitizeFilename(stationId + "_" + sequence + "." + extension));
+            if (Files.notExists(destinationFile)) {
+                return destinationFile;
+            }
+        }
+        throw new RuntimeException(String.format("Number of photos per station %s/%s exceeded", destinationDir.getFileName(), stationId));
     }
 
     @Override

@@ -279,6 +279,11 @@ public class InboxService implements ManageInboxUseCase {
         var station = findOrCreateStation(inboxEntry, command);
 
         // TODO: support creating new stations without photo, then we are finished here
+        if (inboxEntry.getExtension() == null) {
+            log.info("No photo to import for InboxEntry={}", inboxEntry.getId());
+            inboxDao.done(inboxEntry.getId());
+            return;
+        }
 
         if (hasConflict(inboxEntry.getId(), station) && !command.getConflictResolution().solvesPhotoConflict()) {
             throw new IllegalArgumentException("There is a conflict with another photo");
@@ -290,10 +295,11 @@ public class InboxService implements ManageInboxUseCase {
                 .orElseThrow(() -> new IllegalArgumentException("Country " + station.getKey().getCountry() + " not found"));
 
         try {
-            // TODO: remove urPath from initial insert/update, calculate filename when photoId is created, then update urlPath in a separate update
+            var urlPath = photoStorage.importPhoto(inboxEntry, station);
+
             var photoBuilder = Photo.builder()
                     .stationKey(station.getKey())
-                    .urlPath(getPhotoUrlPath(inboxEntry, station))
+                    .urlPath(urlPath)
                     .photographer(photographer)
                     .createdAt(Instant.now())
                     .license(getLicenseForPhoto(photographer, country));
@@ -325,21 +331,14 @@ public class InboxService implements ManageInboxUseCase {
                 photoId = photoDao.insert(photo);
             }
 
-            // TODO: importPhoto needs the photoId
-            photoStorage.importPhoto(inboxEntry, station);
             inboxDao.done(inboxEntry.getId());
             log.info("Upload {} with photoId {} accepted: {}", inboxEntry.getId(), photoId, inboxEntry.getFilename());
             // TODO: tootNewPhoto needs the photoId
-            mastodonBot.tootNewPhoto(station, inboxEntry, photo);
+            mastodonBot.tootNewPhoto(station, inboxEntry, photo, photoId);
         } catch (Exception e) {
             log.error("Error importing upload {} photo {}", inboxEntry.getId(), inboxEntry.getFilename());
             throw new RuntimeException("Error moving file", e);
         }
-    }
-
-    private String getPhotoUrlPath(InboxEntry inboxEntry, Station station) {
-        // TODO: add photoId and extract code together with PhotoFileStorage.java#45
-        return "/" + station.getKey().getCountry() + "/" + station.getKey().getId() + "." + inboxEntry.getExtension();
     }
 
     /**
@@ -395,6 +394,7 @@ public class InboxService implements ManageInboxUseCase {
                     .active(command.getActive())
                     .build();
             stationDao.insert(newStation);
+            log.info("New station '{}' created: {}", newStation.getTitle(), newStation.getKey());
             return newStation;
         });
     }
