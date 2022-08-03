@@ -278,18 +278,19 @@ public class InboxService implements ManageInboxUseCase {
 
         var station = findOrCreateStation(inboxEntry, command);
 
-        if (station.hasPhoto() && !command.getConflictResolution().solvesPhotoConflict()) {
-            throw new IllegalArgumentException("Station already has a photo");
-        }
+        // TODO: support creating new stations without photo, then we are finished here
+
         if (hasConflict(inboxEntry.getId(), station) && !command.getConflictResolution().solvesPhotoConflict()) {
-            throw new IllegalArgumentException("There is a conflict with another upload");
+            throw new IllegalArgumentException("There is a conflict with another photo");
         }
 
-        var photographer = userDao.findById(inboxEntry.getPhotographerId()).orElseThrow();
+        var photographer = userDao.findById(inboxEntry.getPhotographerId())
+                .orElseThrow(() -> new IllegalArgumentException("Photographer " + inboxEntry.getPhotographerId() + " not found"));
         var country = countryDao.findById(StringUtils.lowerCase(station.getKey().getCountry()))
-                .orElseThrow(() -> new IllegalArgumentException("Country not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Country " + station.getKey().getCountry() + " not found"));
 
         try {
+            // TODO: remove urPath from initial insert/update, calculate filename when photoId is created, then update urlPath in a separate update
             var photoBuilder = Photo.builder()
                     .stationKey(station.getKey())
                     .urlPath(getPhotoUrlPath(inboxEntry, station))
