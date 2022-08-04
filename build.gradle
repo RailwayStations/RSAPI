@@ -72,7 +72,7 @@ dependencies {
 	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.3'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
-	runtimeOnly "org.mariadb.jdbc:mariadb-java-client:3.0.6"
+	runtimeOnly "org.mariadb.jdbc:mariadb-java-client:3.0.7"
 	testImplementation "org.springframework.boot:spring-boot-starter-test"
 	testImplementation "org.springframework.security:spring-security-test:5.7.2"
 	testImplementation "org.awaitility:awaitility:4.2.0"
