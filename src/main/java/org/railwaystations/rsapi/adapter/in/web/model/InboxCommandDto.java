@@ -16,7 +16,7 @@ import java.util.Objects;
 
 @Schema(name = "InboxCommand", description = "command to import or reject an inbox entry")
 @JsonTypeName("InboxCommand")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-08-01T15:41:32.161852543+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-08-05T22:51:20.951507269+02:00[Europe/Berlin]")
 public class InboxCommandDto {
 
   @JsonProperty("id")
@@ -30,6 +30,12 @@ public class InboxCommandDto {
 
   @JsonProperty("title")
   private String title;
+
+  @JsonProperty("lat")
+  private Double lat;
+
+  @JsonProperty("lon")
+  private Double lon;
 
   @JsonProperty("rejectReason")
   private String rejectReason;
@@ -217,6 +223,44 @@ public class InboxCommandDto {
     this.title = title;
   }
 
+  public InboxCommandDto lat(Double lat) {
+    this.lat = lat;
+    return this;
+  }
+
+  /**
+   * Get lat
+   * @return lat
+  */
+  
+  @Schema(name = "lat", required = false)
+  public Double getLat() {
+    return lat;
+  }
+
+  public void setLat(Double lat) {
+    this.lat = lat;
+  }
+
+  public InboxCommandDto lon(Double lon) {
+    this.lon = lon;
+    return this;
+  }
+
+  /**
+   * Get lon
+   * @return lon
+  */
+  
+  @Schema(name = "lon", required = false)
+  public Double getLon() {
+    return lon;
+  }
+
+  public void setLon(Double lon) {
+    this.lon = lon;
+  }
+
   public InboxCommandDto rejectReason(String rejectReason) {
     this.rejectReason = rejectReason;
     return this;
@@ -344,6 +388,8 @@ public class InboxCommandDto {
         Objects.equals(this.countryCode, inboxCommand.countryCode) &&
         Objects.equals(this.stationId, inboxCommand.stationId) &&
         Objects.equals(this.title, inboxCommand.title) &&
+        Objects.equals(this.lat, inboxCommand.lat) &&
+        Objects.equals(this.lon, inboxCommand.lon) &&
         Objects.equals(this.rejectReason, inboxCommand.rejectReason) &&
         Objects.equals(this.DS100, inboxCommand.DS100) &&
         Objects.equals(this.active, inboxCommand.active) &&
@@ -354,7 +400,7 @@ public class InboxCommandDto {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, countryCode, stationId, title, rejectReason, DS100, active, conflictResolution, createStation, command);
+    return Objects.hash(id, countryCode, stationId, title, lat, lon, rejectReason, DS100, active, conflictResolution, createStation, command);
   }
 
   @Override
@@ -365,6 +411,8 @@ public class InboxCommandDto {
     sb.append("    countryCode: ").append(toIndentedString(countryCode)).append("\n");
     sb.append("    stationId: ").append(toIndentedString(stationId)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
+    sb.append("    lat: ").append(toIndentedString(lat)).append("\n");
+    sb.append("    lon: ").append(toIndentedString(lon)).append("\n");
     sb.append("    rejectReason: ").append(toIndentedString(rejectReason)).append("\n");
     sb.append("    DS100: ").append(toIndentedString(DS100)).append("\n");
     sb.append("    active: ").append(toIndentedString(active)).append("\n");

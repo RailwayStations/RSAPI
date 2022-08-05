@@ -13,6 +13,7 @@ import org.railwaystations.rsapi.adapter.out.db.InboxDao;
 import org.railwaystations.rsapi.adapter.out.db.PhotoDao;
 import org.railwaystations.rsapi.adapter.out.db.StationDao;
 import org.railwaystations.rsapi.adapter.out.db.UserDao;
+import org.railwaystations.rsapi.core.model.Coordinates;
 import org.railwaystations.rsapi.core.model.Country;
 import org.railwaystations.rsapi.core.model.InboxCommand;
 import org.railwaystations.rsapi.core.model.InboxEntry;
@@ -27,11 +28,16 @@ import org.railwaystations.rsapi.core.ports.out.PhotoStorage;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -70,6 +76,7 @@ class InboxServiceTest {
     @BeforeEach
     void setup() {
         inboxService = new InboxService(stationDao, photoStorage, monitor, inboxDao, userDao, countryDao, photoDao, "inboxBaseUrl", mastodonBot);
+        reset(stationDao, photoStorage, monitor, inboxDao, userDao, countryDao, photoDao, mastodonBot);
     }
 
     @Test
@@ -104,7 +111,7 @@ class InboxServiceTest {
         static final String IMPORTED_PHOTO_URL_PATH = "/de/1.jpg";
 
         @Test
-        void importPhotoSuccessfully() throws IOException {
+        void importPhotoForExistingStation() throws IOException {
             var command = createInboxCommand1().build();
             var inboxEntry = createInboxEntry1().build();
             when(inboxDao.findById(INBOX_ENTRY1_ID)).thenReturn(inboxEntry);
@@ -129,6 +136,64 @@ class InboxServiceTest {
             verify(photoStorage).importPhoto(inboxEntry, station);
             verify(inboxDao).done(inboxEntry.getId());
             verify(mastodonBot).tootNewPhoto(station, inboxEntry, photoCaptor.getValue(), IMPORTED_PHOTO_ID);
+        }
+
+        @Test
+        void importPhotoForNewStation() throws IOException {
+            var command = createNewStationCommand1().build();
+            var inboxEntry = createInboxEntry1()
+                    .stationId(null)
+                    .build();
+            when(inboxDao.findById(INBOX_ENTRY1_ID)).thenReturn(inboxEntry);
+            when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), null)).thenReturn(Collections.emptySet());
+            when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), command.getStationId())).thenReturn(Collections.emptySet());
+            var newStation = createNewStationByCommand(command).build();
+            when(userDao.findById(PHOTOGRAPHER.getId())).thenReturn(Optional.of(PHOTOGRAPHER));
+            when(countryDao.findById(DE.getCode())).thenReturn(Optional.of(DE));
+            when(photoDao.insert(photoCaptor.capture())).thenReturn(IMPORTED_PHOTO_ID);
+            when(photoStorage.importPhoto(inboxEntry, newStation)).thenReturn(IMPORTED_PHOTO_URL_PATH);
+
+            inboxService.importUpload(command);
+
+            verify(inboxDao).countPendingInboxEntriesForNearbyCoordinates(command.getId(), command.getCoordinates());
+            verify(stationDao).countNearbyCoordinates(command.getCoordinates());
+            verify(stationDao).insert(newStation);
+            assertThat(photoCaptor.getValue()).usingRecursiveComparison().ignoringFields("createdAt")
+                    .isEqualTo(Photo.builder()
+                            .stationKey(newStation.getKey())
+                            .urlPath(IMPORTED_PHOTO_URL_PATH)
+                            .photographer(PHOTOGRAPHER)
+                            .createdAt(Instant.now())
+                            .license(PHOTOGRAPHER.getLicense())
+                            .primary(true)
+                            .build());
+            verify(photoStorage).importPhoto(inboxEntry, newStation);
+            verify(inboxDao).done(inboxEntry.getId());
+            verify(mastodonBot).tootNewPhoto(newStation, inboxEntry, photoCaptor.getValue(), IMPORTED_PHOTO_ID);
+        }
+
+        @Test
+        void createNewStationWithoutPhoto() throws IOException {
+            var command = createNewStationCommand1().build();
+            var inboxEntry = createInboxEntry1()
+                    .stationId(null)
+                    .extension(null)
+                    .build();
+            when(inboxDao.findById(INBOX_ENTRY1_ID)).thenReturn(inboxEntry);
+            when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), null)).thenReturn(Collections.emptySet());
+            when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), command.getStationId())).thenReturn(Collections.emptySet());
+            var newStation = createNewStationByCommand(command).build();
+            when(countryDao.findById(DE.getCode())).thenReturn(Optional.of(DE));
+
+            inboxService.importUpload(command);
+
+            verify(inboxDao).countPendingInboxEntriesForNearbyCoordinates(command.getId(), command.getCoordinates());
+            verify(stationDao).countNearbyCoordinates(command.getCoordinates());
+            verify(stationDao).insert(newStation);
+            verify(photoDao, never()).insert(any(Photo.class));
+            verify(photoStorage, never()).importPhoto(any(InboxEntry.class), any(Station.class));
+            verify(inboxDao).done(inboxEntry.getId());
+            verify(mastodonBot, never()).tootNewPhoto(any(Station.class), any(InboxEntry.class), any(Photo.class), anyLong());
         }
 
         @Test
@@ -188,6 +253,25 @@ class InboxServiceTest {
             assertThatThrownBy(() -> inboxService.importUpload(command)).isInstanceOf(IllegalArgumentException.class).hasMessage("There is a conflict with another photo");
         }
 
+    }
+
+    private Station.StationBuilder createNewStationByCommand(InboxCommand command) {
+        return Station.builder()
+                .key(new Station.Key(command.getCountryCode(), command.getStationId()))
+                .title(command.getTitle())
+                .coordinates(command.getCoordinates())
+                .ds100(command.getDs100())
+                .active(command.getActive());
+    }
+
+    private InboxCommand.InboxCommandBuilder createNewStationCommand1() {
+        return createInboxCommand1()
+                .createStation(true)
+                .countryCode(DE.getCode())
+                .stationId("Z1")
+                .title("New Station")
+                .coordinates(new Coordinates(1, 2))
+                .active(true);
     }
 
     private Station.StationBuilder createStationDe1() {

@@ -278,8 +278,7 @@ public class InboxService implements ManageInboxUseCase {
 
         var station = findOrCreateStation(inboxEntry, command);
 
-        // TODO: support creating new stations without photo, then we are finished here
-        if (inboxEntry.getExtension() == null) {
+        if (!inboxEntry.isPhotoUpload()) {
             log.info("No photo to import for InboxEntry={}", inboxEntry.getId());
             inboxDao.done(inboxEntry.getId());
             return;
@@ -365,31 +364,28 @@ public class InboxService implements ManageInboxUseCase {
             }
 
             // create station
-            var country = countryDao.findById(StringUtils.lowerCase(command.getCountryCode()));
-            if (country.isEmpty()) {
+            if (countryDao.findById(StringUtils.lowerCase(command.getCountryCode())).isEmpty()) {
                 throw new IllegalArgumentException("Country not found");
             }
             if (StringUtils.isBlank(command.getStationId())) {
                 throw new IllegalArgumentException("Station ID can't be empty");
             }
-            if (hasConflict(inboxEntry.getId(), inboxEntry.getCoordinates()) && !command.getConflictResolution().solvesStationConflict()) {
+
+            if (!command.hasCoords() || !command.getCoordinates().isValid()) {
+                throw new IllegalArgumentException("No valid coordinates provided");
+            }
+            if (hasConflict(inboxEntry.getId(), command.getCoordinates()) && !command.getConflictResolution().solvesStationConflict()) {
                 throw new IllegalArgumentException("There is a conflict with a nearby station");
             }
-            if (command.hasCoords() && !command.getCoordinates().isValid()) {
-                throw new IllegalArgumentException("Lat/Lon out of range");
-            }
 
-            var coordinates = inboxEntry.getCoordinates();
-            if (command.hasCoords()) {
-                coordinates = command.getCoordinates();
+            if (StringUtils.isBlank(command.getTitle())) {
+                throw new IllegalArgumentException("Station title can't be empty");
             }
-
-            var title = command.getTitle() != null ? command.getTitle() : inboxEntry.getTitle();
 
             var newStation = Station.builder()
                     .key(new Station.Key(command.getCountryCode(), command.getStationId()))
-                    .title(title)
-                    .coordinates(coordinates)
+                    .title(command.getTitle())
+                    .coordinates(command.getCoordinates())
                     .ds100(command.getDs100())
                     .active(command.getActive())
                     .build();
@@ -421,6 +417,8 @@ public class InboxService implements ManageInboxUseCase {
                                      String country, String contentType, String stationTitle,
                                      Double latitude, Double longitude, String comment,
                                      boolean active, User user) {
+        // TODO: support for new station without photo
+
         if (!user.isEmailVerified()) {
             log.info("Photo upload failed for user {}, email not verified", user.getName());
             return InboxResponse.of(InboxResponse.InboxResponseState.UNAUTHORIZED,"Email not verified");

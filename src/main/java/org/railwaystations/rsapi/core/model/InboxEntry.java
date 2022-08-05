@@ -55,14 +55,6 @@ public class InboxEntry {
 
     boolean notified;
 
-    private Long getCreatedAtEpochMilli() {
-        return createdAt != null ? createdAt.toEpochMilli() : null;
-    }
-
-    public boolean hasCoords() {
-        return coordinates != null && !coordinates.hasZeroCoords();
-    }
-
     public Double getLat() {
         return coordinates != null ? coordinates.getLat() : null;
     }
@@ -71,7 +63,7 @@ public class InboxEntry {
         return coordinates != null ? coordinates.getLon() : null;
     }
 
-    public boolean isPhotoUpload() { return problemReportType == null; }
+    public boolean isPhotoUpload() { return problemReportType == null && extension != null; }
 
     public boolean isProblemReport() {
         return problemReportType != null;

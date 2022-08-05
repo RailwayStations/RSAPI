@@ -1671,6 +1671,12 @@ components:
           description: ID of a new station
         title:
           type: string
+        lat:
+          type: number
+          format: double
+        lon:
+          type: number
+          format: double
         rejectReason:
           type: string
           description: explanation of a rejection

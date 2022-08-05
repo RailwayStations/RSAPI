@@ -100,6 +100,7 @@ public class InboxController {
                                           @RequestParam(value = ACTIVE, required = false) Boolean active,
                                           @RequestParam(value = FILE) MultipartFile file,
                                           @RequestHeader(value = HttpHeaders.REFERER) String referer) throws JsonProcessingException {
+        // TODO: support for new station without photo (file == null)
         log.info("MultipartFormData: email={}, station={}, country={}, file={}", email, stationId, countryCode, file.getName());
         var refererUri = URI.create(referer);
 
@@ -347,6 +348,7 @@ public class InboxController {
                 .countryCode(command.getCountryCode())
                 .stationId(command.getStationId())
                 .title(command.getTitle())
+                .coordinates(mapCoordinates(command.getLat(), command.getLon()))
                 .rejectReason(command.getRejectReason())
                 .ds100(command.getDS100())
                 .active(command.getActive() != null ? command.getActive() : true)

@@ -328,7 +328,18 @@ class RsapiIntegrationTests {
 
 
 		// send import command
-		sendInboxCommand("{\"id\": " + uploadId + ", \"stationId\": \"" + stationId + "\", \"countryCode\": \"de\", \"command\": \"IMPORT\", \"createStation\": true}");
+		sendInboxCommand("""
+				{
+					 "id": %s,
+					 "stationId": "%s",
+					 "countryCode": "de",
+					 "title": "Hintertupfingen",
+					 "lat": 50.123,
+					 "lon": 9.123,
+					 "command": "IMPORT",
+					 "createStation": true
+				}
+				""".formatted(uploadId, stationId));
 
 		// assert station is imported
 		var newStation = loadStationByKey("de", stationId);
