@@ -28,12 +28,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.testcontainers.containers.MariaDBContainer;
-import org.testcontainers.utility.DockerImageName;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -59,7 +55,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
 		properties = {"server.error.include-message=always"})
 @ActiveProfiles("test")
-class RsapiIntegrationTests {
+class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 
 	@Autowired
 	private ObjectMapper mapper;
@@ -72,24 +68,6 @@ class RsapiIntegrationTests {
 
 	@Autowired
 	private WorkDir workDir;
-
-	private static final MariaDBContainer<?> mariadb;
-
-	static {
-		mariadb = new MariaDBContainer<>(DockerImageName.parse("mariadb:10.1"));
-		mariadb.start();
-	}
-
-	@DynamicPropertySource
-	static void properties(DynamicPropertyRegistry registry) {
-		registry.add("spring.datasource.url", mariadb::getJdbcUrl);
-		registry.add("spring.datasource.username", mariadb::getUsername);
-		registry.add("spring.datasource.password", mariadb::getPassword);
-	}
-
-	@Test
-	void contextLoads() {
-	}
 
 	@Test
 	void stationsAllCountries() {
