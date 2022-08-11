@@ -268,22 +268,40 @@ public class InboxService implements ManageInboxUseCase {
         return station;
     }
 
-    public void importUpload(InboxCommand command) {
+    public void importMissingStation(InboxCommand command) {
         var inboxEntry = assertPendingInboxEntryExists(command);
-        log.info("Importing upload {}, {}", inboxEntry.getId(), inboxEntry.getFilename());
+        log.info("Importing photo {}, {}", inboxEntry.getId(), inboxEntry.getFilename());
 
         if (inboxEntry.isProblemReport()) {
             throw new IllegalArgumentException("Can't import a problem report");
         }
 
-        var station = findOrCreateStation(inboxEntry, command);
+        var station = findOrCreateStation(command);
+
+        if (inboxEntry.isPhotoUpload()) {
+            importPhoto(command, inboxEntry, station);
+        } else {
+            log.info("No photo to import for InboxEntry={}", inboxEntry.getId());
+        }
+        inboxDao.done(inboxEntry.getId());
+    }
+
+    public void importPhoto(InboxCommand command) {
+        var inboxEntry = assertPendingInboxEntryExists(command);
+        log.info("Importing photo {}, {}", inboxEntry.getId(), inboxEntry.getFilename());
 
         if (!inboxEntry.isPhotoUpload()) {
-            log.info("No photo to import for InboxEntry={}", inboxEntry.getId());
-            inboxDao.done(inboxEntry.getId());
-            return;
+            throw new IllegalArgumentException("No photo to import");
         }
 
+        var station = findStationByCountryAndId(inboxEntry.getCountryCode(), inboxEntry.getStationId())
+                .orElseThrow(() -> new IllegalArgumentException("Station not found"));
+
+        importPhoto(command, inboxEntry, station);
+        inboxDao.done(inboxEntry.getId());
+    }
+
+    private void importPhoto(InboxCommand command, InboxEntry inboxEntry, Station station) {
         if (hasConflict(inboxEntry.getId(), station) && !command.getConflictResolution().solvesPhotoConflict()) {
             throw new IllegalArgumentException("There is a conflict with another photo");
         }
@@ -330,7 +348,6 @@ public class InboxService implements ManageInboxUseCase {
                 photoId = photoDao.insert(photo);
             }
 
-            inboxDao.done(inboxEntry.getId());
             log.info("Upload {} with photoId {} accepted: {}", inboxEntry.getId(), photoId, inboxEntry.getFilename());
             // TODO: tootNewPhoto needs the photoId
             mastodonBot.tootNewPhoto(station, inboxEntry, photo, photoId);
@@ -351,18 +368,10 @@ public class InboxService implements ManageInboxUseCase {
         return photographer.getLicense();
     }
 
-    private Station findOrCreateStation(InboxEntry inboxEntry, InboxCommand command) {
-        var station = findStationByCountryAndId(inboxEntry.getCountryCode(), inboxEntry.getStationId());
-        if (station.isEmpty() && command.getCreateStation()) {
-            station = findStationByCountryAndId(command.getCountryCode(), command.getStationId());
-            station.ifPresent(s -> log.info("Importing missing station upload {} to existing station {}", inboxEntry.getId(), s.getKey()));
-        }
+    private Station findOrCreateStation(InboxCommand command) {
+        var station = findStationByCountryAndId(command.getCountryCode(), command.getStationId());
 
         return station.orElseGet(()-> {
-            if (!command.getCreateStation() || StringUtils.isNotBlank(inboxEntry.getStationId())) {
-                throw new IllegalArgumentException("Station not found");
-            }
-
             // create station
             if (countryDao.findById(StringUtils.lowerCase(command.getCountryCode())).isEmpty()) {
                 throw new IllegalArgumentException("Country not found");
@@ -370,14 +379,12 @@ public class InboxService implements ManageInboxUseCase {
             if (StringUtils.isBlank(command.getStationId())) {
                 throw new IllegalArgumentException("Station ID can't be empty");
             }
-
             if (!command.hasCoords() || !command.getCoordinates().isValid()) {
                 throw new IllegalArgumentException("No valid coordinates provided");
             }
-            if (hasConflict(inboxEntry.getId(), command.getCoordinates()) && !command.getConflictResolution().solvesStationConflict()) {
+            if (hasConflict(command.getId(), command.getCoordinates()) && !command.getConflictResolution().solvesStationConflict()) {
                 throw new IllegalArgumentException("There is a conflict with a nearby station");
             }
-
             if (StringUtils.isBlank(command.getTitle())) {
                 throw new IllegalArgumentException("Station title can't be empty");
             }

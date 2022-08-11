@@ -25,8 +25,6 @@ public class InboxCommand {
 
     ConflictResolution conflictResolution;
 
-    Boolean createStation;
-
     public boolean hasCoords() {
         return coordinates != null && !coordinates.hasZeroCoords();
     }
@@ -44,7 +42,7 @@ public class InboxCommand {
         OVERWRITE_EXISTING_PHOTO(true, false),
         IMPORT_AS_NEW_PRIMARY_PHOTO(true, false),
         IMPORT_AS_NEW_SECONDARY_PHOTO(true, false),
-        CREATE_NEW_STATION(false, true);
+        IGNORE_NEARBY_STATION(false, true);
 
         private final boolean solvesPhotoConflict;
         private final boolean solvesStationConflict;

@@ -314,8 +314,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 					 "title": "Hintertupfingen",
 					 "lat": 50.123,
 					 "lon": 9.123,
-					 "command": "IMPORT",
-					 "createStation": true
+					 "command": "IMPORT_MISSING_STATION"
 				}
 				""".formatted(uploadId, stationId));
 
@@ -491,7 +490,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 	void postAdminInboxCommandWithUnknownInboxExntry() throws JsonProcessingException {
 		HttpHeaders headers = createJsonHeaders();
 		var response = restTemplateWithBasicAuthUser10()
-				.postForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), new HttpEntity<>("{\"id\": -1, \"command\": \"IMPORT\"}", headers), String.class);
+				.postForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), new HttpEntity<>("{\"id\": -1, \"command\": \"IMPORT_PHOTO\"}", headers), String.class);
 
 		assertThat(response.getStatusCodeValue()).isEqualTo(400);
 		var jsonNode = mapper.readTree(response.getBody());

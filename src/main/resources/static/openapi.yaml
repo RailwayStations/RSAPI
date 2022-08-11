@@ -7,7 +7,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20220802.1100"
+  version: "20220811.2230"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -1694,14 +1694,12 @@ components:
             - OVERWRITE_EXISTING_PHOTO
             - IMPORT_AS_NEW_PRIMARY_PHOTO
             - IMPORT_AS_NEW_SECONDARY_PHOTO
-            - CREATE_NEW_STATION
-        createStation:
-          type: boolean
-          description: create the station if it doesn't exist
+            - IGNORE_NEARBY_STATION
         command:
           type: string
           enum:
-            - IMPORT
+            - IMPORT_PHOTO
+            - IMPORT_MISSING_STATION
             - ACTIVATE_STATION
             - DEACTIVATE_STATION
             - DELETE_STATION

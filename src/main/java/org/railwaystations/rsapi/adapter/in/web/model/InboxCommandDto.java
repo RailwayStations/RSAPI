@@ -16,7 +16,7 @@ import java.util.Objects;
 
 @Schema(name = "InboxCommand", description = "command to import or reject an inbox entry")
 @JsonTypeName("InboxCommand")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-08-05T22:51:20.951507269+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-08-11T22:38:36.048774788+02:00[Europe/Berlin]")
 public class InboxCommandDto {
 
   @JsonProperty("id")
@@ -58,7 +58,7 @@ public class InboxCommandDto {
     
     IMPORT_AS_NEW_SECONDARY_PHOTO("IMPORT_AS_NEW_SECONDARY_PHOTO"),
     
-    CREATE_NEW_STATION("CREATE_NEW_STATION");
+    IGNORE_NEARBY_STATION("IGNORE_NEARBY_STATION");
 
     private String value;
 
@@ -90,14 +90,13 @@ public class InboxCommandDto {
   @JsonProperty("conflictResolution")
   private ConflictResolutionEnum conflictResolution;
 
-  @JsonProperty("createStation")
-  private Boolean createStation;
-
   /**
    * Gets or Sets command
    */
   public enum CommandEnum {
-    IMPORT("IMPORT"),
+    IMPORT_PHOTO("IMPORT_PHOTO"),
+    
+    IMPORT_MISSING_STATION("IMPORT_MISSING_STATION"),
     
     ACTIVATE_STATION("ACTIVATE_STATION"),
     
@@ -337,25 +336,6 @@ public class InboxCommandDto {
     this.conflictResolution = conflictResolution;
   }
 
-  public InboxCommandDto createStation(Boolean createStation) {
-    this.createStation = createStation;
-    return this;
-  }
-
-  /**
-   * create the station if it doesn't exist
-   * @return createStation
-  */
-  
-  @Schema(name = "createStation", description = "create the station if it doesn't exist", required = false)
-  public Boolean getCreateStation() {
-    return createStation;
-  }
-
-  public void setCreateStation(Boolean createStation) {
-    this.createStation = createStation;
-  }
-
   public InboxCommandDto command(CommandEnum command) {
     this.command = command;
     return this;
@@ -394,13 +374,12 @@ public class InboxCommandDto {
         Objects.equals(this.DS100, inboxCommand.DS100) &&
         Objects.equals(this.active, inboxCommand.active) &&
         Objects.equals(this.conflictResolution, inboxCommand.conflictResolution) &&
-        Objects.equals(this.createStation, inboxCommand.createStation) &&
         Objects.equals(this.command, inboxCommand.command);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, countryCode, stationId, title, lat, lon, rejectReason, DS100, active, conflictResolution, createStation, command);
+    return Objects.hash(id, countryCode, stationId, title, lat, lon, rejectReason, DS100, active, conflictResolution, command);
   }
 
   @Override
@@ -417,7 +396,6 @@ public class InboxCommandDto {
     sb.append("    DS100: ").append(toIndentedString(DS100)).append("\n");
     sb.append("    active: ").append(toIndentedString(active)).append("\n");
     sb.append("    conflictResolution: ").append(toIndentedString(conflictResolution)).append("\n");
-    sb.append("    createStation: ").append(toIndentedString(createStation)).append("\n");
     sb.append("    command: ").append(toIndentedString(command)).append("\n");
     sb.append("}");
     return sb.toString();

@@ -35,7 +35,9 @@ public interface ManageInboxUseCase {
 
     void rejectInboxEntry(InboxCommand command);
 
-    void importUpload(InboxCommand command);
+    void importPhoto(InboxCommand command);
+
+    void importMissingStation(InboxCommand command);
 
     void updateStationActiveState(InboxCommand command, boolean active);
 

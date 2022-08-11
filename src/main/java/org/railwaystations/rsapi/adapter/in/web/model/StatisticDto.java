@@ -14,7 +14,7 @@ import java.util.Objects;
 
 @Schema(name = "Statistic", description = "Statistic of number of stations with and without photos")
 @JsonTypeName("Statistic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-08-01T15:41:32.161852543+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-08-11T22:38:36.048774788+02:00[Europe/Berlin]")
 public class StatisticDto {
 
   @JsonProperty("total")

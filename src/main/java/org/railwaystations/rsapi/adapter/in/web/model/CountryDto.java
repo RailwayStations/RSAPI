@@ -17,7 +17,7 @@ import java.util.Objects;
 
 @Schema(name = "Country", description = "Supported Country with its configuration")
 @JsonTypeName("Country")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-08-01T15:47:04.802984002+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-08-11T22:38:36.048774788+02:00[Europe/Berlin]")
 public class CountryDto {
 
   @JsonProperty("code")

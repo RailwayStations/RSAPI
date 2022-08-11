@@ -323,7 +323,8 @@ public class InboxController {
             var command = toDomain(commandDto);
             switch (commandDto.getCommand()) {
                 case REJECT -> manageInboxUseCase.rejectInboxEntry(command);
-                case IMPORT -> manageInboxUseCase.importUpload(command);
+                case IMPORT_PHOTO -> manageInboxUseCase.importPhoto(command);
+                case IMPORT_MISSING_STATION -> manageInboxUseCase.importMissingStation(command);
                 case ACTIVATE_STATION -> manageInboxUseCase.updateStationActiveState(command, true);
                 case DEACTIVATE_STATION -> manageInboxUseCase.updateStationActiveState(command, false);
                 case DELETE_STATION -> manageInboxUseCase.deleteStation(command);
@@ -353,7 +354,6 @@ public class InboxController {
                 .ds100(command.getDS100())
                 .active(command.getActive() != null ? command.getActive() : true)
                 .conflictResolution(toDomain(command.getConflictResolution()))
-                .createStation(command.getCreateStation())
                 .build();
     }
 
@@ -366,7 +366,7 @@ public class InboxController {
             case OVERWRITE_EXISTING_PHOTO -> InboxCommand.ConflictResolution.OVERWRITE_EXISTING_PHOTO;
             case IMPORT_AS_NEW_PRIMARY_PHOTO -> InboxCommand.ConflictResolution.IMPORT_AS_NEW_PRIMARY_PHOTO;
             case IMPORT_AS_NEW_SECONDARY_PHOTO -> InboxCommand.ConflictResolution.IMPORT_AS_NEW_SECONDARY_PHOTO;
-            case CREATE_NEW_STATION -> InboxCommand.ConflictResolution.CREATE_NEW_STATION;
+            case IGNORE_NEARBY_STATION -> InboxCommand.ConflictResolution.IGNORE_NEARBY_STATION;
         };
     }
 
