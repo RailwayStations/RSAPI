@@ -669,7 +669,7 @@ paths:
           schema:
             type: boolean
       requestBody:
-        description: image
+        description: image, required for existing station, optional for missing stations
         content:
           image/jpeg:
             schema:
@@ -679,7 +679,10 @@ paths:
             schema:
               type: string
               format: byte
-        required: true
+          application/octet-stream:
+            schema:
+              type: string
+              format: byte
       responses:
         202:
           description: upload successful

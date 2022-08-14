@@ -100,7 +100,6 @@ public class InboxController {
                                           @RequestParam(value = ACTIVE, required = false) Boolean active,
                                           @RequestParam(value = FILE) MultipartFile file,
                                           @RequestHeader(value = HttpHeaders.REFERER) String referer) throws JsonProcessingException {
-        // TODO: support for new station without photo (file == null)
         log.info("MultipartFormData: email={}, station={}, country={}, file={}", email, stationId, countryCode, file.getName());
         var refererUri = URI.create(referer);
 
@@ -112,8 +111,14 @@ public class InboxController {
                                 refererUri);
             }
 
-            var response = uploadPhoto(userAgent, file.getInputStream(), StringUtils.trimToNull(stationId),
-                    countryCode, file.getContentType(), stationTitle, latitude, longitude, comment, active, userDetailsService.loadUserByUsername(email));
+            InboxResponseDto response;
+            if (file.isEmpty()) {
+                response = uploadPhoto(userAgent, null, StringUtils.trimToNull(stationId),
+                        countryCode, null, stationTitle, latitude, longitude, comment, active, userDetailsService.loadUserByUsername(email));
+            } else {
+                response = uploadPhoto(userAgent, file.getInputStream(), StringUtils.trimToNull(stationId),
+                        countryCode, file.getContentType(), stationTitle, latitude, longitude, comment, active, userDetailsService.loadUserByUsername(email));
+            }
             return createIFrameAnswer(response, refererUri);
         } catch (Exception e) {
             log.error("FormUpload error", e);

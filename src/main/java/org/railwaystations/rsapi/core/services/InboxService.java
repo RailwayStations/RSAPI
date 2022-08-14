@@ -428,7 +428,7 @@ public class InboxService implements ManageInboxUseCase {
 
     @Override
     public InboxResponse uploadPhoto(String clientInfo, InputStream body, String stationId,
-                                     String country, String contentType, String stationTitle,
+                                     String countryCode, String contentType, String stationTitle,
                                      Double latitude, Double longitude, String comment,
                                      boolean active, User user) {
         if (!user.isEmailVerified()) {
@@ -436,13 +436,13 @@ public class InboxService implements ManageInboxUseCase {
             return InboxResponse.of(InboxResponse.InboxResponseState.UNAUTHORIZED,"Email not verified");
         }
 
-        var station = findStationByCountryAndId(country, stationId);
+        var station = findStationByCountryAndId(countryCode, stationId);
         Coordinates coordinates;
         if (station.isEmpty()) {
             log.warn("Station not found");
             if (StringUtils.isBlank(stationTitle) || latitude == null || longitude == null) {
                 log.warn("Not enough data for missing station: title={}, latitude={}, longitude={}", stationTitle, latitude, longitude);
-                return InboxResponse.of(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA, "Not enough data: either 'country' and 'stationId' or 'title', 'latitude' and 'longitude' have to be provided");
+                return InboxResponse.of(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA, "Not enough data: either 'countryCode' and 'stationId' or 'title', 'latitude' and 'longitude' have to be provided");
             }
             coordinates = new Coordinates(latitude, longitude);
             if (!coordinates.isValid()) {
@@ -454,20 +454,20 @@ public class InboxService implements ManageInboxUseCase {
         }
 
         var extension = ImageUtil.mimeToExtension(contentType);
-        if (extension == null) {
+        if (station.isPresent() && extension == null) {
             log.warn("Unknown contentType '{}'", contentType);
             return InboxResponse.of(InboxResponse.InboxResponseState.UNSUPPORTED_CONTENT_TYPE, "unsupported content type (only jpg and png are supported)");
         }
 
         boolean conflict = hasConflict(null, station.orElse(null)) || hasConflict(null, coordinates);
 
-        String filename;
-        String inboxUrl;
+        String filename = null;
+        String inboxUrl = null;
         Long id;
-        Long crc32;
+        Long crc32 = null;
         try {
             var inboxEntry = InboxEntry.builder()
-                    .countryCode(country)
+                    .countryCode(countryCode)
                     .title(stationTitle)
                     .coordinates(coordinates)
                     .photographerId(user.getId())
@@ -482,20 +482,26 @@ public class InboxService implements ManageInboxUseCase {
                 inboxEntry.setStationId(s.getKey().getId());
             });
             id = inboxDao.insert(inboxEntry);
-            filename = InboxEntry.createFilename(id, extension);
-            crc32 = photoStorage.storeUpload(body, filename);
-            inboxDao.updateCrc32(id, crc32);
+            if (extension != null) {
+                filename = InboxEntry.createFilename(id, extension);
+                crc32 = photoStorage.storeUpload(body, filename);
+                inboxDao.updateCrc32(id, crc32);
+                inboxUrl = inboxBaseUrl + "/" + UriUtils.encodePath(filename, StandardCharsets.UTF_8);
+            }
 
             var duplicateInfo = conflict ? " (possible duplicate!)" : "";
-            inboxUrl = inboxBaseUrl + "/" + UriUtils.encodePath(filename, StandardCharsets.UTF_8);
             if (station.isPresent()) {
                 monitor.sendMessage(String.format("New photo upload for %s - %s:%s%n%s%n%s%s%nby %s%nvia %s",
                         station.get().getTitle(), station.get().getKey().getCountry(), station.get().getKey().getId(),
                         StringUtils.trimToEmpty(comment), inboxUrl, duplicateInfo, user.getName(), clientInfo), photoStorage.getUploadFile(filename));
-            } else {
+            } else if (filename != null) {
                 monitor.sendMessage(String.format("Photo upload for missing station %s at https://map.railway-stations.org/index.php?mlat=%s&mlon=%s&zoom=18&layers=M%n%s%n%s%s%nby %s%nvia %s",
                         stationTitle, latitude, longitude,
                         StringUtils.trimToEmpty(comment), inboxUrl, duplicateInfo, user.getName(), clientInfo), photoStorage.getUploadFile(filename));
+            } else {
+                monitor.sendMessage(String.format("Report missing station %s at https://map.railway-stations.org/index.php?mlat=%s&mlon=%s&zoom=18&layers=M%n%s%s%nby %s%nvia %s",
+                        stationTitle, latitude, longitude,
+                        StringUtils.trimToEmpty(comment), duplicateInfo, user.getName(), clientInfo));
             }
         } catch (PhotoStorage.PhotoTooLargeException e) {
             return InboxResponse.of(InboxResponse.InboxResponseState.PHOTO_TOO_LARGE, "Photo too large, max " + e.getMaxSize() + " bytes allowed");
