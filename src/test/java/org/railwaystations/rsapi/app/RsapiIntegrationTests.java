@@ -91,7 +91,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 
 	@Test
 	void outdatedStationById() {
-		var station = loadStationByKey("de", "7051");
+		var station = loadDeStationByStationId("7051");
 		assertThat(station.getCountry()).isEqualTo("de");
 		assertThat(station.getIdStr()).isEqualTo("7051");
 		assertThat(station.getOutdated()).isTrue();
@@ -230,11 +230,11 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 	}
 
 	private StationDto loadStationDe6932() {
-		return loadStationByKey("de", "6932");
+		return loadDeStationByStationId("6932");
 	}
 
-	private StationDto loadStationByKey(String countryCode, String id) {
-		return loadRaw("/" + countryCode + "/stations/" + id, 200, StationDto.class).getBody();
+	private StationDto loadDeStationByStationId(String stationId) {
+		return loadRaw("/de/stations/" + stationId, 200, StationDto.class).getBody();
 	}
 
 	@Test
@@ -314,12 +314,13 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 					 "title": "Hintertupfingen",
 					 "lat": 50.123,
 					 "lon": 9.123,
+					 "active": true,
 					 "command": "IMPORT_MISSING_STATION"
 				}
 				""".formatted(uploadId, stationId));
 
 		// assert station is imported
-		var newStation = loadStationByKey("de", stationId);
+		var newStation = loadDeStationByStationId(stationId);
 		assertThat(newStation.getTitle()).isEqualTo("Hintertupfingen");
 		assertThat(newStation.getLat()).isEqualTo(50.123);
 		assertThat(newStation.getLon()).isEqualTo(9.123);
@@ -338,7 +339,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 		sendInboxCommand("{\"id\": " + idWrongPhoto + ", \"command\": \"DELETE_PHOTO\"}");
 
 		// assert station has no photo anymore
-		var deletedPhotoStation = loadStationByKey("de", stationId);
+		var deletedPhotoStation = loadDeStationByStationId(stationId);
 		assertThat(deletedPhotoStation.getPhotoUrl()).isNull();
 
 		// send problem report station not existing
@@ -394,7 +395,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 	}
 
 	private void assertCoordinatesOfStation6815(double lat, double lon) {
-		var station = loadStationByKey("de", "6815");
+		var station = loadDeStationByStationId("6815");
 		assertThat(station).isNotNull();
 		assertThat(station.getLat()).isEqualTo(lat);
 		assertThat(station.getLon()).isEqualTo(lon);
@@ -402,7 +403,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 
 	@Test
 	void problemReportWithWrongStationName() throws JsonProcessingException {
-		var stationBefore = loadStationByKey("de", "6815");
+		var stationBefore = loadDeStationByStationId("6815");
 		assertThat(stationBefore).isNotNull();
 		assertThat(stationBefore.getTitle()).isEqualTo("Wippra");
 
@@ -416,7 +417,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 		var id = sendProblemReport(problemReportJson);
 		sendInboxCommand("{\"id\": " + id + ", \"command\": \"CHANGE_NAME\", \"title\": \"Admin New Name\"}");
 
-		var stationAfter = loadStationByKey("de", "6815");
+		var stationAfter = loadDeStationByStationId("6815");
 		assertThat(stationAfter).isNotNull();
 		assertThat(stationAfter.getTitle()).isEqualTo("Admin New Name");
 	}
@@ -457,7 +458,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 	}
 
 	private void assertOutdatedPhotoOfStation7065(boolean outdated) {
-		var station = loadStationByKey("de", "7065");
+		var station = loadDeStationByStationId("7065");
 		assertThat(station).isNotNull();
 		assertThat(station.getOutdated()).isEqualTo(outdated);
 	}

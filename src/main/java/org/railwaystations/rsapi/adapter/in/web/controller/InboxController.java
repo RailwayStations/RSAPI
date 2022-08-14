@@ -352,7 +352,7 @@ public class InboxController {
                 .coordinates(mapCoordinates(command.getLat(), command.getLon()))
                 .rejectReason(command.getRejectReason())
                 .ds100(command.getDS100())
-                .active(command.getActive() != null ? command.getActive() : true)
+                .active(command.getActive() != null ? command.getActive() : null)
                 .conflictResolution(toDomain(command.getConflictResolution()))
                 .build();
     }

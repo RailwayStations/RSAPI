@@ -302,8 +302,13 @@ public class InboxService implements ManageInboxUseCase {
     }
 
     private void importPhoto(InboxCommand command, InboxEntry inboxEntry, Station station) {
-        if (hasConflict(inboxEntry.getId(), station) && !command.getConflictResolution().solvesPhotoConflict()) {
-            throw new IllegalArgumentException("There is a conflict with another photo");
+        if (hasConflict(inboxEntry.getId(), station)) {
+            if (!command.getConflictResolution().solvesPhotoConflict()) {
+                throw new IllegalArgumentException("There is a conflict with another photo");
+            }
+            if (!station.hasPhoto() && command.getConflictResolution() != InboxCommand.ConflictResolution.IMPORT_AS_NEW_PRIMARY_PHOTO) {
+                throw new IllegalArgumentException("Conflict with another upload! The only possible ConflictResolution strategy is IMPORT_AS_NEW_PRIMARY_PHOTO.");
+            }
         }
 
         var photographer = userDao.findById(inboxEntry.getPhotographerId())
@@ -349,7 +354,6 @@ public class InboxService implements ManageInboxUseCase {
             }
 
             log.info("Upload {} with photoId {} accepted: {}", inboxEntry.getId(), photoId, inboxEntry.getFilename());
-            // TODO: tootNewPhoto needs the photoId
             mastodonBot.tootNewPhoto(station, inboxEntry, photo, photoId);
         } catch (Exception e) {
             log.error("Error importing upload {} photo {}", inboxEntry.getId(), inboxEntry.getFilename());
@@ -388,6 +392,9 @@ public class InboxService implements ManageInboxUseCase {
             if (StringUtils.isBlank(command.getTitle())) {
                 throw new IllegalArgumentException("Station title can't be empty");
             }
+            if (command.getActive() == null) {
+                throw new IllegalArgumentException("No Active flag provided");
+            }
 
             var newStation = Station.builder()
                     .key(new Station.Key(command.getCountryCode(), command.getStationId()))
@@ -424,8 +431,6 @@ public class InboxService implements ManageInboxUseCase {
                                      String country, String contentType, String stationTitle,
                                      Double latitude, Double longitude, String comment,
                                      boolean active, User user) {
-        // TODO: support for new station without photo
-
         if (!user.isEmailVerified()) {
             log.info("Photo upload failed for user {}, email not verified", user.getName());
             return InboxResponse.of(InboxResponse.InboxResponseState.UNAUTHORIZED,"Email not verified");
