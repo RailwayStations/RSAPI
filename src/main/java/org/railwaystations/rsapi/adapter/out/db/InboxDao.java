@@ -34,7 +34,7 @@ public interface InboxDao {
                        FROM inbox u
                             LEFT JOIN stations s ON s.countryCode = u.countryCode AND s.id = u.stationId
                             LEFT JOIN users p ON p.id = u.photographerId
-                            LEFT JOIN photos f ON f.countryCode = u.countryCode AND f.id = u.stationId
+                            LEFT JOIN photos f ON f.countryCode = u.countryCode AND f.stationId = u.stationId AND f.primary = true
                     """;
     String COUNTRY_CODE = "countryCode";
     String STATION_ID = "stationId";
