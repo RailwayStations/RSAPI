@@ -22,19 +22,19 @@ import java.util.List;
 public interface InboxDao {
 
     String JOIN_QUERY = """
-                    SELECT u.id, u.countryCode, u.stationId, u.title u_title, s.title s_title, u.lat u_lat, u.lon u_lon, s.lat s_lat, s.lon s_lon,
-                         u.photographerId, p.name photographerNickname, p.email photographerEmail, u.extension, u.comment, u.rejectReason, u.createdAt,
-                         u.done, u.problemReportType, u.active, u.crc32, u.notified, f.urlPath,
+                    SELECT i.id, i.countryCode, i.stationId, i.title i_title, s.title s_title, i.lat i_lat, i.lon i_lon, s.lat s_lat, s.lon s_lon,
+                         i.photographerId, u.name photographerNickname, u.email photographerEmail, i.extension, i.comment, i.rejectReason, i.createdAt,
+                         i.done, i.problemReportType, i.active, i.crc32, i.notified, p.urlPath,
                          (
                             SELECT COUNT(*)
-                                FROM inbox u2
-                                WHERE u2.countryCode IS NOT NULL AND u2.countryCode = u.countryCode
-                                AND u2.stationId IS NOT NULL AND u2.stationId = u.stationId AND u2.done = false AND u2.id != u.id
+                                FROM inbox i2
+                                WHERE i2.countryCode IS NOT NULL AND i2.countryCode = i.countryCode
+                                AND i2.stationId IS NOT NULL AND i2.stationId = i.stationId AND i2.done = false AND i2.id != i.id
                          ) AS conflict
-                       FROM inbox u
-                            LEFT JOIN stations s ON s.countryCode = u.countryCode AND s.id = u.stationId
-                            LEFT JOIN users p ON p.id = u.photographerId
-                            LEFT JOIN photos f ON f.countryCode = u.countryCode AND f.stationId = u.stationId AND f.primary = true
+                       FROM inbox i
+                            LEFT JOIN stations s ON s.countryCode = i.countryCode AND s.id = i.stationId
+                            LEFT JOIN users u ON u.id = i.photographerId
+                            LEFT JOIN photos p ON p.countryCode = i.countryCode AND p.stationId = i.stationId AND p.primary = true
                     """;
     String COUNTRY_CODE = "countryCode";
     String STATION_ID = "stationId";
@@ -42,19 +42,19 @@ public interface InboxDao {
     String PHOTOGRAPHER_ID = "photographerId";
     String COORDS = "coords";
 
-    @SqlQuery(JOIN_QUERY + " WHERE u.id = :id")
+    @SqlQuery(JOIN_QUERY + " WHERE i.id = :id")
     @RegisterRowMapper(InboxEntryMapper.class)
     InboxEntry findById(@Bind(ID) long id);
 
-    @SqlQuery(JOIN_QUERY + " WHERE u.done = false ORDER BY id")
+    @SqlQuery(JOIN_QUERY + " WHERE i.done = false ORDER BY id")
     @RegisterRowMapper(InboxEntryMapper.class)
     List<InboxEntry> findPendingInboxEntries();
 
     @SqlQuery("""
-              SELECT u.countryCode, u.stationId, u.title u_title, s.title s_title, u.lat u_lat, u.lon u_lon, s.lat s_lat, s.lon s_lon
-                FROM inbox u
-                    LEFT JOIN stations s ON s.countryCode = u.countryCode AND s.id = u.stationId
-                WHERE u.done = false AND (u.problemReportType IS NULL OR u.problemReportType = '')
+              SELECT i.countryCode, i.stationId, i.title i_title, s.title s_title, i.lat i_lat, i.lon i_lon, s.lat s_lat, s.lon s_lon
+                FROM inbox i
+                    LEFT JOIN stations s ON s.countryCode = i.countryCode AND s.id = i.stationId
+                WHERE i.done = false AND (i.problemReportType IS NULL OR i.problemReportType = '')
               """)
     @RegisterRowMapper(PublicInboxEntryMapper.class)
     List<PublicInboxEntry> findPublicInboxEntries();
@@ -87,7 +87,7 @@ public interface InboxDao {
     @SqlUpdate("UPDATE inbox SET crc32 = :crc32 WHERE id = :id")
     void updateCrc32(@Bind(ID) Long id, @Bind("crc32") Long crc32);
 
-    @SqlQuery(JOIN_QUERY + " WHERE u.done = true AND u.notified = false")
+    @SqlQuery(JOIN_QUERY + " WHERE i.done = true AND i.notified = false")
     @RegisterRowMapper(InboxEntryMapper.class)
     List<InboxEntry> findInboxEntriesToNotify();
 
@@ -153,7 +153,7 @@ public interface InboxDao {
      * Gets the uploaded title, if not present returns the station title
      */
     static String getTitle(ResultSet rs) throws SQLException {
-        var title = rs.getString("u_title");
+        var title = rs.getString("i_title");
         if (StringUtils.isBlank(title)) {
             title = rs.getString("s_title");
         }
@@ -164,7 +164,7 @@ public interface InboxDao {
      * Get the uploaded coordinates, if not present or not valid gets the station coordinates
      */
     static Coordinates getCoordinates(ResultSet rs) throws SQLException {
-        var coordinates = new Coordinates(rs.getDouble("u_lat"), rs.getDouble("u_lon"));
+        var coordinates = new Coordinates(rs.getDouble("i_lat"), rs.getDouble("i_lon"));
         if (!coordinates.isValid()) {
             coordinates = new Coordinates(rs.getDouble("s_lat"), rs.getDouble("s_lon"));
         }
