@@ -9,6 +9,7 @@ import org.railwaystations.rsapi.adapter.out.db.StationDao;
 import org.railwaystations.rsapi.adapter.out.db.UserDao;
 import org.railwaystations.rsapi.core.model.Coordinates;
 import org.railwaystations.rsapi.core.model.Country;
+import org.railwaystations.rsapi.core.model.InboxCommand;
 import org.railwaystations.rsapi.core.model.InboxEntry;
 import org.railwaystations.rsapi.core.model.InboxResponse;
 import org.railwaystations.rsapi.core.model.InboxStateQuery;
@@ -171,46 +172,22 @@ public class InboxService implements ManageInboxUseCase {
         return inboxBaseUrl + (processed ? "/processed/" : "/") + filename;
     }
 
-    @Override
-    public void processAdminInboxCommand(@NotNull User user, @NotNull InboxEntry command) {
-        log.info("Executing adminInbox command {} for Nickname: {}", command.getCommand(), user.getName());
-        var inboxEntry = inboxDao.findById(command.getId());
-        if (inboxEntry == null || inboxEntry.isDone()) {
-            throw new IllegalArgumentException("No pending inbox entry found");
-        }
-        switch (command.getCommand()) {
-            case REJECT -> rejectInboxEntry(inboxEntry, command.getRejectReason());
-            case IMPORT -> importUpload(inboxEntry, command);
-            case ACTIVATE_STATION -> updateStationActiveState(inboxEntry, true);
-            case DEACTIVATE_STATION -> updateStationActiveState(inboxEntry, false);
-            case DELETE_STATION -> deleteStation(inboxEntry);
-            case DELETE_PHOTO -> deletePhoto(inboxEntry);
-            case MARK_SOLVED -> markProblemReportSolved(inboxEntry);
-            case CHANGE_NAME -> {
-                if (StringUtils.isBlank(command.getTitle())) {
-                    throw new IllegalArgumentException("Empty new title: " + command.getTitle());
-                }
-                changeStationTitle(inboxEntry, command.getTitle());
-            }
-            case UPDATE_LOCATION -> updateLocation(inboxEntry, command);
-            case PHOTO_OUTDATED -> markPhotoOutdated(inboxEntry);
-            default -> throw new IllegalArgumentException("Unexpected command value: " + command.getCommand());
-        }
-    }
-
-    private void markPhotoOutdated(InboxEntry inboxEntry) {
-        assertStationExistsAndHasPhoto(inboxEntry);
-        photoDao.updatePhotoOutdated(inboxEntry.getCountryCode(), inboxEntry.getStationId());
+    // TODO: extend this function to use photo id
+    public void markPrimaryPhotoOutdated(InboxCommand command) {
+        var inboxEntry = assertPendingInboxEntryExists(command);
+        var station = assertStationExistsAndHasPhoto(inboxEntry);
+        photoDao.updatePhotoOutdated(station.getPhoto().getId());
         inboxDao.done(inboxEntry.getId());
     }
 
-    private void updateLocation(InboxEntry inboxEntry, InboxEntry command) {
+    public void updateLocation(InboxCommand command) {
+        var inboxEntry = assertPendingInboxEntryExists(command);
         var coordinates = inboxEntry.getCoordinates();
         if (command.hasCoords()) {
             coordinates = command.getCoordinates();
         }
         if (coordinates == null || !coordinates.isValid()) {
-            throw new IllegalArgumentException("Can't update location, coordinates: " + command.getCommand());
+            throw new IllegalArgumentException("Can't update location, coordinates: " + command.getCoordinates());
         }
 
         var station = assertStationExists(inboxEntry);
@@ -228,39 +205,54 @@ public class InboxService implements ManageInboxUseCase {
         return "Z" + (stationDao.getMaxZ() + 1);
     }
 
-    private void updateStationActiveState(InboxEntry inboxEntry, boolean active) {
+    public void updateStationActiveState(InboxCommand command, boolean active) {
+        var inboxEntry = assertPendingInboxEntryExists(command);
         var station = assertStationExists(inboxEntry);
         stationDao.updateActive(station.getKey(), active);
         inboxDao.done(inboxEntry.getId());
         log.info("Problem report {} station {} set active to {}", inboxEntry.getId(), station.getKey(), active);
     }
 
-    private void changeStationTitle(InboxEntry inboxEntry, String newTitle) {
+    public void changeStationTitle(InboxCommand command) {
+        var inboxEntry = assertPendingInboxEntryExists(command);
+        if (StringUtils.isBlank(command.getTitle())) {
+            throw new IllegalArgumentException("Empty new title: " + command.getTitle());
+        }
         var station = assertStationExists(inboxEntry);
-        stationDao.changeStationTitle(station.getKey(), newTitle);
+        stationDao.changeStationTitle(station.getKey(), command.getTitle());
         inboxDao.done(inboxEntry.getId());
-        log.info("Problem report {} station {} change name to {}", inboxEntry.getId(), station.getKey(), newTitle);
+        log.info("Problem report {} station {} changed name to {}", inboxEntry.getId(), station.getKey(), command.getTitle());
     }
 
-    private void deleteStation(InboxEntry inboxEntry) {
+    private InboxEntry assertPendingInboxEntryExists(InboxCommand command) {
+        var inboxEntry = inboxDao.findById(command.getId());
+        if (inboxEntry == null || inboxEntry.isDone()) {
+            throw new IllegalArgumentException("No pending inbox entry found");
+        }
+        return inboxEntry;
+    }
+
+    public void deleteStation(InboxCommand command) {
+        var inboxEntry = assertPendingInboxEntryExists(command);
         var station = assertStationExists(inboxEntry);
-        photoDao.delete(station.getKey());
         stationDao.delete(station.getKey());
         inboxDao.done(inboxEntry.getId());
         log.info("Problem report {} station {} deleted", inboxEntry.getId(), station.getKey());
     }
 
-    private void deletePhoto(InboxEntry inboxEntry) {
+    // TODO: extend this function to delete photo by id
+    public void deletePrimaryPhoto(InboxCommand command) {
+        var inboxEntry = assertPendingInboxEntryExists(command);
         var station = assertStationExistsAndHasPhoto(inboxEntry);
-        photoDao.delete(station.getKey());
+        photoDao.delete(station.getPhoto().getId());
         inboxDao.done(inboxEntry.getId());
         log.info("Problem report {} photo of station {} deleted", inboxEntry.getId(), station.getKey());
     }
 
-    private void markProblemReportSolved(InboxEntry inboxEntry) {
-        assertStationExists(inboxEntry);
+    public void markProblemReportSolved(InboxCommand command) {
+        var inboxEntry = assertPendingInboxEntryExists(command);
         inboxDao.done(inboxEntry.getId());
-        log.info("Problem report {} accepted", inboxEntry.getId());
+        log.info("Problem report {} resolved", inboxEntry.getId());
     }
 
     private Station assertStationExists(InboxEntry inboxEntry) {
@@ -276,52 +268,97 @@ public class InboxService implements ManageInboxUseCase {
         return station;
     }
 
-    private void importUpload(InboxEntry inboxEntry, InboxEntry command) {
-        log.info("Importing upload {}, {}", inboxEntry.getId(), inboxEntry.getFilename());
+    public void importMissingStation(InboxCommand command) {
+        var inboxEntry = assertPendingInboxEntryExists(command);
+        log.info("Importing photo {}, {}", inboxEntry.getId(), inboxEntry.getFilename());
 
         if (inboxEntry.isProblemReport()) {
             throw new IllegalArgumentException("Can't import a problem report");
         }
 
-        var station = findOrCreateStation(inboxEntry, command);
+        var station = findOrCreateStation(command);
 
-        if (station.hasPhoto() && !command.getIgnoreConflict()) {
-            throw new IllegalArgumentException("Station already has a photo");
+        if (inboxEntry.isPhotoUpload()) {
+            importPhoto(command, inboxEntry, station);
+        } else {
+            log.info("No photo to import for InboxEntry={}", inboxEntry.getId());
         }
-        if (hasConflict(inboxEntry.getId(), station) && !command.getIgnoreConflict()) {
-            throw new IllegalArgumentException("There is a conflict with another upload");
+        inboxDao.done(inboxEntry.getId());
+    }
+
+    public void importPhoto(InboxCommand command) {
+        var inboxEntry = assertPendingInboxEntryExists(command);
+        log.info("Importing photo {}, {}", inboxEntry.getId(), inboxEntry.getFilename());
+
+        if (!inboxEntry.isPhotoUpload()) {
+            throw new IllegalArgumentException("No photo to import");
         }
 
-        var photographer = userDao.findById(inboxEntry.getPhotographerId()).orElseThrow();
+        var station = findStationByCountryAndId(inboxEntry.getCountryCode(), inboxEntry.getStationId())
+                .orElseThrow(() -> new IllegalArgumentException("Station not found"));
+
+        importPhoto(command, inboxEntry, station);
+        inboxDao.done(inboxEntry.getId());
+    }
+
+    private void importPhoto(InboxCommand command, InboxEntry inboxEntry, Station station) {
+        if (hasConflict(inboxEntry.getId(), station)) {
+            if (!command.getConflictResolution().solvesPhotoConflict()) {
+                throw new IllegalArgumentException("There is a conflict with another photo");
+            }
+            if (!station.hasPhoto() && command.getConflictResolution() != InboxCommand.ConflictResolution.IMPORT_AS_NEW_PRIMARY_PHOTO) {
+                throw new IllegalArgumentException("Conflict with another upload! The only possible ConflictResolution strategy is IMPORT_AS_NEW_PRIMARY_PHOTO.");
+            }
+        }
+
+        var photographer = userDao.findById(inboxEntry.getPhotographerId())
+                .orElseThrow(() -> new IllegalArgumentException("Photographer " + inboxEntry.getPhotographerId() + " not found"));
         var country = countryDao.findById(StringUtils.lowerCase(station.getKey().getCountry()))
-                .orElseThrow(() -> new IllegalArgumentException("Country not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Country " + station.getKey().getCountry() + " not found"));
 
         try {
-            var photo = Photo.builder()
+            var urlPath = photoStorage.importPhoto(inboxEntry, station);
+
+            var photoBuilder = Photo.builder()
                     .stationKey(station.getKey())
-                    .urlPath(getPhotoUrlPath(inboxEntry, station, country))
+                    .urlPath(urlPath)
                     .photographer(photographer)
                     .createdAt(Instant.now())
-                    .license(getLicenseForPhoto(photographer, country))
-                    .build();
+                    .license(getLicenseForPhoto(photographer, country));
+            Photo photo;
+            long photoId;
             if (station.hasPhoto()) {
-                photoDao.update(photo);
+                switch (command.getConflictResolution()) {
+                    case IMPORT_AS_NEW_PRIMARY_PHOTO -> {
+                        photoDao.setAllPhotosForStationSecondary(station.getKey());
+                        photo = photoBuilder.primary(true).build();
+                        photoId = photoDao.insert(photo);
+                    }
+                    case IMPORT_AS_NEW_SECONDARY_PHOTO -> {
+                        photo = photoBuilder.primary(false).build();
+                        photoId = photoDao.insert(photo);
+                    }
+                    case OVERWRITE_EXISTING_PHOTO -> {
+                        photoId = station.getPhoto().getId();
+                        photo = photoBuilder
+                                .id(photoId)
+                                .primary(station.getPhoto().isPrimary())
+                                .build();
+                        photoDao.update(photo);
+                    }
+                    default -> throw new IllegalArgumentException("No suitable conflict resolution provided");
+                }
             } else {
-                photoDao.insert(photo);
+                photo = photoBuilder.primary(true).build();
+                photoId = photoDao.insert(photo);
             }
 
-            photoStorage.importPhoto(inboxEntry, country, station);
-            inboxDao.done(inboxEntry.getId());
-            log.info("Upload {} accepted: {}", inboxEntry.getId(), inboxEntry.getFilename());
-            mastodonBot.tootNewPhoto(station, inboxEntry, photo);
+            log.info("Upload {} with photoId {} accepted: {}", inboxEntry.getId(), photoId, inboxEntry.getFilename());
+            mastodonBot.tootNewPhoto(station, inboxEntry, photo, photoId);
         } catch (Exception e) {
             log.error("Error importing upload {} photo {}", inboxEntry.getId(), inboxEntry.getFilename());
             throw new RuntimeException("Error moving file", e);
         }
-    }
-
-    private String getPhotoUrlPath(InboxEntry inboxEntry, Station station, Country country) {
-        return "/" + country.getCode() + "/" + station.getKey().getId() + "." + inboxEntry.getExtension();
     }
 
     /**
@@ -335,60 +372,52 @@ public class InboxService implements ManageInboxUseCase {
         return photographer.getLicense();
     }
 
-    private Station findOrCreateStation(InboxEntry inboxEntry, InboxEntry command) {
-        var station = findStationByCountryAndId(inboxEntry.getCountryCode(), inboxEntry.getStationId());
-        if (station.isEmpty() && command.getCreateStation()) {
-            station = findStationByCountryAndId(command.getCountryCode(), command.getStationId());
-            station.ifPresent(s -> log.info("Importing missing station upload {} to existing station {}", inboxEntry.getId(), s.getKey()));
-        }
+    private Station findOrCreateStation(InboxCommand command) {
+        var station = findStationByCountryAndId(command.getCountryCode(), command.getStationId());
 
         return station.orElseGet(()-> {
-            if (!command.getCreateStation() || StringUtils.isNotBlank(inboxEntry.getStationId())) {
-                throw new IllegalArgumentException("Station not found");
-            }
-
             // create station
-            var country = countryDao.findById(StringUtils.lowerCase(command.getCountryCode()));
-            if (country.isEmpty()) {
+            if (countryDao.findById(StringUtils.lowerCase(command.getCountryCode())).isEmpty()) {
                 throw new IllegalArgumentException("Country not found");
             }
             if (StringUtils.isBlank(command.getStationId())) {
                 throw new IllegalArgumentException("Station ID can't be empty");
             }
-            if (hasConflict(inboxEntry.getId(), inboxEntry.getCoordinates()) && !command.getIgnoreConflict()) {
+            if (!command.hasCoords() || !command.getCoordinates().isValid()) {
+                throw new IllegalArgumentException("No valid coordinates provided");
+            }
+            if (hasConflict(command.getId(), command.getCoordinates()) && !command.getConflictResolution().solvesStationConflict()) {
                 throw new IllegalArgumentException("There is a conflict with a nearby station");
             }
-            if (command.hasCoords() && !command.getCoordinates().isValid()) {
-                throw new IllegalArgumentException("Lat/Lon out of range");
+            if (StringUtils.isBlank(command.getTitle())) {
+                throw new IllegalArgumentException("Station title can't be empty");
             }
-
-            var coordinates = inboxEntry.getCoordinates();
-            if (command.hasCoords()) {
-                coordinates = command.getCoordinates();
+            if (command.getActive() == null) {
+                throw new IllegalArgumentException("No Active flag provided");
             }
-
-            var title = command.getTitle() != null ? command.getTitle() : inboxEntry.getTitle();
 
             var newStation = Station.builder()
                     .key(new Station.Key(command.getCountryCode(), command.getStationId()))
-                    .title(title)
-                    .coordinates(coordinates)
+                    .title(command.getTitle())
+                    .coordinates(command.getCoordinates())
                     .ds100(command.getDs100())
                     .active(command.getActive())
                     .build();
             stationDao.insert(newStation);
+            log.info("New station '{}' created: {}", newStation.getTitle(), newStation.getKey());
             return newStation;
         });
     }
 
-    private void rejectInboxEntry(InboxEntry inboxEntry, String rejectReason) {
-        inboxDao.reject(inboxEntry.getId(), rejectReason);
+    public void rejectInboxEntry(InboxCommand command) {
+        var inboxEntry = assertPendingInboxEntryExists(command);
+        inboxDao.reject(inboxEntry.getId(), command.getRejectReason());
         if (inboxEntry.isProblemReport()) {
-            log.info("Rejecting problem report {}, {}", inboxEntry.getId(), rejectReason);
+            log.info("Rejecting problem report {}, {}", inboxEntry.getId(), command.getRejectReason());
             return;
         }
 
-        log.info("Rejecting upload {}, {}, {}", inboxEntry.getId(), rejectReason, inboxEntry.getFilename());
+        log.info("Rejecting upload {}, {}, {}", inboxEntry.getId(), command.getRejectReason(), inboxEntry.getFilename());
 
         try {
             photoStorage.reject(inboxEntry);
@@ -399,7 +428,7 @@ public class InboxService implements ManageInboxUseCase {
 
     @Override
     public InboxResponse uploadPhoto(String clientInfo, InputStream body, String stationId,
-                                     String country, String contentType, String stationTitle,
+                                     String countryCode, String contentType, String stationTitle,
                                      Double latitude, Double longitude, String comment,
                                      boolean active, User user) {
         if (!user.isEmailVerified()) {
@@ -407,13 +436,13 @@ public class InboxService implements ManageInboxUseCase {
             return InboxResponse.of(InboxResponse.InboxResponseState.UNAUTHORIZED,"Email not verified");
         }
 
-        var station = findStationByCountryAndId(country, stationId);
+        var station = findStationByCountryAndId(countryCode, stationId);
         Coordinates coordinates;
         if (station.isEmpty()) {
             log.warn("Station not found");
             if (StringUtils.isBlank(stationTitle) || latitude == null || longitude == null) {
                 log.warn("Not enough data for missing station: title={}, latitude={}, longitude={}", stationTitle, latitude, longitude);
-                return InboxResponse.of(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA, "Not enough data: either 'country' and 'stationId' or 'title', 'latitude' and 'longitude' have to be provided");
+                return InboxResponse.of(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA, "Not enough data: either 'countryCode' and 'stationId' or 'title', 'latitude' and 'longitude' have to be provided");
             }
             coordinates = new Coordinates(latitude, longitude);
             if (!coordinates.isValid()) {
@@ -425,20 +454,20 @@ public class InboxService implements ManageInboxUseCase {
         }
 
         var extension = ImageUtil.mimeToExtension(contentType);
-        if (extension == null) {
+        if (station.isPresent() && extension == null) {
             log.warn("Unknown contentType '{}'", contentType);
             return InboxResponse.of(InboxResponse.InboxResponseState.UNSUPPORTED_CONTENT_TYPE, "unsupported content type (only jpg and png are supported)");
         }
 
         boolean conflict = hasConflict(null, station.orElse(null)) || hasConflict(null, coordinates);
 
-        String filename;
-        String inboxUrl;
+        String filename = null;
+        String inboxUrl = null;
         Long id;
-        Long crc32;
+        Long crc32 = null;
         try {
             var inboxEntry = InboxEntry.builder()
-                    .countryCode(country)
+                    .countryCode(countryCode)
                     .title(stationTitle)
                     .coordinates(coordinates)
                     .photographerId(user.getId())
@@ -453,20 +482,26 @@ public class InboxService implements ManageInboxUseCase {
                 inboxEntry.setStationId(s.getKey().getId());
             });
             id = inboxDao.insert(inboxEntry);
-            filename = InboxEntry.createFilename(id, extension);
-            crc32 = photoStorage.storeUpload(body, filename);
-            inboxDao.updateCrc32(id, crc32);
+            if (extension != null) {
+                filename = InboxEntry.createFilename(id, extension);
+                crc32 = photoStorage.storeUpload(body, filename);
+                inboxDao.updateCrc32(id, crc32);
+                inboxUrl = inboxBaseUrl + "/" + UriUtils.encodePath(filename, StandardCharsets.UTF_8);
+            }
 
             var duplicateInfo = conflict ? " (possible duplicate!)" : "";
-            inboxUrl = inboxBaseUrl + "/" + UriUtils.encodePath(filename, StandardCharsets.UTF_8);
             if (station.isPresent()) {
                 monitor.sendMessage(String.format("New photo upload for %s - %s:%s%n%s%n%s%s%nby %s%nvia %s",
                         station.get().getTitle(), station.get().getKey().getCountry(), station.get().getKey().getId(),
                         StringUtils.trimToEmpty(comment), inboxUrl, duplicateInfo, user.getName(), clientInfo), photoStorage.getUploadFile(filename));
-            } else {
+            } else if (filename != null) {
                 monitor.sendMessage(String.format("Photo upload for missing station %s at https://map.railway-stations.org/index.php?mlat=%s&mlon=%s&zoom=18&layers=M%n%s%n%s%s%nby %s%nvia %s",
                         stationTitle, latitude, longitude,
                         StringUtils.trimToEmpty(comment), inboxUrl, duplicateInfo, user.getName(), clientInfo), photoStorage.getUploadFile(filename));
+            } else {
+                monitor.sendMessage(String.format("Report missing station %s at https://map.railway-stations.org/index.php?mlat=%s&mlon=%s&zoom=18&layers=M%n%s%s%nby %s%nvia %s",
+                        stationTitle, latitude, longitude,
+                        StringUtils.trimToEmpty(comment), duplicateInfo, user.getName(), clientInfo));
             }
         } catch (PhotoStorage.PhotoTooLargeException e) {
             return InboxResponse.of(InboxResponse.InboxResponseState.PHOTO_TOO_LARGE, "Photo too large, max " + e.getMaxSize() + " bytes allowed");

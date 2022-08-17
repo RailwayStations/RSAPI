@@ -667,4 +667,53 @@
         </update>
     </changeSet>
 
+    <changeSet id="41" author="pstorch">
+        <renameTable oldTableName="photos" newTableName="photos_old"/>
+
+        <createTable tableName="photos">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="countryCode" type="char(2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="stationId" type="varchar(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="primary" type="boolean" valueBoolean="true" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="outdated" type="boolean" valueBoolean="false" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="urlPath" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="license" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="photographerId" type="integer">
+                <constraints nullable="false" referencedTableName="users" referencedColumnNames="id" foreignKeyName="fk_photo_user"/>
+            </column>
+            <column name="createdAt" type="long">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <sql>
+            INSERT INTO photos (countryCode, stationId, `primary`, outdated, urlPath, license, photographerId, createdAt)
+            SELECT countryCode, id, true, outdated, urlPath, license, photographerId, createdAt
+            FROM photos_old;
+        </sql>
+        <dropTable tableName="photos_old"/>
+
+        <addForeignKeyConstraint baseColumnNames="countryCode, stationId"
+                                 baseTableName="photos"
+                                 constraintName="fk_photo_station"
+                                 referencedColumnNames="countryCode, id"
+                                 referencedTableName="stations"
+                                 onUpdate="CASCADE"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
 </databaseChangeLog>

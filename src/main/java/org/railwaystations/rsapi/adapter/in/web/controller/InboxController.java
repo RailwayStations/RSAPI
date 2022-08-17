@@ -20,6 +20,7 @@ import org.railwaystations.rsapi.app.auth.AuthUser;
 import org.railwaystations.rsapi.app.auth.RSAuthenticationProvider;
 import org.railwaystations.rsapi.app.auth.RSUserDetailsService;
 import org.railwaystations.rsapi.core.model.Coordinates;
+import org.railwaystations.rsapi.core.model.InboxCommand;
 import org.railwaystations.rsapi.core.model.InboxEntry;
 import org.railwaystations.rsapi.core.model.InboxResponse;
 import org.railwaystations.rsapi.core.model.InboxStateQuery;
@@ -110,8 +111,14 @@ public class InboxController {
                                 refererUri);
             }
 
-            var response = uploadPhoto(userAgent, file.getInputStream(), StringUtils.trimToNull(stationId),
-                    countryCode, file.getContentType(), stationTitle, latitude, longitude, comment, active, userDetailsService.loadUserByUsername(email));
+            InboxResponseDto response;
+            if (file.isEmpty()) {
+                response = uploadPhoto(userAgent, null, StringUtils.trimToNull(stationId),
+                        countryCode, null, stationTitle, latitude, longitude, comment, active, userDetailsService.loadUserByUsername(email));
+            } else {
+                response = uploadPhoto(userAgent, file.getInputStream(), StringUtils.trimToNull(stationId),
+                        countryCode, file.getContentType(), stationTitle, latitude, longitude, comment, active, userDetailsService.loadUserByUsername(email));
+            }
             return createIFrameAnswer(response, refererUri);
         } catch (Exception e) {
             log.error("FormUpload error", e);
@@ -315,44 +322,56 @@ public class InboxController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, value = "/adminInbox", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<AdminInboxCommandResponseDto> adminInbox(@AuthenticationPrincipal AuthUser user, @RequestBody InboxCommandDto command) {
+    public ResponseEntity<AdminInboxCommandResponseDto> adminInbox(@AuthenticationPrincipal AuthUser user, @RequestBody InboxCommandDto commandDto) {
+        log.info("Executing adminInbox commandDto {} for Nickname: {}", commandDto.getCommand(), user.getUsername());
         try {
-            manageInboxUseCase.processAdminInboxCommand(user.getUser(), toDomain(command));
+            var command = toDomain(commandDto);
+            switch (commandDto.getCommand()) {
+                case REJECT -> manageInboxUseCase.rejectInboxEntry(command);
+                case IMPORT_PHOTO -> manageInboxUseCase.importPhoto(command);
+                case IMPORT_MISSING_STATION -> manageInboxUseCase.importMissingStation(command);
+                case ACTIVATE_STATION -> manageInboxUseCase.updateStationActiveState(command, true);
+                case DEACTIVATE_STATION -> manageInboxUseCase.updateStationActiveState(command, false);
+                case DELETE_STATION -> manageInboxUseCase.deleteStation(command);
+                case DELETE_PHOTO -> manageInboxUseCase.deletePrimaryPhoto(command);
+                case MARK_SOLVED -> manageInboxUseCase.markProblemReportSolved(command);
+                case CHANGE_NAME -> manageInboxUseCase.changeStationTitle(command);
+                case UPDATE_LOCATION -> manageInboxUseCase.updateLocation(command);
+                case PHOTO_OUTDATED -> manageInboxUseCase.markPrimaryPhotoOutdated(command);
+                default -> throw new IllegalArgumentException("Unexpected commandDto value: " + commandDto.getCommand());
+            }
         } catch (IllegalArgumentException e) {
-            log.warn("adminInbox command {} failed", command, e);
+            log.warn("adminInbox commandDto {} failed", commandDto, e);
             return new ResponseEntity<>(new AdminInboxCommandResponseDto().status(HttpStatus.BAD_REQUEST.value()).message(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
 
         return new ResponseEntity<>(new AdminInboxCommandResponseDto().status(HttpStatus.OK.value()).message("ok"), HttpStatus.OK);
     }
 
-    private InboxEntry toDomain(InboxCommandDto command) {
-        return InboxEntry.builder()
+    private InboxCommand toDomain(InboxCommandDto command) {
+        return InboxCommand.builder()
                 .id(command.getId())
                 .countryCode(command.getCountryCode())
                 .stationId(command.getStationId())
                 .title(command.getTitle())
+                .coordinates(mapCoordinates(command.getLat(), command.getLon()))
                 .rejectReason(command.getRejectReason())
-                .command(toDomain(command.getCommand()))
                 .ds100(command.getDS100())
-                .active(command.getActive() != null ? command.getActive() : true)
-                .ignoreConflict(command.getIgnoreConflict())
-                .createStation(command.getCreateStation())
+                .active(command.getActive() != null ? command.getActive() : null)
+                .conflictResolution(toDomain(command.getConflictResolution()))
                 .build();
     }
 
-    private InboxEntry.Command toDomain(InboxCommandDto.CommandEnum command) {
-        return switch (command) {
-            case PHOTO_OUTDATED -> InboxEntry.Command.PHOTO_OUTDATED;
-            case IMPORT -> InboxEntry.Command.IMPORT;
-            case REJECT -> InboxEntry.Command.REJECT;
-            case CHANGE_NAME -> InboxEntry.Command.CHANGE_NAME;
-            case MARK_SOLVED -> InboxEntry.Command.MARK_SOLVED;
-            case DELETE_PHOTO -> InboxEntry.Command.DELETE_PHOTO;
-            case DELETE_STATION -> InboxEntry.Command.DELETE_STATION;
-            case UPDATE_LOCATION -> InboxEntry.Command.UPDATE_LOCATION;
-            case ACTIVATE_STATION -> InboxEntry.Command.ACTIVATE_STATION;
-            case DEACTIVATE_STATION -> InboxEntry.Command.DEACTIVATE_STATION;
+    private InboxCommand.ConflictResolution toDomain(InboxCommandDto.ConflictResolutionEnum conflictResolution) {
+        if (conflictResolution == null) {
+            return InboxCommand.ConflictResolution.DO_NOTHING;
+        }
+        return switch (conflictResolution) {
+            case DO_NOTHING -> InboxCommand.ConflictResolution.DO_NOTHING;
+            case OVERWRITE_EXISTING_PHOTO -> InboxCommand.ConflictResolution.OVERWRITE_EXISTING_PHOTO;
+            case IMPORT_AS_NEW_PRIMARY_PHOTO -> InboxCommand.ConflictResolution.IMPORT_AS_NEW_PRIMARY_PHOTO;
+            case IMPORT_AS_NEW_SECONDARY_PHOTO -> InboxCommand.ConflictResolution.IMPORT_AS_NEW_SECONDARY_PHOTO;
+            case IGNORE_NEARBY_STATION -> InboxCommand.ConflictResolution.IGNORE_NEARBY_STATION;
         };
     }
 

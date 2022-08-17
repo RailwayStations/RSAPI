@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.annotation.Generated;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -16,7 +17,7 @@ import java.util.Objects;
 
 @Schema(name = "Country", description = "Supported Country with its configuration")
 @JsonTypeName("Country")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-06-27T19:01:27.797025753+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-08-11T22:38:36.048774788+02:00[Europe/Berlin]")
 public class CountryDto {
 
   @JsonProperty("code")
@@ -53,8 +54,8 @@ public class CountryDto {
    * Two letter country code
    * @return code
   */
-  
-  @Schema(name = "code", description = "Two letter country code", required = false)
+  @NotNull 
+  @Schema(name = "code", description = "Two letter country code", required = true)
   public String getCode() {
     return code;
   }
@@ -72,8 +73,8 @@ public class CountryDto {
    * Name of the country
    * @return name
   */
-  
-  @Schema(name = "name", description = "Name of the country", required = false)
+  @NotNull 
+  @Schema(name = "name", description = "Name of the country", required = true)
   public String getName() {
     return name;
   }
@@ -167,8 +168,8 @@ public class CountryDto {
    * Is this an active country where we collect photos?
    * @return active
   */
-  
-  @Schema(name = "active", description = "Is this an active country where we collect photos?", required = false)
+  @NotNull 
+  @Schema(name = "active", description = "Is this an active country where we collect photos?", required = true)
   public Boolean getActive() {
     return active;
   }

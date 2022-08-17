@@ -40,14 +40,14 @@ public class MastodonBotHttpClient implements MastodonBot {
 
     @Override
     @Async
-    public void tootNewPhoto(Station station, InboxEntry inboxEntry, Photo photo) {
+    public void tootNewPhoto(Station station, InboxEntry inboxEntry, Photo photo, long photoId) {
         if (StringUtils.isBlank(config.instanceUrl()) || StringUtils.isBlank(config.token()) || StringUtils.isBlank(config.stationUrl())) {
             log.info("New photo for Station {} not tooted, {}", station.getKey(), this);
             return;
         }
         log.info("Sending toot for new photo of: {}", station.getKey());
         try {
-            String json = createStatusJson(station, inboxEntry, photo);
+            String json = createStatusJson(station, inboxEntry, photo, photoId);
             var request = HttpRequest.newBuilder()
                     .uri(URI.create(config.instanceUrl() + "/api/v1/statuses"))
                     .header("Content-Type", MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
@@ -69,10 +69,10 @@ public class MastodonBotHttpClient implements MastodonBot {
         }
     }
 
-    private String createStatusJson(Station station, InboxEntry inboxEntry, Photo photo) throws JsonProcessingException {
-        var status = String.format("%s%nby %s%n%s?countryCode=%s&stationId=%s",
+    private String createStatusJson(Station station, InboxEntry inboxEntry, Photo photo, long photoId) throws JsonProcessingException {
+        var status = String.format("%s%nby %s%n%s?countryCode=%s&stationId=%s&photoId=%s",
                 station.getTitle(), photo.getPhotographer().getDisplayName(), config.stationUrl(),
-                station.getKey().getCountry(), station.getKey().getId());
+                station.getKey().getCountry(), station.getKey().getId(), photoId);
         if (StringUtils.isNotBlank(inboxEntry.getComment())) {
             status += String.format("%n%s", inboxEntry.getComment());
         }

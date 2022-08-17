@@ -13,7 +13,7 @@ import java.util.Objects;
  */
 
 @JsonTypeName("AdminInboxCommandResponse")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-06-27T19:01:27.797025753+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-08-11T22:38:36.048774788+02:00[Europe/Berlin]")
 public class AdminInboxCommandResponseDto {
 
   @JsonProperty("status")

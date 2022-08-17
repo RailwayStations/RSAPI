@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.annotation.Generated;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
@@ -15,7 +16,7 @@ import java.util.Objects;
 
 @Schema(name = "InboxEntry", description = "Represents an uploaded photo with processing state")
 @JsonTypeName("InboxEntry")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-06-27T19:01:27.797025753+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-08-11T22:38:36.048774788+02:00[Europe/Berlin]")
 public class InboxEntryDto {
 
   @JsonProperty("id")
@@ -41,6 +42,9 @@ public class InboxEntryDto {
 
   @JsonProperty("photographerEmail")
   private String photographerEmail;
+
+  @JsonProperty("photoId")
+  private Long photoId;
 
   @JsonProperty("comment")
   private String comment;
@@ -128,8 +132,8 @@ public class InboxEntryDto {
    * Get id
    * @return id
   */
-  
-  @Schema(name = "id", required = false)
+  @NotNull 
+  @Schema(name = "id", required = true)
   public Long getId() {
     return id;
   }
@@ -242,8 +246,8 @@ public class InboxEntryDto {
    * Get photographerNickname
    * @return photographerNickname
   */
-  
-  @Schema(name = "photographerNickname", required = false)
+  @NotNull 
+  @Schema(name = "photographerNickname", required = true)
   public String getPhotographerNickname() {
     return photographerNickname;
   }
@@ -271,6 +275,25 @@ public class InboxEntryDto {
     this.photographerEmail = photographerEmail;
   }
 
+  public InboxEntryDto photoId(Long photoId) {
+    this.photoId = photoId;
+    return this;
+  }
+
+  /**
+   * ID of the photo
+   * @return photoId
+  */
+  
+  @Schema(name = "photoId", description = "ID of the photo", required = false)
+  public Long getPhotoId() {
+    return photoId;
+  }
+
+  public void setPhotoId(Long photoId) {
+    this.photoId = photoId;
+  }
+
   public InboxEntryDto comment(String comment) {
     this.comment = comment;
     return this;
@@ -280,8 +303,8 @@ public class InboxEntryDto {
    * Get comment
    * @return comment
   */
-  
-  @Schema(name = "comment", required = false)
+  @NotNull 
+  @Schema(name = "comment", required = true)
   public String getComment() {
     return comment;
   }
@@ -299,8 +322,8 @@ public class InboxEntryDto {
    * Get createdAt
    * @return createdAt
   */
-  
-  @Schema(name = "createdAt", required = false)
+  @NotNull 
+  @Schema(name = "createdAt", required = true)
   public Long getCreatedAt() {
     return createdAt;
   }
@@ -318,8 +341,8 @@ public class InboxEntryDto {
    * true if this photo was already imported or rejected
    * @return done
   */
-  
-  @Schema(name = "done", description = "true if this photo was already imported or rejected", required = false)
+  @NotNull 
+  @Schema(name = "done", description = "true if this photo was already imported or rejected", required = true)
   public Boolean getDone() {
     return done;
   }
@@ -375,8 +398,8 @@ public class InboxEntryDto {
    * this station has already a photo (conflict)
    * @return hasPhoto
   */
-  
-  @Schema(name = "hasPhoto", description = "this station has already a photo (conflict)", required = false)
+  @NotNull 
+  @Schema(name = "hasPhoto", description = "this station has already a photo (conflict)", required = true)
   public Boolean getHasPhoto() {
     return hasPhoto;
   }
@@ -478,6 +501,7 @@ public class InboxEntryDto {
         Objects.equals(this.lon, inboxEntry.lon) &&
         Objects.equals(this.photographerNickname, inboxEntry.photographerNickname) &&
         Objects.equals(this.photographerEmail, inboxEntry.photographerEmail) &&
+        Objects.equals(this.photoId, inboxEntry.photoId) &&
         Objects.equals(this.comment, inboxEntry.comment) &&
         Objects.equals(this.createdAt, inboxEntry.createdAt) &&
         Objects.equals(this.done, inboxEntry.done) &&
@@ -492,7 +516,7 @@ public class InboxEntryDto {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, countryCode, stationId, title, lat, lon, photographerNickname, photographerEmail, comment, createdAt, done, filename, inboxUrl, hasPhoto, hasConflict, problemReportType, isProcessed, active);
+    return Objects.hash(id, countryCode, stationId, title, lat, lon, photographerNickname, photographerEmail, photoId, comment, createdAt, done, filename, inboxUrl, hasPhoto, hasConflict, problemReportType, isProcessed, active);
   }
 
   @Override
@@ -507,6 +531,7 @@ public class InboxEntryDto {
     sb.append("    lon: ").append(toIndentedString(lon)).append("\n");
     sb.append("    photographerNickname: ").append(toIndentedString(photographerNickname)).append("\n");
     sb.append("    photographerEmail: ").append(toIndentedString(photographerEmail)).append("\n");
+    sb.append("    photoId: ").append(toIndentedString(photoId)).append("\n");
     sb.append("    comment: ").append(toIndentedString(comment)).append("\n");
     sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
     sb.append("    done: ").append(toIndentedString(done)).append("\n");

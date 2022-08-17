@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.annotation.Generated;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
@@ -12,7 +13,7 @@ import java.util.Objects;
  */
 
 @JsonTypeName("GeneralErrorMessage")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-06-27T19:01:27.797025753+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-08-11T22:38:36.048774788+02:00[Europe/Berlin]")
 public class GeneralErrorMessageDto {
 
   @JsonProperty("timestamp")
@@ -58,8 +59,8 @@ public class GeneralErrorMessageDto {
    * Get status
    * @return status
   */
-  
-  @Schema(name = "status", required = false)
+  @NotNull 
+  @Schema(name = "status", required = true)
   public Integer getStatus() {
     return status;
   }
@@ -96,8 +97,8 @@ public class GeneralErrorMessageDto {
    * Get message
    * @return message
   */
-  
-  @Schema(name = "message", required = false)
+  @NotNull 
+  @Schema(name = "message", required = true)
   public String getMessage() {
     return message;
   }

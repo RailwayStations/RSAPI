@@ -28,12 +28,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.testcontainers.containers.MariaDBContainer;
-import org.testcontainers.utility.DockerImageName;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -59,7 +55,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
 		properties = {"server.error.include-message=always"})
 @ActiveProfiles("test")
-class RsapiIntegrationTests {
+class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 
 	@Autowired
 	private ObjectMapper mapper;
@@ -72,24 +68,6 @@ class RsapiIntegrationTests {
 
 	@Autowired
 	private WorkDir workDir;
-
-	private static final MariaDBContainer<?> mariadb;
-
-	static {
-		mariadb = new MariaDBContainer<>(DockerImageName.parse("mariadb:10.1"));
-		mariadb.start();
-	}
-
-	@DynamicPropertySource
-	static void properties(DynamicPropertyRegistry registry) {
-		registry.add("spring.datasource.url", mariadb::getJdbcUrl);
-		registry.add("spring.datasource.username", mariadb::getUsername);
-		registry.add("spring.datasource.password", mariadb::getPassword);
-	}
-
-	@Test
-	void contextLoads() {
-	}
 
 	@Test
 	void stationsAllCountries() {
@@ -113,7 +91,7 @@ class RsapiIntegrationTests {
 
 	@Test
 	void outdatedStationById() {
-		var station = loadStationByKey("de", "7051");
+		var station = loadDeStationByStationId("7051");
 		assertThat(station.getCountry()).isEqualTo("de");
 		assertThat(station.getIdStr()).isEqualTo("7051");
 		assertThat(station.getOutdated()).isTrue();
@@ -252,11 +230,11 @@ class RsapiIntegrationTests {
 	}
 
 	private StationDto loadStationDe6932() {
-		return loadStationByKey("de", "6932");
+		return loadDeStationByStationId("6932");
 	}
 
-	private StationDto loadStationByKey(String countryCode, String id) {
-		return loadRaw("/" + countryCode + "/stations/" + id, 200, StationDto.class).getBody();
+	private StationDto loadDeStationByStationId(String stationId) {
+		return loadRaw("/de/stations/" + stationId, 200, StationDto.class).getBody();
 	}
 
 	@Test
@@ -328,10 +306,21 @@ class RsapiIntegrationTests {
 
 
 		// send import command
-		sendInboxCommand("{\"id\": " + uploadId + ", \"stationId\": \"" + stationId + "\", \"countryCode\": \"de\", \"command\": \"IMPORT\", \"createStation\": true}");
+		sendInboxCommand("""
+				{
+					 "id": %s,
+					 "stationId": "%s",
+					 "countryCode": "de",
+					 "title": "Hintertupfingen",
+					 "lat": 50.123,
+					 "lon": 9.123,
+					 "active": true,
+					 "command": "IMPORT_MISSING_STATION"
+				}
+				""".formatted(uploadId, stationId));
 
 		// assert station is imported
-		var newStation = loadStationByKey("de", stationId);
+		var newStation = loadDeStationByStationId(stationId);
 		assertThat(newStation.getTitle()).isEqualTo("Hintertupfingen");
 		assertThat(newStation.getLat()).isEqualTo(50.123);
 		assertThat(newStation.getLon()).isEqualTo(9.123);
@@ -350,7 +339,7 @@ class RsapiIntegrationTests {
 		sendInboxCommand("{\"id\": " + idWrongPhoto + ", \"command\": \"DELETE_PHOTO\"}");
 
 		// assert station has no photo anymore
-		var deletedPhotoStation = loadStationByKey("de", stationId);
+		var deletedPhotoStation = loadDeStationByStationId(stationId);
 		assertThat(deletedPhotoStation.getPhotoUrl()).isNull();
 
 		// send problem report station not existing
@@ -406,7 +395,7 @@ class RsapiIntegrationTests {
 	}
 
 	private void assertCoordinatesOfStation6815(double lat, double lon) {
-		var station = loadStationByKey("de", "6815");
+		var station = loadDeStationByStationId("6815");
 		assertThat(station).isNotNull();
 		assertThat(station.getLat()).isEqualTo(lat);
 		assertThat(station.getLon()).isEqualTo(lon);
@@ -414,7 +403,7 @@ class RsapiIntegrationTests {
 
 	@Test
 	void problemReportWithWrongStationName() throws JsonProcessingException {
-		var stationBefore = loadStationByKey("de", "6815");
+		var stationBefore = loadDeStationByStationId("6815");
 		assertThat(stationBefore).isNotNull();
 		assertThat(stationBefore.getTitle()).isEqualTo("Wippra");
 
@@ -428,7 +417,7 @@ class RsapiIntegrationTests {
 		var id = sendProblemReport(problemReportJson);
 		sendInboxCommand("{\"id\": " + id + ", \"command\": \"CHANGE_NAME\", \"title\": \"Admin New Name\"}");
 
-		var stationAfter = loadStationByKey("de", "6815");
+		var stationAfter = loadDeStationByStationId("6815");
 		assertThat(stationAfter).isNotNull();
 		assertThat(stationAfter.getTitle()).isEqualTo("Admin New Name");
 	}
@@ -469,7 +458,7 @@ class RsapiIntegrationTests {
 	}
 
 	private void assertOutdatedPhotoOfStation7065(boolean outdated) {
-		var station = loadStationByKey("de", "7065");
+		var station = loadDeStationByStationId("7065");
 		assertThat(station).isNotNull();
 		assertThat(station.getOutdated()).isEqualTo(outdated);
 	}
@@ -502,7 +491,7 @@ class RsapiIntegrationTests {
 	void postAdminInboxCommandWithUnknownInboxExntry() throws JsonProcessingException {
 		HttpHeaders headers = createJsonHeaders();
 		var response = restTemplateWithBasicAuthUser10()
-				.postForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), new HttpEntity<>("{\"id\": -1, \"command\": \"IMPORT\"}", headers), String.class);
+				.postForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), new HttpEntity<>("{\"id\": -1, \"command\": \"IMPORT_PHOTO\"}", headers), String.class);
 
 		assertThat(response.getStatusCodeValue()).isEqualTo(400);
 		var jsonNode = mapper.readTree(response.getBody());

@@ -5,14 +5,16 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.annotation.Generated;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
- * StationDto
+ * A railway-station object with location and optional photo
  */
 
+@Schema(name = "Station", description = "A railway-station object with location and optional photo")
 @JsonTypeName("Station")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-06-27T19:01:27.797025753+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-08-11T22:38:36.048774788+02:00[Europe/Berlin]")
 public class StationDto {
 
   @JsonProperty("idStr")
@@ -35,6 +37,9 @@ public class StationDto {
 
   @JsonProperty("photoUrl")
   private String photoUrl;
+
+  @JsonProperty("photoId")
+  private Long photoId;
 
   @JsonProperty("license")
   private String license;
@@ -69,8 +74,8 @@ public class StationDto {
    * Unique ID of the station per country
    * @return idStr
   */
-  
-  @Schema(name = "idStr", description = "Unique ID of the station per country", required = false)
+  @NotNull 
+  @Schema(name = "idStr", description = "Unique ID of the station per country", required = true)
   public String getIdStr() {
     return idStr;
   }
@@ -107,8 +112,8 @@ public class StationDto {
    * Two character country code
    * @return country
   */
-  
-  @Schema(name = "country", description = "Two character country code", required = false)
+  @NotNull 
+  @Schema(name = "country", description = "Two character country code", required = true)
   public String getCountry() {
     return country;
   }
@@ -126,8 +131,8 @@ public class StationDto {
    * Name of the station
    * @return title
   */
-  
-  @Schema(name = "title", description = "Name of the station", required = false)
+  @NotNull 
+  @Schema(name = "title", description = "Name of the station", required = true)
   public String getTitle() {
     return title;
   }
@@ -193,6 +198,25 @@ public class StationDto {
     this.photoUrl = photoUrl;
   }
 
+  public StationDto photoId(Long photoId) {
+    this.photoId = photoId;
+    return this;
+  }
+
+  /**
+   * ID of the photo
+   * @return photoId
+  */
+  
+  @Schema(name = "photoId", description = "ID of the photo", required = false)
+  public Long getPhotoId() {
+    return photoId;
+  }
+
+  public void setPhotoId(Long photoId) {
+    this.photoId = photoId;
+  }
+
   public StationDto license(String license) {
     this.license = license;
     return this;
@@ -240,8 +264,8 @@ public class StationDto {
    * Latitude of the station
    * @return lat
   */
-  
-  @Schema(name = "lat", description = "Latitude of the station", required = false)
+  @NotNull 
+  @Schema(name = "lat", description = "Latitude of the station", required = true)
   public Double getLat() {
     return lat;
   }
@@ -259,8 +283,8 @@ public class StationDto {
    * Longitute of the station
    * @return lon
   */
-  
-  @Schema(name = "lon", description = "Longitute of the station", required = false)
+  @NotNull 
+  @Schema(name = "lon", description = "Longitute of the station", required = true)
   public Double getLon() {
     return lon;
   }
@@ -316,8 +340,8 @@ public class StationDto {
    * Get active
    * @return active
   */
-  
-  @Schema(name = "active", required = false)
+  @NotNull 
+  @Schema(name = "active", required = true)
   public Boolean getActive() {
     return active;
   }
@@ -361,6 +385,7 @@ public class StationDto {
         Objects.equals(this.photographer, station.photographer) &&
         Objects.equals(this.photographerUrl, station.photographerUrl) &&
         Objects.equals(this.photoUrl, station.photoUrl) &&
+        Objects.equals(this.photoId, station.photoId) &&
         Objects.equals(this.license, station.license) &&
         Objects.equals(this.licenseUrl, station.licenseUrl) &&
         Objects.equals(this.lat, station.lat) &&
@@ -373,7 +398,7 @@ public class StationDto {
 
   @Override
   public int hashCode() {
-    return Objects.hash(idStr, id, country, title, photographer, photographerUrl, photoUrl, license, licenseUrl, lat, lon, createdAt, ds100, active, outdated);
+    return Objects.hash(idStr, id, country, title, photographer, photographerUrl, photoUrl, photoId, license, licenseUrl, lat, lon, createdAt, ds100, active, outdated);
   }
 
   @Override
@@ -387,6 +412,7 @@ public class StationDto {
     sb.append("    photographer: ").append(toIndentedString(photographer)).append("\n");
     sb.append("    photographerUrl: ").append(toIndentedString(photographerUrl)).append("\n");
     sb.append("    photoUrl: ").append(toIndentedString(photoUrl)).append("\n");
+    sb.append("    photoId: ").append(toIndentedString(photoId)).append("\n");
     sb.append("    license: ").append(toIndentedString(license)).append("\n");
     sb.append("    licenseUrl: ").append(toIndentedString(licenseUrl)).append("\n");
     sb.append("    lat: ").append(toIndentedString(lat)).append("\n");

@@ -55,13 +55,13 @@ class MastodonBotHttpClientTest {
         var inboxEntry = InboxEntry.builder()
                         .comment("comment")
                         .build();
-        client.tootNewPhoto(station, inboxEntry, photo);
+        client.tootNewPhoto(station, inboxEntry, photo, 1);
 
         verify(postRequestedFor(urlEqualTo("/api/v1/statuses"))
                 .withHeader("Authorization", equalTo("Bearer token"))
                 .withHeader("Content-Type", equalTo("application/json;charset=UTF-8"))
                 .withRequestBody(equalToJson("""
-                        {"status": "title\\nby name\\nhttps://station.url?countryCode=de&stationId=1234\\ncomment"}"""
+                        {"status": "title\\nby name\\nhttps://station.url?countryCode=de&stationId=1234&photoId=1\\ncomment"}"""
                 )));
     }
 }

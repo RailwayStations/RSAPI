@@ -13,7 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @Slf4j
@@ -153,7 +152,7 @@ public class ProfileService implements ManageProfileUseCase {
             monitor.sendMessage(
                     String.format("Update email for user '%s' from email '%s' to '%s'%nvia%s",
                             user.getName(), user.getEmail(), newProfile.getEmail(), clientInfo));
-            var emailVerificationToken = UUID.randomUUID().toString();
+            var emailVerificationToken = User.createNewEmailVerificationToken();
             sendEmailVerification(newProfile.getEmail(), emailVerificationToken);
             userDao.updateEmailVerification(user.getId(), emailVerificationToken);
         }
@@ -164,21 +163,20 @@ public class ProfileService implements ManageProfileUseCase {
     @Override
     public void resendEmailVerification(User user) {
         log.info("Resend EmailVerification for '{}'", user.getEmail());
-        var emailVerificationToken = UUID.randomUUID().toString();
+        var emailVerificationToken = User.createNewEmailVerificationToken();
         userDao.updateEmailVerification(user.getId(), emailVerificationToken);
         sendEmailVerification(user.getEmail(), emailVerificationToken);
     }
 
     @Override
     public Optional<User> emailVerification(String token) {
-        var userByToken = userDao.findByEmailVerification(token);
-        if (userByToken.isPresent()) {
-            User user = userByToken.get();
-            userDao.updateEmailVerification(user.getId(), User.EMAIL_VERIFIED);
-            monitor.sendMessage(
-                    String.format("Email verified {nickname='%s', email='%s'}", user.getName(), user.getEmail()));
-        }
-        return userByToken;
+        return userDao.findByEmailVerification(token)
+                .map(user -> {
+                    userDao.updateEmailVerification(user.getId(), User.EMAIL_VERIFIED);
+                    monitor.sendMessage(
+                            String.format("Email verified {nickname='%s', email='%s'}", user.getName(), user.getEmail()));
+                    return user;
+                });
     }
 
     private void sendPasswordMail(String email, String newPassword) {

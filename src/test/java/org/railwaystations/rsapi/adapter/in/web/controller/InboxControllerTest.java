@@ -1,6 +1,7 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
 import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -163,8 +164,11 @@ class InboxControllerTest {
 
     private ResultActions whenPostImage(String nickname, int userId, String email, String stationId, String country,
                                         String stationTitle, Double latitude, Double longitude, String comment, String emailVerification) throws Exception {
-        var inputBytes = "image-content".getBytes(Charset.defaultCharset());
+        return whenPostPhotoUpload(nickname, userId, email, stationId, country, stationTitle, latitude, longitude, comment, emailVerification, "image-content".getBytes(Charset.defaultCharset()), "image/jpeg");
+    }
 
+    @NotNull
+    private ResultActions whenPostPhotoUpload(String nickname, int userId, String email, String stationId, String country, String stationTitle, Double latitude, Double longitude, String comment, String emailVerification, byte[] inputBytes, String contentType) throws Exception {
         var headers = new HttpHeaders();
         if (country != null) {
             headers.add("Country", country);
@@ -184,13 +188,13 @@ class InboxControllerTest {
         if (comment != null) {
             headers.add("Comment", comment);
         }
-        headers.add("Content-Type", "image/jpeg");
+        headers.add("Content-Type", contentType);
         headers.add("User-Agent", "UserAgent");
 
         return mvc.perform(post("/photoUpload")
                         .headers(headers)
                         .content(inputBytes)
-                        .with(user(new AuthUser(User.builder().name(nickname).license(License.CC0_10).id(userId).email(email).emailVerification(emailVerification).build(),Collections.emptyList())))
+                        .with(user(new AuthUser(User.builder().name(nickname).license(License.CC0_10).id(userId).email(email).emailVerification(emailVerification).build(), Collections.emptyList())))
                         .with(csrf()))
                 .andExpect(validOpenApi());
     }
@@ -235,7 +239,7 @@ class InboxControllerTest {
     }
 
     @Test
-    void testPostIframe() throws Exception {
+    void testPostPhotoForExistingStationViaIframe() throws Exception {
         var uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
         when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("nickname@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("","", Collections.emptyList()));
         when(inboxDao.insert(any())).thenReturn(1L);
@@ -246,7 +250,12 @@ class InboxControllerTest {
         verify(inboxDao).insert(uploadCaptor.capture());
         assertUpload(uploadCaptor.getValue(), "de","4711", null, null);
 
-        assertThat(monitor.getMessages().get(0)).isEqualTo("New photo upload for Station4711 - de:4711\nSome Comment\nhttp://inbox.railway-stations.org/1.jpg\nby nickname\nvia UserAgent");
+        assertThat(monitor.getMessages().get(0)).isEqualTo("""
+                    New photo upload for Station4711 - de:4711
+                    Some Comment
+                    http://inbox.railway-stations.org/1.jpg
+                    by nickname
+                    via UserAgent""");
     }
 
     private String whenPostImageIframe(String email,
@@ -266,6 +275,38 @@ class InboxControllerTest {
     }
 
     @Test
+    void testRepostMissingStationWithoutPhotoViaIframe() throws Exception {
+        var uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
+        when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("nickname@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("","", Collections.emptyList()));
+        when(inboxDao.insert(any())).thenReturn(1L);
+        var response = mvc.perform(multipart("/photoUpload")
+                        .file(new MockMultipartFile("file", null, "application/octet-stream", (byte[]) null))
+                        .param("email", "nickname@example.com")
+                        .param("uploadToken", "secretUploadToken")
+                        .param("stationTitle", "Missing Station")
+                        .param("latitude", "10")
+                        .param("longitude", "20")
+                        .param("active", "true")
+                        .param("countryCode", "de")
+                        .param("comment", "Some Comment")
+                        .header("User-Agent", "UserAgent")
+                        .header("Referer", "http://localhost/uploadPage.php")
+                        .header("Accept", "text/html")
+                        .with(csrf()))
+                .andReturn().getResponse().getContentAsString();
+
+        assertThat(response).contains("REVIEW");
+        verify(inboxDao).insert(uploadCaptor.capture());
+        assertUpload(uploadCaptor.getValue(), "de",null, "Missing Station", new Coordinates(10, 20));
+
+        assertThat(monitor.getMessages().get(0)).isEqualTo("""
+                Report missing station Missing Station at https://map.railway-stations.org/index.php?mlat=10.0&mlon=20.0&zoom=18&layers=M
+                Some Comment
+                by nickname
+                via UserAgent""");
+    }
+
+    @Test
     void testUploadPhoto() throws Exception {
         var uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
         when(inboxDao.insert(any())).thenReturn(1L);
@@ -280,7 +321,12 @@ class InboxControllerTest {
         assertFileWithContentExistsInInbox("image-content", "1.jpg");
         verify(inboxDao).insert(uploadCaptor.capture());
         assertUpload(uploadCaptor.getValue(), "de","4711", null, null);
-        assertThat(monitor.getMessages().get(0)).isEqualTo("New photo upload for Station4711 - de:4711\nSome Comment\nhttp://inbox.railway-stations.org/1.jpg\nby @nick name\nvia UserAgent");
+        assertThat(monitor.getMessages().get(0)).isEqualTo("""
+                New photo upload for Station4711 - de:4711
+                Some Comment
+                http://inbox.railway-stations.org/1.jpg
+                by @nick name
+                via UserAgent""");
     }
 
     private void assertUpload(InboxEntry inboxEntry, String countryCode, String stationId, String title, Coordinates coordinates) {
@@ -313,7 +359,33 @@ class InboxControllerTest {
         verify(inboxDao).insert(uploadCaptor.capture());
         assertUpload(uploadCaptor.getValue(), null,null, "Missing Station", new Coordinates(50.9876, 9.1234));
 
-        assertThat(monitor.getMessages().get(0)).isEqualTo("Photo upload for missing station Missing Station at https://map.railway-stations.org/index.php?mlat=50.9876&mlon=9.1234&zoom=18&layers=M\nSome Comment\nhttp://inbox.railway-stations.org/4.jpg\nby @nick name\nvia UserAgent");
+        assertThat(monitor.getMessages().get(0)).isEqualTo("""
+                Photo upload for missing station Missing Station at https://map.railway-stations.org/index.php?mlat=50.9876&mlon=9.1234&zoom=18&layers=M
+                Some Comment
+                http://inbox.railway-stations.org/4.jpg
+                by @nick name
+                via UserAgent""");
+    }
+
+    @Test
+    void testPostMissingStationWithoutPhoto() throws Exception {
+        when(inboxDao.insert(any())).thenReturn(4L);
+        var uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
+
+        whenPostPhotoUpload("@nick name", 42, "nickname@example.com",null, null, "Missing Station", 50.9876d, 9.1234d, "Some Comment", User.EMAIL_VERIFIED, null, "application/octet-stream")
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.state").value("REVIEW"))
+                .andExpect(jsonPath("$.id").value(4))
+                .andExpect(jsonPath("$.filename").doesNotExist());
+
+        verify(inboxDao).insert(uploadCaptor.capture());
+        assertUpload(uploadCaptor.getValue(), null,null, "Missing Station", new Coordinates(50.9876, 9.1234));
+
+        assertThat(monitor.getMessages().get(0)).isEqualTo("""
+                Report missing station Missing Station at https://map.railway-stations.org/index.php?mlat=50.9876&mlon=9.1234&zoom=18&layers=M
+                Some Comment
+                by @nick name
+                via UserAgent""");
     }
 
     @ParameterizedTest
@@ -340,7 +412,12 @@ class InboxControllerTest {
                 .andExpect(jsonPath("$.filename").value("3.jpg"));
 
         assertFileWithContentExistsInInbox(IMAGE_CONTENT, "3.jpg");
-        assertThat(monitor.getMessages().get(0)).isEqualTo("New photo upload for Station4711 - de:4711\n\nhttp://inbox.railway-stations.org/3.jpg\nby @someuser\nvia UserAgent");
+        assertThat(monitor.getMessages().get(0)).isEqualTo("""
+                New photo upload for Station4711 - de:4711
+                
+                http://inbox.railway-stations.org/3.jpg
+                by @someuser
+                via UserAgent""");
     }
 
     @Test
@@ -355,7 +432,12 @@ class InboxControllerTest {
                 .andExpect(jsonPath("$.filename").value("2.jpg"));
 
         assertFileWithContentExistsInInbox(IMAGE_CONTENT, "2.jpg");
-        assertThat(monitor.getMessages().get(0)).isEqualTo("New photo upload for Station4711 - de:4711\n\nhttp://inbox.railway-stations.org/2.jpg (possible duplicate!)\nby @nick name\nvia UserAgent");
+        assertThat(monitor.getMessages().get(0)).isEqualTo("""
+                New photo upload for Station4711 - de:4711
+                
+                http://inbox.railway-stations.org/2.jpg (possible duplicate!)
+                by @nick name
+                via UserAgent""");
     }
 
     @Test
@@ -427,7 +509,12 @@ class InboxControllerTest {
                 .andExpect(jsonPath("$.filename").value("5.jpg"));
 
         assertFileWithContentExistsInInbox(IMAGE_CONTENT, "5.jpg");
-        assertThat(monitor.getMessages().get(0)).isEqualTo("New photo upload for Station1234 - de:1234\n\nhttp://inbox.railway-stations.org/5.jpg (possible duplicate!)\nby @nick name\nvia UserAgent");
+        assertThat(monitor.getMessages().get(0)).isEqualTo("""
+                New photo upload for Station1234 - de:1234
+                
+                http://inbox.railway-stations.org/5.jpg (possible duplicate!)
+                by @nick name
+                via UserAgent""");
     }
 
     @Test
@@ -471,7 +558,11 @@ class InboxControllerTest {
                 .andExpect(jsonPath("$.id").value(6))
                 .andExpect(jsonPath("$.filename").doesNotExist());
 
-        assertThat(monitor.getMessages().get(0)).isEqualTo("New problem report for Station1234 - de:1234\nOTHER: something is wrong\nby @nick name\nvia UserAgent");
+        assertThat(monitor.getMessages().get(0)).isEqualTo("""
+                New problem report for Station1234 - de:1234
+                OTHER: something is wrong
+                by @nick name
+                via UserAgent""");
     }
 
     @Test
@@ -490,6 +581,5 @@ class InboxControllerTest {
     private User createUser(String name, int id) {
         return User.builder().name(name).url("photographerUrl").license(License.CC0_10).id(id).ownPhotos(true).anonymous(false).admin(false).emailVerification(User.EMAIL_VERIFIED).sendNotifications(true).build();
     }
-
 
 }

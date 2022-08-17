@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.annotation.Generated;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
@@ -15,7 +16,7 @@ import java.util.Objects;
 
 @Schema(name = "InboxCommand", description = "command to import or reject an inbox entry")
 @JsonTypeName("InboxCommand")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-06-27T19:01:27.797025753+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-08-11T22:38:36.048774788+02:00[Europe/Berlin]")
 public class InboxCommandDto {
 
   @JsonProperty("id")
@@ -30,6 +31,12 @@ public class InboxCommandDto {
   @JsonProperty("title")
   private String title;
 
+  @JsonProperty("lat")
+  private Double lat;
+
+  @JsonProperty("lon")
+  private Double lon;
+
   @JsonProperty("rejectReason")
   private String rejectReason;
 
@@ -39,17 +46,57 @@ public class InboxCommandDto {
   @JsonProperty("active")
   private Boolean active;
 
-  @JsonProperty("ignoreConflict")
-  private Boolean ignoreConflict;
+  /**
+   * how to handle conflicts
+   */
+  public enum ConflictResolutionEnum {
+    DO_NOTHING("DO_NOTHING"),
+    
+    OVERWRITE_EXISTING_PHOTO("OVERWRITE_EXISTING_PHOTO"),
+    
+    IMPORT_AS_NEW_PRIMARY_PHOTO("IMPORT_AS_NEW_PRIMARY_PHOTO"),
+    
+    IMPORT_AS_NEW_SECONDARY_PHOTO("IMPORT_AS_NEW_SECONDARY_PHOTO"),
+    
+    IGNORE_NEARBY_STATION("IGNORE_NEARBY_STATION");
 
-  @JsonProperty("createStation")
-  private Boolean createStation;
+    private String value;
+
+    ConflictResolutionEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static ConflictResolutionEnum fromValue(String value) {
+      for (ConflictResolutionEnum b : ConflictResolutionEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  @JsonProperty("conflictResolution")
+  private ConflictResolutionEnum conflictResolution;
 
   /**
    * Gets or Sets command
    */
   public enum CommandEnum {
-    IMPORT("IMPORT"),
+    IMPORT_PHOTO("IMPORT_PHOTO"),
+    
+    IMPORT_MISSING_STATION("IMPORT_MISSING_STATION"),
     
     ACTIVATE_STATION("ACTIVATE_STATION"),
     
@@ -108,8 +155,8 @@ public class InboxCommandDto {
    * Get id
    * @return id
   */
-  
-  @Schema(name = "id", required = false)
+  @NotNull 
+  @Schema(name = "id", required = true)
   public Long getId() {
     return id;
   }
@@ -175,6 +222,44 @@ public class InboxCommandDto {
     this.title = title;
   }
 
+  public InboxCommandDto lat(Double lat) {
+    this.lat = lat;
+    return this;
+  }
+
+  /**
+   * Get lat
+   * @return lat
+  */
+  
+  @Schema(name = "lat", required = false)
+  public Double getLat() {
+    return lat;
+  }
+
+  public void setLat(Double lat) {
+    this.lat = lat;
+  }
+
+  public InboxCommandDto lon(Double lon) {
+    this.lon = lon;
+    return this;
+  }
+
+  /**
+   * Get lon
+   * @return lon
+  */
+  
+  @Schema(name = "lon", required = false)
+  public Double getLon() {
+    return lon;
+  }
+
+  public void setLon(Double lon) {
+    this.lon = lon;
+  }
+
   public InboxCommandDto rejectReason(String rejectReason) {
     this.rejectReason = rejectReason;
     return this;
@@ -232,42 +317,23 @@ public class InboxCommandDto {
     this.active = active;
   }
 
-  public InboxCommandDto ignoreConflict(Boolean ignoreConflict) {
-    this.ignoreConflict = ignoreConflict;
+  public InboxCommandDto conflictResolution(ConflictResolutionEnum conflictResolution) {
+    this.conflictResolution = conflictResolution;
     return this;
   }
 
   /**
-   * ignore a conflict
-   * @return ignoreConflict
+   * how to handle conflicts
+   * @return conflictResolution
   */
   
-  @Schema(name = "ignoreConflict", description = "ignore a conflict", required = false)
-  public Boolean getIgnoreConflict() {
-    return ignoreConflict;
+  @Schema(name = "conflictResolution", description = "how to handle conflicts", required = false)
+  public ConflictResolutionEnum getConflictResolution() {
+    return conflictResolution;
   }
 
-  public void setIgnoreConflict(Boolean ignoreConflict) {
-    this.ignoreConflict = ignoreConflict;
-  }
-
-  public InboxCommandDto createStation(Boolean createStation) {
-    this.createStation = createStation;
-    return this;
-  }
-
-  /**
-   * create the station if it doesn't exist
-   * @return createStation
-  */
-  
-  @Schema(name = "createStation", description = "create the station if it doesn't exist", required = false)
-  public Boolean getCreateStation() {
-    return createStation;
-  }
-
-  public void setCreateStation(Boolean createStation) {
-    this.createStation = createStation;
+  public void setConflictResolution(ConflictResolutionEnum conflictResolution) {
+    this.conflictResolution = conflictResolution;
   }
 
   public InboxCommandDto command(CommandEnum command) {
@@ -279,8 +345,8 @@ public class InboxCommandDto {
    * Get command
    * @return command
   */
-  
-  @Schema(name = "command", required = false)
+  @NotNull 
+  @Schema(name = "command", required = true)
   public CommandEnum getCommand() {
     return command;
   }
@@ -302,17 +368,18 @@ public class InboxCommandDto {
         Objects.equals(this.countryCode, inboxCommand.countryCode) &&
         Objects.equals(this.stationId, inboxCommand.stationId) &&
         Objects.equals(this.title, inboxCommand.title) &&
+        Objects.equals(this.lat, inboxCommand.lat) &&
+        Objects.equals(this.lon, inboxCommand.lon) &&
         Objects.equals(this.rejectReason, inboxCommand.rejectReason) &&
         Objects.equals(this.DS100, inboxCommand.DS100) &&
         Objects.equals(this.active, inboxCommand.active) &&
-        Objects.equals(this.ignoreConflict, inboxCommand.ignoreConflict) &&
-        Objects.equals(this.createStation, inboxCommand.createStation) &&
+        Objects.equals(this.conflictResolution, inboxCommand.conflictResolution) &&
         Objects.equals(this.command, inboxCommand.command);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, countryCode, stationId, title, rejectReason, DS100, active, ignoreConflict, createStation, command);
+    return Objects.hash(id, countryCode, stationId, title, lat, lon, rejectReason, DS100, active, conflictResolution, command);
   }
 
   @Override
@@ -323,11 +390,12 @@ public class InboxCommandDto {
     sb.append("    countryCode: ").append(toIndentedString(countryCode)).append("\n");
     sb.append("    stationId: ").append(toIndentedString(stationId)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
+    sb.append("    lat: ").append(toIndentedString(lat)).append("\n");
+    sb.append("    lon: ").append(toIndentedString(lon)).append("\n");
     sb.append("    rejectReason: ").append(toIndentedString(rejectReason)).append("\n");
     sb.append("    DS100: ").append(toIndentedString(DS100)).append("\n");
     sb.append("    active: ").append(toIndentedString(active)).append("\n");
-    sb.append("    ignoreConflict: ").append(toIndentedString(ignoreConflict)).append("\n");
-    sb.append("    createStation: ").append(toIndentedString(createStation)).append("\n");
+    sb.append("    conflictResolution: ").append(toIndentedString(conflictResolution)).append("\n");
     sb.append("    command: ").append(toIndentedString(command)).append("\n");
     sb.append("}");
     return sb.toString();
