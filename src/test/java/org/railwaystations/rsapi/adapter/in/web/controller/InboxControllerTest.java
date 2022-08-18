@@ -1,5 +1,7 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
+import com.atlassian.oai.validator.OpenApiInteractionValidator;
+import com.atlassian.oai.validator.whitelist.ValidationErrorsWhitelist;
 import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,6 +52,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
+import static com.atlassian.oai.validator.whitelist.rule.WhitelistRules.allOf;
+import static com.atlassian.oai.validator.whitelist.rule.WhitelistRules.messageHasKey;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
@@ -200,7 +204,12 @@ class InboxControllerTest {
     }
 
     private ResultMatcher validOpenApi() {
-        return openApi().isValid("static/openapi.yaml");
+        return openApi().isValid(OpenApiInteractionValidator
+                .createFor("static/openapi.yaml")
+                .withWhitelist(ValidationErrorsWhitelist
+                        .create()
+                        .withRule("No security", allOf(messageHasKey("validation.request.security.missing"))))
+                .build());
     }
 
     @Test

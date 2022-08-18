@@ -101,6 +101,7 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
 		var headers = new HttpHeaders();
 		headers.add("Nickname", "nickname");
 		headers.add("Email", "nickname@example.com");
+		headers.add("Upload-Token", "wrong");
 		var response = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
 
 		assertThat(response.getStatusCodeValue()).isEqualTo(401);
@@ -200,18 +201,13 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
 
 
 		var secondPassword = "!\"$%&/()=?-1234567890";
-		changePassword(firstPassword, secondPassword, true, true);
-		changePassword(secondPassword, "\\=oF`)X77__U}G", false, false);
+		changePassword(firstPassword, secondPassword, true);
+		changePassword(secondPassword, "\\=oF`)X77__U}G", false);
 	}
 
-	private void changePassword(String oldPassword, String newPassword, boolean authUploadToken, boolean changePasswordViaHeader) {
+	private void changePassword(String oldPassword, String newPassword, boolean changePasswordViaHeader) {
 		var headers = new HttpHeaders();
-		if (authUploadToken) {
-			headers.add("Upload-Token", oldPassword);
-			headers.add("Email", "user14@example.com");
-		} else {
-			headers.setBasicAuth("user14@example.com", oldPassword);
-		}
+		headers.setBasicAuth("user14@example.com", oldPassword);
 
 		HttpEntity<Object> changePasswordRequest;
 		if (changePasswordViaHeader) {

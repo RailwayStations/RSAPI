@@ -7,7 +7,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20220811.2230"
+  version: "20220818.2040"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -604,22 +604,15 @@ paths:
   /photoUpload:
     post:
       summary: Upload a new Photo
+      security:
+        - basicAuth: []
+        - uploadToken: []
       parameters:
-        - name: Authorization
-          in: header
-          description: basic authorization
-          required: false
-          schema:
-            type: string
-        - name: Upload-Token
-          in: header
-          description: DEPRECATED, use basic authorization! Upload Token
-          required: false
-          schema:
-            type: string
         - name: Email
           in: header
-          description: DEPRECATED, use basic authorization! Email or name of the user
+          description: |
+            DEPRECATED, use basic authorization! 
+            Email or name of the user, used together with the uploadToken security
           required: false
           schema:
             type: string
@@ -721,12 +714,8 @@ paths:
   /reportProblem:
     post:
       summary: Report a for a Railway-Station
-      parameters:
-        - name: Authorization
-          in: header
-          description: basic authorization
-          schema:
-            type: string
+      security:
+        - basicAuth: []
       requestBody:
         description: The problem report
         content:
@@ -760,12 +749,8 @@ paths:
   /userInbox:
     post:
       summary: Query the state of photo uploads of the authorized user
-      parameters:
-        - name: Authorization
-          in: header
-          description: basic authorization
-          schema:
-            type: string
+      security:
+        - basicAuth: []
       requestBody:
         content:
           application/json:
@@ -819,12 +804,8 @@ paths:
   /adminInbox:
     get:
       summary: Get the current inbox, photos and problem reports under review.
-      parameters:
-        - name: Authorization
-          in: header
-          description: basic authorization
-          schema:
-            type: string
+      security:
+        - basicAuth: []
       responses:
         200:
           description: array of inbox objects
@@ -841,13 +822,10 @@ paths:
           description: forbidden
           content: {}
     post:
-      summary: Import or reject an uploaded photo or a problem report from the inbox
-      parameters:
-        - name: Authorization
-          in: header
-          description: basic authorization
-          schema:
-            type: string
+      summary: |
+        Import or reject an uploaded photo or a problem report from the inbox
+      security:
+        - basicAuth: []
       requestBody:
         content:
           application/json:
@@ -926,12 +904,8 @@ paths:
   /resendEmailVerification:
     post:
       summary: Sends a new eMail-Verification mail
-      parameters:
-        - name: Authorization
-          in: header
-          description: basic authorization with old password
-          schema:
-            type: string
+      security:
+        - basicAuth: []
       responses:
         200:
           description: email successfully sent
@@ -984,12 +958,9 @@ paths:
   /changePassword:
     post:
       summary: Change user password
+      security:
+        - basicAuth: []
       parameters:
-        - name: Authorization
-          in: header
-          description: basic authorization with old password
-          schema:
-            type: string
         - name: New-Password
           in: header
           description: new password, deprecated use body message for proper encoding
@@ -1025,22 +996,15 @@ paths:
   /myProfile:
     get:
       summary: Get the users profile
+      security:
+        - basicAuth: []
+        - uploadToken: []
       parameters:
-        - name: Authorization
-          in: header
-          description: basic authorization
-          schema:
-            type: string
-          required: false
-        - name: Upload-Token
-          in: header
-          description: DEPRECATED, use basic authorization! Upload Token
-          required: false
-          schema:
-            type: string
         - name: Email
           in: header
-          description: DEPRECATED, use basic authorization! Email or name of the user
+          description: |
+            DEPRECATED, use basic authorization! 
+            Email or name of the user, used together with the uploadToken security
           required: false
           schema:
             type: string
@@ -1060,22 +1024,15 @@ paths:
     post:
       summary: Update the users profile. In case the email has been changed, only
         the email is saved and a new password / Upload-Token is send.
+      security:
+        - basicAuth: []
+        - uploadToken: []
       parameters:
-        - name: Authorization
-          in: header
-          description: basic authorization
-          required: false
-          schema:
-            type: string
-        - name: Upload-Token
-          in: header
-          description: DEPRECATED, use basic authorization! Upload Token
-          required: false
-          schema:
-            type: string
         - name: Email
           in: header
-          description: DEPRECATED, use basic authorization! Email or name of the user
+          description: |
+            DEPRECATED, use basic authorization! 
+            Email or name of the user, used together with the uploadToken security
           required: false
           schema:
             type: string
@@ -1252,6 +1209,18 @@ paths:
           description: file not found
           content: {}
 components:
+  securitySchemes:
+    basicAuth:
+      description: HTTP Basic Authentication
+      type: http
+      scheme: basic
+    uploadToken:
+      description: |
+        DEPRECATED authentication via personal Upload-Token!
+        Used together with Email header.
+      type: apiKey
+      in: header
+      name: Upload-Token
   schemas:
     Station:
       description: A railway-station object with location and optional photo
