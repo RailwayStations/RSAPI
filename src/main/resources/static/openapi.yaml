@@ -2,12 +2,13 @@
 openapi: 3.0.1
 info:
   title: RSAPI
-  description: 'Backend Service for https://www.railway-stations.org/. Sourcecode
-    available at: https://github.com/RailwayStations/RSAPI.'
+  description: |
+    Backend Service for https://www.railway-stations.org/. 
+    Sourcecode available at: https://github.com/RailwayStations/RSAPI.
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20220821.1020"
+  version: "20220821.1400"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -40,8 +41,8 @@ paths:
             type: string
         - name: maxDistance
           in: query
-          description: filter by max distance from the coordinates given by lat and
-            lon
+          description: |
+            filter by max distance from the coordinates given by lat and lon
           schema:
             type: integer
             format: int64
@@ -103,8 +104,8 @@ paths:
             type: string
         - name: maxDistance
           in: query
-          description: filter by max distance from the coordinates given by lat and
-            lon
+          description: |
+            filter by max distance from the coordinates given by lat and lon
           schema:
             type: integer
             format: int64
@@ -158,8 +159,8 @@ paths:
             type: string
         - name: maxDistance
           in: query
-          description: filter by max distance from the coordinates given by lat and
-            lon
+          description: |
+            filter by max distance from the coordinates given by lat and lon
           schema:
             type: integer
             format: int64
@@ -218,8 +219,8 @@ paths:
             type: string
         - name: maxDistance
           in: query
-          description: filter by max distance from the coordinates given by lat and
-            lon
+          description: |
+            filter by max distance from the coordinates given by lat and lon
           schema:
             type: integer
             format: int64
@@ -279,7 +280,8 @@ paths:
       parameters:
         - name: sinceHours
           in: query
-          description: defines the timeframe since when to look for recent photo uploads,
+          description: |
+            defines the timeframe since when to look for recent photo uploads,
             default is 10h
           schema:
             type: integer
@@ -1050,8 +1052,9 @@ paths:
           description: forbidden
           content: {}
     post:
-      summary: Update the users profile. In case the email has been changed, only
-        the email is saved and a new password / Upload-Token is send.
+      summary: Update the users profile. 
+      description: |
+        In case the email has been changed, only the email is saved and a new password is send.
       security:
         - basicAuth: []
         - uploadToken: []
@@ -1283,11 +1286,13 @@ components:
           format: int64
         license:
           type: string
-          description: License of the photo, clients need to link to an online version
+          description: |
+            License of the photo, clients need to link to an online version
             of the license text
         licenseUrl:
           type: string
-          description: The URL of the license text. Clients should use this to link
+          description: |
+            The URL of the license text. Clients should use this to link
             to the online version of the license text
         lat:
           type: number
@@ -1299,7 +1304,8 @@ components:
           format: double
         createdAt:
           type: integer
-          description: Timestamp when the photo was created in the railway-stations
+          description: |
+            Timestamp when the photo was created in the railway-stations
             database (Milliseconds since 1.1.1970)
           format: int64
         DS100:
@@ -1317,7 +1323,8 @@ components:
         - lon
         - active
     Photographers:
-      description: JSON Object with photographers nickname as parameter and number
+      description: |
+        JSON Object with photographers nickname as parameter and number
         of photos as their value
       type: object
     Statistic:
@@ -1362,7 +1369,8 @@ components:
           description: Twitter Tags when sharing the photo on Twitter
         timetableUrlTemplate:
           type: string
-          description: URL template for the timetable, contains {title}, {id} and
+          description: |
+            URL template for the timetable, contains {title}, {id} and
             {DS100} placeholders which need to be replaced
         overrideLicense:
           type: string
