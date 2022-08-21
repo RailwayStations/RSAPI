@@ -7,7 +7,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20220818.2040"
+  version: "20220821.1020"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -20,6 +20,7 @@ paths:
   /{country}/stations:
     get:
       summary: Finds railway stations by various query criteria
+      deprecated: true
       parameters:
         - name: country
           in: path
@@ -82,6 +83,7 @@ paths:
   /{country}/stations.gpx:
     get:
       summary: Finds railway stations by various query criteria as GPX
+      deprecated: true
       parameters:
         - name: country
           in: path
@@ -291,8 +293,8 @@ paths:
                 $ref: '#/components/schemas/Station'
   /{country}/photographers:
     get:
-      summary: List of all photographers of a given country with their number of photos
-        taken
+      summary: List of all photographers of a given country with their number of photos taken
+      deprecated: true
       parameters:
         - name: country
           in: path
@@ -321,8 +323,8 @@ paths:
           content: {}
   /{country}/photographers.txt:
     get:
-      summary: List of all photographers of a given country with their number of photos
-        taken
+      summary: List of all photographers of a given country with their number of photos taken
+      deprecated: true
       parameters:
         - name: country
           in: path
@@ -348,8 +350,8 @@ paths:
           content: {}
   /{country}/photographers.json:
     get:
-      summary: List of all photographers of a given country with their number of photos
-        taken
+      summary: List of all photographers of a given country with their number of photos taken
+      deprecated: true
       parameters:
         - name: country
           in: path
@@ -376,6 +378,13 @@ paths:
   /photographers:
     get:
       summary: List of all photographers with their number of photos taken
+      parameters:
+        - name: country
+          in: header
+          description: filter by country code
+          required: false
+          schema:
+            type: string
       responses:
         200:
           description: successful operation
@@ -395,6 +404,13 @@ paths:
   /photographers.json:
     get:
       summary: List of all photographers with their number of photos taken
+      parameters:
+        - name: country
+          in: header
+          description: filter by country code
+          required: false
+          schema:
+            type: string
       responses:
         200:
           description: successful operation
@@ -411,6 +427,13 @@ paths:
   /photographers.txt:
     get:
       summary: List of all photographers with their number of photos taken
+      parameters:
+        - name: country
+          in: header
+          description: filter by country code
+          required: false
+          schema:
+            type: string
       responses:
         200:
           description: successful operation
@@ -427,6 +450,7 @@ paths:
   /{country}/stats:
     get:
       summary: Statistic of photos with and without photos by country
+      deprecated: true
       parameters:
         - name: country
           in: path
@@ -456,6 +480,7 @@ paths:
   /{country}/stats.json:
     get:
       summary: Statistic of photos with and without photos by country
+      deprecated: true
       parameters:
         - name: country
           in: path
@@ -482,6 +507,7 @@ paths:
   /{country}/stats.txt:
     get:
       summary: Statistic of photos with and without photos by country
+      deprecated: true
       parameters:
         - name: country
           in: path
@@ -611,8 +637,8 @@ paths:
         - name: Email
           in: header
           description: |
-            DEPRECATED, use basic authorization! 
             Email or name of the user, used together with the uploadToken security
+          deprecated: true
           required: false
           schema:
             type: string
@@ -933,7 +959,8 @@ paths:
   /newUploadToken:
     post:
       summary: Requests a new Upload-Token (now password) only
-      description: DEPRECATED, use reset password
+      description: use /resetPassword instead
+      deprecated: true
       parameters:
         - name: Email
           in: header
@@ -964,6 +991,7 @@ paths:
         - name: New-Password
           in: header
           description: new password, deprecated use body message for proper encoding
+          deprecated: true
           required: false
           schema:
             type: string
@@ -1003,8 +1031,8 @@ paths:
         - name: Email
           in: header
           description: |
-            DEPRECATED, use basic authorization! 
             Email or name of the user, used together with the uploadToken security
+          deprecated: true
           required: false
           schema:
             type: string
@@ -1031,8 +1059,8 @@ paths:
         - name: Email
           in: header
           description: |
-            DEPRECATED, use basic authorization! 
             Email or name of the user, used together with the uploadToken security
+          deprecated: true
           required: false
           schema:
             type: string
@@ -1231,7 +1259,8 @@ components:
           description: Unique ID of the station per country
         id:
           type: integer
-          description: DEPRECATED! Unique (numeric) ID of the station per country
+          description: Unique (numeric) ID of the station per country
+          deprecated: true
           format: int64
         country:
           type: string
