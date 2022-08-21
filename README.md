@@ -1,11 +1,7 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b9882fcf1221409680f36afe2c85fcba)](https://www.codacy.com/gh/RailwayStations/RSAPI?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=RailwayStations/RSAPI&amp;utm_campaign=Badge_Grade) [![Coverage Status](https://coveralls.io/repos/github/RailwayStations/RSAPI/badge.svg?branch=master)](https://coveralls.io/github/RailwayStations/RSAPI?branch=master) 
 
 # Railway Stations API
-Backend Service for the https://map.railway-stations.org and the Mobile Apps for [Android](https://github.com/RailwayStations/RSAndroidApp) and [iOS](https://github.com/RailwayStations/Bahnhofsfotos) of the [Bahnhofsfotos opendata Project](https://github.com/RailwayStations).
-It started as a simple GPX Exporter to use the Waypoints in your favorite Map App or GPS Device.
-Later it was enhanced to export a plaintext list of the Waypoints for the first static online map, which doesn't exist anymore.
-Then it returned the Waypoints as json for the Android and iOS Apps as well as the Website.
-Over time more and more countries have been added, see [Use](#use).
+Backend Service for the https://map.railway-stations.org website and the Mobile Apps for [Android](https://github.com/RailwayStations/RSAndroidApp) and [iOS](https://github.com/RailwayStations/Bahnhofsfotos) of the [Bahnhofsfotos opendata Project](https://github.com/RailwayStations).
 
 This API is hosted at https://api.railway-stations.org or at the Deutsche Bahn developer site: https://developer.deutschebahn.com/store/apis/list where you can also find an online and executable version of the OpenAPI documentation.
 
@@ -18,6 +14,10 @@ Run on Unix like systems:
 Run on Windows:
 
 ```./gradlew.bat build bootJar```
+
+Build docker image:
+
+```docker build . -t railwaystations/rsapi:latest```
 
 ## Working Directory
 
@@ -33,34 +33,19 @@ The following subdirectories are being used:
   - `done`: imported (unprocessed) photos
   - `<countryCode>/import`: old import directories for batch imports
 
-## Docker
-This project can be run as a Docker container. The docker image is automatically built via the above maven build command.
+## Run
 
-- build:
-  ```docker build . -t railwaystations/rsapi:latest```
-
-- Configure the ```application-prod.yaml``` file from current directory and put it into the rsapi work directory.
-    
-- Run interactively:
-  ```docker run -it -e SPRING_PROFILES_ACTIVE=prod --net=host --rm -v <work-dir>:/var/rsapi --name rsapi railwaystations/rsapi```
-
-- Run as background service:
-  ```docker run -d -e SPRING_PROFILES_ACTIVE=prod --net=host --restart always --name rsapi -v <work-dir>:/var/rsapi railwaystations/rsapi:latest```
- 
-Ready to use images are published at https://hub.docker.com/repository/docker/railwaystations/rsapi
+The API can be started via `docker compose up -d` locally. It starts two Docker container: a local Maria DB and the API. The API is then available via `http://localhost:8080`.
 
 ## Maria DB
 
-For local testing purpose you can start a MariaDB in docker with `mariadb-start.sh`.
+For local testing and debugging purpose you can start the MariaDB container standalone with `docker compose up mariadb -d`.
 
-Enter mysql CLI:
+Enter mariadb CLI:
 `docker exec -it mariadb mysql -ursapi -prsapi rsapi --default-character-set=utf8mb4`
 
-### Migrations
+## Useage
 
-RSAPI used Liquibase for database schema migration. This schema is updated automatically on start.
-
-## Use
 Point your browser to `http://localhost:8080/{country}/stations`, where `country` can be "de", "ch", "fi", "uk", ...
 
 With the following query parameter:
@@ -73,24 +58,14 @@ A more detailed API documentation can be found in the [OpenAPI](src/main/resourc
 
 ### Examples
 - all supported countries: https://api.railway-stations.org/countries
-- all german trainstations: https://api.railway-stations.org/de/stations
-- german trainstations without photo: https://api.railway-stations.org/de/stations?hasPhoto=false
-- austrian trainsations from photographer @android_oma: https://api.railway-stations.org/ch/stations?photographer=@android_oma
-- german trainsations within 20km from FFM mainstation: https://api.railway-stations.org/de/stations?maxDistance=20&lat=50.1060866&lon=8.6615762
+- all german trainstations: https://api.railway-stations.org/stations?country=de
+- german trainstations without photo: https://api.railway-stations.org/stations?country=de&hasPhoto=false
+- austrian trainsations from photographer @pokipsie: https://api.railway-stations.org/stations?country=ch&photographer=@pokipsie
+- german trainsations within 20km from FFM mainstation: https://api.railway-stations.org/stations?country=de&maxDistance=20&lat=50.1060866&lon=8.6615762
 - all photographers with count of photos: https://api.railway-stations.org/photographers.txt
-- german photographers: https://api.railway-stations.org/de/photographers.txt
-- statistic per country (de): https://api.railway-stations.org/de/stats.txt
+- german photographers: https://api.railway-stations.org/photographers.txt?country=de
+- statistic per country (de): https://api.railway-stations.org/stats.txt?country=de
 
 The default output format is json. But can easily be changed to GPX or TXT. Either set the `Accept` header to `text/plain` or `application/gpx+xml` or simply add the extension `.txt` or `.gpx` to the end of the URL.
 
 Download the .gpx file and import it to your favourite Map application (e.g. Locus on Android).
-
-### Nextcloud and Docker
-
-On our server we use two directories `toprocess` and `processed` from a Nextcloud shared directory. To use these two directories in the API running in Docker they need to be created as Docker volumes and mounted into the Docker instance.
-
-- Install [fentas/davfs](https://github.com/fentas/docker-volume-davfs) plugin: `docker plugin install fentas/davfs`
-- Create volumes:
-  - `docker volume create -d fentas/davfs -o url=https://<user>:<password>@cloud.railway-stations.org/remote.php/webdav/VsionAI/roh -o uid=1000 -o gid=1000 toprocess`
-  - `docker volume create -d fentas/davfs -o url=https://<user>:<password>@cloud.railway-stations.org/remote.php/webdav/VsionAI/verpixelt -o uid=1000 -o gid=1000 processed`
-- Run Container with these volumes: `docker run -d --name rsapi -v /var/rsapi:/var/rsapi -v toprocess:/var/rsapi/inbox/toprocess -v processed:/var/rsapi/inbox/processed railwaystations/rsapi:latest`
