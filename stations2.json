@@ -1,4 +1,5 @@
 {
+    "country": "de",
     "photoBaseUrl": "https://api.railway-stations.org/photos/",
     "licenses": [
         {
@@ -17,68 +18,50 @@
             "url": "https://twitter.com/user2"
         }
     ],
-    "stationsByCountry": [
+    "stations": [
         {
-            "code": "de",
-            "stations": [
-                {
-                    "id": "1500",
-                    "title": "Eichenzell",
-                    "lat": 50.4944517863314,
-                    "lon": 9.6942526102066,
-                    "DS100": "FEIZ",
-                    "photos": [
-                        {
-                            "id": 4012,
-                            "photographer": "user1",
-                            "path": "de/1500_1.jpg",
-                            "createdAt": 1457327715000,
-                            "license": "CC0"
-                        },
-                        {
-                            "id": 4013,
-                            "photographer": "user1",
-                            "path": "de/1500_2.jpg",
-                            "createdAt": 1457345715000,
-                            "license": "CC0",
-                            "outdated": true
-                        }
-                    ]
-                },
-                {
-                    "id": "1546",
-                    "title": "Elfershausen-Trimberg",
-                    "lat": 50.1404521364625,
-                    "lon": 9.96913433074951,
-                    "DS100": "NELF",
-                    "inactive": true,
-                    "photos": [
-                        {
-                            "id": 4051,
-                            "photographer": "user1",
-                            "path": "de/1546.jpg",
-                            "createdAt": 1486929388000,
-                            "license": "CC0"
-                        }
-                    ]
-                },
-                {
-                    "id": "6460",
-                    "title": "Wächtersbach",
-                    "lat": 50.2536044954027,
-                    "lon": 9.29536374044219,
-                    "DS100": "FWAE",
-                    "photos": [
-                        {
-                            "id": 8158,
-                            "photographer": "user1",
-                            "path": "de/6460.jpg",
-                            "createdAt": 1491166102000,
-                            "license": "CC0"
-                        }
-                    ]
-                }
-            ]
+            "id": "1500",
+            "title": "Eichenzell",
+            "lat": 50.4944517863314,
+            "lon": 9.6942526102066,
+            "DS100": "FEIZ",
+            "photo": {
+                "id": 4012,
+                "photographer": "user1",
+                "path": "de/1500_1.jpg",
+                "createdAt": 1457327715000,
+                "license": "CC0"
+            }
+        },
+        {
+            "id": "1546",
+            "title": "Elfershausen-Trimberg",
+            "lat": 50.1404521364625,
+            "lon": 9.96913433074951,
+            "DS100": "NELF",
+            "inactive": true,
+            "photo": {
+                "id": 4051,
+                "photographer": "user1",
+                "path": "de/1546.jpg",
+                "createdAt": 1486929388000,
+                "license": "CC0",
+                "outdated": true
+            }
+        },
+        {
+            "id": "6460",
+            "title": "Wächtersbach",
+            "lat": 50.2536044954027,
+            "lon": 9.29536374044219,
+            "DS100": "FWAE",
+            "photo": {
+                "id": 8158,
+                "photographer": "user1",
+                "path": "de/6460.jpg",
+                "createdAt": 1491166102000,
+                "license": "CC0"
+            }
         }
     ]
 }
