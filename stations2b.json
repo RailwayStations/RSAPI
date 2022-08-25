@@ -24,14 +24,7 @@
             "title": "Eichenzell",
             "lat": 50.4944517863314,
             "lon": 9.6942526102066,
-            "ds100": "FEIZ",
-            "photo": {
-                "id": 4012,
-                "photographer": "user1",
-                "path": "de/1500_1.jpg",
-                "createdAt": 1457327715000,
-                "license": "CC0"
-            }
+            "ds100": "FEIZ"
         },
         {
             "id": "1546",
@@ -39,29 +32,41 @@
             "lat": 50.1404521364625,
             "lon": 9.96913433074951,
             "ds100": "NELF",
-            "inactive": true,
-            "photo": {
-                "id": 4051,
-                "photographer": "user1",
-                "path": "de/1546.jpg",
-                "createdAt": 1486929388000,
-                "license": "CC0",
-                "outdated": true
-            }
+            "inactive": true
         },
         {
             "id": "6460",
             "title": "Wächtersbach",
             "lat": 50.2536044954027,
             "lon": 9.29536374044219,
-            "ds100": "FWAE",
-            "photo": {
-                "id": 8158,
-                "photographer": "user1",
-                "path": "de/6460.jpg",
-                "createdAt": 1491166102000,
-                "license": "CC0"
-            }
+            "ds100": "FWAE"
+        }
+    ],
+    "photos": [
+        {
+            "id": 4012,
+            "stationId": "1500",
+            "photographer": "user1",
+            "path": "de/1500_1.jpg",
+            "createdAt": 1457327715000,
+            "license": "CC0"
+        },
+        {
+            "id": 4051,
+            "stationId": "1546",
+            "photographer": "user1",
+            "path": "de/1546.jpg",
+            "createdAt": 1486929388000,
+            "license": "CC0",
+            "outdated": true
+        },
+        {
+            "id": 8158,
+            "stationId": "6460",
+            "photographer": "user1",
+            "path": "de/6460.jpg",
+            "createdAt": 1491166102000,
+            "license": "CC0"
         }
     ]
 }
