@@ -1,0 +1,40 @@
+{
+    "idStr": "1973",
+    "id": 1973,
+    "country": "de",
+    "title": "Fulda",
+    "photoId": 4430,
+    "photographer": "pstorch",
+    "photographerUrl": "https://github.com/pstorch",
+    "photoUrl": "https://api.railway-stations.org/photos/de/1973.jpg",
+    "license": "CC0 1.0 Universell (CC0 1.0)",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "lat": 50.5547372607544,
+    "lon": 9.6843855869764,
+    "createdAt": 1451846273000,
+    "DS100": "FFU",
+    "active": true,
+    "outdated": false,
+    "secondaryPhotos": [
+        {
+            "photoId": 4432,
+            "photographer": "pstorch",
+            "photographerUrl": "https://github.com/pstorch",
+            "photoUrl": "https://api.railway-stations.org/photos/de/1973_2.jpg",
+            "license": "CC0 1.0 Universell (CC0 1.0)",
+            "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+            "createdAt": 1452846476000,
+            "outdated": false
+        },
+        {
+            "photoId": 4436,
+            "photographer": "pstorch",
+            "photographerUrl": "https://github.com/pstorch",
+            "photoUrl": "https://api.railway-stations.org/photos/de/1973_5.jpg",
+            "license": "CC0 1.0 Universell (CC0 1.0)",
+            "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+            "createdAt": 1452946481000,
+            "outdated": false
+        }
+    ]
+}
