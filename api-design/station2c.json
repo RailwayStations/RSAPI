@@ -1,5 +1,5 @@
 {
-    "countryCode": "de",
+    "country": "de",
     "photoBaseUrl": "https://api.railway-stations.org/photos/",
     "licenses": [
         {
@@ -36,7 +36,7 @@
                 },
                 {
                     "id": 4013,
-                    "photographer": "user1",
+                    "photographer": "user2",
                     "path": "de/1973_2.jpg",
                     "createdAt": 1457345715000,
                     "license": "CC0",

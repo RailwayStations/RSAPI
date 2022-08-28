@@ -1,5 +1,5 @@
 {
-    "countryCode": "de",
+    "country": "de",
     "photoBaseUrl": "https://api.railway-stations.org/photos/",
     "licenses": [
         {

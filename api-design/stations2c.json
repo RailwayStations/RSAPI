@@ -1,5 +1,5 @@
 {
-    "countryCode": "de",
+    "country": "de",
     "photoBaseUrl": "https://api.railway-stations.org/photos/",
     "licenses": [
         {
@@ -32,7 +32,7 @@
                     "path": "de/1500_1.jpg",
                     "createdAt": 1457327715000,
                     "license": "CC0"
-                },
+                }
             ]
         },
         {
@@ -45,12 +45,12 @@
             "photos": [
                 {
                     "id": 4051,
-                    "photographer": "user1",
+                    "photographer": "user2",
                     "path": "de/1546.jpg",
                     "createdAt": 1486929388000,
                     "license": "CC0",
                     "outdated": true
-                },
+                }
             ]
         },
         {
