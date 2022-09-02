@@ -398,29 +398,6 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testNewUploadTokenViaEmail() throws Exception {
-        var user = User.builder()
-                .name("existing")
-                .license(License.CC0_10)
-                .email("existing@example.com")
-                .ownPhotos(true)
-                .anonymous(false)
-                .url("https://link@example.com")
-                .sendNotifications(true).build();
-        when(userDao.findByNormalizedName(user.getName())).thenReturn(Optional.of(user));
-        when(userDao.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-
-        mvc.perform(post("/newUploadToken")
-                        .header("User-Agent", "UserAgent")
-                        .header("Email", "existing@example.com")
-                        .with(csrf()))
-                .andExpect(validOpenApi())
-                .andExpect(status().isAccepted());
-
-        assertThat(monitor.getMessages().get(0)).isEqualTo("Reset Password for 'existing', email='existing@example.com'");
-    }
-
-    @Test
     void testResetPasswordViaEmail() throws Exception {
         var user = User.builder()
                 .name("existing")

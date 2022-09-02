@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20220821.1400"
+  version: "20220902.2200"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -958,32 +958,6 @@ paths:
             text/plain:
               schema:
                 type: string
-  /newUploadToken:
-    post:
-      summary: Requests a new Upload-Token (now password) only
-      description: use /resetPassword instead
-      deprecated: true
-      parameters:
-        - name: Email
-          in: header
-          description: email or name of the user
-          required: true
-          schema:
-            type: string
-      responses:
-        202:
-          description: request accepted, email with new password (uploadToken) will
-            be sent
-          content: {}
-        400:
-          description: Bad Request
-          content:
-            text/plain:
-              schema:
-                type: string
-        404:
-          description: User not found
-          content: {}
   /changePassword:
     post:
       summary: Change user password
@@ -1103,43 +1077,6 @@ paths:
               schema:
                 type: string
       x-codegen-request-body-name: profile
-  /fotos/{country}/{filename}:
-    get:
-      summary: downloads the given photo
-      parameters:
-        - name: country
-          in: path
-          description: country code
-          required: true
-          schema:
-            type: string
-        - name: filename
-          in: path
-          description: filename of the photo
-          required: true
-          schema:
-            type: string
-        - name: width
-          in: query
-          description: scale the image to the given width
-          schema:
-            type: integer
-            format: int32
-      responses:
-        200:
-          description: ok
-          content:
-            image/jpeg:
-              schema:
-                type: string
-                format: binary
-            image/png:
-              schema:
-                type: string
-                format: binary
-        404:
-          description: file not found
-          content: {}
   /photos/{country}/{filename}:
     get:
       summary: downloads the given photo

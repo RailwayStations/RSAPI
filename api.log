@@ -26,6 +26,7 @@ GET /wp-login.php
 GET /&
 GET /.git/config
 GET /*/wp-login.php
+GET /*/*
 
 GET /
 GET /adminInbox
@@ -34,11 +35,9 @@ GET /countries
 GET /countries.json
 GET /countries?active=
 GET /countries?onlyActive=
-GET /country=in
 GET /emailVerification/*
 GET /inbox/processed/*
 GET /inbox/*
-GET /jp&stationId=
 GET /myProfile
 GET /nextZ
 GET /openapi.yaml
@@ -48,14 +47,11 @@ GET /photographers.json
 GET /photographers.txt
 GET /photographers.txt?country=
 GET /photographers?country=
-GET /photos/*/Jelenia_Go%CC%81ra_5105580.JPG
-GET /photos/*/berlin
 GET /photos/*/*
 GET /photos/*/*?width=
 GET /publicInbox
 GET /recentPhotoImports?sinceHours=
 GET /stations
-GET /stations/country=de&active=
 GET /stations/?country=&active=
 GET /stations?active=
 GET /stations?country=
@@ -67,9 +63,7 @@ GET /stations?country=&country=&country=&country=&country=&country=&country=
 GET /stations?country=&country=&country=&country=&country=&country=&country=&country=&country=&country=
 GET /stations?country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=
 GET /stations?country=&hasPhoto=
-GET /stations?country=&id=
 GET /stations?country=&photographer=
-GET /stations?country=&stationId=
 GET /stations?photographer=
 GET /stats
 GET /stats.json
@@ -80,18 +74,12 @@ GET /*/photographers.json
 GET /*/photographers.txt
 GET /*/stations
 GET /*/stations/
-GET /*/stations/tw1245
-GET /*/stations/tw1415
-GET /*/stations/tw1420
 GET /*/stations/*
 GET /*/stations?hasPhoto=
 GET /*/stations?lat=&lon=&maxDistance=
 GET /*/stations?photographer=
 GET /*/stats
 GET /*/stats.txt
-GET /*/*
-GET //stations/
-GET //stations?country=
 HEAD /
 HEAD /photos/*/*
 OPTIONS /adminInbox
