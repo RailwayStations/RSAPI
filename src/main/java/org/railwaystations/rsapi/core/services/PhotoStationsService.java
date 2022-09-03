@@ -37,20 +37,11 @@ public class PhotoStationsService implements FindPhotoStationsUseCase {
     }
 
     public Optional<Station> findByCountryAndId(String country, String stationId) {
-        if (StringUtils.isBlank(stationId)) {
+        if (StringUtils.isBlank(stationId) || StringUtils.isBlank(country)) {
             return Optional.empty();
         }
-        if (StringUtils.isNotBlank(country)) {
-            return findByKey(new Station.Key(country, stationId));
-        }
-        Set<Station> stations = stationDao.findById(stationId);
-        if (stations.size() > 1) {
-            return Optional.empty(); // id is not unique
-        }
-        return stations.stream().findFirst();
-    }
 
-    public Optional<Station> findByKey(Station.Key key) {
+        var key = new Station.Key(country, stationId);
         return stationDao.findByKey(key.getCountry(), key.getId()).stream().findFirst();
     }
 

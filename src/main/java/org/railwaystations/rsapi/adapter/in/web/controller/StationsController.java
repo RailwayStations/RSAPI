@@ -16,7 +16,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -80,7 +79,7 @@ public class StationsController {
                                         @RequestParam(value = LAT, required = false) Double lat,
                                         @RequestParam(value = LON, required = false) Double lon,
                                         @RequestParam(value = ACTIVE, required = false) Boolean active) {
-        return get(Collections.singleton(country), hasPhoto, photographer, maxDistance, lat, lon, active);
+        return get(Set.of(country), hasPhoto, photographer, maxDistance, lat, lon, active);
     }
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"}, value = "/{country}/stations.json")
