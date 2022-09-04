@@ -8,7 +8,8 @@ and [iOS](https://github.com/RailwayStations/Bahnhofsfotos) of
 the [Bahnhofsfotos opendata Project](https://github.com/RailwayStations).
 
 This API is hosted at https://api.railway-stations.org or at the Deutsche Bahn developer
-site: https://developer.deutschebahn.com/store/apis/list where you can also find an online and executable version of the OpenAPI documentation.
+site: https://developer.deutschebahn.com/store/apis/list where you can also find an online and executable version of the
+OpenAPI documentation.
 
 ## build
 
