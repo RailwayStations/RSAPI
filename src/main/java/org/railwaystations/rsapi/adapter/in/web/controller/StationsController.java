@@ -1,7 +1,6 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
 import org.railwaystations.rsapi.adapter.in.web.model.StationDto;
-import org.railwaystations.rsapi.adapter.in.web.writer.StationsGpxWriter;
 import org.railwaystations.rsapi.core.model.Station;
 import org.railwaystations.rsapi.core.ports.in.FindPhotoStationsUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -39,7 +37,7 @@ public class StationsController {
     @Value("${photoBaseUrl}")
     private String photoBaseUrl;
 
-    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8", StationsGpxWriter.GPX_MEDIA_TYPE_VALUE}, value = "/stations")
+    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"}, value = "/stations")
     public List<StationDto> get(@RequestParam(value = COUNTRY, required = false) Set<String> countries,
                                 @RequestParam(value = HAS_PHOTO, required = false) Boolean hasPhoto,
                                 @RequestParam(value = PHOTOGRAPHER, required = false) String photographer,
@@ -61,18 +59,7 @@ public class StationsController {
         return get(countries, hasPhoto, photographer, maxDistance, lat, lon, active);
     }
 
-    @GetMapping(produces = {StationsGpxWriter.GPX_MEDIA_TYPE_VALUE}, value = "/stations.gpx")
-    public List<StationDto> getAsGpx(@RequestParam(value = COUNTRY, required = false) Set<String> countries,
-                             @RequestParam(value = HAS_PHOTO, required = false) Boolean hasPhoto,
-                             @RequestParam(value = PHOTOGRAPHER, required = false) String photographer,
-                             @RequestParam(value = MAX_DISTANCE, required = false) Integer maxDistance,
-                             @RequestParam(value = LAT, required = false) Double lat,
-                             @RequestParam(value = LON, required = false) Double lon,
-                             @RequestParam(value = ACTIVE, required = false) Boolean active) {
-        return get(countries, hasPhoto, photographer, maxDistance, lat, lon, active);
-    }
-
-    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8", StationsGpxWriter.GPX_MEDIA_TYPE_VALUE}, value = "/{country}/stations")
+    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"}, value = "/{country}/stations")
     public List<StationDto> getWithCountry(@PathVariable(COUNTRY) String country,
                                         @RequestParam(value = HAS_PHOTO, required = false) Boolean hasPhoto,
                                         @RequestParam(value = PHOTOGRAPHER, required = false) String photographer,
@@ -80,22 +67,11 @@ public class StationsController {
                                         @RequestParam(value = LAT, required = false) Double lat,
                                         @RequestParam(value = LON, required = false) Double lon,
                                         @RequestParam(value = ACTIVE, required = false) Boolean active) {
-        return get(Collections.singleton(country), hasPhoto, photographer, maxDistance, lat, lon, active);
+        return get(Set.of(country), hasPhoto, photographer, maxDistance, lat, lon, active);
     }
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"}, value = "/{country}/stations.json")
     public List<StationDto> getWithCountryAsJson(@PathVariable(COUNTRY) String country,
-                                              @RequestParam(value = HAS_PHOTO, required = false) Boolean hasPhoto,
-                                              @RequestParam(value = PHOTOGRAPHER, required = false) String photographer,
-                                              @RequestParam(value = MAX_DISTANCE, required = false) Integer maxDistance,
-                                              @RequestParam(value = LAT, required = false) Double lat,
-                                              @RequestParam(value = LON, required = false) Double lon,
-                                              @RequestParam(value = ACTIVE, required = false) Boolean active) {
-        return getWithCountry(country, hasPhoto, photographer, maxDistance, lat, lon, active);
-    }
-
-    @GetMapping(produces = {StationsGpxWriter.GPX_MEDIA_TYPE_VALUE}, value = "/{country}/stations.gpx")
-    public List<StationDto> getWithCountryAsGpx(@PathVariable(COUNTRY) String country,
                                               @RequestParam(value = HAS_PHOTO, required = false) Boolean hasPhoto,
                                               @RequestParam(value = PHOTOGRAPHER, required = false) String photographer,
                                               @RequestParam(value = MAX_DISTANCE, required = false) Integer maxDistance,

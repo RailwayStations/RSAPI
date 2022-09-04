@@ -1,0 +1,36 @@
+[
+    {
+        "idStr": "791",
+        "id": 791,
+        "country": "us",
+        "title": "Concord",
+        "photographer": "HeroRareheart",
+        "photographerUrl": "https://railway-stations.org",
+        "photoUrl": "https://api.railway-stations.org/photos/us/791.jpg",
+        "photoId": 16159,
+        "license": "CC0 1.0 Universell (CC0 1.0)",
+        "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "lat": 42.457147,
+        "lon": -71.35805,
+        "createdAt": 1654182226000,
+        "active": true,
+        "outdated": false
+    },
+    {
+        "idStr": "884",
+        "id": 884,
+        "country": "us",
+        "title": "West Concord",
+        "photographer": "HeroRareheart",
+        "photographerUrl": "https://railway-stations.org",
+        "photoUrl": "https://api.railway-stations.org/photos/us/884.jpg",
+        "photoId": 16163,
+        "license": "CC0 1.0 Universell (CC0 1.0)",
+        "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "lat": 42.456372,
+        "lon": -71.392372,
+        "createdAt": 1654182236000,
+        "active": true,
+        "outdated": false
+    }
+]

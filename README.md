@@ -51,7 +51,6 @@ Point your browser to `http://localhost:8080/{country}/stations`, where `country
 With the following query parameter:
 - `hasPhoto`: boolean, indicates if only trainstations with or without a photo should be selected
 - `photographer`: (nick)name of a photographer, select only trainstations with photos from her
-- `maxDistance`, `lat`, `lon`: select trainstations within a max distance of km of the given reference point
 - `country`: select trainstations from a given country, this parameter is an alternative to the `{country}` path
 
 A more detailed API documentation can be found in the [OpenAPI](src/main/resources/static/openapi.yaml) file or online at [developer.deutschebahn.com](https://developer.deutschebahn.com/store/apis/list).
@@ -61,11 +60,6 @@ A more detailed API documentation can be found in the [OpenAPI](src/main/resourc
 - all german trainstations: https://api.railway-stations.org/stations?country=de
 - german trainstations without photo: https://api.railway-stations.org/stations?country=de&hasPhoto=false
 - austrian trainsations from photographer @pokipsie: https://api.railway-stations.org/stations?country=ch&photographer=@pokipsie
-- german trainsations within 20km from FFM mainstation: https://api.railway-stations.org/stations?country=de&maxDistance=20&lat=50.1060866&lon=8.6615762
-- all photographers with count of photos: https://api.railway-stations.org/photographers.txt
-- german photographers: https://api.railway-stations.org/photographers.txt?country=de
-- statistic per country (de): https://api.railway-stations.org/stats.txt?country=de
-
-The default output format is json. But can easily be changed to GPX or TXT. Either set the `Accept` header to `text/plain` or `application/gpx+xml` or simply add the extension `.txt` or `.gpx` to the end of the URL.
-
-Download the .gpx file and import it to your favourite Map application (e.g. Locus on Android).
+- all photographers with count of photos: https://api.railway-stations.org/photographers
+- german photographers: https://api.railway-stations.org/photographers?country=de
+- statistic per country (de): https://api.railway-stations.org/stats?country=de

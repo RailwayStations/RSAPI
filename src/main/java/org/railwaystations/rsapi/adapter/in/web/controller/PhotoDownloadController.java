@@ -28,13 +28,6 @@ public class PhotoDownloadController {
     @Autowired
     private PhotoStorage photoStorage;
 
-    @GetMapping(value = "/fotos/{countryCode}/{filename}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
-    public ResponseEntity<byte[]> fotos(@PathVariable(COUNTRY_CODE) String countryCode,
-                                 @PathVariable(FILENAME) String filename,
-                                 @RequestParam(value = WIDTH, required = false) Integer width) throws IOException {
-        return photos(countryCode, filename, width);
-    }
-
     @GetMapping(value = "/photos/{countryCode}/{filename}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
     public ResponseEntity<byte[]> photos(@PathVariable(COUNTRY_CODE) String countryCode,
                                   @PathVariable(FILENAME) String filename,

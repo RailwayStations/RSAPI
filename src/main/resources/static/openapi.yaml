@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20220821.1400"
+  version: "20220904.1245"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -67,72 +67,11 @@ paths:
         200:
           description: successful operation
           content:
-            application/gpx+xml:
-              schema:
-                type: string
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Station'
-            text/plain:
-              schema:
-                type: string
-        404:
-          description: Country not found
-          content: {}
-  /{country}/stations.gpx:
-    get:
-      summary: Finds railway stations by various query criteria as GPX
-      deprecated: true
-      parameters:
-        - name: country
-          in: path
-          description: filter by country code
-          required: true
-          schema:
-            type: string
-        - name: hasPhoto
-          in: query
-          description: filter by photo availalbe/missing
-          schema:
-            type: boolean
-        - name: photographer
-          in: query
-          description: filter by nickname of a photographer
-          schema:
-            type: string
-        - name: maxDistance
-          in: query
-          description: |
-            filter by max distance from the coordinates given by lat and lon
-          schema:
-            type: integer
-            format: int64
-        - name: lat
-          in: query
-          description: latitute of the coordinates to filter by max distance
-          schema:
-            type: number
-            format: double
-        - name: lon
-          in: query
-          description: longitude of the coordinates to filter by max distance
-          schema:
-            type: number
-            format: double
-        - name: active
-          in: query
-          description: filter on active/inactive stations
-          schema:
-            type: boolean
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/gpx+xml:
-              schema:
-                type: string
         404:
           description: Country not found
           content: {}
@@ -185,69 +124,11 @@ paths:
         200:
           description: successful operation
           content:
-            application/gpx+xml:
-              schema:
-                type: string
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Station'
-            text/plain:
-              schema:
-                type: string
-  /stations.gpx:
-    get:
-      summary: Finds railway stations by various query criteria
-      parameters:
-        - name: country
-          in: query
-          description: filter by country code
-          schema:
-            type: array
-            items:
-              type: string
-        - name: hasPhoto
-          in: query
-          description: filter by photo availalbe/missing
-          schema:
-            type: boolean
-        - name: photographer
-          in: query
-          description: filter by nickname of a photographer
-          schema:
-            type: string
-        - name: maxDistance
-          in: query
-          description: |
-            filter by max distance from the coordinates given by lat and lon
-          schema:
-            type: integer
-            format: int64
-        - name: lat
-          in: query
-          description: latitute of the coordinates to filter by max distance
-          schema:
-            type: number
-            format: double
-        - name: lon
-          in: query
-          description: longitude of the coordinates to filter by max distance
-          schema:
-            type: number
-            format: double
-        - name: active
-          in: query
-          description: filter on active/inactive stations
-          schema:
-            type: boolean
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/gpx+xml:
-              schema:
-                type: string
   /{country}/stations/{id}:
     get:
       summary: Find a railway station by its ID
@@ -958,32 +839,6 @@ paths:
             text/plain:
               schema:
                 type: string
-  /newUploadToken:
-    post:
-      summary: Requests a new Upload-Token (now password) only
-      description: use /resetPassword instead
-      deprecated: true
-      parameters:
-        - name: Email
-          in: header
-          description: email or name of the user
-          required: true
-          schema:
-            type: string
-      responses:
-        202:
-          description: request accepted, email with new password (uploadToken) will
-            be sent
-          content: {}
-        400:
-          description: Bad Request
-          content:
-            text/plain:
-              schema:
-                type: string
-        404:
-          description: User not found
-          content: {}
   /changePassword:
     post:
       summary: Change user password
@@ -1103,43 +958,6 @@ paths:
               schema:
                 type: string
       x-codegen-request-body-name: profile
-  /fotos/{country}/{filename}:
-    get:
-      summary: downloads the given photo
-      parameters:
-        - name: country
-          in: path
-          description: country code
-          required: true
-          schema:
-            type: string
-        - name: filename
-          in: path
-          description: filename of the photo
-          required: true
-          schema:
-            type: string
-        - name: width
-          in: query
-          description: scale the image to the given width
-          schema:
-            type: integer
-            format: int32
-      responses:
-        200:
-          description: ok
-          content:
-            image/jpeg:
-              schema:
-                type: string
-                format: binary
-            image/png:
-              schema:
-                type: string
-                format: binary
-        404:
-          description: file not found
-          content: {}
   /photos/{country}/{filename}:
     get:
       summary: downloads the given photo

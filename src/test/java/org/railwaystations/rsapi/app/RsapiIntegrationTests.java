@@ -30,16 +30,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import javax.imageio.ImageIO;
 import javax.servlet.Filter;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -161,22 +156,6 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 		assertThat(jsonNode).isNotNull();
 		assertThat(jsonNode.isArray()).isTrue();
 		assertThat(jsonNode.size()).isEqualTo(729);
-	}
-
-	@Test
-	void stationsGpx() throws IOException, ParserConfigurationException, SAXException {
-		var response = loadRaw(String.format("/ch/%s.gpx?hasPhoto=true", "stations"), 200, String.class);
-		var factory = DocumentBuilderFactory.newInstance();
-		var builder = factory.newDocumentBuilder();
-		var content = readSaveStringEntity(response);
-		var doc = builder.parse(new InputSource(new StringReader(content)));
-		var gpx = doc.getDocumentElement();
-		assertThat(response.getHeaders().getFirst("Content-Type")).isEqualTo("application/gpx+xml");
-		assertThat(gpx.getTagName()).isEqualTo("gpx");
-		assertThat(gpx.getAttribute("xmlns")).isEqualTo("http://www.topografix.com/GPX/1/1");
-		assertThat(gpx.getAttribute("version")).isEqualTo("1.1");
-		var wpts = gpx.getElementsByTagName("wpt");
-		assertThat(wpts.getLength()).isEqualTo(7);
 	}
 
 	private String readSaveStringEntity(ResponseEntity<String> response) {
