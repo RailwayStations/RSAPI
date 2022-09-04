@@ -158,10 +158,6 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 		assertThat(jsonNode.size()).isEqualTo(729);
 	}
 
-	private String readSaveStringEntity(ResponseEntity<String> response) {
-		return response.getBody();
-	}
-
 	private StationDto[] assertLoadStationsOk(String path) {
 		var response = loadRaw(path, 200, StationDto[].class);
 
@@ -532,11 +528,10 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 
 	@TestConfiguration
 	static class SpringConfig {
-		private final String TMP_WORK_DIR = createTempWorkDir();
 
 		@Bean
 		public WorkDir workDir() {
-            return new WorkDir(TMP_WORK_DIR, null);
+            return new WorkDir(createTempWorkDir(), null);
 		}
 
 		@Bean
