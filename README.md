@@ -34,12 +34,12 @@ below.
 The following subdirectories are being used:
 
 - `photos`
-    - `<countryCode>`: photos for the country identified by the country code
+    - `{country}`: photos for the country identified by the country code
 - `inbox`: all uploads are collected here
     - `toprocess`: uploaded photos are sent to VsionAI for image processing
     - `processed`: processed photos from VsionAI
     - `done`: imported (unprocessed) photos
-    - `<countryCode>/import`: old import directories for batch imports
+    - `{country}/import`: old import directories for batch imports
 
 ## Run
 
@@ -56,7 +56,7 @@ Enter mariadb CLI:
 
 ## Useage
 
-Point your browser to `http://localhost:8080/{country}/stations`, where `country` can be "de", "ch", "fi", "uk", ...
+Point your browser to `http://localhost:8080/stations?country=de`, where `country` can be "de", "ch", "fi", "uk", ...
 
 With the following query parameter:
 
