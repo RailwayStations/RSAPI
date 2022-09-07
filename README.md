@@ -8,14 +8,14 @@ and [iOS](https://github.com/RailwayStations/Bahnhofsfotos) of
 the [Bahnhofsfotos opendata Project](https://github.com/RailwayStations).
 
 This API is hosted at https://api.railway-stations.org or at the Deutsche Bahn developer
-site: https://developer.deutschebahn.com/store/apis/list where you can also find an online and executable version of the
-OpenAPI documentation.
+site: https://developer.deutschebahn.com/store/apis/list where you can also find an online and executable version of the OpenAPI documentation.
 
 ## build
 
 To build the project, you need Java 17.
 
 Run on Unix like systems:
+
 ```./gradlew build bootJar```
 
 Run on Windows:
@@ -34,16 +34,23 @@ below.
 The following subdirectories are being used:
 
 - `photos`
+
     - `{country}`: photos for the country identified by the country code
+
 - `inbox`: all uploads are collected here
+
     - `toprocess`: uploaded photos are sent to VsionAI for image processing
+
     - `processed`: processed photos from VsionAI
+
     - `done`: imported (unprocessed) photos
+
     - `{country}/import`: old import directories for batch imports
 
 ## Run
 
 The API can be started via `docker compose up -d` locally. It starts two Docker container: a local Maria DB and the API.
+
 The API is then available via `http://localhost:8080`.
 
 ## Maria DB
@@ -52,6 +59,7 @@ For local testing and debugging purpose you can start the MariaDB container stan
 with `docker compose up mariadb -d`.
 
 Enter mariadb CLI:
+
 `docker exec -it mariadb mysql -ursapi -prsapi rsapi --default-character-set=utf8mb4`
 
 ## Useage
@@ -61,7 +69,9 @@ Point your browser to `http://localhost:8080/stations?country=de`, where `countr
 With the following query parameter:
 
 - `hasPhoto`: boolean, indicates if only trainstations with or without a photo should be selected
+
 - `photographer`: (nick)name of a photographer, select only trainstations with photos from her
+
 - `country`: select trainstations from a given country, this parameter is an alternative to the `{country}` path
 
 A more detailed API documentation can be found in the [OpenAPI](src/main/resources/static/openapi.yaml) file or online
@@ -70,10 +80,17 @@ at [developer.deutschebahn.com](https://developer.deutschebahn.com/store/apis/li
 ### Examples
 
 - all supported countries: https://api.railway-stations.org/countries
+
 - all german trainstations: https://api.railway-stations.org/stations?country=de
+
 - german trainstations without photo: https://api.railway-stations.org/stations?country=de&hasPhoto=false
+
 - austrian trainsations from photographer
+
   @pokipsie: https://api.railway-stations.org/stations?country=ch&photographer=@pokipsie
+
 - all photographers with count of photos: https://api.railway-stations.org/photographers
+
 - german photographers: https://api.railway-stations.org/photographers?country=de
+
 - statistic per country (de): https://api.railway-stations.org/stats?country=de
