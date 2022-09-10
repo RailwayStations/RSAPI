@@ -42,6 +42,8 @@
 
       `/stationPhotos/{country}/{id}`
 
+      `/stationById/{country}/{id}`
+
     - all stations of a `country` with the primary photo (optional with filter of `hasPhoto` and `isActive`)
 
       `/stations2/{country}?hasPhoto=&isActive=`
@@ -52,15 +54,19 @@
 
     - all stations with photos of one `photographer` (optional with filter by `country`)
 
-      `/photographers/{name}/photos`
+      `/photographers/{photographer}/photos?country={country}`
 
-      `/stationPhotosByUser/{photographer}`
+      `/stationPhotosByUser/{photographer}?country={country}`
+
+      `/stationsByPhotographer/{photographer}?country={country}`
 
     - all stations with a photo which was recently imported, with filter by `importedSince` (max one month)
 
-      `/stationPhotos?importedSince={importedSince}?`
+      `/stationPhotos?importedSince={importedSince}`
 
-      `/stationsWithPhotosImportedSince?importedSince={importedSince}?`
+      `/stationsWithPhotosImportedSince?importedSince={importedSince}`
+
+      `/stationsByRecentPhotoImports?importedSince={importedSince}`
 
   - **Or** one for all:
 
