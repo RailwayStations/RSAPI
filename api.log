@@ -1,4 +1,4 @@
-     12 GET /.env
+     10 GET /.env
       2 GET /admin.php
       1 GET /ads.txt
       2 GET /alfa.php
@@ -45,6 +45,7 @@
       2 GET /wp-1ogin_bak.php
       2 GET /wp-admin/config.bak.php
       2 GET /wp-booking.php
+      4 GET /wp-commentin.php
       4 GET /wp-content/
       2 GET /wp-content/config.bak.php
       2 GET /wp-content/db_cache.php
@@ -59,6 +60,7 @@
       2 GET /wp-content/plugins/wpconfig.bak.php?act=
       2 GET /wp-content/plugins/wpdiscuz/themes/default/style-rtl.css
       2 GET /wp-content/themes/config.bak.php
+      3 GET /wp-content/themes/seotheme/mar.php
       2 GET /wp-content/wp-1ogin_bak.php
       2 GET /wp-content/wp-old-index.php?action=&pass=&submit=
       2 GET /wp-includes/config.bak.php
@@ -67,84 +69,79 @@
       2 GET /wp-includes/lfx.php
       2 GET /wp-includes/small.php
       2 GET /wp-includes/wpconfig.bak.php?act=
-     10 GET /wp-login.php
+      8 GET /wp-login.php
       2 GET /xmlrp.php?url=
       1 GET /&
-        GET /.git/config
+      2 GET /.git/config
       2 GET /*/wp-login.php
       1 GET /*/*
       2 POST /ALFA_DATA/alfacgiapi/perl.alfa
       2 POST /alfacgiapi/perl.alfa
       1 POST /wp-includes/css/wp-config.php
       2 POST /wp-plain.php
-      2 POST /ALFA_DATA/alfacgiapi/perl.alfa
-      2 POST /alfacgiapi/perl.alfa
-      1 POST /wp-includes/css/wp-config.php
-      2 POST /wp-plain.php
 
       1 GET /germany/stations/*
-      2 GET /jp&stationId=
+      1 GET /stations?code=
+      2 GET /stations?DS100=
       2 GET /stations?undefined&hasPhoto=
 
-     67 GET /
-      3 HEAD /
-      8 POST /
-     
-      9 GET /adminInbox
-     38 GET /adminInboxCount
-    519 GET /countries
-      6 GET /countries.json
+     75 GET /
+      1 HEAD /
+      6 POST /
+
+
+      8 GET /adminInbox
+     30 GET /adminInboxCount
+    496 GET /countries
+      2 GET /countries.json
       4 GET /emailVerification/*
-    268 GET /inbox/processed/*
-     19 GET /inbox/*
-     52 GET /myProfile
+    266 GET /inbox/processed/*
+     11 GET /inbox/*
+      2 GET /index.php?3x=
+     55 GET /myProfile
      18 GET /nextZ
-      8 GET /openapi.yaml
-      1 GET /photoUpload
-      8 GET /photographers
-      3 GET /photographers.json
-      5 GET /photographers.txt
-     61 GET /photographers?country=
-  45028 GET /photos/*/*
-      7 GET /photos/*/*?width=
-    648 GET /publicInbox
+      4 GET /openapi.yaml
+      3 GET /photographers
+      4 GET /photographers.json
+      9 GET /photographers.txt
+     24 GET /photographers?country=
+  26296 GET /photos/*/*
+      8 GET /photos/*/*?width=
+    655 GET /publicInbox
       2 GET /recentPhotoImports
-    190 GET /recentPhotoImports?sinceHours=
-      9 GET /stations
-   7480 GET /stations?country=
-     15 GET /stations?country=&active=
-     22 GET /stations?country=&country=
-      7 GET /stations?country=&country=&country=
+    184 GET /recentPhotoImports?sinceHours=
+     10 GET /stations
+   7366 GET /stations?country=
+     16 GET /stations?country=&active=
+     20 GET /stations?country=&country=
+      2 GET /stations?country=&country=&country=
       1 GET /stations?country=&country=&country=&country=
       4 GET /stations?country=&country=&country=&country=&country=&country=
-      3 GET /stations?country=&country=&country=&country=&country=&country=&country=
-      1 GET /stations?country=&country=&country=&country=&country=&country=&country=&country=&country=&country=
+      7 GET /stations?country=&country=&country=&country=&country=&country=&country=
       1 GET /stations?country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=
-      6 GET /stations?country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=
       1 GET /stations?country=&country=&country=&hasPhoto=
-      2 GET /stations?country=&hasPhoto=
-     25 GET /stations?photographer=
-  21334 GET /stats
+      1 GET /stations?country=&hasPhoto=
+     35 GET /stations?photographer=
+  20940 GET /stats
       1 GET /stats.txt
       1 GET /stats.txt?country=
-     49 GET /stats?country=
-      2 GET /*/photographers
-     12 GET /*/photographers.json
-      3 GET /*/photographers.txt
-   4499 GET /*/stations
-     30 GET /*/stations/
-  83574 GET /*/stations/*
-      1 GET /*/stations?photographer=
-    283 GET /*/stats
-     89 OPTIONS /adminInbox
-     38 OPTIONS /adminInboxCount
-     44 OPTIONS /myProfile
+     21 GET /stats?country=
+     18 GET /*/photographers.json
+      5 GET /*/photographers.txt
+   4316 GET /*/stations
+  49396 GET /*/stations/*
+      1 GET /*/stations?hasPhoto=
+    297 GET /*/stats
+      1 GET /*/stats.txt
+     88 OPTIONS /adminInbox
+     30 OPTIONS /adminInboxCount
+     45 OPTIONS /myProfile
       3 OPTIONS /registration
       1 OPTIONS /resetPassword
      80 POST /adminInbox
-      2 POST /myProfile
-     76 POST /photoUpload
+      4 POST /myProfile
+     84 POST /photoUpload
       5 POST /registration
-      3 POST /reportProblem
+      2 POST /reportProblem
       1 POST /resetPassword
-     91 POST /userInbox
+    117 POST /userInbox
