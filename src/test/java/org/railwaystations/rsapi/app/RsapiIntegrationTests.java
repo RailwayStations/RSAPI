@@ -144,12 +144,6 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 	}
 
 	@Test
-	void stationsDeFromDgerkrathWithinMax5km() {
-		var stations = assertLoadStationsOk("/de/stations?maxDistance=5&lat=49.0065325041363&lon=13.2770955562592&photographer=@user27");
-		assertThat(stations.length).isEqualTo(2);
-	}
-
-	@Test
 	void stationsJson() throws IOException {
 		var response = loadRaw("/de/stations.json", 200, String.class);
 		var jsonNode = mapper.readTree(response.getBody());

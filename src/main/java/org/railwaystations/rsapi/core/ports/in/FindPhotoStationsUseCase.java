@@ -9,7 +9,7 @@ import java.util.Set;
 
 public interface FindPhotoStationsUseCase {
 
-    List<Station> findStationsBy(Set<String> countries, Boolean hasPhoto, String photographer, Integer maxDistance, Double lat, Double lon, Boolean active);
+    List<Station> findStationsBy(Set<String> countries, Boolean hasPhoto, String photographer, Boolean active);
 
     Optional<Station> findByCountryAndId(String country, String id);
 

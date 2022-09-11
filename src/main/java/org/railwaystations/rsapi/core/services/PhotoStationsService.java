@@ -49,11 +49,10 @@ public class PhotoStationsService implements FindPhotoStationsUseCase {
         return stationDao.findRecentImports(since);
     }
 
-    public List<Station> findStationsBy(Set<String> countries, Boolean hasPhoto, String photographer,
-                                        Integer maxDistance, Double lat, Double lon, Boolean active) {
+    public List<Station> findStationsBy(Set<String> countries, Boolean hasPhoto, String photographer, Boolean active) {
         // TODO: can we search this on the DB?
         return getStationsByCountry(countries)
-                .values().stream().filter(station -> station.appliesTo(hasPhoto, photographer, maxDistance, lat, lon, active)).collect(Collectors.toList());
+                .values().stream().filter(station -> station.appliesTo(hasPhoto, photographer, active)).collect(Collectors.toList());
 
     }
 

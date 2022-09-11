@@ -22,9 +22,9 @@ class StationTest {
     void appliesToNullPhotographer() {
         var station = createStationTestFixtureBuilder()
                 .build();
-        assertThat(station.appliesTo(null, "test", null, null, null, null)).isEqualTo(false);
-        assertThat(station.appliesTo(false, null, null, null, null, null)).isEqualTo(true);
-        assertThat(station.appliesTo(true, null, null, null, null, null)).isEqualTo(false);
+        assertThat(station.appliesTo(null, "test", null)).isEqualTo(false);
+        assertThat(station.appliesTo(false, null, null)).isEqualTo(true);
+        assertThat(station.appliesTo(true, null, null)).isEqualTo(false);
     }
 
     @Test
@@ -32,36 +32,9 @@ class StationTest {
         var station = createStationTestFixtureBuilder()
                 .photo(createTestPhoto())
                 .build();
-        assertThat(station.appliesTo(null, "test", null, null, null, null)).isEqualTo(true);
-        assertThat(station.appliesTo(false, null, null, null, null, null)).isEqualTo(false);
-        assertThat(station.appliesTo(true, null, null, null, null, null)).isEqualTo(true);
-    }
-
-    @Test
-    void appliesToDistance() {
-        var station = createStationTestFixtureBuilder()
-                .coordinates(TEST_COORDINATES)
-                .build();
-        assertThat(station.appliesTo(null, null, 50, 50.8, 9.8, null)).isEqualTo(true);
-        assertThat(station.appliesTo(null, null, 50, 55.0, 8.0, null)).isEqualTo(false);
-    }
-
-    @Test
-    void appliesToDistanceAndPhotographer() {
-        var station = createStationTestFixtureBuilder()
-                .coordinates(TEST_COORDINATES)
-                .photo(createTestPhoto())
-                .build();
-        assertThat(station.appliesTo(null, "test", 50, 50.8, 9.8, null)).isEqualTo(true);
-    }
-
-    @Test
-    void appliesToActive() {
-        var station = createStationTestFixtureBuilder()
-                .coordinates(TEST_COORDINATES)
-                .photo(createTestPhoto())
-                .build();
-        assertThat(station.appliesTo(null, "test", null, null, null, true)).isEqualTo(true);
+        assertThat(station.appliesTo(null, "test", null)).isEqualTo(true);
+        assertThat(station.appliesTo(false, null, null)).isEqualTo(false);
+        assertThat(station.appliesTo(true, null, null)).isEqualTo(true);
     }
 
     private Station.StationBuilder createStationTestFixtureBuilder() {
@@ -71,13 +44,12 @@ class StationTest {
     }
 
     @Test
-    void appliesToInactive() {
+    void appliesToActive() {
         var station = createStationTestFixtureBuilder()
                 .coordinates(TEST_COORDINATES)
                 .photo(createTestPhoto())
-                .active(false)
                 .build();
-        assertThat(station.appliesTo(null, "test", null, null, null, false)).isEqualTo(true);
+        assertThat(station.appliesTo(null, "test", true)).isEqualTo(true);
     }
 
     private Photo createTestPhoto() {

@@ -47,16 +47,13 @@ public class Station {
         return Station.EARTH_RADIUS * c;
     }
 
-    public boolean appliesTo(Boolean hasPhoto, String photographer, Integer maxDistance, Double lat, Double lon, Boolean active) {
+    public boolean appliesTo(Boolean hasPhoto, String photographer, Boolean active) {
         boolean result = true;
         if (hasPhoto != null) {
             result = this.hasPhoto() == hasPhoto;
         }
         if (photographer != null) {
             result &= hasPhoto() && photographer.equals(photo.getPhotographer().getDisplayName());
-        }
-        if (maxDistance != null && lat != null && lon != null) {
-            result &= this.distanceTo(lat, lon) < maxDistance;
         }
         if (active != null) {
             result &= active == this.active;
