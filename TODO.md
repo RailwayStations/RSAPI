@@ -3,8 +3,10 @@
 - reduce amount of integration tests
 
 - package structure:
-  - app vs. application vs. core
-  - core/model vs. domain
+
+    - app vs. application vs. core
+
+    - core/model vs. domain
 
 - full (incoming) model validation
 
@@ -13,20 +15,67 @@
 - reintroduce multistage docker build
 
 - harden docker
-  - user
-  - readonly filesystem
 
-- Parameter Object for MastodonBot.tootNewPhoto?
+    - user
 
-- InboxEntry: change @Data to @Value annotation
+    - readonly filesystem
 
-- Replace `/<country>/*` endpoints with `/*?country=<country>` parameter
-  See [api.log](api.log)
+- Parameter Object for `MastodonBot.tootNewPhoto`?
 
-- Multiple Photos per Station
-  - Support photoId for problem reports related to a photo
-  - New Station API to support multiple photos per station 
-    Endpoints needed:
-    - all stations of a `country` (optional with filter of `hasPhoto` and `isActive`)
-    - all photos of stations of a `photographer` (optional with filter by `country`)
-    - recent photo imports with filter by `createdAt` (not too far ago, e.g. one month)
+- InboxEntry: change `@Data` to `@Value` annotation
+
+- Replace `/<country>/*` endpoints with `/*?country=<country>` parameter, see [api.log](api.log)
+
+## Multiple photos per station
+
+- Support photoId for problem reports related to a photo
+
+- New Station API to support multiple photos per station
+
+  - 4 new endpoints needed:
+
+    - one station with all photos by `country` and `id`
+
+      ~~`/stations2/{country}/{id}`~~
+
+      ~~`/stationPhotos/{country}/{id}`~~
+
+      `/stationById/{country}/{id}`
+
+    - all stations of a `country` with the primary photo (optional with filter of `hasPhoto` and `active`)
+
+      ~~`/stations2/{country}?hasPhoto=&active=`~~
+
+      ~~`/countryStations/{country}?hasPhoto=&active=`~~
+
+      `/stationsByCountry/{country}?hasPhoto=&active=`
+
+    - all stations with photos of one `photographer` (optional with filter by `country`)
+
+      ~~`/photographers/{photographer}/photos?country={country}`~~
+
+      ~~`/stationPhotosByUser/{photographer}?country={country}`~~
+
+      `/stationsByPhotographer/{photographer}?country={country}`
+
+    - all stations with a photo which was recently imported, with filter by `importedSince` (max one month)
+
+      ~~`/stationPhotos?importedSince={importedSince}`~~
+
+      ~~`/stationsWithPhotosImportedSince?importedSince={importedSince}`~~
+
+      `/stationsByRecentPhotoImports?importedSince={importedSince}`
+
+  - **Or** one for all:
+
+    ~~`/stations2?country=&id=&photographer=&importedSince&hasPhoto=&active=`~~
+
+    valid combinations:
+
+      - `country`, `id`
+
+      - `country`, (`hasPhoto`), (`active`)
+
+      - `photographer`, (`country`)
+
+      - `createdSince`
