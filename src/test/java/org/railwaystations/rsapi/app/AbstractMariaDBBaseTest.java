@@ -11,6 +11,7 @@ public abstract class AbstractMariaDBBaseTest {
 
     static {
         mariadb = new MariaDBContainer<>(DockerImageName.parse("mariadb:10.8"));
+        mariadb.withEnv("TZ", "Etc/UTC");
         mariadb.start();
     }
 
