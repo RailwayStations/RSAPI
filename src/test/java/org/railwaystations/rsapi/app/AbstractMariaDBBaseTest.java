@@ -17,7 +17,7 @@ public abstract class AbstractMariaDBBaseTest {
 
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", () -> mariadb.getJdbcUrl() + "?useUnicode=yes&characterEncoding=UTF-8&serverTimezone=UTC&useLegacyDatetimeCode=false&sessionVariables=time_zone='+00:00'");
+        registry.add("spring.datasource.url", mariadb::getJdbcUrl);
         registry.add("spring.datasource.username", mariadb::getUsername);
         registry.add("spring.datasource.password", mariadb::getPassword);
     }
