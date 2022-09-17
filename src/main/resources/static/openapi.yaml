@@ -44,7 +44,96 @@ paths:
                 $ref: '#/components/schemas/PhotoStations'
         404:
           description: Station not found
-          content: {}
+          content: { }
+
+  /photoStationsByCountry/{country}:
+    get:
+      summary: List stations by country
+      description: |
+        Returns only the primary photo of each station.
+        Stations can optionally be filtered by 'hasPhoto' and/or 'isActive' flag.
+      parameters:
+        - name: country
+          in: path
+          description: country code
+          required: true
+          schema:
+            type: string
+        - name: hasPhoto
+          in: query
+          description: filter by photo available/missing
+          schema:
+            type: boolean
+        - name: isActive
+          in: query
+          description: filter on active/inactive stations
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhotoStations'
+
+  /photoStationsByPhotographer/{photographer}:
+    get:
+      summary: List stations with photos by the given photographer
+      description: |
+        Returns only the photos of a station which belong to the photographer.
+        Can return several photos per station, not necessarily the primary photo.
+      parameters:
+        - name: photographer
+          in: path
+          description: photographer name
+          required: true
+          schema:
+            type: string
+        - name: country
+          in: query
+          description: country code
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhotoStations'
+
+  /photoStationsByRecentPhotoImports:
+    get:
+      summary: List stations with photos uploaded in the last 24h
+      description: |
+        Returns only the recently imported photos of a station, defined by the sinceHours parameter.
+        Can return several photos per station, not necessarily the primary photo.
+      parameters:
+        - name: photographer
+          in: path
+          description: photographer name
+          required: true
+          schema:
+            type: string
+        - name: sinceHours
+          in: query
+          description: |
+            defines the timeframe since when to look for recent photo uploads,
+            default is 10h
+          schema:
+            type: integer
+            format: int32
+            default: 10
+            minimum: 1
+            maximum: 800
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhotoStations'
 
   /{country}/stations:
     get:
@@ -83,7 +172,7 @@ paths:
                   $ref: '#/components/schemas/Station'
         404:
           description: Country not found
-          content: {}
+          content: { }
 
   /stations:
     get:
@@ -146,11 +235,11 @@ paths:
                 $ref: '#/components/schemas/Station'
         404:
           description: Station not found
-          content: {}
+          content: { }
 
   /recentPhotoImports:
     get:
-      summary: List stations with photo uploads in the las 24h
+      summary: List stations with photo uploads in the last 24h
       parameters:
         - name: sinceHours
           in: query
@@ -197,7 +286,7 @@ paths:
                 type: string
         404:
           description: Country not found
-          content: {}
+          content: { }
 
   /{country}/photographers.txt:
     get:
@@ -225,7 +314,7 @@ paths:
                 type: string
         404:
           description: Country not found
-          content: {}
+          content: { }
 
   /{country}/photographers.json:
     get:
@@ -253,7 +342,7 @@ paths:
                 type: string
         404:
           description: Country not found
-          content: {}
+          content: { }
 
   /photographers:
     get:
@@ -359,7 +448,7 @@ paths:
                 type: string
         404:
           description: Country not found
-          content: {}
+          content: { }
 
   /{country}/stats.json:
     get:
@@ -387,7 +476,7 @@ paths:
                 type: string
         404:
           description: Country not found
-          content: {}
+          content: { }
 
   /{country}/stats.txt:
     get:
@@ -415,7 +504,7 @@ paths:
                 type: string
         404:
           description: Country not found
-          content: {}
+          content: { }
 
   /stats:
     get:
@@ -438,7 +527,7 @@ paths:
                 $ref: '#/components/schemas/Statistic'
         404:
           description: Country not found
-          content: {}
+          content: { }
 
   /stats.json:
     get:
@@ -458,7 +547,7 @@ paths:
                 $ref: '#/components/schemas/Statistic'
         404:
           description: Country not found
-          content: {}
+          content: { }
 
   /stats.txt:
     get:
@@ -478,7 +567,7 @@ paths:
                 type: string
         404:
           description: Country not found
-          content: {}
+          content: { }
 
   /countries:
     get:
@@ -522,8 +611,8 @@ paths:
     post:
       summary: Upload a new Photo
       security:
-        - basicAuth: []
-        - uploadToken: []
+        - basicAuth: [ ]
+        - uploadToken: [ ]
       parameters:
         - name: Email
           in: header
@@ -614,7 +703,7 @@ paths:
                 $ref: '#/components/schemas/InboxResponse'
         403:
           description: forbidden
-          content: {}
+          content: { }
         409:
           description: photo already exists
           content:
@@ -633,7 +722,7 @@ paths:
     post:
       summary: Report a for a Railway-Station
       security:
-        - basicAuth: []
+        - basicAuth: [ ]
       requestBody:
         description: The problem report
         content:
@@ -662,14 +751,14 @@ paths:
                 $ref: '#/components/schemas/InboxResponse'
         403:
           description: forbidden
-          content: {}
+          content: { }
       x-codegen-request-body-name: problemReport
 
   /userInbox:
     post:
       summary: Query the state of photo uploads of the authorized user
       security:
-        - basicAuth: []
+        - basicAuth: [ ]
       requestBody:
         content:
           application/json:
@@ -728,7 +817,7 @@ paths:
     get:
       summary: Get the current inbox, photos and problem reports under review.
       security:
-        - basicAuth: []
+        - basicAuth: [ ]
       responses:
         200:
           description: array of inbox objects
@@ -740,15 +829,15 @@ paths:
                   $ref: '#/components/schemas/InboxEntry'
         401:
           description: not authorized
-          content: {}
+          content: { }
         403:
           description: forbidden
-          content: {}
+          content: { }
     post:
       summary: |
         Import or reject an uploaded photo or a problem report from the inbox
       security:
-        - basicAuth: []
+        - basicAuth: [ ]
       requestBody:
         content:
           application/json:
@@ -770,10 +859,10 @@ paths:
                 $ref: '#/components/schemas/AdminInboxCommandResponse'
         401:
           description: not authorized
-          content: {}
+          content: { }
         403:
           description: forbidden
-          content: {}
+          content: { }
       x-codegen-request-body-name: UploadCommand
 
   /registration:
@@ -789,7 +878,7 @@ paths:
       responses:
         202:
           description: registration accepted
-          content: {}
+          content: { }
         400:
           description: Bad Request
           content:
@@ -804,7 +893,7 @@ paths:
                 type: string
         422:
           description: unprocessable entity, Registration input document error
-          content: {}
+          content: { }
       x-codegen-request-body-name: registration
 
   /emailVerification/{token}:
@@ -825,17 +914,17 @@ paths:
                 type: string
         404:
           description: token not found, verification failed
-          content: {}
+          content: { }
 
   /resendEmailVerification:
     post:
       summary: Sends a new eMail-Verification mail
       security:
-        - basicAuth: []
+        - basicAuth: [ ]
       responses:
         200:
           description: email successfully sent
-          content: {}
+          content: { }
 
   /resetPassword:
     post:
@@ -850,7 +939,7 @@ paths:
       responses:
         202:
           description: request accepted, email with new password will be sent
-          content: {}
+          content: { }
         400:
           description: Bad Request
           content:
@@ -862,7 +951,7 @@ paths:
     post:
       summary: Change user password
       security:
-        - basicAuth: []
+        - basicAuth: [ ]
       parameters:
         - name: New-Password
           in: header
@@ -896,14 +985,14 @@ paths:
                 type: string
         404:
           description: User not found
-          content: {}
+          content: { }
 
   /myProfile:
     get:
       summary: Get the users profile
       security:
-        - basicAuth: []
-        - uploadToken: []
+        - basicAuth: [ ]
+        - uploadToken: [ ]
       parameters:
         - name: Email
           in: header
@@ -922,17 +1011,17 @@ paths:
                 $ref: '#/components/schemas/Profile'
         401:
           description: authorization failed
-          content: {}
+          content: { }
         403:
           description: forbidden
-          content: {}
+          content: { }
     post:
-      summary: Update the users profile. 
+      summary: Update the users profile.
       description: |
         In case the email has been changed, only the email is saved and a new password is send.
       security:
-        - basicAuth: []
-        - uploadToken: []
+        - basicAuth: [ ]
+        - uploadToken: [ ]
       parameters:
         - name: Email
           in: header
@@ -967,10 +1056,10 @@ paths:
                 type: string
         401:
           description: authorization failed
-          content: {}
+          content: { }
         403:
           description: forbidden
-          content: {}
+          content: { }
         409:
           description: conflict with existing name or email
           content:
@@ -1015,7 +1104,7 @@ paths:
                 format: binary
         404:
           description: file not found
-          content: {}
+          content: { }
 
   /inbox/{filename}:
     get:
@@ -1047,7 +1136,7 @@ paths:
                 format: binary
         404:
           description: file not found
-          content: {}
+          content: { }
 
   /inbox/processed/{filename}:
     get:
@@ -1079,7 +1168,7 @@ paths:
                 format: binary
         404:
           description: file not found
-          content: {}
+          content: { }
 
 components:
   securitySchemes:
@@ -1165,7 +1254,7 @@ components:
       description: A station with its photos
       type: object
       properties:
-        country: 
+        country:
           type: string
           description: 2 letter code of the country
           example: "uk"

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.constraints.Max;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -44,36 +45,36 @@ public class StationsController {
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"}, value = "/stations.json")
     public List<StationDto> getAsJson(@RequestParam(value = COUNTRY, required = false) Set<String> countries,
-                                  @RequestParam(value = HAS_PHOTO, required = false) Boolean hasPhoto,
-                                  @RequestParam(value = PHOTOGRAPHER, required = false) String photographer,
+                                      @RequestParam(value = HAS_PHOTO, required = false) Boolean hasPhoto,
+                                      @RequestParam(value = PHOTOGRAPHER, required = false) String photographer,
                                       @RequestParam(value = ACTIVE, required = false) Boolean active) {
         return get(countries, hasPhoto, photographer, active);
     }
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"}, value = "/{country}/stations")
     public List<StationDto> getWithCountry(@PathVariable(COUNTRY) String country,
-                                        @RequestParam(value = HAS_PHOTO, required = false) Boolean hasPhoto,
-                                        @RequestParam(value = PHOTOGRAPHER, required = false) String photographer,
+                                           @RequestParam(value = HAS_PHOTO, required = false) Boolean hasPhoto,
+                                           @RequestParam(value = PHOTOGRAPHER, required = false) String photographer,
                                            @RequestParam(value = ACTIVE, required = false) Boolean active) {
         return get(Set.of(country), hasPhoto, photographer, active);
     }
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"}, value = "/{country}/stations.json")
     public List<StationDto> getWithCountryAsJson(@PathVariable(COUNTRY) String country,
-                                              @RequestParam(value = HAS_PHOTO, required = false) Boolean hasPhoto,
-                                              @RequestParam(value = PHOTOGRAPHER, required = false) String photographer,
+                                                 @RequestParam(value = HAS_PHOTO, required = false) Boolean hasPhoto,
+                                                 @RequestParam(value = PHOTOGRAPHER, required = false) String photographer,
                                                  @RequestParam(value = ACTIVE, required = false) Boolean active) {
         return getWithCountry(country, hasPhoto, photographer, active);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8", value = "/{country}/stations/{id}")
     public StationDto getById(@PathVariable(COUNTRY) String country,
-                           @PathVariable(ID) String id) {
+                              @PathVariable(ID) String id) {
         return toDto(findPhotoStationsUseCase.findByCountryAndId(country, id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8", value = "/recentPhotoImports")
-    public List<StationDto> recentPhotoImports(@RequestParam(value = SINCE_HOURS, required = false, defaultValue = "10") long sinceHours) {
+    public List<StationDto> recentPhotoImports(@RequestParam(value = SINCE_HOURS, required = false, defaultValue = "10") @Max(800) long sinceHours) {
         return toDto(findPhotoStationsUseCase.findRecentImports(Instant.now().minus(sinceHours, ChronoUnit.HOURS)));
     }
 

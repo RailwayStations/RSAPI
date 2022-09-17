@@ -46,7 +46,7 @@
 
           ~~`/stationById/{country}/{id}`~~
 
-          `/photoStationById/{country}/{id}`
+          `/photoStationById/{country}/{id}` ✅
 
         - all stations of a `country` with the primary photo (optional with filter of `hasPhoto` and `active`)
 
@@ -56,7 +56,7 @@
 
           ~~`/stationsByCountry/{country}?hasPhoto=&active=`~~
 
-          `/photoStationsByCountry/{country}?hasPhoto=&active=`
+          `/photoStationsByCountry/{country}?hasPhoto=&isActive=`
 
         - all stations with photos of one `photographer` (optional with filter by `country`)
 

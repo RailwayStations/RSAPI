@@ -34,8 +34,8 @@ public class PhotoStationsController {
     private String photoBaseUrl;
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"}, value = "/photoStationById/{country}/{id}")
-    public PhotoStationsDto get(@PathVariable(value = "country") String country,
-                                @PathVariable(value = "id") String id) {
+    public PhotoStationsDto photoStationById(@PathVariable(value = "country") String country,
+                                             @PathVariable(value = "id") String id) {
         var station = findPhotoStationsUseCase.findByCountryAndId(country, id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return new PhotoStationsDto()
                 .photoBaseUrl(photoBaseUrl)
@@ -43,6 +43,15 @@ public class PhotoStationsController {
                 .photographers(mapPhotographers(station))
                 .stations(mapStations(station));
     }
+
+    /*
+    TODO: missing endpoints
+
+    /photoStationsByCountry/{country}?hasPhoto=&isActive=
+    /photoStationsByPhotographer/{photographer}?country={country}
+    /photoStationsByRecentPhotoImports?sinceHours={sinceHours}
+
+     */
 
     private List<PhotoStationDto> mapStations(Station station) {
         return List.of(new PhotoStationDto()
