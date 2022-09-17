@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = StationsController.class)
-@ContextConfiguration(classes={WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class})
+@ContextConfiguration(classes = {WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class})
 @AutoConfigureMockMvc(addFilters = false)
 class StationsControllerTest {
 
@@ -47,14 +47,14 @@ class StationsControllerTest {
                 .title("Lummerland")
                 .coordinates(new Coordinates(50.0, 9.0))
                 .ds100("XYZ")
-                .photo(Photo.builder()
-                    .stationKey(key5)
-                    .urlPath("/xy/5.jpg")
-                    .photographer(createTestPhotographer("Jim Knopf", "photographerUrl", License.CC0_10))
-                    .license(License.CC0_10)
-                    .build())
                 .active(false)
                 .build();
+        stationXY.getPhotos().add(Photo.builder()
+                .stationKey(key5)
+                .urlPath("/xy/5.jpg")
+                .photographer(createTestPhotographer("Jim Knopf", "photographerUrl", License.CC0_10))
+                .license(License.CC0_10)
+                .build());
 
         var key3 = new Station.Key("ab", "3");
         var stationAB = Station.builder()
@@ -62,14 +62,14 @@ class StationsControllerTest {
                 .title("Nimmerland")
                 .coordinates(new Coordinates(40.0, 6.0))
                 .ds100("ABC")
-                .photo(Photo.builder()
-                    .stationKey(key3)
-                    .urlPath("/ab/3.jpg")
-                    .photographer(createTestPhotographer("Peter Pan", "photographerUrl2", License.CC_BY_NC_SA_30_DE))
-                    .license(License.CC_BY_NC_40_INT)
-                    .build())
                 .active(true)
                 .build();
+        stationAB.getPhotos().add(Photo.builder()
+                .stationKey(key3)
+                .urlPath("/ab/3.jpg")
+                .photographer(createTestPhotographer("Peter Pan", "photographerUrl2", License.CC_BY_NC_SA_30_DE))
+                .license(License.CC_BY_NC_40_INT)
+                .build());
 
         var stationsAll = List.of(stationAB, stationXY);
 

@@ -176,7 +176,7 @@ public class InboxService implements ManageInboxUseCase {
     public void markPrimaryPhotoOutdated(InboxCommand command) {
         var inboxEntry = assertPendingInboxEntryExists(command);
         var station = assertStationExistsAndHasPhoto(inboxEntry);
-        photoDao.updatePhotoOutdated(station.getPhoto().getId());
+        photoDao.updatePhotoOutdated(station.getPhotos().get(0).getId());
         inboxDao.done(inboxEntry.getId());
     }
 
@@ -244,7 +244,7 @@ public class InboxService implements ManageInboxUseCase {
     public void deletePrimaryPhoto(InboxCommand command) {
         var inboxEntry = assertPendingInboxEntryExists(command);
         var station = assertStationExistsAndHasPhoto(inboxEntry);
-        photoDao.delete(station.getPhoto().getId());
+        photoDao.delete(station.getPhotos().get(0).getId());
         inboxDao.done(inboxEntry.getId());
         log.info("Problem report {} photo of station {} deleted", inboxEntry.getId(), station.getKey());
     }
@@ -339,10 +339,11 @@ public class InboxService implements ManageInboxUseCase {
                         photoId = photoDao.insert(photo);
                     }
                     case OVERWRITE_EXISTING_PHOTO -> {
-                        photoId = station.getPhoto().getId();
+                        // TODO: do we overwrite only the primary photo?
+                        photoId = station.getPhotos().get(0).getId();
                         photo = photoBuilder
                                 .id(photoId)
-                                .primary(station.getPhoto().isPrimary())
+                                .primary(station.getPhotos().get(0).isPrimary())
                                 .build();
                         photoDao.update(photo);
                     }

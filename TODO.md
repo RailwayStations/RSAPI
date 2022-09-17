@@ -24,6 +24,8 @@
 
 - InboxEntry: change `@Data` to `@Value` annotation
 
+- Is there a better way for Country.providerApps and Station.photos?
+
 - Replace `/<country>/*` endpoints with `/*?country=<country>` parameter, see [api.log](api.log)
 
 ## Multiple photos per station
@@ -32,50 +34,60 @@
 
 - New Station API to support multiple photos per station
 
-  - 4 new endpoints needed:
+    - 4 new endpoints needed:
 
-    - one station with all photos by `country` and `id`
+        - one station with all photos by `country` and `id`
 
-      ~~`/stations2/{country}/{id}`~~
+          ~~`/stations2/{country}/{id}`~~
 
-      ~~`/stationPhotos/{country}/{id}`~~
+          ~~`/stationPhotos/{country}/{id}`~~
 
-      `/stationById/{country}/{id}`
+          ~~`/stationsByCountry/{country}/{id}`~~
 
-    - all stations of a `country` with the primary photo (optional with filter of `hasPhoto` and `active`)
+          ~~`/stationById/{country}/{id}`~~
 
-      ~~`/stations2/{country}?hasPhoto=&active=`~~
+          `/photoStationById/{country}/{id}`
 
-      ~~`/countryStations/{country}?hasPhoto=&active=`~~
+        - all stations of a `country` with the primary photo (optional with filter of `hasPhoto` and `active`)
 
-      `/stationsByCountry/{country}?hasPhoto=&active=`
+          ~~`/stations2/{country}?hasPhoto=&active=`~~
 
-    - all stations with photos of one `photographer` (optional with filter by `country`)
+          ~~`/countryStations/{country}?hasPhoto=&active=`~~
 
-      ~~`/photographers/{photographer}/photos?country={country}`~~
+          ~~`/stationsByCountry/{country}?hasPhoto=&active=`~~
 
-      ~~`/stationPhotosByUser/{photographer}?country={country}`~~
+          `/photoStationsByCountry/{country}?hasPhoto=&active=`
 
-      `/stationsByPhotographer/{photographer}?country={country}`
+        - all stations with photos of one `photographer` (optional with filter by `country`)
 
-    - all stations with a photo which was recently imported, with filter by `importedSince` (max one month)
+          ~~`/photographers/{photographer}/photos?country={country}`~~
 
-      ~~`/stationPhotos?importedSince={importedSince}`~~
+          ~~`/stationPhotosByUser/{photographer}?country={country}`~~
 
-      ~~`/stationsWithPhotosImportedSince?importedSince={importedSince}`~~
+          ~~`/stationsByPhotographer/{photographer}?country={country}`~~
 
-      `/stationsByRecentPhotoImports?importedSince={importedSince}`
+          `/photoStationsByPhotographer/{photographer}?country={country}`
 
-  - **Or** one for all:
+        - all stations with a photo which was recently imported, with filter by `importedSince` (max one month)
 
-    ~~`/stations2?country=&id=&photographer=&importedSince&hasPhoto=&active=`~~
+          ~~`/stationPhotos?importedSince={importedSince}`~~
 
-    valid combinations:
+          ~~`/stationsWithPhotosImportedSince?importedSince={importedSince}`~~
 
-      - `country`, `id`
+          ~~`/stationsByRecentPhotoImports?importedSince={importedSince}`~~
 
-      - `country`, (`hasPhoto`), (`active`)
+          `/photoStationsByRecentPhotoImports?importedSince={importedSince}`
 
-      - `photographer`, (`country`)
+    - **Or** one for all:
 
-      - `createdSince`
+      ~~`/stations2?country=&id=&photographer=&importedSince&hasPhoto=&active=`~~
+
+      valid combinations:
+
+        - `country`, `id`
+
+        - `country`, (`hasPhoto`), (`active`)
+
+        - `photographer`, (`country`)
+
+        - `createdSince`

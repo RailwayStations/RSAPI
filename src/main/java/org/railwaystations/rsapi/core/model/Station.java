@@ -2,8 +2,11 @@ package org.railwaystations.rsapi.core.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.Value;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Value
@@ -22,13 +25,14 @@ public class Station {
 
     String ds100;
 
-    Photo photo;
+    @Getter
+    List<Photo> photos = new ArrayList<>();
 
     @Builder.Default
     boolean active = true;
 
     public boolean hasPhoto() {
-        return this.photo != null;
+        return this.photos.size() > 0;
     }
 
     /*
@@ -53,7 +57,7 @@ public class Station {
             result = this.hasPhoto() == hasPhoto;
         }
         if (photographer != null) {
-            result &= hasPhoto() && photographer.equals(photo.getPhotographer().getDisplayName());
+            result &= hasPhoto() && photos.stream().anyMatch(photo -> photo.getPhotographer().getDisplayName().equals(photographer));
         }
         if (active != null) {
             result &= active == this.active;

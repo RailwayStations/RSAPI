@@ -67,7 +67,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = InboxController.class, properties = {"inboxBaseUrl=http://inbox.railway-stations.org"})
-@ContextConfiguration(classes={WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class, MockMvcTestConfiguration.class, WebSecurityConfig.class})
+@ContextConfiguration(classes = {WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class, MockMvcTestConfiguration.class, WebSecurityConfig.class})
 @Import({InboxService.class, PhotoFileStorage.class, RSUserDetailsService.class})
 @ActiveProfiles("mockMvcTest")
 class InboxControllerTest {
@@ -143,13 +143,16 @@ class InboxControllerTest {
     }
 
     private Station createStation(Station.Key key, Coordinates coordinates, String ds100, Photo photo) {
-        return Station.builder()
+        var station = Station.builder()
                 .key(key)
                 .title("Station" + key.getId())
                 .coordinates(coordinates)
                 .ds100(ds100)
-                .photo(photo)
                 .build();
+        if (photo != null) {
+            station.getPhotos().add(photo);
+        }
+        return station;
     }
 
     private Photo createPhoto(Station.Key key0815, User Jim_Knopf) {
@@ -225,7 +228,7 @@ class InboxControllerTest {
 
     @Test
     void testPostIframeEmailNotVerified() throws Exception {
-        when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("someuser@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("","", Collections.emptyList()));
+        when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("someuser@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("", "", Collections.emptyList()));
         when(inboxDao.insert(any())).thenReturn(1L);
         var response = whenPostImageIframe("someuser@example.com", "http://localhost/uploadPage.php");
 
@@ -237,9 +240,9 @@ class InboxControllerTest {
 
     @Test
     void testPostIframeMaliciousReferer() throws Exception {
-        when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("nickname@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("","", Collections.emptyList()));
+        when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("nickname@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("", "", Collections.emptyList()));
         when(inboxDao.insert(any())).thenReturn(1L);
-        
+
         var response = whenPostImageIframe("nickname@example.com", "http://localhost/uploadPage.php<script>alert('FooBar!');</script>");
 
         assertThat(response).isEqualTo("Illegal character in path at index 31: http://localhost/uploadPage.php<script>alert('FooBar!');</script>");
@@ -250,21 +253,21 @@ class InboxControllerTest {
     @Test
     void testPostPhotoForExistingStationViaIframe() throws Exception {
         var uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
-        when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("nickname@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("","", Collections.emptyList()));
+        when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("nickname@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("", "", Collections.emptyList()));
         when(inboxDao.insert(any())).thenReturn(1L);
         var response = whenPostImageIframe("nickname@example.com", "http://localhost/uploadPage.php");
 
         assertThat(response).contains("REVIEW");
         assertFileWithContentExistsInInbox("image-content", "1.jpg");
         verify(inboxDao).insert(uploadCaptor.capture());
-        assertUpload(uploadCaptor.getValue(), "de","4711", null, null);
+        assertUpload(uploadCaptor.getValue(), "de", "4711", null, null);
 
         assertThat(monitor.getMessages().get(0)).isEqualTo("""
-                    New photo upload for Station4711 - de:4711
-                    Some Comment
-                    http://inbox.railway-stations.org/1.jpg
-                    by nickname
-                    via UserAgent""");
+                New photo upload for Station4711 - de:4711
+                Some Comment
+                http://inbox.railway-stations.org/1.jpg
+                by nickname
+                via UserAgent""");
     }
 
     private String whenPostImageIframe(String email,
@@ -286,7 +289,7 @@ class InboxControllerTest {
     @Test
     void testRepostMissingStationWithoutPhotoViaIframe() throws Exception {
         var uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
-        when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("nickname@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("","", Collections.emptyList()));
+        when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("nickname@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("", "", Collections.emptyList()));
         when(inboxDao.insert(any())).thenReturn(1L);
         var response = mvc.perform(multipart("/photoUpload")
                         .file(new MockMultipartFile("file", null, "application/octet-stream", (byte[]) null))
@@ -306,7 +309,7 @@ class InboxControllerTest {
 
         assertThat(response).contains("REVIEW");
         verify(inboxDao).insert(uploadCaptor.capture());
-        assertUpload(uploadCaptor.getValue(), "de",null, "Missing Station", new Coordinates(10, 20));
+        assertUpload(uploadCaptor.getValue(), "de", null, "Missing Station", new Coordinates(10, 20));
 
         assertThat(monitor.getMessages().get(0)).isEqualTo("""
                 Report missing station Missing Station at https://map.railway-stations.org/index.php?mlat=10.0&mlon=20.0&zoom=18&layers=M
@@ -320,7 +323,7 @@ class InboxControllerTest {
         var uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
         when(inboxDao.insert(any())).thenReturn(1L);
 
-        whenPostImage("@nick name", 42, "nickname@example.com","4711", "de", null, null, null, "Some Comment")
+        whenPostImage("@nick name", 42, "nickname@example.com", "4711", "de", null, null, null, "Some Comment")
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$.state").value("REVIEW"))
                 .andExpect(jsonPath("$.id").value(1))
@@ -329,7 +332,7 @@ class InboxControllerTest {
 
         assertFileWithContentExistsInInbox("image-content", "1.jpg");
         verify(inboxDao).insert(uploadCaptor.capture());
-        assertUpload(uploadCaptor.getValue(), "de","4711", null, null);
+        assertUpload(uploadCaptor.getValue(), "de", "4711", null, null);
         assertThat(monitor.getMessages().get(0)).isEqualTo("""
                 New photo upload for Station4711 - de:4711
                 Some Comment
@@ -358,7 +361,7 @@ class InboxControllerTest {
         when(inboxDao.insert(any())).thenReturn(4L);
         var uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
 
-        whenPostImage("@nick name", 42, "nickname@example.com",null, null, "Missing Station", 50.9876d, 9.1234d, "Some Comment")
+        whenPostImage("@nick name", 42, "nickname@example.com", null, null, "Missing Station", 50.9876d, 9.1234d, "Some Comment")
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$.state").value("REVIEW"))
                 .andExpect(jsonPath("$.id").value(4))
@@ -366,7 +369,7 @@ class InboxControllerTest {
 
         assertFileWithContentExistsInInbox(IMAGE_CONTENT, "4.jpg");
         verify(inboxDao).insert(uploadCaptor.capture());
-        assertUpload(uploadCaptor.getValue(), null,null, "Missing Station", new Coordinates(50.9876, 9.1234));
+        assertUpload(uploadCaptor.getValue(), null, null, "Missing Station", new Coordinates(50.9876, 9.1234));
 
         assertThat(monitor.getMessages().get(0)).isEqualTo("""
                 Photo upload for missing station Missing Station at https://map.railway-stations.org/index.php?mlat=50.9876&mlon=9.1234&zoom=18&layers=M
@@ -381,14 +384,14 @@ class InboxControllerTest {
         when(inboxDao.insert(any())).thenReturn(4L);
         var uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
 
-        whenPostPhotoUpload("@nick name", 42, "nickname@example.com",null, null, "Missing Station", 50.9876d, 9.1234d, "Some Comment", User.EMAIL_VERIFIED, null, "application/octet-stream")
+        whenPostPhotoUpload("@nick name", 42, "nickname@example.com", null, null, "Missing Station", 50.9876d, 9.1234d, "Some Comment", User.EMAIL_VERIFIED, null, "application/octet-stream")
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$.state").value("REVIEW"))
                 .andExpect(jsonPath("$.id").value(4))
                 .andExpect(jsonPath("$.filename").doesNotExist());
 
         verify(inboxDao).insert(uploadCaptor.capture());
-        assertUpload(uploadCaptor.getValue(), null,null, "Missing Station", new Coordinates(50.9876, 9.1234));
+        assertUpload(uploadCaptor.getValue(), null, null, "Missing Station", new Coordinates(50.9876, 9.1234));
 
         assertThat(monitor.getMessages().get(0)).isEqualTo("""
                 Report missing station Missing Station at https://map.railway-stations.org/index.php?mlat=50.9876&mlon=9.1234&zoom=18&layers=M
@@ -399,12 +402,12 @@ class InboxControllerTest {
 
     @ParameterizedTest
     @CsvSource({"-91d, 9.1234d",
-                "91d, 9.1234d",
-                "50.9876d, -181d",
-                "50.9876d, 181d",
+            "91d, 9.1234d",
+            "50.9876d, -181d",
+            "50.9876d, 181d",
     })
     void testPostMissingStationLatLonOutOfRange(Double latitude, Double longitude) throws Exception {
-        whenPostImage("@nick name", 42, "nickname@example.com",null, null, "Missing Station", latitude, longitude, null)
+        whenPostImage("@nick name", 42, "nickname@example.com", null, null, "Missing Station", latitude, longitude, null)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.state").value("LAT_LON_OUT_OF_RANGE"))
                 .andExpect(jsonPath("$.id").doesNotExist())
@@ -414,7 +417,7 @@ class InboxControllerTest {
     @Test
     void testPostSomeUserWithTokenSalt() throws Exception {
         when(inboxDao.insert(any())).thenReturn(3L);
-        whenPostImage("@someuser", 11, "someuser@example.com","4711", "de", null, null, null, null)
+        whenPostImage("@someuser", 11, "someuser@example.com", "4711", "de", null, null, null, null)
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$.state").value("REVIEW"))
                 .andExpect(jsonPath("$.id").value(3))
@@ -423,7 +426,7 @@ class InboxControllerTest {
         assertFileWithContentExistsInInbox(IMAGE_CONTENT, "3.jpg");
         assertThat(monitor.getMessages().get(0)).isEqualTo("""
                 New photo upload for Station4711 - de:4711
-                
+                                
                 http://inbox.railway-stations.org/3.jpg
                 by @someuser
                 via UserAgent""");
@@ -434,7 +437,7 @@ class InboxControllerTest {
         when(inboxDao.insert(any())).thenReturn(2L);
         when(inboxDao.countPendingInboxEntriesForStation(null, "de", "4711")).thenReturn(1);
 
-        whenPostImage("@nick name", 42, "nickname@example.com","4711", "de", null, null, null, null)
+        whenPostImage("@nick name", 42, "nickname@example.com", "4711", "de", null, null, null, null)
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.state").value("CONFLICT"))
                 .andExpect(jsonPath("$.id").value(2))
@@ -443,7 +446,7 @@ class InboxControllerTest {
         assertFileWithContentExistsInInbox(IMAGE_CONTENT, "2.jpg");
         assertThat(monitor.getMessages().get(0)).isEqualTo("""
                 New photo upload for Station4711 - de:4711
-                
+                                
                 http://inbox.railway-stations.org/2.jpg (possible duplicate!)
                 by @nick name
                 via UserAgent""");
@@ -487,7 +490,7 @@ class InboxControllerTest {
                 .id(id)
                 .countryCode(countryCode)
                 .stationId(stationId)
-                .title("Station " +  stationId)
+                .title("Station " + stationId)
                 .coordinates(new Coordinates(50.1, 9.2))
                 .photographerId(user.getId())
                 .photographerNickname(user.getName())
@@ -511,7 +514,7 @@ class InboxControllerTest {
     @Test
     void testPostDuplicate() throws Exception {
         when(inboxDao.insert(any())).thenReturn(5L);
-        whenPostImage("@nick name", 42, "nickname@example.com","1234", "de", null, null, null, null)
+        whenPostImage("@nick name", 42, "nickname@example.com", "1234", "de", null, null, null, null)
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.state").value("CONFLICT"))
                 .andExpect(jsonPath("$.id").value(5))
@@ -520,7 +523,7 @@ class InboxControllerTest {
         assertFileWithContentExistsInInbox(IMAGE_CONTENT, "5.jpg");
         assertThat(monitor.getMessages().get(0)).isEqualTo("""
                 New photo upload for Station1234 - de:1234
-                
+                                
                 http://inbox.railway-stations.org/5.jpg (possible duplicate!)
                 by @nick name
                 via UserAgent""");
@@ -528,7 +531,7 @@ class InboxControllerTest {
 
     @Test
     void testPostEmailNotVerified() throws Exception {
-        whenPostImage("@nick name", 42, "nickname@example.com","1234", "de", null, null, null, null, "blahblah")
+        whenPostImage("@nick name", 42, "nickname@example.com", "1234", "de", null, null, null, null, "blahblah")
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.state").value("UNAUTHORIZED"))
                 .andExpect(jsonPath("$.id").doesNotExist())

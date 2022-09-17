@@ -50,11 +50,11 @@ class MastodonBotHttpClientTest {
         var station = Station.builder()
                 .key(key)
                 .title("title")
-                .photo(photo)
                 .build();
+        station.getPhotos().add(photo);
         var inboxEntry = InboxEntry.builder()
-                        .comment("comment")
-                        .build();
+                .comment("comment")
+                .build();
         client.tootNewPhoto(station, inboxEntry, photo, 1);
 
         verify(postRequestedFor(urlEqualTo("/api/v1/statuses"))

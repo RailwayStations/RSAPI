@@ -284,12 +284,12 @@ class InboxServiceTest {
     }
 
     private void whenStation1HasPhoto() {
-        when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), STATION_KEY_DE_1.getId())).thenReturn(Set.of(createStationDe1()
-                .photo(Photo.builder()
-                        .id(EXISTING_PHOTO_ID)
-                        .primary(true)
-                        .build())
-                .build()));
+        var stationDe1 = createStationDe1().build();
+        stationDe1.getPhotos().add(Photo.builder()
+                .id(EXISTING_PHOTO_ID)
+                .primary(true)
+                .build());
+        when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), STATION_KEY_DE_1.getId())).thenReturn(Set.of(stationDe1));
     }
 
     private Station.StationBuilder createNewStationByCommand(InboxCommand command) {

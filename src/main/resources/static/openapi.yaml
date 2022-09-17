@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20220911.1425"
+  version: "20220917.1010"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -17,7 +17,35 @@ tags:
     externalDocs:
       description: Find out more
       url: https://www.railway-stations.org
+
 paths:
+  /photoStationById/{country}/{id}:
+    get:
+      summary: Get a railway station of a country by its id with all its photos
+      parameters:
+        - name: country
+          in: path
+          description: country code
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          description: id of the station
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhotoStations'
+        404:
+          description: Station not found
+          content: {}
+
   /{country}/stations:
     get:
       summary: Finds railway stations by various query criteria
@@ -56,6 +84,7 @@ paths:
         404:
           description: Country not found
           content: {}
+
   /stations:
     get:
       summary: Finds railway stations by various query criteria
@@ -91,6 +120,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Station'
+
   /{country}/stations/{id}:
     get:
       summary: Find a railway station by its ID
@@ -117,6 +147,7 @@ paths:
         404:
           description: Station not found
           content: {}
+
   /recentPhotoImports:
     get:
       summary: List stations with photo uploads in the las 24h
@@ -136,6 +167,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Station'
+
   /{country}/photographers:
     get:
       summary: List of all photographers of a given country with their number of photos taken
@@ -166,6 +198,7 @@ paths:
         404:
           description: Country not found
           content: {}
+
   /{country}/photographers.txt:
     get:
       summary: List of all photographers of a given country with their number of photos taken
@@ -193,6 +226,7 @@ paths:
         404:
           description: Country not found
           content: {}
+
   /{country}/photographers.json:
     get:
       summary: List of all photographers of a given country with their number of photos taken
@@ -220,6 +254,7 @@ paths:
         404:
           description: Country not found
           content: {}
+
   /photographers:
     get:
       summary: List of all photographers with their number of photos taken
@@ -246,6 +281,7 @@ paths:
             text/plain:
               schema:
                 type: string
+
   /photographers.json:
     get:
       summary: List of all photographers with their number of photos taken
@@ -269,6 +305,7 @@ paths:
             text/plain:
               schema:
                 type: string
+
   /photographers.txt:
     get:
       summary: List of all photographers with their number of photos taken
@@ -292,6 +329,7 @@ paths:
             text/plain:
               schema:
                 type: string
+
   /{country}/stats:
     get:
       summary: Statistic of photos with and without photos by country
@@ -322,6 +360,7 @@ paths:
         404:
           description: Country not found
           content: {}
+
   /{country}/stats.json:
     get:
       summary: Statistic of photos with and without photos by country
@@ -349,6 +388,7 @@ paths:
         404:
           description: Country not found
           content: {}
+
   /{country}/stats.txt:
     get:
       summary: Statistic of photos with and without photos by country
@@ -376,6 +416,7 @@ paths:
         404:
           description: Country not found
           content: {}
+
   /stats:
     get:
       summary: Overall statistic of photos with and without photos
@@ -398,6 +439,7 @@ paths:
         404:
           description: Country not found
           content: {}
+
   /stats.json:
     get:
       summary: Overall statistic of photos with and without photos
@@ -417,6 +459,7 @@ paths:
         404:
           description: Country not found
           content: {}
+
   /stats.txt:
     get:
       summary: Overall statistic of photos with and without photos
@@ -436,6 +479,7 @@ paths:
         404:
           description: Country not found
           content: {}
+
   /countries:
     get:
       summary: List of all supported countries with their configuration
@@ -454,6 +498,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Country'
+
   /countries.json:
     get:
       summary: List of all supported countries with their configuration
@@ -472,6 +517,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Country'
+
   /photoUpload:
     post:
       summary: Upload a new Photo
@@ -582,6 +628,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/InboxResponse'
       x-codegen-request-body-name: image
+
   /reportProblem:
     post:
       summary: Report a for a Railway-Station
@@ -617,6 +664,7 @@ paths:
           description: forbidden
           content: {}
       x-codegen-request-body-name: problemReport
+
   /userInbox:
     post:
       summary: Query the state of photo uploads of the authorized user
@@ -640,6 +688,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/InboxStateQueryResponse'
       x-codegen-request-body-name: UploadStateQueries
+
   /publicInbox:
     get:
       summary: Get the current public inbox, stations where photos have been uploaded
@@ -652,6 +701,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PublicInboxEntry'
+
   /adminInboxCount:
     get:
       summary: Count pending inbox items
@@ -662,6 +712,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InboxCountResponse'
+
   /nextZ:
     get:
       summary: Get next Z-StationId for missing stations
@@ -672,6 +723,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NextZResponse'
+
   /adminInbox:
     get:
       summary: Get the current inbox, photos and problem reports under review.
@@ -723,6 +775,7 @@ paths:
           description: forbidden
           content: {}
       x-codegen-request-body-name: UploadCommand
+
   /registration:
     post:
       summary: Register for an account
@@ -753,6 +806,7 @@ paths:
           description: unprocessable entity, Registration input document error
           content: {}
       x-codegen-request-body-name: registration
+
   /emailVerification/{token}:
     get:
       summary: Verify eMail-Address with verification token
@@ -772,6 +826,7 @@ paths:
         404:
           description: token not found, verification failed
           content: {}
+
   /resendEmailVerification:
     post:
       summary: Sends a new eMail-Verification mail
@@ -781,6 +836,7 @@ paths:
         200:
           description: email successfully sent
           content: {}
+
   /resetPassword:
     post:
       summary: Requests a new password only
@@ -801,6 +857,7 @@ paths:
             text/plain:
               schema:
                 type: string
+
   /changePassword:
     post:
       summary: Change user password
@@ -840,6 +897,7 @@ paths:
         404:
           description: User not found
           content: {}
+
   /myProfile:
     get:
       summary: Get the users profile
@@ -920,6 +978,7 @@ paths:
               schema:
                 type: string
       x-codegen-request-body-name: profile
+
   /photos/{country}/{filename}:
     get:
       summary: downloads the given photo
@@ -957,6 +1016,7 @@ paths:
         404:
           description: file not found
           content: {}
+
   /inbox/{filename}:
     get:
       summary: downloads the given photo from the inbox
@@ -988,6 +1048,7 @@ paths:
         404:
           description: file not found
           content: {}
+
   /inbox/processed/{filename}:
     get:
       summary: downloads the given photo from the processed inbox
@@ -1019,6 +1080,7 @@ paths:
         404:
           description: file not found
           content: {}
+
 components:
   securitySchemes:
     basicAuth:
@@ -1032,7 +1094,151 @@ components:
       type: apiKey
       in: header
       name: Upload-Token
+
   schemas:
+    PhotoStations:
+      description: Stations with photos
+      type: object
+      properties:
+        photoBaseUrl:
+          type: string
+          description: Base URL of all photos
+          example: "https://api.railway-stations.org/photos/"
+        licenses:
+          type: array
+          description: List of used licenses, might be empty if no photos available
+          items:
+            $ref: '#/components/schemas/PhotoLicense'
+        photographers:
+          type: array
+          description: List of all photographers, might be empty if no photos available
+          items:
+            $ref: '#/components/schemas/Photographer'
+        stations:
+          type: array
+          description: List of the stations
+          items:
+            $ref: '#/components/schemas/PhotoStation'
+      required:
+        - "photoBaseUrl"
+        - "licenses"
+        - "photographers"
+        - "stations"
+
+    PhotoLicense:
+      description: License used by a photo
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique id of the license
+          example: "CC0"
+        name:
+          type: string
+          description: Name of the license to display at the photo
+          example: "CC0 1.0 Universell (CC0 1.0)"
+        url:
+          type: string
+          format: url
+          description: URL of the license to link to from the photo
+          example: "https://creativecommons.org/publicdomain/zero/1.0/"
+      required:
+        - "id"
+        - "name"
+        - "url"
+
+    Photographer:
+      description: The creator of a photo
+      type: object
+      properties:
+        name:
+          type: string
+          description: Username of the photographer
+        url:
+          type: string
+          format: url
+          description: Link to the photographers social media account or homepage
+      required:
+        - "name"
+
+    PhotoStation:
+      description: A station with its photos
+      type: object
+      properties:
+        country: 
+          type: string
+          description: 2 letter code of the country
+          example: "uk"
+        id:
+          type: string
+          description: Id of the station within the country
+          example: "7054260"
+        title:
+          type: string
+          description: Title of the station
+          example: "London Victoria"
+        lat:
+          type: number
+          format: double
+          description: Latitude of the station
+        lon:
+          type: number
+          format: double
+          description: Longitute of the station
+        shortCode:
+          type: string
+          description: Provider specific short code of the station, e.g. RIL100 or DS100 for german stations
+        inactive:
+          type: boolean
+          description: Indicates if this station is inactive
+          default: false
+        photos:
+          type: array
+          description: Photos of the station. If more than one photo is given, the first one is the primary photo. List might be empty or only the primary photo provided.
+          items:
+            $ref: '#/components/schemas/Photo'
+      required:
+        - "country"
+        - "id"
+        - "title"
+        - "lat"
+        - "lon"
+        - "photos"
+
+    Photo:
+      description: A photo of a station
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique id of a photo
+        photographer:
+          type: string
+          description: Name of the photographer
+        path:
+          type: string
+          description: URL path to the photo, to be used together with the photoBaseUrl
+        createdAt:
+          type: integer
+          format: int64
+          description: |
+            Timestamp when the photo was created in the railway-stations
+            database (Epoche milliseconds since 1.1.1970)
+        license:
+          type: string
+          description: Id of the license used for this photo
+        outdated:
+          type: boolean
+          description: Indicates if this photo is outdated
+          default: false
+      required:
+        - "id"
+        - "photographer"
+        - "path"
+        - "createdAt"
+        - "license"
+
     Station:
       description: A railway-station object with location and optional photo
       type: object
@@ -1086,7 +1292,7 @@ components:
           type: integer
           description: |
             Timestamp when the photo was created in the railway-stations
-            database (Milliseconds since 1.1.1970)
+            database (Epoche milliseconds since 1.1.1970)
           format: int64
         DS100:
           type: string
@@ -1102,11 +1308,13 @@ components:
         - lat
         - lon
         - active
+
     Photographers:
       description: |
         JSON Object with photographers nickname as parameter and number
         of photos as their value
       type: object
+
     Statistic:
       description: Statistic of number of stations with and without photos
       type: object
@@ -1131,6 +1339,7 @@ components:
         - withPhoto
         - withoutPhoto
         - photographers
+
     Country:
       description: Supported Country with its configuration
       type: object
@@ -1167,6 +1376,7 @@ components:
         - code
         - name
         - active
+
     ProviderApp:
       description: Provider App information
       type: object
@@ -1185,6 +1395,7 @@ components:
         - type
         - name
         - url
+
     License:
       description: the only accepted type is "CC0 1.0 Universell (CC0 1.0)", the others are listed for backward compatibility
       type: string
@@ -1193,6 +1404,7 @@ components:
         - CC0 1.0 Universell (CC0 1.0)
         - CC4
         - CC BY-SA 4.0
+
     UpdateProfile:
       description: User profile information
       type: object
@@ -1217,6 +1429,7 @@ components:
         - email
         - license
         - photoOwner
+
     RegisterProfile:
       description: User profile information
       type: object
@@ -1243,6 +1456,7 @@ components:
         - email
         - license
         - photoOwner
+
     Profile:
       description: User profile information
       type: object
@@ -1272,6 +1486,7 @@ components:
         - nickname
         - license
         - photoOwner
+
     InboxResponse:
       description: Response status of photo uploads and problem reports
       type: object
@@ -1304,6 +1519,7 @@ components:
           description: CRC32 checksum of the uploaded photo
           type: integer
           format: int64
+
     InboxStateQueryRequest:
       type: object
       properties:
@@ -1312,6 +1528,7 @@ components:
           format: int64
       required:
         - id
+
     InboxStateQueryResponse:
       description: Inbox state query
       type: object
@@ -1352,6 +1569,7 @@ components:
       required:
         - id
         - state
+
     PublicInboxEntry:
       description: Represents an uploaded photo under review
       type: object
@@ -1374,6 +1592,7 @@ components:
         - title
         - lat
         - lon
+
     InboxEntry:
       description: Represents an uploaded photo with processing state
       type: object
@@ -1445,6 +1664,7 @@ components:
         - createdAt
         - done
         - hasPhoto
+
     InboxCommand:
       description: command to import or reject an inbox entry
       type: object
@@ -1501,6 +1721,7 @@ components:
       required:
         - id
         - command
+
     InboxCountResponse:
       description: counts the pending inbox entries
       type: object
@@ -1510,6 +1731,7 @@ components:
           format: int64
       required:
         - pendingInboxEntries
+
     AdminInboxCommandResponse:
       type: object
       properties:
@@ -1521,6 +1743,7 @@ components:
       required:
         - status
         - message
+
     NextZResponse:
       type: object
       properties:
@@ -1528,6 +1751,7 @@ components:
           type: string
       required:
         - nextZ
+
     ProblemReport:
       description: Represents a report of a problem with a station
       type: object
@@ -1564,6 +1788,7 @@ components:
         - stationId
         - comment
         - type
+
     ChangePassword:
       type: object
       properties:
@@ -1571,6 +1796,7 @@ components:
           type: string
       required:
         - newPassword
+
     GeneralErrorMessage:
       type: object
       properties:

@@ -14,7 +14,7 @@ import java.util.Objects;
 
 @Schema(name = "Station", description = "A railway-station object with location and optional photo")
 @JsonTypeName("Station")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-08-11T22:38:36.048774788+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-09-17T10:27:28.459965650+02:00[Europe/Berlin]")
 public class StationDto {
 
   @JsonProperty("idStr")
@@ -90,11 +90,11 @@ public class StationDto {
   }
 
   /**
-   * DEPRECATED! Unique (numeric) ID of the station per country
+   * Unique (numeric) ID of the station per country
    * @return id
   */
   
-  @Schema(name = "id", description = "DEPRECATED! Unique (numeric) ID of the station per country", required = false)
+  @Schema(name = "id", description = "Unique (numeric) ID of the station per country", required = false)
   public Long getId() {
     return id;
   }
@@ -223,11 +223,11 @@ public class StationDto {
   }
 
   /**
-   * License of the photo, clients need to link to an online version of the license text
+   * License of the photo, clients need to link to an online version of the license text 
    * @return license
   */
   
-  @Schema(name = "license", description = "License of the photo, clients need to link to an online version of the license text", required = false)
+  @Schema(name = "license", description = "License of the photo, clients need to link to an online version of the license text ", required = false)
   public String getLicense() {
     return license;
   }
@@ -242,11 +242,11 @@ public class StationDto {
   }
 
   /**
-   * The URL of the license text. Clients should use this to link to the online version of the license text
+   * The URL of the license text. Clients should use this to link to the online version of the license text 
    * @return licenseUrl
   */
   
-  @Schema(name = "licenseUrl", description = "The URL of the license text. Clients should use this to link to the online version of the license text", required = false)
+  @Schema(name = "licenseUrl", description = "The URL of the license text. Clients should use this to link to the online version of the license text ", required = false)
   public String getLicenseUrl() {
     return licenseUrl;
   }
@@ -299,11 +299,11 @@ public class StationDto {
   }
 
   /**
-   * Timestamp when the photo was created in the railway-stations database (Milliseconds since 1.1.1970)
+   * Timestamp when the photo was created in the railway-stations database (Epoche milliseconds since 1.1.1970) 
    * @return createdAt
   */
   
-  @Schema(name = "createdAt", description = "Timestamp when the photo was created in the railway-stations database (Milliseconds since 1.1.1970)", required = false)
+  @Schema(name = "createdAt", description = "Timestamp when the photo was created in the railway-stations database (Epoche milliseconds since 1.1.1970) ", required = false)
   public Long getCreatedAt() {
     return createdAt;
   }

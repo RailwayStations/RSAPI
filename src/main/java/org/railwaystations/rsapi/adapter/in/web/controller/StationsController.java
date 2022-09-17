@@ -93,7 +93,7 @@ public class StationsController {
                 .lon(station.getCoordinates().getLon());
 
         if (station.hasPhoto()) {
-            var photo = station.getPhoto();
+            var photo = station.getPhotos().get(0);
             var license = photo.getLicense();
             stationDto.license(license != null ? license.getDisplayName() : null)
                     .licenseUrl(license != null ? license.getUrl() : null)

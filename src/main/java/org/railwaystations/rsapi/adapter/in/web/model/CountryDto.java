@@ -17,7 +17,7 @@ import java.util.Objects;
 
 @Schema(name = "Country", description = "Supported Country with its configuration")
 @JsonTypeName("Country")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-08-11T22:38:36.048774788+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-09-17T10:27:28.459965650+02:00[Europe/Berlin]")
 public class CountryDto {
 
   @JsonProperty("code")
@@ -127,11 +127,11 @@ public class CountryDto {
   }
 
   /**
-   * URL template for the timetable, contains {title}, {id} and {DS100} placeholders which need to be replaced
+   * URL template for the timetable, contains {title}, {id} and {DS100} placeholders which need to be replaced 
    * @return timetableUrlTemplate
   */
   
-  @Schema(name = "timetableUrlTemplate", description = "URL template for the timetable, contains {title}, {id} and {DS100} placeholders which need to be replaced", required = false)
+  @Schema(name = "timetableUrlTemplate", description = "URL template for the timetable, contains {title}, {id} and {DS100} placeholders which need to be replaced ", required = false)
   public String getTimetableUrlTemplate() {
     return timetableUrlTemplate;
   }

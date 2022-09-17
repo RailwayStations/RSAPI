@@ -2,7 +2,7 @@ package org.railwaystations.rsapi.core.model;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
-import lombok.Singular;
+import lombok.Getter;
 import lombok.Value;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class Country {
 
     boolean active;
 
-    @Singular
+    @Getter
     List<ProviderApp> providerApps = new ArrayList<>();
 
 }

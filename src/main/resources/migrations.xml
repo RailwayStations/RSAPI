@@ -28,14 +28,16 @@
             <column name="name" value="Deutschland"/>
             <column name="stationsIndex" value="bahnhoefe"/>
             <column name="photosIndex" value="bahnhofsfotosde"/>
-            <column name="timetableUrlTemplate" value="https://mobile.bahn.de/bin/mobil/bhftafel.exe/dox?bt=dep&amp;max=10&amp;rt=1&amp;use_realtime_filter=1&amp;start=yes&amp;input={title}"/>
+            <column name="timetableUrlTemplate"
+                    value="https://mobile.bahn.de/bin/mobil/bhftafel.exe/dox?bt=dep&amp;max=10&amp;rt=1&amp;use_realtime_filter=1&amp;start=yes&amp;input={title}"/>
         </insert>
         <insert tableName="countries">
             <column name="id" value="ch"/>
             <column name="name" value="Schweiz"/>
             <column name="stationsIndex" value="bahnhoefec2"/>
             <column name="photosIndex" value="bahnhofsfotosch"/>
-            <column name="timetableUrlTemplate" value="http://fahrplan.sbb.ch/bin/stboard.exe/dn?input={title}&amp;REQTrain_name=&amp;boardType=dep&amp;time=now&amp;maxJourneys=20&amp;selectDate=today&amp;productsFilter=1111111111&amp;start=yes"/>
+            <column name="timetableUrlTemplate"
+                    value="http://fahrplan.sbb.ch/bin/stboard.exe/dn?input={title}&amp;REQTrain_name=&amp;boardType=dep&amp;time=now&amp;maxJourneys=20&amp;selectDate=today&amp;productsFilter=1111111111&amp;start=yes"/>
             <column name="email" value="fotos@schweizer-bahnhoefe.ch"/>
             <column name="twitterTags" value="@BahnhoefeCH, @android_oma, #BahnhofsfotoCH"/>
         </insert>
@@ -65,14 +67,16 @@
             <column name="name" value="España"/>
             <column name="stationsIndex" value="bahnhoefees"/>
             <column name="photosIndex" value="bahnhofsfotoses"/>
-            <column name="timetableUrlTemplate" value="http://www.adif.es/AdifWeb/estacionesMapa.jsp?i=en_US&amp;dest=&amp;pes=informacion&amp;e={DS100}"/>
+            <column name="timetableUrlTemplate"
+                    value="http://www.adif.es/AdifWeb/estacionesMapa.jsp?i=en_US&amp;dest=&amp;pes=informacion&amp;e={DS100}"/>
         </insert>
         <insert tableName="countries">
             <column name="id" value="pl"/>
             <column name="name" value="Polska"/>
             <column name="stationsIndex" value="bahnhoefepl"/>
             <column name="photosIndex" value="bahnhofsfotospl"/>
-            <column name="timetableUrlTemplate" value="http://mt.rozklad-pkp.pl/de/sq?input={id}&amp;maxJourneys=15&amp;start=start"/>
+            <column name="timetableUrlTemplate"
+                    value="http://mt.rozklad-pkp.pl/de/sq?input={id}&amp;maxJourneys=15&amp;start=start"/>
         </insert>
         <insert tableName="countries">
             <column name="id" value="nl"/>
@@ -86,7 +90,8 @@
             <column name="name" value="Österreich"/>
             <column name="stationsIndex" value="bahnhoefeat"/>
             <column name="photosIndex" value="bahnhofsfotosat"/>
-            <column name="timetableUrlTemplate" value="http://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_liveticker&amp;evaId={id}&amp;boardType=dep&amp;productsFilter=1111111111111111&amp;dirInput=&amp;tickerID=dep&amp;start=yes&amp;eqstops=false&amp;showJourneys=12&amp;additionalTime=0"/>
+            <column name="timetableUrlTemplate"
+                    value="http://fahrplan.oebb.at/bin/stboard.exe/dn?L=vs_liveticker&amp;evaId={id}&amp;boardType=dep&amp;productsFilter=1111111111111111&amp;dirInput=&amp;tickerID=dep&amp;start=yes&amp;eqstops=false&amp;showJourneys=12&amp;additionalTime=0"/>
         </insert>
         <insert tableName="countries">
             <column name="id" value="in"/>
@@ -100,7 +105,8 @@
             <column name="name" value="Ireland"/>
             <column name="stationsIndex" value="bahnhoefeie"/>
             <column name="photosIndex" value="bahnhofsfotosie"/>
-            <column name="timetableUrlTemplate" value="http://www.irishrail.ie/timetables/live-departure-times?code={DS100}"/>
+            <column name="timetableUrlTemplate"
+                    value="http://www.irishrail.ie/timetables/live-departure-times?code={DS100}"/>
         </insert>
         <insert tableName="countries">
             <column name="id" value="no"/>
@@ -154,14 +160,16 @@
             <column name="name" value="Deutschland"/>
             <column name="stationsIndex" value="file:./src/test/resources/stationsDe.json"/>
             <column name="photosIndex" value="file:./src/test/resources/photosDe.json"/>
-            <column name="timetableUrlTemplate" value="https://mobile.bahn.de/bin/mobil/bhftafel.exe/dox?bt=dep&amp;max=10&amp;rt=1&amp;use_realtime_filter=1&amp;start=yes&amp;input={title}"/>
+            <column name="timetableUrlTemplate"
+                    value="https://mobile.bahn.de/bin/mobil/bhftafel.exe/dox?bt=dep&amp;max=10&amp;rt=1&amp;use_realtime_filter=1&amp;start=yes&amp;input={title}"/>
         </insert>
         <insert tableName="countries">
             <column name="id" value="ch"/>
             <column name="name" value="Schweiz"/>
             <column name="stationsIndex" value="file:./src/test/resources/stationsCh.json"/>
             <column name="photosIndex" value="file:./src/test/resources/photosCh.json"/>
-            <column name="timetableUrlTemplate" value="http://fahrplan.sbb.ch/bin/stboard.exe/dn?input={title}&amp;REQTrain_name=&amp;boardType=dep&amp;time=now&amp;maxJourneys=20&amp;selectDate=today&amp;productsFilter=1111111111&amp;start=yes"/>
+            <column name="timetableUrlTemplate"
+                    value="http://fahrplan.sbb.ch/bin/stboard.exe/dn?input={title}&amp;REQTrain_name=&amp;boardType=dep&amp;time=now&amp;maxJourneys=20&amp;selectDate=today&amp;productsFilter=1111111111&amp;start=yes"/>
             <column name="email" value="fotos@schweizer-bahnhoefe.ch"/>
             <column name="twitterTags" value="@BahnhoefeCH, @android_oma, #BahnhofsfotoCH"/>
         </insert>
@@ -238,7 +246,8 @@
             </column>
             <column name="license" type="varchar(100)"/>
             <column name="photographerId" type="integer">
-                <constraints nullable="false" referencedTableName="users" referencedColumnNames="id" foreignKeyName="fk_user"/>
+                <constraints nullable="false" referencedTableName="users" referencedColumnNames="id"
+                             foreignKeyName="fk_user"/>
             </column>
             <column name="createdAt" type="long">
                 <constraints nullable="false"/>
@@ -303,7 +312,8 @@
             <column name="providerIosApp" type="varchar(100)"/>
         </addColumn>
         <update tableName="countries">
-            <column name="providerAndroidApp" value="https://play.google.com/store/apps/details?id=de.hafas.android.db"/>
+            <column name="providerAndroidApp"
+                    value="https://play.google.com/store/apps/details?id=de.hafas.android.db"/>
             <column name="providerIosApp" value="https://apps.apple.com/app/db-navigator/id343555245"/>
             <where>id = 'de'</where>
         </update>
@@ -313,7 +323,8 @@
             <where>id = 'fr'</where>
         </update>
         <update tableName="countries">
-            <column name="providerAndroidApp" value="https://play.google.com/store/apps/details?id=ch.sbb.mobile.android.b2c"/>
+            <column name="providerAndroidApp"
+                    value="https://play.google.com/store/apps/details?id=ch.sbb.mobile.android.b2c"/>
             <column name="providerIosApp" value="https://itunes.apple.com/app/sbb-mobile/id294855237"/>
             <where>id = 'ch'</where>
         </update>
@@ -323,7 +334,8 @@
             <where>id = 'at'</where>
         </update>
         <update tableName="countries">
-            <column name="providerAndroidApp" value="https://play.google.com/store/apps/details?id=de.hafas.android.pkp"/>
+            <column name="providerAndroidApp"
+                    value="https://play.google.com/store/apps/details?id=de.hafas.android.pkp"/>
             <column name="providerIosApp" value="https://apps.apple.com/app/bilkom/id529806476"/>
             <where>id = 'pl'</where>
         </update>
@@ -364,7 +376,8 @@
             <where>id in (11,15)</where>
         </update>
         <update tableName="users">
-            <column name="key" value="246172676F6E32696424763D3139246D3D36353533362C743D322C703D3124426D4F637165757646794E44754132726B566A6A3177246A7568362F6E6C2F49437A4B475570446E6B674171754A304F7A486A62694F587442542F2B62584D49476300000000000000000000000000000000000000000000000000000000000000"/>
+            <column name="key"
+                    value="246172676F6E32696424763D3139246D3D36353533362C743D322C703D3124426D4F637165757646794E44754132726B566A6A3177246A7568362F6E6C2F49437A4B475570446E6B674171754A304F7A486A62694F587442542F2B62584D49476300000000000000000000000000000000000000000000000000000000000000"/>
             <where>id = 28</where>
         </update>
     </changeSet>
@@ -454,7 +467,8 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="photographerId" type="integer">
-                <constraints nullable="false" referencedTableName="users" referencedColumnNames="id" foreignKeyName="fk_inbox_user"/>
+                <constraints nullable="false" referencedTableName="users" referencedColumnNames="id"
+                             foreignKeyName="fk_inbox_user"/>
             </column>
             <column name="countryCode" type="char(2)"/>
             <column name="stationId" type="varchar(30)"/>
@@ -537,7 +551,7 @@
             <column name="notified" valueBoolean="true"/>
             <where>done = :value</where>
             <whereParams>
-                <param valueBoolean="true" />
+                <param valueBoolean="true"/>
             </whereParams>
         </update>
         <addColumn tableName="users">
@@ -561,11 +575,13 @@
 
     <changeSet id="32" author="pstorch" context="junit or test">
         <update tableName="users">
-            <column name="key" value="246172676F6E32696424763D3139246D3D36353533362C743D322C703D312432634C6B4C6949415958584E52742B6C7A3062614541242B706C7463365A4371386D534551772B4139374B304E37544B386A7072582F774141614B525933456D783400000000000000000000000000000000000000000000000000000000000000"/>
+            <column name="key"
+                    value="246172676F6E32696424763D3139246D3D36353533362C743D322C703D312432634C6B4C6949415958584E52742B6C7A3062614541242B706C7463365A4371386D534551772B4139374B304E37544B386A7072582F774141614B525933456D783400000000000000000000000000000000000000000000000000000000000000"/>
             <where>id = 11</where>
         </update>
         <update tableName="users">
-            <column name="key" value="246172676F6E32696424763D3139246D3D36353533362C743D322C703D3124674B6B4C4644564D566E75436B4A64526F547838437724396E4E5A763970415750532F41456549456F59702F7A377635796B3270787357395057705053444633723400000000000000000000000000000000000000000000000000000000000000"/>
+            <column name="key"
+                    value="246172676F6E32696424763D3139246D3D36353533362C743D322C703D3124674B6B4C4644564D566E75436B4A64526F547838437724396E4E5A763970415750532F41456549456F59702F7A377635796B3270787357395057705053444633723400000000000000000000000000000000000000000000000000000000000000"/>
             <where>id = 15</where>
         </update>
     </changeSet>
@@ -662,7 +678,8 @@
             <where>license NOT like 'CC%'</where>
         </update>
         <update tableName="users">
-            <column name="emailVerification" valueComputed="substring(emailVerification, 7, length(emailVerification))"/>
+            <column name="emailVerification"
+                    valueComputed="substring(emailVerification, 7, length(emailVerification))"/>
             <where>emailVerification like 'TOKEN:%'</where>
         </update>
     </changeSet>
@@ -693,7 +710,8 @@
                 <constraints nullable="false"/>
             </column>
             <column name="photographerId" type="integer">
-                <constraints nullable="false" referencedTableName="users" referencedColumnNames="id" foreignKeyName="fk_photo_user"/>
+                <constraints nullable="false" referencedTableName="users" referencedColumnNames="id"
+                             foreignKeyName="fk_photo_user"/>
             </column>
             <column name="createdAt" type="long">
                 <constraints nullable="false"/>
@@ -701,7 +719,8 @@
         </createTable>
 
         <sql>
-            INSERT INTO photos (countryCode, stationId, `primary`, outdated, urlPath, license, photographerId, createdAt)
+            INSERT INTO photos (countryCode, stationId, `primary`, outdated, urlPath, license, photographerId,
+            createdAt)
             SELECT countryCode, id, true, outdated, urlPath, license, photographerId, createdAt
             FROM photos_old;
         </sql>
@@ -714,6 +733,19 @@
                                  referencedTableName="stations"
                                  onUpdate="CASCADE"
                                  onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="42" author="pstorch" context="junit or test">
+        <insert tableName="photos">
+            <column name="countryCode">de</column>
+            <column name="stationId">6932</column>
+            <column name="primary" valueBoolean="false"/>
+            <column name="photographerId">11</column>
+            <column name="urlPath">/de/6932_2.jpg</column>
+            <column name="license">CC0_10</column>
+            <column name="outdated" valueBoolean="true"/>
+            <column name="createdAt" valueDate="2022-08-01T14:45:23"/>
+        </insert>
     </changeSet>
 
 </databaseChangeLog>

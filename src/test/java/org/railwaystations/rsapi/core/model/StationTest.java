@@ -29,9 +29,8 @@ class StationTest {
 
     @Test
     void appliesToPhotographer() {
-        var station = createStationTestFixtureBuilder()
-                .photo(createTestPhoto())
-                .build();
+        var station = createStationTestFixtureBuilder().build();
+        station.getPhotos().add(createTestPhoto());
         assertThat(station.appliesTo(null, "test", null)).isEqualTo(true);
         assertThat(station.appliesTo(false, null, null)).isEqualTo(false);
         assertThat(station.appliesTo(true, null, null)).isEqualTo(true);
@@ -46,9 +45,8 @@ class StationTest {
     @Test
     void appliesToActive() {
         var station = createStationTestFixtureBuilder()
-                .coordinates(TEST_COORDINATES)
-                .photo(createTestPhoto())
-                .build();
+                .coordinates(TEST_COORDINATES).build();
+        station.getPhotos().add(createTestPhoto());
         assertThat(station.appliesTo(null, "test", true)).isEqualTo(true);
     }
 
