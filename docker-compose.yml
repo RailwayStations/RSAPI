@@ -22,10 +22,10 @@ services:
     container_name: mariadb
     restart: unless-stopped
     environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=rsapi
-      - MYSQL_USER=rsapi
-      - MYSQL_PASSWORD=rsapi
+      - MARIADB_ROOT_PASSWORD=root
+      - MARIADB_DATABASE=rsapi
+      - MARIADB_USER=rsapi
+      - MARIADB_PASSWORD=rsapi
     network_mode: "host"
     command:
       - "--character-set-server=utf8mb4"
