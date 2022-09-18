@@ -130,6 +130,39 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
     }
 
     @Test
+    void photoStationsByCountryDe() {
+        var response = restTemplate.getForEntity(String.format("http://localhost:%d/photoStationsByCountry/de", port),
+                PhotoStationsDto.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        var photoStationsDto = response.getBody();
+        assertThat(photoStationsDto).isNotNull();
+        assertThat(photoStationsDto.getStations())
+                .anyMatch(photoStationDto -> photoStationDto.getCountry().equals("de") && photoStationDto.getId().equals("6721"));
+        assertThat(photoStationsDto.getStations())
+                .noneMatch(photoStationDto -> !photoStationDto.getCountry().equals("de"));
+
+        // check if we can find the license and photographer of one stationphoto
+        var stationWithPhoto = photoStationsDto.getStations().stream().filter(photoStationDto -> photoStationDto.getPhotos().size() > 0).findAny();
+        assertThat(stationWithPhoto).isPresent();
+        assertThat(photoStationsDto.getLicenses()).anyMatch(photoLicenseDto -> photoLicenseDto.getId().equals(stationWithPhoto.get().getPhotos().get(0).getLicense()));
+        assertThat(photoStationsDto.getPhotographers()).anyMatch(photographerDto -> photographerDto.getName().equals(stationWithPhoto.get().getPhotos().get(0).getPhotographer()));
+    }
+
+    @Test
+    void photoStationsByCountry_with_unknown_country() {
+        var response = restTemplate.getForEntity(String.format("http://localhost:%d/photoStationsByCountry/00", port),
+                PhotoStationsDto.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        var photoStationsDto = response.getBody();
+        assertThat(photoStationsDto).isNotNull();
+        assertThat(photoStationsDto.getLicenses()).isEmpty();
+        assertThat(photoStationsDto.getPhotographers()).isEmpty();
+        assertThat(photoStationsDto.getStations()).isEmpty();
+    }
+
+    @Test
     void outdatedStationById() {
         var station = loadDeStationByStationId("7051");
         assertThat(station.getCountry()).isEqualTo("de");

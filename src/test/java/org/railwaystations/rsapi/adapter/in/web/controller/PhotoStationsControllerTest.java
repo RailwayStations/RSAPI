@@ -1,7 +1,6 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.railwaystations.rsapi.adapter.in.web.ErrorHandlingControllerAdvice;
 import org.railwaystations.rsapi.core.model.Coordinates;
@@ -19,7 +18,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
 import static org.mockito.Mockito.when;
@@ -94,46 +95,110 @@ class PhotoStationsControllerTest {
                 .outdated(true)
                 .build());
 
-        // TODO: testdata for next tests
-        /*
-        var stationsAll = List.of(stationAB, stationXY5);
-
-        when(photoStationsService.findStationsBy(Collections.singleton("xy"), null, null, null)).thenReturn(List.of(stationXY5));
-        when(photoStationsService.findStationsBy(Collections.singleton("ab"), null, null, null)).thenReturn(List.of(stationAB));
-        when(photoStationsService.findStationsBy(null, null, null, null)).thenReturn(stationsAll);
-         */
+        when(photoStationsService.findStationsBy(Set.of("xy"), null, null, null)).thenReturn(List.of(stationXY1, stationXY5));
+        when(photoStationsService.findStationsBy(Set.of("xy"), null, null, false)).thenReturn(List.of(stationXY1));
+        when(photoStationsService.findStationsBy(Set.of("xy"), true, null, null)).thenReturn(List.of(stationXY5));
 
         when(photoStationsService.findByCountryAndId("xy", "1")).thenReturn(Optional.of(stationXY1));
         when(photoStationsService.findByCountryAndId("ab", "3")).thenReturn(Optional.of(stationAB));
     }
 
     @Test
-    @Disabled
     void get_photoStationsByCountry() throws Exception {
         mvc.perform(get("/photoStationsByCountry/xy"))
                 .andExpect(status().isOk())
                 .andExpect(validOpenApi())
-                .andExpect(jsonPath("$.[0].country").value("xy"))
-                .andExpect(jsonPath("$.[0].idStr").value("5"))
-                .andExpect(jsonPath("$.[0].title").value("Lummerland"))
-                .andExpect(jsonPath("$.[0].lat").value(50.0))
-                .andExpect(jsonPath("$.[0].lon").value(9.0))
-                .andExpect(jsonPath("$.[0].photographer").value("Jim Knopf"))
-                .andExpect(jsonPath("$.[0].DS100").value("XYZ"))
-                .andExpect(jsonPath("$.[0].photoUrl").value("http://localhost:8080/photos/xy/5.jpg"))
-                .andExpect(jsonPath("$.[0].license").value("CC0 1.0 Universell (CC0 1.0)"))
-                .andExpect(jsonPath("$.[0].photographerUrl").value("photographerUrl"))
-                .andExpect(jsonPath("$.[0].active").value(false));
+                .andExpect(jsonPath("$.photoBaseUrl").value("http://localhost:8080/photos"))
+                .andExpect(jsonPath("$.licenses[0].id").value("CC0_10"))
+                .andExpect(jsonPath("$.licenses[0].name").value("CC0 1.0 Universell (CC0 1.0)"))
+                .andExpect(jsonPath("$.licenses[0].url").value("https://creativecommons.org/publicdomain/zero/1.0/"))
+                .andExpect(jsonPath("$.licenses[1]").doesNotExist())
+                .andExpect(jsonPath("$.photographers[0].name").value("Jim Knopf"))
+                .andExpect(jsonPath("$.photographers[0].url").value("photographerUrlJim"))
+                .andExpect(jsonPath("$.photographers[1]").doesNotExist())
+                .andExpect(jsonPath("$.stations[0].country").value("xy"))
+                .andExpect(jsonPath("$.stations[0].id").value("1"))
+                .andExpect(jsonPath("$.stations[0].title").value("Lummerland Ost"))
+                .andExpect(jsonPath("$.stations[0].lat").value(50.1))
+                .andExpect(jsonPath("$.stations[0].lon").value(9.1))
+                .andExpect(jsonPath("$.stations[0].shortCode").value("XYY"))
+                .andExpect(jsonPath("$.stations[0].inactive").value(true))
+                .andExpect(jsonPath("$.stations[0].photos").isEmpty())
+                .andExpect(jsonPath("$.stations[1].country").value("xy"))
+                .andExpect(jsonPath("$.stations[1].id").value("5"))
+                .andExpect(jsonPath("$.stations[1].title").value("Lummerland"))
+                .andExpect(jsonPath("$.stations[1].lat").value(50.0))
+                .andExpect(jsonPath("$.stations[1].lon").value(9.0))
+                .andExpect(jsonPath("$.stations[1].shortCode").value("XYZ"))
+                .andExpect(jsonPath("$.stations[1].inactive").doesNotExist())
+                .andExpect(jsonPath("$.stations[1].photos[0].id").value(0L))
+                .andExpect(jsonPath("$.stations[1].photos[0].photographer").value("Jim Knopf"))
+                .andExpect(jsonPath("$.stations[1].photos[0].path").value("/xy/5.jpg"))
+                .andExpect(jsonPath("$.stations[1].photos[0].license").value("CC0_10"))
+                .andExpect(jsonPath("$.stations[1].photos[0].createdAt").value(CREATED_AT.toEpochMilli()))
+                .andExpect(jsonPath("$.stations[1].photos[0].outdated").doesNotExist())
+                .andExpect(jsonPath("$.stations[1].photos[1]").doesNotExist())
+                .andExpect(jsonPath("$.stations[2]").doesNotExist());
     }
 
     @Test
-    @Disabled
-    void get_photoStationsByCountry_with_active_filter() throws Exception {
-        mvc.perform(get("/photoStationsByCountry/xy?active=true"))
+    void get_photoStationsByCountry_with_isActive_filter() throws Exception {
+        mvc.perform(get("/photoStationsByCountry/xy?isActive=false"))
                 .andExpect(status().isOk())
                 .andExpect(validOpenApi())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$").isEmpty());
+                .andExpect(jsonPath("$.photoBaseUrl").value("http://localhost:8080/photos"))
+                .andExpect(jsonPath("$.licenses").isEmpty())
+                .andExpect(jsonPath("$.photographers").isEmpty())
+                .andExpect(jsonPath("$.stations[0].country").value("xy"))
+                .andExpect(jsonPath("$.stations[0].id").value("1"))
+                .andExpect(jsonPath("$.stations[0].title").value("Lummerland Ost"))
+                .andExpect(jsonPath("$.stations[0].lat").value(50.1))
+                .andExpect(jsonPath("$.stations[0].lon").value(9.1))
+                .andExpect(jsonPath("$.stations[0].shortCode").value("XYY"))
+                .andExpect(jsonPath("$.stations[0].inactive").value(true))
+                .andExpect(jsonPath("$.stations[0].photos").isEmpty())
+                .andExpect(jsonPath("$.stations[1]").doesNotExist());
+    }
+
+    @Test
+    void get_photoStationsByCountry_with_hasPhoto_filter() throws Exception {
+        mvc.perform(get("/photoStationsByCountry/xy?hasPhoto=true"))
+                .andExpect(status().isOk())
+                .andExpect(validOpenApi())
+                .andExpect(jsonPath("$.photoBaseUrl").value("http://localhost:8080/photos"))
+                .andExpect(jsonPath("$.licenses[0].id").value("CC0_10"))
+                .andExpect(jsonPath("$.licenses[0].name").value("CC0 1.0 Universell (CC0 1.0)"))
+                .andExpect(jsonPath("$.licenses[0].url").value("https://creativecommons.org/publicdomain/zero/1.0/"))
+                .andExpect(jsonPath("$.licenses[1]").doesNotExist())
+                .andExpect(jsonPath("$.photographers[0].name").value("Jim Knopf"))
+                .andExpect(jsonPath("$.photographers[0].url").value("photographerUrlJim"))
+                .andExpect(jsonPath("$.photographers[1]").doesNotExist())
+                .andExpect(jsonPath("$.stations[0].country").value("xy"))
+                .andExpect(jsonPath("$.stations[0].id").value("5"))
+                .andExpect(jsonPath("$.stations[0].title").value("Lummerland"))
+                .andExpect(jsonPath("$.stations[0].lat").value(50))
+                .andExpect(jsonPath("$.stations[0].lon").value(9))
+                .andExpect(jsonPath("$.stations[0].shortCode").value("XYZ"))
+                .andExpect(jsonPath("$.stations[0].inactive").doesNotExist())
+                .andExpect(jsonPath("$.stations[0].photos[0].id").value(0L))
+                .andExpect(jsonPath("$.stations[0].photos[0].photographer").value("Jim Knopf"))
+                .andExpect(jsonPath("$.stations[0].photos[0].path").value("/xy/5.jpg"))
+                .andExpect(jsonPath("$.stations[0].photos[0].license").value("CC0_10"))
+                .andExpect(jsonPath("$.stations[0].photos[0].createdAt").value(CREATED_AT.toEpochMilli()))
+                .andExpect(jsonPath("$.stations[0].photos[0].outdated").doesNotExist())
+                .andExpect(jsonPath("$.stations[0].photos[1]").doesNotExist())
+                .andExpect(jsonPath("$.stations[1]").doesNotExist());
+    }
+
+    @Test
+    void get_photoStationsByCountry_with_unknown_country() throws Exception {
+        mvc.perform(get("/photoStationsByCountry/00"))
+                .andExpect(status().isOk())
+                .andExpect(validOpenApi())
+                .andExpect(jsonPath("$.photoBaseUrl").value("http://localhost:8080/photos"))
+                .andExpect(jsonPath("$.licenses").isEmpty())
+                .andExpect(jsonPath("$.photographers").isEmpty())
+                .andExpect(jsonPath("$.stations").isEmpty());
     }
 
     private ResultMatcher validOpenApi() {
@@ -155,7 +220,8 @@ class PhotoStationsControllerTest {
                 .andExpect(jsonPath("$.stations[0].lon").value(9.1))
                 .andExpect(jsonPath("$.stations[0].shortCode").value("XYY"))
                 .andExpect(jsonPath("$.stations[0].inactive").value(true))
-                .andExpect(jsonPath("$.stations[0].photos").isEmpty());
+                .andExpect(jsonPath("$.stations[0].photos").isEmpty())
+                .andExpect(jsonPath("$.stations[1]").doesNotExist());
     }
 
     @Test
@@ -192,7 +258,8 @@ class PhotoStationsControllerTest {
                 .andExpect(jsonPath("$.stations[0].photos[1].path").value("/ab/3_2.jpg"))
                 .andExpect(jsonPath("$.stations[0].photos[1].license").value("CC0_10"))
                 .andExpect(jsonPath("$.stations[0].photos[1].createdAt").value(CREATED_AT.toEpochMilli()))
-                .andExpect(jsonPath("$.stations[0].photos[1].outdated").value(true));
+                .andExpect(jsonPath("$.stations[0].photos[1].outdated").value(true))
+                .andExpect(jsonPath("$.stations[1]").doesNotExist());
     }
 
     @Test
