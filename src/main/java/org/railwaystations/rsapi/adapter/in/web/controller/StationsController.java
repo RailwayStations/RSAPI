@@ -40,7 +40,7 @@ public class StationsController {
                                 @RequestParam(value = HAS_PHOTO, required = false) Boolean hasPhoto,
                                 @RequestParam(value = PHOTOGRAPHER, required = false) String photographer,
                                 @RequestParam(value = ACTIVE, required = false) Boolean active) {
-        return toDto(findPhotoStationsUseCase.findStationsBy(countries, hasPhoto, photographer, active));
+        return toDto(findPhotoStationsUseCase.findByCountry(countries, hasPhoto, photographer, active));
     }
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"}, value = "/stations.json")

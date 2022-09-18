@@ -61,6 +61,20 @@ public interface StationDao {
     @RegisterRowMapper(PhotoMapper.class)
     Set<Station> findByKey(@Bind("countryCode") String countryCode, @Bind("id") String id);
 
+    @SqlQuery("""
+            SELECT s.countryCode, s.id, s.DS100, s.title, s.lat, s.lon, s.active,
+                    p.id AS photoId, p.primary, p.urlPath, p.license, p.createdAt, p.outdated, u.id AS photographerId,
+                    u.name, u.url AS photographerUrl, u.license AS photographerLicense, u.anonymous
+            FROM stations s
+                LEFT JOIN photos p ON p.countryCode = s.countryCode AND p.stationId = s.id
+                LEFT JOIN users u ON u.id = p.photographerId
+            WHERE (:countryCode IS NULL OR s.countryCode = :countryCode) AND ((u.name = :photographer AND u.anonymous = false) OR (u.anonymous = true AND :photographer = 'Anonym'))
+            """)
+    @UseRowReducer(SingleStationReducer.class)
+    @RegisterRowMapper(SingleStationMapper.class)
+    @RegisterRowMapper(PhotoMapper.class)
+    Set<Station> findByPhotographer(@Bind("photographer") String photographer, @Bind("countryCode") String countryCode);
+
     class SingleStationReducer implements LinkedHashMapRowReducer<Station.Key, Station> {
         @Override
         public void accumulate(Map<Station.Key, Station> map, RowView rowView) {

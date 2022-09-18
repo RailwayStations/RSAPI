@@ -46,16 +46,20 @@ public class PhotoStationsController {
     public PhotoStationsDto photoStationsByCountry(@PathVariable(value = "country") String country,
                                                    @RequestParam(value = "hasPhoto", required = false) Boolean hasPhoto,
                                                    @RequestParam(value = "isActive", required = false) Boolean isActive) {
-        var stations = findPhotoStationsUseCase.findStationsBy(Set.of(country), hasPhoto, isActive);
+        var stations = findPhotoStationsUseCase.findByCountry(Set.of(country), hasPhoto, isActive);
+        return mapPhotoStations(stations);
+    }
+
+    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"}, value = "/photoStationsByPhotographer/{photographer}")
+    public PhotoStationsDto photoStationsByPhotographer(@PathVariable(value = "photographer") String photographer,
+                                                        @RequestParam(value = "country", required = false) String country) {
+        var stations = findPhotoStationsUseCase.findByPhotographer(photographer, country);
         return mapPhotoStations(stations);
     }
 
     /*
-    TODO: missing endpoints
-
-    /photoStationsByPhotographer/{photographer}?country={country}
+    TODO: missing endpoint
     /photoStationsByRecentPhotoImports?sinceHours={sinceHours}
-
      */
 
     private PhotoStationsDto mapPhotoStations(Set<Station> stations) {

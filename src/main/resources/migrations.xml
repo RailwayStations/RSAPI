@@ -746,6 +746,26 @@
             <column name="outdated" valueBoolean="true"/>
             <column name="createdAt" valueDate="2022-08-01T14:45:23"/>
         </insert>
+        <insert tableName="photos">
+            <column name="countryCode">ch</column>
+            <column name="stationId">8500013</column>
+            <column name="primary" valueBoolean="false"/>
+            <column name="photographerId">1</column>
+            <column name="urlPath">/ch/8500013.jpg</column>
+            <column name="license">CC0_10</column>
+            <column name="outdated" valueBoolean="true"/>
+            <column name="createdAt" valueDate="2022-09-03T11:43:11"/>
+        </insert>
+        <insert tableName="photos">
+            <column name="countryCode">ch</column>
+            <column name="stationId">8503087</column>
+            <column name="primary" valueBoolean="false"/>
+            <column name="photographerId">11</column>
+            <column name="urlPath">/ch/8503087.jpg</column>
+            <column name="license">CC0_10</column>
+            <column name="outdated" valueBoolean="true"/>
+            <column name="createdAt" valueDate="2022-09-03T11:43:11"/>
+        </insert>
     </changeSet>
 
 </databaseChangeLog>

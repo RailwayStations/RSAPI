@@ -37,7 +37,12 @@ public class PhotoStationsService implements FindPhotoStationsUseCase {
     }
 
     @Override
-    public Set<Station> findStationsBy(Set<String> countries, Boolean hasPhoto, Boolean active) {
+    public Set<Station> findByPhotographer(String photographer, String country) {
+        return stationDao.findByPhotographer(photographer, country);
+    }
+
+    @Override
+    public Set<Station> findByCountry(Set<String> countries, Boolean hasPhoto, Boolean active) {
         if (countries == null || countries.isEmpty()) {
             return stationDao.findByAllCountries(hasPhoto, active);
         } else {
@@ -46,8 +51,8 @@ public class PhotoStationsService implements FindPhotoStationsUseCase {
     }
 
     @Override
-    public Set<Station> findStationsBy(Set<String> countries, Boolean hasPhoto, String photographer, Boolean active) {
-        var stations = findStationsBy(countries, hasPhoto, active);
+    public Set<Station> findByCountry(Set<String> countries, Boolean hasPhoto, String photographer, Boolean active) {
+        var stations = findByCountry(countries, hasPhoto, active);
 
         if (photographer == null) {
             return stations;

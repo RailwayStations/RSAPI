@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.railwaystations.rsapi.adapter.in.web.model.PhotoLicenseDto;
+import org.railwaystations.rsapi.adapter.in.web.model.PhotoStationDto;
 import org.railwaystations.rsapi.adapter.in.web.model.PhotoStationsDto;
 import org.railwaystations.rsapi.adapter.in.web.model.PhotographerDto;
 import org.railwaystations.rsapi.adapter.in.web.model.StationDto;
@@ -47,6 +48,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -160,6 +162,73 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         assertThat(photoStationsDto.getLicenses()).isEmpty();
         assertThat(photoStationsDto.getPhotographers()).isEmpty();
         assertThat(photoStationsDto.getStations()).isEmpty();
+    }
+
+    @Test
+    void photoStationsByPhotographerAndCountry() {
+        var response = restTemplate.getForEntity(String.format("http://localhost:%d/photoStationsByPhotographer/@user10?country=de", port),
+                PhotoStationsDto.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        var photoStationsDto = response.getBody();
+        assertThat(photoStationsDto).isNotNull();
+
+        var licenses = photoStationsDto.getLicenses();
+        assertThat(licenses).containsExactlyInAnyOrder(new PhotoLicenseDto().id("CC0_10").name("CC0 1.0 Universell (CC0 1.0)").url("https://creativecommons.org/publicdomain/zero/1.0/"),
+                new PhotoLicenseDto().id("CC_BY_SA_40").name("CC BY-SA 4.0").url("https://creativecommons.org/licenses/by-sa/4.0/"));
+
+        var photographers = photoStationsDto.getPhotographers();
+        assertThat(photographers).containsExactly(new PhotographerDto().name("@user10").url("https://www.example.com/user10"));
+        assertThat(photographers).noneMatch(photographerDto -> !photographerDto.getName().equals("@user10"));
+        assertThat(photoStationsDto.getStations()).noneMatch(stationDto -> !stationDto.getCountry().equals("de"));
+        assertThat(photoStationsDto.getStations().stream().flatMap(photoStationDto -> photoStationDto.getPhotos().stream())).noneMatch(photoDto -> !photoDto.getPhotographer().equals("@user10"));
+
+        var station = photoStationsDto.getStations().stream()
+                .filter(photoStationDto -> photoStationDto.getCountry().equals("de") && photoStationDto.getId().equals("6966"))
+                .findAny()
+                .orElseThrow();
+        assertThat(station.getCountry()).isEqualTo("de");
+        assertThat(station.getId()).isEqualTo("6966");
+
+        var photo1 = station.getPhotos().get(0);
+        assertThat(photo1.getId()).isEqualTo(40);
+        assertThat(photo1.getPath()).isEqualTo("/de/6966.jpg");
+        assertThat(photo1.getPhotographer()).isEqualTo("@user10");
+        assertThat(photo1.getLicense()).isEqualTo("CC0_10");
+        assertThat(photo1.getOutdated()).isFalse();
+    }
+
+    @Test
+    void photoStationsByPhotographerAnonymInAllCountries() {
+        var response = restTemplate.getForEntity(String.format("http://localhost:%d/photoStationsByPhotographer/Anonym", port),
+                PhotoStationsDto.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        var photoStationsDto = response.getBody();
+        assertThat(photoStationsDto).isNotNull();
+
+        var licenses = photoStationsDto.getLicenses();
+        assertThat(licenses).containsExactlyInAnyOrder(new PhotoLicenseDto().id("CC0_10").name("CC0 1.0 Universell (CC0 1.0)").url("https://creativecommons.org/publicdomain/zero/1.0/"));
+
+        var photographers = photoStationsDto.getPhotographers();
+        assertThat(photographers).containsExactly(new PhotographerDto().name("Anonym").url("https://railway-stations.org"));
+        assertThat(photographers).noneMatch(photographerDto -> !photographerDto.getName().equals("Anonym"));
+        assertThat(photoStationsDto.getStations().stream().map(PhotoStationDto::getCountry).collect(Collectors.toSet())).containsExactlyInAnyOrder("de", "ch");
+        assertThat(photoStationsDto.getStations().stream().flatMap(photoStationDto -> photoStationDto.getPhotos().stream())).noneMatch(photoDto -> !photoDto.getPhotographer().equals("Anonym"));
+
+        var station = photoStationsDto.getStations().stream()
+                .filter(photoStationDto -> photoStationDto.getCountry().equals("de") && photoStationDto.getId().equals("6998"))
+                .findAny()
+                .orElseThrow();
+        assertThat(station.getCountry()).isEqualTo("de");
+        assertThat(station.getId()).isEqualTo("6998");
+
+        var photo1 = station.getPhotos().get(0);
+        assertThat(photo1.getId()).isEqualTo(54);
+        assertThat(photo1.getPath()).isEqualTo("/de/6998_1.jpg");
+        assertThat(photo1.getPhotographer()).isEqualTo("Anonym");
+        assertThat(photo1.getLicense()).isEqualTo("CC0_10");
+        assertThat(photo1.getOutdated()).isFalse();
     }
 
     @Test

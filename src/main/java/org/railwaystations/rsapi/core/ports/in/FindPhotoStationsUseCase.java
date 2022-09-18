@@ -8,12 +8,14 @@ import java.util.Set;
 
 public interface FindPhotoStationsUseCase {
 
-    Set<Station> findStationsBy(Set<String> countries, Boolean hasPhoto, String photographer, Boolean active);
+    Set<Station> findByCountry(Set<String> countries, Boolean hasPhoto, String photographer, Boolean active);
 
-    Set<Station> findStationsBy(Set<String> countries, Boolean hasPhoto, Boolean active);
+    Set<Station> findByCountry(Set<String> countries, Boolean hasPhoto, Boolean active);
 
     Optional<Station> findByCountryAndId(String country, String id);
 
     Set<Station> findRecentImports(Instant minus);
+
+    Set<Station> findByPhotographer(String photographer, String country);
 
 }

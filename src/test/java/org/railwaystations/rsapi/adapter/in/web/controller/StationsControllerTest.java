@@ -72,10 +72,10 @@ class StationsControllerTest {
 
         var stationsAll = Set.of(stationAB, stationXY);
 
-        when(photoStationsService.findStationsBy(Collections.singleton("xy"), null, null, null)).thenReturn(Set.of(stationXY));
-        when(photoStationsService.findStationsBy(Collections.singleton("ab"), null, null, null)).thenReturn(Set.of(stationAB));
-        when(photoStationsService.findStationsBy(null, null, null, null)).thenReturn(stationsAll);
-        when(photoStationsService.findStationsBy(allCountries(), null, null, null)).thenReturn(stationsAll);
+        when(photoStationsService.findByCountry(Collections.singleton("xy"), null, null, null)).thenReturn(Set.of(stationXY));
+        when(photoStationsService.findByCountry(Collections.singleton("ab"), null, null, null)).thenReturn(Set.of(stationAB));
+        when(photoStationsService.findByCountry(null, null, null, null)).thenReturn(stationsAll);
+        when(photoStationsService.findByCountry(allCountries(), null, null, null)).thenReturn(stationsAll);
         when(photoStationsService.findByCountryAndId("ab", "3")).thenReturn(Optional.of(stationAB));
     }
 
