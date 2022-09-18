@@ -18,7 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -71,10 +70,10 @@ class StationsControllerTest {
                 .license(License.CC_BY_NC_40_INT)
                 .build());
 
-        var stationsAll = List.of(stationAB, stationXY);
+        var stationsAll = Set.of(stationAB, stationXY);
 
-        when(photoStationsService.findStationsBy(Collections.singleton("xy"), null, null, null)).thenReturn(List.of(stationXY));
-        when(photoStationsService.findStationsBy(Collections.singleton("ab"), null, null, null)).thenReturn(List.of(stationAB));
+        when(photoStationsService.findStationsBy(Collections.singleton("xy"), null, null, null)).thenReturn(Set.of(stationXY));
+        when(photoStationsService.findStationsBy(Collections.singleton("ab"), null, null, null)).thenReturn(Set.of(stationAB));
         when(photoStationsService.findStationsBy(null, null, null, null)).thenReturn(stationsAll);
         when(photoStationsService.findStationsBy(allCountries(), null, null, null)).thenReturn(stationsAll);
         when(photoStationsService.findByCountryAndId("ab", "3")).thenReturn(Optional.of(stationAB));

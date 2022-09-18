@@ -24,7 +24,6 @@ import org.railwaystations.rsapi.core.model.User;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,13 +39,13 @@ public interface StationDao {
                 LEFT JOIN users u ON u.id = p.photographerId
             """;
 
-    @SqlQuery(JOIN_QUERY + " WHERE c.active = true AND s.countryCode IN (<countryCodes>)")
+    @SqlQuery(JOIN_QUERY + " WHERE s.countryCode IN (<countryCodes>) AND ((c.active = true AND :active IS NULL) OR c.active = :active) AND (:hasPhoto IS NULL OR (p.urlPath IS NULL AND :hasPhoto = false) OR (p.urlPath IS NOT NULL AND :hasPhoto = true))")
     @RegisterRowMapper(StationMapper.class)
-    Set<Station> findByCountryCodes(@BindList("countryCodes") Set<String> countryCodes);
+    Set<Station> findByCountryCodes(@BindList("countryCodes") Set<String> countryCodes, @Bind("hasPhoto") Boolean hasPhoto, @Bind("active") Boolean active);
 
-    @SqlQuery(JOIN_QUERY + " WHERE c.active = true")
+    @SqlQuery(JOIN_QUERY + " WHERE ((c.active = true AND :active IS NULL) OR c.active = :active) AND (:hasPhoto IS NULL OR (p.urlPath IS NULL AND :hasPhoto = false) OR (p.urlPath IS NOT NULL AND :hasPhoto = true))")
     @RegisterRowMapper(StationMapper.class)
-    Set<Station> all();
+    Set<Station> findByAllCountries(@Bind("hasPhoto") Boolean hasPhoto, @Bind("active") Boolean active);
 
     @SqlQuery("""
             SELECT s.countryCode, s.id, s.DS100, s.title, s.lat, s.lon, s.active,
@@ -151,7 +150,7 @@ public interface StationDao {
 
     @SqlQuery(JOIN_QUERY + " WHERE createdAt > :since ORDER BY createdAt DESC")
     @RegisterRowMapper(StationMapper.class)
-    List<Station> findRecentImports(@Bind("since") Instant since);
+    Set<Station> findRecentImports(@Bind("since") Instant since);
 
     /**
      * Count nearby stations using simple pythagoras (only valid for a few km)

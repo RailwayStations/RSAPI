@@ -18,7 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -95,9 +94,9 @@ class PhotoStationsControllerTest {
                 .outdated(true)
                 .build());
 
-        when(photoStationsService.findStationsBy(Set.of("xy"), null, null, null)).thenReturn(List.of(stationXY1, stationXY5));
-        when(photoStationsService.findStationsBy(Set.of("xy"), null, null, false)).thenReturn(List.of(stationXY1));
-        when(photoStationsService.findStationsBy(Set.of("xy"), true, null, null)).thenReturn(List.of(stationXY5));
+        when(photoStationsService.findStationsBy(Set.of("xy"), null, null)).thenReturn(Set.of(stationXY1, stationXY5));
+        when(photoStationsService.findStationsBy(Set.of("xy"), null, false)).thenReturn(Set.of(stationXY1));
+        when(photoStationsService.findStationsBy(Set.of("xy"), true, null)).thenReturn(Set.of(stationXY5));
 
         when(photoStationsService.findByCountryAndId("xy", "1")).thenReturn(Optional.of(stationXY1));
         when(photoStationsService.findByCountryAndId("ab", "3")).thenReturn(Optional.of(stationAB));
@@ -117,27 +116,27 @@ class PhotoStationsControllerTest {
                 .andExpect(jsonPath("$.photographers[0].url").value("photographerUrlJim"))
                 .andExpect(jsonPath("$.photographers[1]").doesNotExist())
                 .andExpect(jsonPath("$.stations[0].country").value("xy"))
-                .andExpect(jsonPath("$.stations[0].id").value("1"))
-                .andExpect(jsonPath("$.stations[0].title").value("Lummerland Ost"))
-                .andExpect(jsonPath("$.stations[0].lat").value(50.1))
-                .andExpect(jsonPath("$.stations[0].lon").value(9.1))
-                .andExpect(jsonPath("$.stations[0].shortCode").value("XYY"))
-                .andExpect(jsonPath("$.stations[0].inactive").value(true))
-                .andExpect(jsonPath("$.stations[0].photos").isEmpty())
+                .andExpect(jsonPath("$.stations[0].id").value("5"))
+                .andExpect(jsonPath("$.stations[0].title").value("Lummerland"))
+                .andExpect(jsonPath("$.stations[0].lat").value(50.0))
+                .andExpect(jsonPath("$.stations[0].lon").value(9.0))
+                .andExpect(jsonPath("$.stations[0].shortCode").value("XYZ"))
+                .andExpect(jsonPath("$.stations[0].inactive").doesNotExist())
+                .andExpect(jsonPath("$.stations[0].photos[0].id").value(0L))
+                .andExpect(jsonPath("$.stations[0].photos[0].photographer").value("Jim Knopf"))
+                .andExpect(jsonPath("$.stations[0].photos[0].path").value("/xy/5.jpg"))
+                .andExpect(jsonPath("$.stations[0].photos[0].license").value("CC0_10"))
+                .andExpect(jsonPath("$.stations[0].photos[0].createdAt").value(CREATED_AT.toEpochMilli()))
+                .andExpect(jsonPath("$.stations[0].photos[0].outdated").doesNotExist())
+                .andExpect(jsonPath("$.stations[0].photos[1]").doesNotExist())
                 .andExpect(jsonPath("$.stations[1].country").value("xy"))
-                .andExpect(jsonPath("$.stations[1].id").value("5"))
-                .andExpect(jsonPath("$.stations[1].title").value("Lummerland"))
-                .andExpect(jsonPath("$.stations[1].lat").value(50.0))
-                .andExpect(jsonPath("$.stations[1].lon").value(9.0))
-                .andExpect(jsonPath("$.stations[1].shortCode").value("XYZ"))
-                .andExpect(jsonPath("$.stations[1].inactive").doesNotExist())
-                .andExpect(jsonPath("$.stations[1].photos[0].id").value(0L))
-                .andExpect(jsonPath("$.stations[1].photos[0].photographer").value("Jim Knopf"))
-                .andExpect(jsonPath("$.stations[1].photos[0].path").value("/xy/5.jpg"))
-                .andExpect(jsonPath("$.stations[1].photos[0].license").value("CC0_10"))
-                .andExpect(jsonPath("$.stations[1].photos[0].createdAt").value(CREATED_AT.toEpochMilli()))
-                .andExpect(jsonPath("$.stations[1].photos[0].outdated").doesNotExist())
-                .andExpect(jsonPath("$.stations[1].photos[1]").doesNotExist())
+                .andExpect(jsonPath("$.stations[1].id").value("1"))
+                .andExpect(jsonPath("$.stations[1].title").value("Lummerland Ost"))
+                .andExpect(jsonPath("$.stations[1].lat").value(50.1))
+                .andExpect(jsonPath("$.stations[1].lon").value(9.1))
+                .andExpect(jsonPath("$.stations[1].shortCode").value("XYY"))
+                .andExpect(jsonPath("$.stations[1].inactive").value(true))
+                .andExpect(jsonPath("$.stations[1].photos").isEmpty())
                 .andExpect(jsonPath("$.stations[2]").doesNotExist());
     }
 

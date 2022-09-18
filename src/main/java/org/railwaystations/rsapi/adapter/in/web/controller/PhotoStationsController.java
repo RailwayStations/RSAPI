@@ -38,7 +38,7 @@ public class PhotoStationsController {
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"}, value = "/photoStationById/{country}/{id}")
     public PhotoStationsDto photoStationById(@PathVariable(value = "country") String country,
                                              @PathVariable(value = "id") String id) {
-        var stations = List.of(findPhotoStationsUseCase.findByCountryAndId(country, id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
+        var stations = Set.of(findPhotoStationsUseCase.findByCountryAndId(country, id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
         return mapPhotoStations(stations);
     }
 
@@ -46,20 +46,19 @@ public class PhotoStationsController {
     public PhotoStationsDto photoStationsByCountry(@PathVariable(value = "country") String country,
                                                    @RequestParam(value = "hasPhoto", required = false) Boolean hasPhoto,
                                                    @RequestParam(value = "isActive", required = false) Boolean isActive) {
-        var stations = findPhotoStationsUseCase.findStationsBy(Set.of(country), hasPhoto, null, isActive);
+        var stations = findPhotoStationsUseCase.findStationsBy(Set.of(country), hasPhoto, isActive);
         return mapPhotoStations(stations);
     }
 
     /*
     TODO: missing endpoints
 
-    /photoStationsByCountry/{country}?hasPhoto=&isActive=
     /photoStationsByPhotographer/{photographer}?country={country}
     /photoStationsByRecentPhotoImports?sinceHours={sinceHours}
 
      */
 
-    private PhotoStationsDto mapPhotoStations(List<Station> stations) {
+    private PhotoStationsDto mapPhotoStations(Set<Station> stations) {
         return new PhotoStationsDto()
                 .photoBaseUrl(photoBaseUrl)
                 .licenses(mapLicenses(stations))
@@ -67,7 +66,7 @@ public class PhotoStationsController {
                 .stations(mapStations(stations));
     }
 
-    private List<PhotoStationDto> mapStations(List<Station> stations) {
+    private List<PhotoStationDto> mapStations(Set<Station> stations) {
         return stations.stream()
                 .map(station -> new PhotoStationDto()
                         .country(station.getKey().getCountry())
@@ -93,7 +92,7 @@ public class PhotoStationsController {
                 .toList();
     }
 
-    private List<PhotographerDto> mapPhotographers(List<Station> stations) {
+    private List<PhotographerDto> mapPhotographers(Set<Station> stations) {
         return stations.stream()
                 .flatMap(station -> station.getPhotos().stream())
                 .map(Photo::getPhotographer)
@@ -105,7 +104,7 @@ public class PhotoStationsController {
                 .toList();
     }
 
-    private List<PhotoLicenseDto> mapLicenses(List<Station> stations) {
+    private List<PhotoLicenseDto> mapLicenses(Set<Station> stations) {
         return stations.stream()
                 .flatMap(station -> station.getPhotos().stream())
                 .map(Photo::getLicense)

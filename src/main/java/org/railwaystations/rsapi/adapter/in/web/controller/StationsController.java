@@ -78,7 +78,7 @@ public class StationsController {
         return toDto(findPhotoStationsUseCase.findRecentImports(Instant.now().minus(sinceHours, ChronoUnit.HOURS)));
     }
 
-    private List<StationDto> toDto(List<Station> stations) {
+    private List<StationDto> toDto(Set<Station> stations) {
         return stations.stream().map(this::toDto).toList();
     }
 
