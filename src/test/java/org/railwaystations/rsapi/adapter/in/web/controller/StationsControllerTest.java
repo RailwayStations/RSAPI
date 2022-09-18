@@ -33,10 +33,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class StationsControllerTest {
 
     @Autowired
-    private MockMvc mvc;
+    MockMvc mvc;
 
     @MockBean
-    private PhotoStationsService photoStationsService;
+    PhotoStationsService photoStationsService;
 
     @BeforeEach
     void setUp() {
@@ -79,7 +79,7 @@ class StationsControllerTest {
         when(photoStationsService.findByCountryAndId("ab", "3")).thenReturn(Optional.of(stationAB));
     }
 
-    private Set<String> allCountries() {
+    Set<String> allCountries() {
         return Set.of("ab", "xy");
     }
 
@@ -110,7 +110,7 @@ class StationsControllerTest {
                 .andExpect(jsonPath("$").isEmpty());
     }
 
-    private ResultMatcher validOpenApi() {
+    ResultMatcher validOpenApi() {
         return openApi().isValid("static/openapi.yaml");
     }
 
@@ -168,7 +168,7 @@ class StationsControllerTest {
                 .andExpect(jsonPath("$.[2]").doesNotExist());
     }
 
-    private User createTestPhotographer(String name, String url, License license) {
+    User createTestPhotographer(String name, String url, License license) {
         return User.builder()
                 .id(0)
                 .name(name)
