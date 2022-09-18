@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20220917.1010"
+  version: "20220918.2000"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -177,6 +177,7 @@ paths:
   /stations:
     get:
       summary: Finds railway stations by various query criteria
+      deprecated: true
       parameters:
         - name: country
           in: query
@@ -213,6 +214,7 @@ paths:
   /{country}/stations/{id}:
     get:
       summary: Find a railway station by its ID
+      deprecated: true
       parameters:
         - name: country
           in: path
@@ -240,6 +242,7 @@ paths:
   /recentPhotoImports:
     get:
       summary: List stations with photo uploads in the last 24h
+      deprecated: true
       parameters:
         - name: sinceHours
           in: query
