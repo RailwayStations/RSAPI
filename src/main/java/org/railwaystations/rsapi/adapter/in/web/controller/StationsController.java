@@ -14,8 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.constraints.Max;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import javax.validation.constraints.Min;
 import java.util.List;
 import java.util.Set;
 
@@ -74,8 +73,8 @@ public class StationsController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8", value = "/recentPhotoImports")
-    public List<StationDto> recentPhotoImports(@RequestParam(value = SINCE_HOURS, required = false, defaultValue = "10") @Max(800) long sinceHours) {
-        return toDto(findPhotoStationsUseCase.findRecentImports(Instant.now().minus(sinceHours, ChronoUnit.HOURS)));
+    public List<StationDto> recentPhotoImports(@RequestParam(value = SINCE_HOURS, required = false, defaultValue = "10") @Min(1) @Max(800) long sinceHours) {
+        return toDto(findPhotoStationsUseCase.findRecentImports(sinceHours));
     }
 
     private List<StationDto> toDto(Set<Station> stations) {

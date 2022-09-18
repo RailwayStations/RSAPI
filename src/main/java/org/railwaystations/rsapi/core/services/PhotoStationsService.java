@@ -7,6 +7,7 @@ import org.railwaystations.rsapi.core.ports.in.FindPhotoStationsUseCase;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -32,8 +33,8 @@ public class PhotoStationsService implements FindPhotoStationsUseCase {
     }
 
     @Override
-    public Set<Station> findRecentImports(Instant since) {
-        return stationDao.findRecentImports(since);
+    public Set<Station> findRecentImports(long sinceHours) {
+        return stationDao.findRecentImports(Instant.now().minus(sinceHours, ChronoUnit.HOURS));
     }
 
     @Override

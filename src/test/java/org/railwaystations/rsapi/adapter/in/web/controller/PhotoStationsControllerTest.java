@@ -306,6 +306,40 @@ class PhotoStationsControllerTest {
                 .andExpect(jsonPath("$.stations[2]").doesNotExist());
     }
 
+    @Test
+    void get_photoStationsByRecentPhotoImports_with_default_sinceHours() throws Exception {
+        var stationXY5 = createStationXY5();
+        stationXY5.getPhotos().add(createPhotoXY5());
+        when(photoStationsService.findRecentImports(10)).thenReturn(Set.of(stationXY5));
+
+        mvc.perform(get("/photoStationsByRecentPhotoImports"))
+                .andExpect(status().isOk())
+                .andExpect(validOpenApi())
+                .andExpect(jsonPath("$.photoBaseUrl").value("http://localhost:8080/photos"))
+                .andExpect(jsonPath("$.licenses.size()").value(1))
+                .andExpect(jsonPath("$.photographers.size()").value(1))
+                .andExpect(jsonPath("$.stations[0].country").value("xy"))
+                .andExpect(jsonPath("$.stations[0].id").value("5"))
+                .andExpect(jsonPath("$.stations[0].photos[0].id").value(0L));
+    }
+
+    @Test
+    void get_photoStationsByRecentPhotoImports_sinceHours_defined() throws Exception {
+        var stationAB3 = createStationAB3();
+        stationAB3.getPhotos().add(createPhotoAB3_1());
+        when(photoStationsService.findRecentImports(100)).thenReturn(Set.of(stationAB3));
+
+        mvc.perform(get("/photoStationsByRecentPhotoImports?sinceHours=100"))
+                .andExpect(status().isOk())
+                .andExpect(validOpenApi())
+                .andExpect(jsonPath("$.photoBaseUrl").value("http://localhost:8080/photos"))
+                .andExpect(jsonPath("$.licenses.size()").value(1))
+                .andExpect(jsonPath("$.photographers.size()").value(1))
+                .andExpect(jsonPath("$.stations[0].country").value("ab"))
+                .andExpect(jsonPath("$.stations[0].id").value("3"))
+                .andExpect(jsonPath("$.stations[0].photos[0].id").value(1L));
+    }
+
     static User createTestPhotographer(String name, String url, License license) {
         return User.builder()
                 .id(0)

@@ -14,9 +14,13 @@ import org.railwaystations.rsapi.adapter.in.web.model.PhotoStationDto;
 import org.railwaystations.rsapi.adapter.in.web.model.PhotoStationsDto;
 import org.railwaystations.rsapi.adapter.in.web.model.PhotographerDto;
 import org.railwaystations.rsapi.adapter.in.web.model.StationDto;
+import org.railwaystations.rsapi.adapter.out.db.PhotoDao;
 import org.railwaystations.rsapi.adapter.out.monitoring.LoggingMonitor;
 import org.railwaystations.rsapi.adapter.out.photostorage.WorkDir;
+import org.railwaystations.rsapi.core.model.License;
+import org.railwaystations.rsapi.core.model.Photo;
 import org.railwaystations.rsapi.core.model.Station;
+import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.ports.out.Monitor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,6 +47,8 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
@@ -59,16 +65,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 
     @Autowired
-    private ObjectMapper mapper;
+    ObjectMapper mapper;
 
     @LocalServerPort
-    private int port;
+    int port;
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    TestRestTemplate restTemplate;
 
     @Autowired
-    private WorkDir workDir;
+    WorkDir workDir;
+
+    @Autowired
+    PhotoDao photoDao;
 
     @Test
     void stationsAllCountries() {
@@ -238,6 +247,49 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         assertThat(photo1.getOutdated()).isFalse();
     }
 
+    @ParameterizedTest
+    @ValueSource(longs = {-1, 0, 801})
+    void photoStationsByRecentPhotoImports_with_sinceHours_out_of_range(long sinceHours) {
+        var response = restTemplate.getForEntity(String.format("http://localhost:%d/photoStationsByRecentPhotoImports?sinceHours=" + sinceHours, port),
+                PhotoStationsDto.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    void photoStationsByRecentPhotoImports_with_sinceHours() {
+        var sinceHours = 5;
+        insertPhotoForDe7051("/de/7051_1.jpg", Instant.now().minus(sinceHours + 1, ChronoUnit.HOURS));
+        insertPhotoForDe7051("/de/7051_2.jpg", Instant.now());
+
+        var response = restTemplate.getForEntity(String.format("http://localhost:%d/photoStationsByRecentPhotoImports?sinceHours=" + sinceHours, port),
+                PhotoStationsDto.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        var photoStationsDto = response.getBody();
+        assertThat(photoStationsDto).isNotNull();
+        var station = photoStationsDto.getStations().stream()
+                .filter(photoStationDto -> photoStationDto.getCountry().equals("de") && photoStationDto.getId().equals("7051"))
+                .findAny()
+                .orElseThrow();
+        assertThat(station.getCountry()).isEqualTo("de");
+        assertThat(station.getId()).isEqualTo("7051");
+        assertThat(station.getPhotos()).hasSize(1);
+        var photo1 = station.getPhotos().get(0);
+        assertThat(photo1.getId()).isNotNull();
+        assertThat(photo1.getPath()).isEqualTo("/de/7051_2.jpg");
+    }
+
+    private void insertPhotoForDe7051(String urlPath, Instant createdAt) {
+        photoDao.insert(Photo.builder()
+                .stationKey(new Station.Key("de", "7051"))
+                .photographer(User.builder().id(11).build())
+                .license(License.CC0_10)
+                .urlPath(urlPath)
+                .createdAt(createdAt)
+                .build());
+    }
+
     @Test
     void outdatedStationById() {
         var station = loadDeStationByStationId("7051");
@@ -306,7 +358,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         assertThat(jsonNode.size()).isEqualTo(729);
     }
 
-    private StationDto[] assertLoadStationsOk(String path) {
+    StationDto[] assertLoadStationsOk(String path) {
         var response = loadRaw(path, 200, StationDto[].class);
 
         if (response.getStatusCodeValue() != 200) {
@@ -315,7 +367,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         return response.getBody();
     }
 
-    private <T> ResponseEntity<T> loadRaw(String path, int expectedStatus, Class<T> responseType) {
+    <T> ResponseEntity<T> loadRaw(String path, int expectedStatus, Class<T> responseType) {
         var response = restTemplate.getForEntity(String.format("http://localhost:%d%s", port, path),
                 responseType);
 
@@ -323,7 +375,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         return response;
     }
 
-    private StationDto findByKey(StationDto[] stations, Station.Key key) {
+    StationDto findByKey(StationDto[] stations, Station.Key key) {
         return Arrays.stream(stations).filter(station -> station.getCountry().equals(key.getCountry()) && station.getIdStr().equals(key.getId())).findAny().orElse(null);
     }
 
@@ -352,11 +404,11 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
                 """);
     }
 
-    private StationDto loadStationDe6932() {
+    StationDto loadStationDe6932() {
         return loadDeStationByStationId("6932");
     }
 
-    private StationDto loadDeStationByStationId(String stationId) {
+    StationDto loadDeStationByStationId(String stationId) {
         return loadRaw("/de/stations/" + stationId, 200, StationDto.class).getBody();
     }
 
@@ -388,7 +440,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         assertThat(response.getStatusCodeValue()).isEqualTo(401);
     }
 
-    private final byte[] IMAGE = Base64.getDecoder().decode("/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=");
+    final byte[] IMAGE = Base64.getDecoder().decode("/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=");
 
     @Test
     void photoUploadUnknownStationThenDeletePhotoThenDeleteStation() throws IOException {
@@ -506,7 +558,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         assertCoordinatesOfStation6815(51.123, 11.123);
     }
 
-    private int sendProblemReport(String problemReportJson) throws JsonProcessingException {
+    int sendProblemReport(String problemReportJson) throws JsonProcessingException {
         var responsePostProblem = restTemplateWithBasicAuthUser10()
                 .postForEntity(String.format("http://localhost:%d%s", port, "/reportProblem"), new HttpEntity<>(problemReportJson, createJsonHeaders()), String.class);
         assertThat(responsePostProblem.getStatusCodeValue()).isEqualTo(202);
@@ -516,7 +568,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         return jsonNodePostProblemReponse.get("id").asInt();
     }
 
-    private void assertCoordinatesOfStation6815(double lat, double lon) {
+    void assertCoordinatesOfStation6815(double lat, double lon) {
         var station = loadDeStationByStationId("6815");
         assertThat(station).isNotNull();
         assertThat(station.getLat()).isEqualTo(lat);
@@ -562,14 +614,14 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
     }
 
     @NotNull
-    private HttpHeaders createJsonHeaders() {
+    HttpHeaders createJsonHeaders() {
         var headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
         return headers;
     }
 
-    private void sendInboxCommand(String inboxCommand) throws JsonProcessingException {
+    void sendInboxCommand(String inboxCommand) throws JsonProcessingException {
         var responseInboxCommand = restTemplateWithBasicAuthUser10()
                 .postForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), new HttpEntity<>(inboxCommand, createJsonHeaders()), String.class);
         assertThat(responseInboxCommand.getStatusCodeValue()).isEqualTo(200);
@@ -579,14 +631,14 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         assertThat(jsonNodeInboxCommandReponse.get("message").asText()).isEqualTo("ok");
     }
 
-    private void assertOutdatedPhotoOfStation7065(boolean outdated) {
+    void assertOutdatedPhotoOfStation7065(boolean outdated) {
         var station = loadDeStationByStationId("7065");
         assertThat(station).isNotNull();
         assertThat(station.getOutdated()).isEqualTo(outdated);
     }
 
 
-    private TestRestTemplate restTemplateWithBasicAuthUser10() {
+    TestRestTemplate restTemplateWithBasicAuthUser10() {
         return restTemplate.withBasicAuth("@user10", "uON60I7XWTIN");
     }
 
@@ -666,7 +718,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         assertThat(jsonNode.size()).isEqualTo(4);
     }
 
-    private void assertProviderApp(JsonNode countryNode, int i, String type, String name, String url) {
+    void assertProviderApp(JsonNode countryNode, int i, String type, String name, String url) {
         var app = countryNode.get("providerApps").get(i);
         assertThat(app.get("type").asText()).isEqualTo(type);
         assertThat(app.get("name").asText()).isEqualTo(name);

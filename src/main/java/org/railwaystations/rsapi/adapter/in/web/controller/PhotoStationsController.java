@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
@@ -57,10 +59,11 @@ public class PhotoStationsController {
         return mapPhotoStations(stations);
     }
 
-    /*
-    TODO: missing endpoint
-    /photoStationsByRecentPhotoImports?sinceHours={sinceHours}
-     */
+    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"}, value = "/photoStationsByRecentPhotoImports")
+    public PhotoStationsDto photoStationsByRecentPhotoImports(@RequestParam(value = "sinceHours", required = false, defaultValue = "10") @Min(1) @Max(800) long sinceHours) {
+        var stations = findPhotoStationsUseCase.findRecentImports(sinceHours);
+        return mapPhotoStations(stations);
+    }
 
     private PhotoStationsDto mapPhotoStations(Set<Station> stations) {
         return new PhotoStationsDto()

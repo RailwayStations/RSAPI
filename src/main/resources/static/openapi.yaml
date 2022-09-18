@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20220918.2000"
+  version: "20220918.2140"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -252,6 +252,9 @@ paths:
           schema:
             type: integer
             format: int32
+            minimum: 1
+            maximum: 800
+            default: 10
       responses:
         200:
           description: successful operation

@@ -75,6 +75,20 @@ public interface StationDao {
     @RegisterRowMapper(PhotoMapper.class)
     Set<Station> findByPhotographer(@Bind("photographer") String photographer, @Bind("countryCode") String countryCode);
 
+    @SqlQuery("""
+            SELECT s.countryCode, s.id, s.DS100, s.title, s.lat, s.lon, s.active,
+                    p.id AS photoId, p.primary, p.urlPath, p.license, p.createdAt, p.outdated, u.id AS photographerId,
+                    u.name, u.url AS photographerUrl, u.license AS photographerLicense, u.anonymous
+            FROM stations s
+                LEFT JOIN photos p ON p.countryCode = s.countryCode AND p.stationId = s.id
+                LEFT JOIN users u ON u.id = p.photographerId
+            WHERE createdAt > :since
+            """)
+    @UseRowReducer(SingleStationReducer.class)
+    @RegisterRowMapper(SingleStationMapper.class)
+    @RegisterRowMapper(PhotoMapper.class)
+    Set<Station> findRecentImports(@Bind("since") Instant since);
+
     class SingleStationReducer implements LinkedHashMapRowReducer<Station.Key, Station> {
         @Override
         public void accumulate(Map<Station.Key, Station> map, RowView rowView) {
@@ -161,10 +175,6 @@ public interface StationDao {
 
     @SqlUpdate("UPDATE stations SET active = :active WHERE countryCode = :key.country AND id = :key.id")
     void updateActive(@BindBean("key") Station.Key key, @Bind("active") boolean active);
-
-    @SqlQuery(JOIN_QUERY + " WHERE createdAt > :since ORDER BY createdAt DESC")
-    @RegisterRowMapper(StationMapper.class)
-    Set<Station> findRecentImports(@Bind("since") Instant since);
 
     /**
      * Count nearby stations using simple pythagoras (only valid for a few km)
