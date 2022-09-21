@@ -547,10 +547,7 @@ class InboxControllerTest {
                 .andExpect(jsonPath("$.filename").doesNotExist());
     }
 
-    private ResultActions whenPostProblemReport(String emailVerification) throws Exception {
-        var problemReportJson = """
-                    { "countryCode": "de", "stationId": "1234", "type": "OTHER", "comment": "something is wrong" }
-                """;
+    private ResultActions whenPostProblemReport(String emailVerification, String problemReportJson) throws Exception {
         return mvc.perform(post("/reportProblem")
                         .header("User-Agent", "UserAgent")
                         .contentType("application/json")
@@ -563,8 +560,11 @@ class InboxControllerTest {
     @Test
     void testPostProblemReport() throws Exception {
         when(inboxDao.insert(any())).thenReturn(6L);
+        var problemReportJson = """
+                    { "countryCode": "de", "stationId": "1234", "type": "OTHER", "comment": "something is wrong" }
+                """;
 
-        whenPostProblemReport(User.EMAIL_VERIFIED)
+        whenPostProblemReport(User.EMAIL_VERIFIED, problemReportJson)
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$.state").value("REVIEW"))
                 .andExpect(jsonPath("$.id").value(6))
@@ -579,7 +579,11 @@ class InboxControllerTest {
 
     @Test
     void testPostProblemReportEmailNotVerified() throws Exception {
-        whenPostProblemReport("blah")
+        var problemReportJson = """
+                    { "countryCode": "de", "stationId": "1234", "type": "OTHER", "comment": "something is wrong" }
+                """;
+
+        whenPostProblemReport("blah", problemReportJson)
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.state").value("UNAUTHORIZED"))
                 .andExpect(jsonPath("$.id").doesNotExist())

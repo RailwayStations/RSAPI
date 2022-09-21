@@ -83,12 +83,23 @@ public class InboxService implements ManageInboxUseCase {
         if (problemReport.getType() == null) {
             return InboxResponse.of(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA, "Problem type is mandatory");
         }
-        if (problemReport.getType().needsPhoto() && !station.get().hasPhoto()) {
-            return InboxResponse.of(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA, "Problem type is only applicable to station with photo");
+        Long photoId = problemReport.getPhotoId();
+        if (problemReport.getType().needsPhoto()) {
+            if (!station.get().hasPhoto()) {
+                return InboxResponse.of(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA, "Problem type is only applicable to station with photo");
+            }
+            if (photoId != null) {
+                if (station.get().getPhotos().stream().noneMatch(photo -> photo.getId() == problemReport.getPhotoId())) {
+                    return InboxResponse.of(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA, "Photo with this id not found at station");
+                }
+            } else {
+                photoId = station.get().getPrimaryPhoto().map(Photo::getId).orElse(null);
+            }
         }
         var inboxEntry = InboxEntry.builder()
                 .countryCode(problemReport.getCountryCode())
                 .stationId(problemReport.getStationId())
+                .photoId(photoId)
                 .coordinates(problemReport.getCoordinates())
                 .photographerId(user.getId())
                 .comment(problemReport.getComment())
@@ -172,11 +183,10 @@ public class InboxService implements ManageInboxUseCase {
         return inboxBaseUrl + (processed ? "/processed/" : "/") + filename;
     }
 
-    // TODO: extend this function to use photo id
-    public void markPrimaryPhotoOutdated(InboxCommand command) {
+    public void markPhotoOutdated(InboxCommand command) {
         var inboxEntry = assertPendingInboxEntryExists(command);
         var station = assertStationExistsAndHasPhoto(inboxEntry);
-        photoDao.updatePhotoOutdated(station.getPhotos().get(0).getId());
+        photoDao.updatePhotoOutdated(getPhotoIdFromInboxOrPrimaryPhoto(inboxEntry, station));
         inboxDao.done(inboxEntry.getId());
     }
 
@@ -240,13 +250,16 @@ public class InboxService implements ManageInboxUseCase {
         log.info("Problem report {} station {} deleted", inboxEntry.getId(), station.getKey());
     }
 
-    // TODO: extend this function to delete photo by id
-    public void deletePrimaryPhoto(InboxCommand command) {
+    public void deletePhoto(InboxCommand command) {
         var inboxEntry = assertPendingInboxEntryExists(command);
         var station = assertStationExistsAndHasPhoto(inboxEntry);
-        photoDao.delete(station.getPhotos().get(0).getId());
+        photoDao.delete(getPhotoIdFromInboxOrPrimaryPhoto(inboxEntry, station));
         inboxDao.done(inboxEntry.getId());
         log.info("Problem report {} photo of station {} deleted", inboxEntry.getId(), station.getKey());
+    }
+
+    private long getPhotoIdFromInboxOrPrimaryPhoto(InboxEntry inboxEntry, Station station) {
+        return inboxEntry.getPhotoId() != null ? inboxEntry.getPhotoId() : station.getPrimaryPhoto().orElseThrow(() -> new IllegalArgumentException("Station has no primary photo")).getId();
     }
 
     public void markProblemReportSolved(InboxCommand command) {
@@ -339,11 +352,12 @@ public class InboxService implements ManageInboxUseCase {
                         photoId = photoDao.insert(photo);
                     }
                     case OVERWRITE_EXISTING_PHOTO -> {
-                        // TODO: do we overwrite only the primary photo?
-                        photoId = station.getPhotos().get(0).getId();
+                        photoId = station.getPrimaryPhoto()
+                                .orElseThrow(() -> new IllegalArgumentException("Station has no primary photo to overwrite"))
+                                .getId();
                         photo = photoBuilder
                                 .id(photoId)
-                                .primary(station.getPhotos().get(0).isPrimary())
+                                .primary(true)
                                 .build();
                         photoDao.update(photo);
                     }
@@ -376,7 +390,7 @@ public class InboxService implements ManageInboxUseCase {
     private Station findOrCreateStation(InboxCommand command) {
         var station = findStationByCountryAndId(command.getCountryCode(), command.getStationId());
 
-        return station.orElseGet(()-> {
+        return station.orElseGet(() -> {
             // create station
             if (countryDao.findById(StringUtils.lowerCase(command.getCountryCode())).isEmpty()) {
                 throw new IllegalArgumentException("Country not found");
@@ -434,7 +448,7 @@ public class InboxService implements ManageInboxUseCase {
                                      boolean active, User user) {
         if (!user.isEmailVerified()) {
             log.info("Photo upload failed for user {}, email not verified", user.getName());
-            return InboxResponse.of(InboxResponse.InboxResponseState.UNAUTHORIZED,"Email not verified");
+            return InboxResponse.of(InboxResponse.InboxResponseState.UNAUTHORIZED, "Email not verified");
         }
 
         var station = findStationByCountryAndId(countryCode, stationId);
@@ -540,5 +554,5 @@ public class InboxService implements ManageInboxUseCase {
     private Optional<Station> findStationByCountryAndId(String countryCode, String stationId) {
         return stationDao.findByKey(countryCode, stationId).stream().findFirst();
     }
-    
+
 }

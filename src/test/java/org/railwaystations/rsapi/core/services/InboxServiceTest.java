@@ -17,8 +17,10 @@ import org.railwaystations.rsapi.core.model.Coordinates;
 import org.railwaystations.rsapi.core.model.Country;
 import org.railwaystations.rsapi.core.model.InboxCommand;
 import org.railwaystations.rsapi.core.model.InboxEntry;
+import org.railwaystations.rsapi.core.model.InboxResponse;
 import org.railwaystations.rsapi.core.model.License;
 import org.railwaystations.rsapi.core.model.Photo;
+import org.railwaystations.rsapi.core.model.ProblemReport;
 import org.railwaystations.rsapi.core.model.ProblemReportType;
 import org.railwaystations.rsapi.core.model.Station;
 import org.railwaystations.rsapi.core.model.User;
@@ -113,6 +115,7 @@ class InboxServiceTest {
     private User createUserWithCC0License() {
         return User.builder()
                 .license(License.CC0_10)
+                .emailVerification(User.EMAIL_VERIFIED)
                 .build();
     }
 
@@ -290,6 +293,10 @@ class InboxServiceTest {
                 .primary(true)
                 .build());
         when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), STATION_KEY_DE_1.getId())).thenReturn(Set.of(stationDe1));
+    }
+
+    private void whenStation1HasNoPhoto() {
+        when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), STATION_KEY_DE_1.getId())).thenReturn(Set.of(createStationDe1().build()));
     }
 
     private Station.StationBuilder createNewStationByCommand(InboxCommand command) {
@@ -481,6 +488,52 @@ class InboxServiceTest {
             when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), STATION_KEY_DE_1.getId())).thenReturn(Set.of(createStationDe1().build()));
 
             assertThatThrownBy(() -> inboxService.importMissingStation(command)).isInstanceOf(IllegalArgumentException.class).hasMessage("There is a conflict with another photo");
+        }
+
+    }
+
+    @Nested
+    class ReportProblem {
+        @Test
+        void reportWrongPhoto() {
+            var problemReport = createWrongPhotoProblemReport(EXISTING_PHOTO_ID);
+            whenStation1HasPhoto();
+
+            var inboxResponse = inboxService.reportProblem(problemReport, createUserWithCC0License(), null);
+
+            assertThat(inboxResponse.getState()).isEqualTo(InboxResponse.InboxResponseState.REVIEW);
+        }
+
+        @Test
+        void reportWrongPhotoWithWrongPhotoId() {
+            var problemReport = createWrongPhotoProblemReport(0L);
+            whenStation1HasPhoto();
+
+            var inboxResponse = inboxService.reportProblem(problemReport, createUserWithCC0License(), null);
+
+            assertThat(inboxResponse.getState()).isEqualTo(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA);
+            assertThat(inboxResponse.getMessage()).isEqualTo("Photo with this id not found at station");
+        }
+
+        @Test
+        void reportWrongPhotoForStationWithoutPhoto() {
+            var problemReport = createWrongPhotoProblemReport(EXISTING_PHOTO_ID);
+            whenStation1HasNoPhoto();
+
+            var inboxResponse = inboxService.reportProblem(problemReport, createUserWithCC0License(), null);
+
+            assertThat(inboxResponse.getState()).isEqualTo(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA);
+            assertThat(inboxResponse.getMessage()).isEqualTo("Problem type is only applicable to station with photo");
+        }
+
+        ProblemReport createWrongPhotoProblemReport(long existingPhotoId) {
+            return ProblemReport.builder()
+                    .countryCode(STATION_KEY_DE_1.getCountry())
+                    .stationId(STATION_KEY_DE_1.getId())
+                    .photoId(existingPhotoId)
+                    .type(ProblemReportType.WRONG_PHOTO)
+                    .comment("a comment")
+                    .build();
         }
 
     }

@@ -768,4 +768,10 @@
         </insert>
     </changeSet>
 
+    <changeSet id="43" author="pstorch">
+        <addColumn tableName="inbox">
+            <column name="photoId" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

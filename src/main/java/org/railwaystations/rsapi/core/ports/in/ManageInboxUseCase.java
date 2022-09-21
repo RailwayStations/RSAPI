@@ -43,11 +43,11 @@ public interface ManageInboxUseCase {
 
     void deleteStation(InboxCommand command);
 
-    void deletePrimaryPhoto(InboxCommand command);
+    void deletePhoto(InboxCommand command);
 
     void markProblemReportSolved(InboxCommand command);
 
     void updateLocation(InboxCommand command);
 
-    void markPrimaryPhotoOutdated(InboxCommand command);
+    void markPhotoOutdated(InboxCommand command);
 }

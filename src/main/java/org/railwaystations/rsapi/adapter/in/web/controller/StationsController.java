@@ -92,19 +92,18 @@ public class StationsController {
                 .lat(station.getCoordinates().getLat())
                 .lon(station.getCoordinates().getLon());
 
-        if (station.hasPhoto()) {
-            var photo = station.getPhotos().get(0);
-            var license = photo.getLicense();
-            stationDto.license(license != null ? license.getDisplayName() : null)
-                    .licenseUrl(license != null ? license.getUrl() : null)
-                    .photoUrl(photoBaseUrl + photo.getUrlPath())
-                    .photoId(photo.getId())
-                    .photographer(photo.getPhotographer().getDisplayName())
-                    .photographerUrl(photo.getPhotographer().getDisplayUrl())
-                    .createdAt(photo.getCreatedAt() != null ? photo.getCreatedAt().toEpochMilli() : null)
-                    .outdated(photo.isOutdated());
-
-        }
+        station.getPrimaryPhoto()
+                .map(photo -> {
+                    stationDto.license(photo.getLicense().getDisplayName())
+                            .licenseUrl(photo.getLicense().getUrl())
+                            .photoUrl(photoBaseUrl + photo.getUrlPath())
+                            .photoId(photo.getId())
+                            .photographer(photo.getPhotographer().getDisplayName())
+                            .photographerUrl(photo.getPhotographer().getDisplayUrl())
+                            .createdAt(photo.getCreatedAt() != null ? photo.getCreatedAt().toEpochMilli() : null)
+                            .outdated(photo.isOutdated());
+                    return null;
+                });
         return stationDto;
     }
 

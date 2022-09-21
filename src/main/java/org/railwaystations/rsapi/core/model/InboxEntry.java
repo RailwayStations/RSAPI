@@ -15,6 +15,8 @@ public class InboxEntry {
 
     String stationId;
 
+    Long photoId;
+
     String title;
 
     Coordinates coordinates;
@@ -63,7 +65,9 @@ public class InboxEntry {
         return coordinates != null ? coordinates.getLon() : null;
     }
 
-    public boolean isPhotoUpload() { return problemReportType == null && extension != null; }
+    public boolean isPhotoUpload() {
+        return problemReportType == null && extension != null;
+    }
 
     public boolean isProblemReport() {
         return problemReportType != null;

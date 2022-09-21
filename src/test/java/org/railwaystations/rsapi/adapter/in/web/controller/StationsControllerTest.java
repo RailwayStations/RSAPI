@@ -53,6 +53,7 @@ class StationsControllerTest {
                 .urlPath("/xy/5.jpg")
                 .photographer(createTestPhotographer("Jim Knopf", "photographerUrl", License.CC0_10))
                 .license(License.CC0_10)
+                .primary(true)
                 .build());
 
         var key3 = new Station.Key("ab", "3");
@@ -68,6 +69,7 @@ class StationsControllerTest {
                 .urlPath("/ab/3.jpg")
                 .photographer(createTestPhotographer("Peter Pan", "photographerUrl2", License.CC_BY_NC_SA_30_DE))
                 .license(License.CC_BY_NC_40_INT)
+                .primary(true)
                 .build());
 
         var stationsAll = Set.of(stationAB, stationXY);

@@ -604,6 +604,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
                 {
                 	"countryCode": "de",
                 	"stationId": "7065",
+                	"photoId": 79,
                 	"type": "PHOTO_OUTDATED",
                 	"comment": "Photo is outdated"
                 }""";

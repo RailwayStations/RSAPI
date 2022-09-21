@@ -22,20 +22,20 @@ import java.util.List;
 public interface InboxDao {
 
     String JOIN_QUERY = """
-                    SELECT i.id, i.countryCode, i.stationId, i.title i_title, s.title s_title, i.lat i_lat, i.lon i_lon, s.lat s_lat, s.lon s_lon,
-                         i.photographerId, u.name photographerNickname, u.email photographerEmail, i.extension, i.comment, i.rejectReason, i.createdAt,
-                         i.done, i.problemReportType, i.active, i.crc32, i.notified, p.urlPath,
-                         (
-                            SELECT COUNT(*)
-                                FROM inbox i2
-                                WHERE i2.countryCode IS NOT NULL AND i2.countryCode = i.countryCode
-                                AND i2.stationId IS NOT NULL AND i2.stationId = i.stationId AND i2.done = false AND i2.id != i.id
-                         ) AS conflict
-                       FROM inbox i
-                            LEFT JOIN stations s ON s.countryCode = i.countryCode AND s.id = i.stationId
-                            LEFT JOIN users u ON u.id = i.photographerId
-                            LEFT JOIN photos p ON p.countryCode = i.countryCode AND p.stationId = i.stationId AND p.primary = true
-                    """;
+            SELECT i.id, i.countryCode, i.stationId, i.photoId, i.title i_title, s.title s_title, i.lat i_lat, i.lon i_lon, s.lat s_lat, s.lon s_lon,
+                 i.photographerId, u.name photographerNickname, u.email photographerEmail, i.extension, i.comment, i.rejectReason, i.createdAt,
+                 i.done, i.problemReportType, i.active, i.crc32, i.notified, p.urlPath,
+                 (
+                    SELECT COUNT(*)
+                        FROM inbox i2
+                        WHERE i2.countryCode IS NOT NULL AND i2.countryCode = i.countryCode
+                        AND i2.stationId IS NOT NULL AND i2.stationId = i.stationId AND i2.done = false AND i2.id != i.id
+                 ) AS conflict
+               FROM inbox i
+                    LEFT JOIN stations s ON s.countryCode = i.countryCode AND s.id = i.stationId
+                    LEFT JOIN users u ON u.id = i.photographerId
+                    LEFT JOIN photos p ON p.countryCode = i.countryCode AND p.stationId = i.stationId AND ( ( p.primary = true AND i.photoId IS NULL) OR ( p.id = i.photoId ) )
+            """;
     String COUNTRY_CODE = "countryCode";
     String STATION_ID = "stationId";
     String ID = "id";
@@ -51,17 +51,17 @@ public interface InboxDao {
     List<InboxEntry> findPendingInboxEntries();
 
     @SqlQuery("""
-              SELECT i.countryCode, i.stationId, i.title i_title, s.title s_title, i.lat i_lat, i.lon i_lon, s.lat s_lat, s.lon s_lon
-                FROM inbox i
-                    LEFT JOIN stations s ON s.countryCode = i.countryCode AND s.id = i.stationId
-                WHERE i.done = false AND (i.problemReportType IS NULL OR i.problemReportType = '')
-              """)
+            SELECT i.countryCode, i.stationId, i.title i_title, s.title s_title, i.lat i_lat, i.lon i_lon, s.lat s_lat, s.lon s_lon
+              FROM inbox i
+                  LEFT JOIN stations s ON s.countryCode = i.countryCode AND s.id = i.stationId
+              WHERE i.done = false AND (i.problemReportType IS NULL OR i.problemReportType = '')
+            """)
     @RegisterRowMapper(PublicInboxEntryMapper.class)
     List<PublicInboxEntry> findPublicInboxEntries();
 
     @SqlUpdate("""
-            INSERT INTO inbox (countryCode, stationId, title, lat, lon, photographerId, extension, comment, done, createdAt, problemReportType, active)
-                    VALUES (:countryCode, :stationId, :title, :lat, :lon, :photographerId, :extension, :comment, :done, :createdAt, :problemReportType, :active)
+            INSERT INTO inbox (countryCode, stationId, photoId, title, lat, lon, photographerId, extension, comment, done, createdAt, problemReportType, active)
+                    VALUES (:countryCode, :stationId, :photoId, :title, :lat, :lon, :photographerId, :extension, :comment, :done, :createdAt, :problemReportType, :active)
             """)
     @GetGeneratedKeys(ID)
     Long insert(@BindBean InboxEntry inboxEntry);
@@ -115,6 +115,7 @@ public interface InboxDao {
                     .id(id)
                     .countryCode(rs.getString(COUNTRY_CODE))
                     .stationId(rs.getString(STATION_ID))
+                    .photoId(rs.getLong("photoId"))
                     .title(title)
                     .coordinates(coordinates)
                     .photographerId(rs.getInt(PHOTOGRAPHER_ID))

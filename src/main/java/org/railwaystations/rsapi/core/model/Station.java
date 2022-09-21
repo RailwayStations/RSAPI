@@ -8,6 +8,7 @@ import lombok.Value;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Value
 @Builder
@@ -37,9 +38,13 @@ public class Station {
 
     public boolean appliesTo(String photographer) {
         if (photographer != null) {
-            return hasPhoto() && photos.stream().anyMatch(photo -> photo.getPhotographer().getDisplayName().equals(photographer));
+            return photos.stream().anyMatch(photo -> photo.getPhotographer().getDisplayName().equals(photographer));
         }
         return true;
+    }
+
+    public Optional<Photo> getPrimaryPhoto() {
+        return photos.stream().filter(Photo::isPrimary).findAny();
     }
 
     @Value
