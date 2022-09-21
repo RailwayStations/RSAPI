@@ -2,7 +2,6 @@ package org.railwaystations.rsapi.adapter.in.web.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.annotation.Generated;
 import javax.validation.Valid;
@@ -15,245 +14,245 @@ import java.util.Objects;
  * A station with its photos
  */
 
-@Schema(name = "PhotoStation", description = "A station with its photos")
 @JsonTypeName("PhotoStation")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-09-17T10:27:28.459965650+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-09-21T21:45:29.210227244+02:00[Europe/Berlin]")
 public class PhotoStationDto {
 
-  @JsonProperty("country")
-  private String country;
+    @JsonProperty("country")
+    private String country;
 
-  @JsonProperty("id")
-  private String id;
+    @JsonProperty("id")
+    private String id;
 
-  @JsonProperty("title")
-  private String title;
+    @JsonProperty("title")
+    private String title;
 
-  @JsonProperty("lat")
-  private Double lat;
+    @JsonProperty("lat")
+    private Double lat;
 
-  @JsonProperty("lon")
-  private Double lon;
+    @JsonProperty("lon")
+    private Double lon;
 
-  @JsonProperty("shortCode")
-  private String shortCode;
+    @JsonProperty("shortCode")
+    private String shortCode;
 
-  @JsonProperty("inactive")
-  private Boolean inactive = false;
+    @JsonProperty("inactive")
+    private Boolean inactive = false;
 
-  @JsonProperty("photos")
-  @Valid
-  private List<PhotoDto> photos = new ArrayList<>();
+    @JsonProperty("photos")
+    @Valid
+    private List<PhotoDto> photos = new ArrayList<>();
 
-  public PhotoStationDto country(String country) {
-    this.country = country;
-    return this;
-  }
-
-  /**
-   * 2 letter code of the country
-   * @return country
-  */
-  @NotNull 
-  @Schema(name = "country", example = "uk", description = "2 letter code of the country", required = true)
-  public String getCountry() {
-    return country;
-  }
-
-  public void setCountry(String country) {
-    this.country = country;
-  }
-
-  public PhotoStationDto id(String id) {
-    this.id = id;
-    return this;
-  }
-
-  /**
-   * Id of the station within the country
-   * @return id
-  */
-  @NotNull 
-  @Schema(name = "id", example = "7054260", description = "Id of the station within the country", required = true)
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public PhotoStationDto title(String title) {
-    this.title = title;
-    return this;
-  }
-
-  /**
-   * Title of the station
-   * @return title
-  */
-  @NotNull 
-  @Schema(name = "title", example = "London Victoria", description = "Title of the station", required = true)
-  public String getTitle() {
-    return title;
-  }
-
-  public void setTitle(String title) {
-    this.title = title;
-  }
-
-  public PhotoStationDto lat(Double lat) {
-    this.lat = lat;
-    return this;
-  }
-
-  /**
-   * Latitude of the station
-   * @return lat
-  */
-  @NotNull 
-  @Schema(name = "lat", description = "Latitude of the station", required = true)
-  public Double getLat() {
-    return lat;
-  }
-
-  public void setLat(Double lat) {
-    this.lat = lat;
-  }
-
-  public PhotoStationDto lon(Double lon) {
-    this.lon = lon;
-    return this;
-  }
-
-  /**
-   * Longitute of the station
-   * @return lon
-  */
-  @NotNull 
-  @Schema(name = "lon", description = "Longitute of the station", required = true)
-  public Double getLon() {
-    return lon;
-  }
-
-  public void setLon(Double lon) {
-    this.lon = lon;
-  }
-
-  public PhotoStationDto shortCode(String shortCode) {
-    this.shortCode = shortCode;
-    return this;
-  }
-
-  /**
-   * Provider specific short code of the station, e.g. RIL100 or DS100 for german stations
-   * @return shortCode
-  */
-  
-  @Schema(name = "shortCode", description = "Provider specific short code of the station, e.g. RIL100 or DS100 for german stations", required = false)
-  public String getShortCode() {
-    return shortCode;
-  }
-
-  public void setShortCode(String shortCode) {
-    this.shortCode = shortCode;
-  }
-
-  public PhotoStationDto inactive(Boolean inactive) {
-    this.inactive = inactive;
-    return this;
-  }
-
-  /**
-   * Indicates if this station is inactive
-   * @return inactive
-  */
-  
-  @Schema(name = "inactive", description = "Indicates if this station is inactive", required = false)
-  public Boolean getInactive() {
-    return inactive;
-  }
-
-  public void setInactive(Boolean inactive) {
-    this.inactive = inactive;
-  }
-
-  public PhotoStationDto photos(List<PhotoDto> photos) {
-    this.photos = photos;
-    return this;
-  }
-
-  public PhotoStationDto addPhotosItem(PhotoDto photosItem) {
-    if (this.photos == null) {
-      this.photos = new ArrayList<>();
+    public PhotoStationDto country(String country) {
+        this.country = country;
+        return this;
     }
-    this.photos.add(photosItem);
-    return this;
-  }
 
-  /**
-   * Photos of the station. If more than one photo is given, the first one is the primary photo. List might be empty or only the primary photo provided.
-   * @return photos
-  */
-  @NotNull @Valid 
-  @Schema(name = "photos", description = "Photos of the station. If more than one photo is given, the first one is the primary photo. List might be empty or only the primary photo provided.", required = true)
-  public List<PhotoDto> getPhotos() {
-    return photos;
-  }
-
-  public void setPhotos(List<PhotoDto> photos) {
-    this.photos = photos;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
+    /**
+     * 2 letter code of the country
+     *
+     * @return country
+     */
+    @NotNull
+    public String getCountry() {
+        return country;
     }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
+
+    public void setCountry(String country) {
+        this.country = country;
     }
-    PhotoStationDto photoStation = (PhotoStationDto) o;
-    return Objects.equals(this.country, photoStation.country) &&
-        Objects.equals(this.id, photoStation.id) &&
-        Objects.equals(this.title, photoStation.title) &&
-        Objects.equals(this.lat, photoStation.lat) &&
-        Objects.equals(this.lon, photoStation.lon) &&
-        Objects.equals(this.shortCode, photoStation.shortCode) &&
-        Objects.equals(this.inactive, photoStation.inactive) &&
-        Objects.equals(this.photos, photoStation.photos);
-  }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(country, id, title, lat, lon, shortCode, inactive, photos);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class PhotoStationDto {\n");
-    sb.append("    country: ").append(toIndentedString(country)).append("\n");
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    title: ").append(toIndentedString(title)).append("\n");
-    sb.append("    lat: ").append(toIndentedString(lat)).append("\n");
-    sb.append("    lon: ").append(toIndentedString(lon)).append("\n");
-    sb.append("    shortCode: ").append(toIndentedString(shortCode)).append("\n");
-    sb.append("    inactive: ").append(toIndentedString(inactive)).append("\n");
-    sb.append("    photos: ").append(toIndentedString(photos)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(Object o) {
-    if (o == null) {
-      return "null";
+    public PhotoStationDto id(String id) {
+        this.id = id;
+        return this;
     }
-    return o.toString().replace("\n", "\n    ");
-  }
+
+    /**
+     * Id of the station within the country
+     *
+     * @return id
+     */
+    @NotNull
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public PhotoStationDto title(String title) {
+        this.title = title;
+        return this;
+    }
+
+    /**
+     * Title of the station
+     *
+     * @return title
+     */
+    @NotNull
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public PhotoStationDto lat(Double lat) {
+        this.lat = lat;
+        return this;
+    }
+
+    /**
+     * Latitude of the station
+     *
+     * @return lat
+     */
+    @NotNull
+    public Double getLat() {
+        return lat;
+    }
+
+    public void setLat(Double lat) {
+        this.lat = lat;
+    }
+
+    public PhotoStationDto lon(Double lon) {
+        this.lon = lon;
+        return this;
+    }
+
+    /**
+     * Longitute of the station
+     *
+     * @return lon
+     */
+    @NotNull
+    public Double getLon() {
+        return lon;
+    }
+
+    public void setLon(Double lon) {
+        this.lon = lon;
+    }
+
+    public PhotoStationDto shortCode(String shortCode) {
+        this.shortCode = shortCode;
+        return this;
+    }
+
+    /**
+     * Provider specific short code of the station, e.g. RIL100 or DS100 for german stations
+     *
+     * @return shortCode
+     */
+
+    public String getShortCode() {
+        return shortCode;
+    }
+
+    public void setShortCode(String shortCode) {
+        this.shortCode = shortCode;
+    }
+
+    public PhotoStationDto inactive(Boolean inactive) {
+        this.inactive = inactive;
+        return this;
+    }
+
+    /**
+     * Indicates if this station is inactive
+     *
+     * @return inactive
+     */
+
+    public Boolean getInactive() {
+        return inactive;
+    }
+
+    public void setInactive(Boolean inactive) {
+        this.inactive = inactive;
+    }
+
+    public PhotoStationDto photos(List<PhotoDto> photos) {
+        this.photos = photos;
+        return this;
+    }
+
+    public PhotoStationDto addPhotosItem(PhotoDto photosItem) {
+        if (this.photos == null) {
+            this.photos = new ArrayList<>();
+        }
+        this.photos.add(photosItem);
+        return this;
+    }
+
+    /**
+     * Photos of the station. If more than one photo is given, the first one is the primary photo. List might be empty or only the primary photo provided.
+     *
+     * @return photos
+     */
+    @NotNull
+    @Valid
+    public List<PhotoDto> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(List<PhotoDto> photos) {
+        this.photos = photos;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PhotoStationDto photoStation = (PhotoStationDto) o;
+        return Objects.equals(this.country, photoStation.country) &&
+                Objects.equals(this.id, photoStation.id) &&
+                Objects.equals(this.title, photoStation.title) &&
+                Objects.equals(this.lat, photoStation.lat) &&
+                Objects.equals(this.lon, photoStation.lon) &&
+                Objects.equals(this.shortCode, photoStation.shortCode) &&
+                Objects.equals(this.inactive, photoStation.inactive) &&
+                Objects.equals(this.photos, photoStation.photos);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(country, id, title, lat, lon, shortCode, inactive, photos);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("class PhotoStationDto {\n");
+        sb.append("    country: ").append(toIndentedString(country)).append("\n");
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
+        sb.append("    title: ").append(toIndentedString(title)).append("\n");
+        sb.append("    lat: ").append(toIndentedString(lat)).append("\n");
+        sb.append("    lon: ").append(toIndentedString(lon)).append("\n");
+        sb.append("    shortCode: ").append(toIndentedString(shortCode)).append("\n");
+        sb.append("    inactive: ").append(toIndentedString(inactive)).append("\n");
+        sb.append("    photos: ").append(toIndentedString(photos)).append("\n");
+        sb.append("}");
+        return sb.toString();
+    }
+
+    /**
+     * Convert the given object to string with each line indented by 4 spaces
+     * (except the first line).
+     */
+    private String toIndentedString(Object o) {
+        if (o == null) {
+            return "null";
+        }
+        return o.toString().replace("\n", "\n    ");
+    }
 }
 

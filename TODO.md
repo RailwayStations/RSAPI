@@ -28,6 +28,27 @@
 
 - Replace `/<country>/*` endpoints with `/*?country=<country>` parameter, see [api.log](api.log)
 
+- Use generated openApi DTOs as source directly
+
+```
+sourceSets.main.java.srcDirs files("${buildDir}/openapi/src/main/java").builtBy('openApiGenerate')
+compileJava.dependsOn tasks.openApiGenerate
+```
+
+- Generate Dtos with lombok annotations:
+
+```
+    configOptions = [
+            ...
+
+            additionalModelTypeAnnotations:
+                    "@lombok.Builder;" +
+                            "@lombok.AllArgsConstructor;" +
+                            "@lombok.Data;" +
+                            "@lombok.NoArgsConstructor"
+    ]
+```
+
 ## Multiple photos per station
 
 - Support photoId for problem reports related to a photo
