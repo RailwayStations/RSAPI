@@ -1,61 +1,22 @@
 package org.railwaystations.rsapi.adapter.in.web.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 import javax.annotation.Generated;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
- * Provider App information
+ * License used by a photo
  */
 
-@JsonTypeName("ProviderApp")
+@JsonTypeName("PhotoLicense")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-09-21T21:45:29.210227244+02:00[Europe/Berlin]")
-public class ProviderAppDto {
+public class PhotoLicenseDto {
 
-    /**
-     * Gets or Sets type
-     */
-    public enum TypeEnum {
-        ANDROID("android"),
-
-        IOS("ios"),
-
-        WEB("web");
-
-        private String value;
-
-        TypeEnum(String value) {
-            this.value = value;
-        }
-
-        @JsonValue
-        public String getValue() {
-            return value;
-        }
-
-        @Override
-        public String toString() {
-            return String.valueOf(value);
-        }
-
-        @JsonCreator
-        public static TypeEnum fromValue(String value) {
-            for (TypeEnum b : TypeEnum.values()) {
-                if (b.value.equals(value)) {
-                    return b;
-                }
-            }
-            throw new IllegalArgumentException("Unexpected value '" + value + "'");
-        }
-    }
-
-    @JsonProperty("type")
-    private TypeEnum type;
+    @JsonProperty("id")
+    private String id;
 
     @JsonProperty("name")
     private String name;
@@ -63,32 +24,32 @@ public class ProviderAppDto {
     @JsonProperty("url")
     private String url;
 
-    public ProviderAppDto type(TypeEnum type) {
-        this.type = type;
+    public PhotoLicenseDto id(String id) {
+        this.id = id;
         return this;
     }
 
     /**
-     * Get type
+     * Unique id of the license
      *
-     * @return type
+     * @return id
      */
     @NotNull
-    public TypeEnum getType() {
-        return type;
+    public String getId() {
+        return id;
     }
 
-    public void setType(TypeEnum type) {
-        this.type = type;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public ProviderAppDto name(String name) {
+    public PhotoLicenseDto name(String name) {
         this.name = name;
         return this;
     }
 
     /**
-     * Get name
+     * Name of the license to display at the photo
      *
      * @return name
      */
@@ -101,13 +62,13 @@ public class ProviderAppDto {
         this.name = name;
     }
 
-    public ProviderAppDto url(String url) {
+    public PhotoLicenseDto url(String url) {
         this.url = url;
         return this;
     }
 
     /**
-     * Get url
+     * URL of the license to link to from the photo
      *
      * @return url
      */
@@ -128,22 +89,22 @@ public class ProviderAppDto {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ProviderAppDto providerApp = (ProviderAppDto) o;
-        return Objects.equals(this.type, providerApp.type) &&
-                Objects.equals(this.name, providerApp.name) &&
-                Objects.equals(this.url, providerApp.url);
+        PhotoLicenseDto photoLicense = (PhotoLicenseDto) o;
+        return Objects.equals(this.id, photoLicense.id) &&
+                Objects.equals(this.name, photoLicense.name) &&
+                Objects.equals(this.url, photoLicense.url);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, name, url);
+        return Objects.hash(id, name, url);
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("class ProviderAppDto {\n");
-        sb.append("    type: ").append(toIndentedString(type)).append("\n");
+        sb.append("class PhotoLicenseDto {\n");
+        sb.append("    id: ").append(toIndentedString(id)).append("\n");
         sb.append("    name: ").append(toIndentedString(name)).append("\n");
         sb.append("    url: ").append(toIndentedString(url)).append("\n");
         sb.append("}");

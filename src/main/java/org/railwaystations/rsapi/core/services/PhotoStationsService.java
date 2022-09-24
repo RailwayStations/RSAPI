@@ -7,14 +7,10 @@ import org.railwaystations.rsapi.core.ports.in.FindPhotoStationsUseCase;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toMap;
 
 @Service
 public class PhotoStationsService implements FindPhotoStationsUseCase {
@@ -26,16 +22,7 @@ public class PhotoStationsService implements FindPhotoStationsUseCase {
         this.stationDao = stationDao;
     }
 
-    public Map<Station.Key, Station> getStationsByCountry(Set<String> countryCodes) {
-        Set<Station> stations;
-        if (countryCodes == null || countryCodes.isEmpty()) {
-            stations = stationDao.all();
-        } else {
-            stations = stationDao.findByCountryCodes(countryCodes);
-        }
-        return stations.stream().collect(toMap(Station::getKey, Function.identity()));
-    }
-
+    @Override
     public Optional<Station> findByCountryAndId(String country, String stationId) {
         if (StringUtils.isBlank(stationId) || StringUtils.isBlank(country)) {
             return Optional.empty();
@@ -45,15 +32,35 @@ public class PhotoStationsService implements FindPhotoStationsUseCase {
         return stationDao.findByKey(key.getCountry(), key.getId()).stream().findFirst();
     }
 
-    public List<Station> findRecentImports(Instant since) {
-        return stationDao.findRecentImports(since);
+    @Override
+    public Set<Station> findRecentImports(long sinceHours) {
+        return stationDao.findRecentImports(Instant.now().minus(sinceHours, ChronoUnit.HOURS));
     }
 
-    public List<Station> findStationsBy(Set<String> countries, Boolean hasPhoto, String photographer, Boolean active) {
-        // TODO: can we search this on the DB?
-        return getStationsByCountry(countries)
-                .values().stream().filter(station -> station.appliesTo(hasPhoto, photographer, active)).collect(Collectors.toList());
+    @Override
+    public Set<Station> findByPhotographer(String photographer, String country) {
+        return stationDao.findByPhotographer(photographer, country);
+    }
 
+    @Override
+    public Set<Station> findByCountry(Set<String> countries, Boolean hasPhoto, Boolean active) {
+        if (countries == null || countries.isEmpty()) {
+            return stationDao.findByAllCountries(hasPhoto, active);
+        } else {
+            return stationDao.findByCountryCodes(countries, hasPhoto, active);
+        }
+    }
+
+    @Override
+    public Set<Station> findByCountry(Set<String> countries, Boolean hasPhoto, String photographer, Boolean active) {
+        var stations = findByCountry(countries, hasPhoto, active);
+
+        if (photographer == null) {
+            return stations;
+        }
+
+        // TODO: can we search this on the DB?
+        return stations.stream().filter(station -> station.appliesTo(photographer)).collect(Collectors.toSet());
     }
 
 }

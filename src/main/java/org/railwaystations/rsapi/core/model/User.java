@@ -25,6 +25,7 @@ public class User {
     public static final String EMAIL_VERIFIED_AT_NEXT_LOGIN = "NEXT_LOGIN";
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
     public static final String ROLE_USER = "ROLE_USER";
+    public static final String ANONYM = "Anonym";
 
     int id;
 
@@ -73,7 +74,7 @@ public class User {
     }
 
     public String getDisplayName() {
-        return anonymous ? "Anonym" : getName();
+        return anonymous ? ANONYM : getName();
     }
 
     /**

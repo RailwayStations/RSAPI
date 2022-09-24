@@ -8,33 +8,55 @@ import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**
- * NextZResponseDto
+ * The creator of a photo
  */
 
-@JsonTypeName("NextZResponse")
+@JsonTypeName("Photographer")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-09-21T21:45:29.210227244+02:00[Europe/Berlin]")
-public class NextZResponseDto {
+public class PhotographerDto {
 
-    @JsonProperty("nextZ")
-    private String nextZ;
+    @JsonProperty("name")
+    private String name;
 
-    public NextZResponseDto nextZ(String nextZ) {
-        this.nextZ = nextZ;
+    @JsonProperty("url")
+    private String url;
+
+    public PhotographerDto name(String name) {
+        this.name = name;
         return this;
     }
 
     /**
-     * Get nextZ
+     * Username of the photographer
      *
-     * @return nextZ
+     * @return name
      */
     @NotNull
-    public String getNextZ() {
-        return nextZ;
+    public String getName() {
+        return name;
     }
 
-    public void setNextZ(String nextZ) {
-        this.nextZ = nextZ;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public PhotographerDto url(String url) {
+        this.url = url;
+        return this;
+    }
+
+    /**
+     * Link to the photographers social media account or homepage
+     *
+     * @return url
+     */
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     @Override
@@ -45,20 +67,22 @@ public class NextZResponseDto {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        NextZResponseDto nextZResponse = (NextZResponseDto) o;
-        return Objects.equals(this.nextZ, nextZResponse.nextZ);
+        PhotographerDto photographer = (PhotographerDto) o;
+        return Objects.equals(this.name, photographer.name) &&
+                Objects.equals(this.url, photographer.url);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(nextZ);
+        return Objects.hash(name, url);
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("class NextZResponseDto {\n");
-        sb.append("    nextZ: ").append(toIndentedString(nextZ)).append("\n");
+        sb.append("class PhotographerDto {\n");
+        sb.append("    name: ").append(toIndentedString(name)).append("\n");
+        sb.append("    url: ").append(toIndentedString(url)).append("\n");
         sb.append("}");
         return sb.toString();
     }

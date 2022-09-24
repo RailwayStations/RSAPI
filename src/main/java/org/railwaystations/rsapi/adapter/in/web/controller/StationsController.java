@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.util.List;
 import java.util.Set;
 
@@ -39,45 +39,45 @@ public class StationsController {
                                 @RequestParam(value = HAS_PHOTO, required = false) Boolean hasPhoto,
                                 @RequestParam(value = PHOTOGRAPHER, required = false) String photographer,
                                 @RequestParam(value = ACTIVE, required = false) Boolean active) {
-        return toDto(findPhotoStationsUseCase.findStationsBy(countries, hasPhoto, photographer, active));
+        return toDto(findPhotoStationsUseCase.findByCountry(countries, hasPhoto, photographer, active));
     }
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"}, value = "/stations.json")
     public List<StationDto> getAsJson(@RequestParam(value = COUNTRY, required = false) Set<String> countries,
-                                  @RequestParam(value = HAS_PHOTO, required = false) Boolean hasPhoto,
-                                  @RequestParam(value = PHOTOGRAPHER, required = false) String photographer,
+                                      @RequestParam(value = HAS_PHOTO, required = false) Boolean hasPhoto,
+                                      @RequestParam(value = PHOTOGRAPHER, required = false) String photographer,
                                       @RequestParam(value = ACTIVE, required = false) Boolean active) {
         return get(countries, hasPhoto, photographer, active);
     }
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"}, value = "/{country}/stations")
     public List<StationDto> getWithCountry(@PathVariable(COUNTRY) String country,
-                                        @RequestParam(value = HAS_PHOTO, required = false) Boolean hasPhoto,
-                                        @RequestParam(value = PHOTOGRAPHER, required = false) String photographer,
+                                           @RequestParam(value = HAS_PHOTO, required = false) Boolean hasPhoto,
+                                           @RequestParam(value = PHOTOGRAPHER, required = false) String photographer,
                                            @RequestParam(value = ACTIVE, required = false) Boolean active) {
         return get(Set.of(country), hasPhoto, photographer, active);
     }
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"}, value = "/{country}/stations.json")
     public List<StationDto> getWithCountryAsJson(@PathVariable(COUNTRY) String country,
-                                              @RequestParam(value = HAS_PHOTO, required = false) Boolean hasPhoto,
-                                              @RequestParam(value = PHOTOGRAPHER, required = false) String photographer,
+                                                 @RequestParam(value = HAS_PHOTO, required = false) Boolean hasPhoto,
+                                                 @RequestParam(value = PHOTOGRAPHER, required = false) String photographer,
                                                  @RequestParam(value = ACTIVE, required = false) Boolean active) {
         return getWithCountry(country, hasPhoto, photographer, active);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8", value = "/{country}/stations/{id}")
     public StationDto getById(@PathVariable(COUNTRY) String country,
-                           @PathVariable(ID) String id) {
+                              @PathVariable(ID) String id) {
         return toDto(findPhotoStationsUseCase.findByCountryAndId(country, id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8", value = "/recentPhotoImports")
-    public List<StationDto> recentPhotoImports(@RequestParam(value = SINCE_HOURS, required = false, defaultValue = "10") long sinceHours) {
-        return toDto(findPhotoStationsUseCase.findRecentImports(Instant.now().minus(sinceHours, ChronoUnit.HOURS)));
+    public List<StationDto> recentPhotoImports(@RequestParam(value = SINCE_HOURS, required = false, defaultValue = "10") @Min(1) @Max(800) long sinceHours) {
+        return toDto(findPhotoStationsUseCase.findRecentImports(sinceHours));
     }
 
-    private List<StationDto> toDto(List<Station> stations) {
+    private List<StationDto> toDto(Set<Station> stations) {
         return stations.stream().map(this::toDto).toList();
     }
 
@@ -92,19 +92,18 @@ public class StationsController {
                 .lat(station.getCoordinates().getLat())
                 .lon(station.getCoordinates().getLon());
 
-        if (station.hasPhoto()) {
-            var photo = station.getPhoto();
-            var license = photo.getLicense();
-            stationDto.license(license != null ? license.getDisplayName() : null)
-                    .licenseUrl(license != null ? license.getUrl() : null)
-                    .photoUrl(photoBaseUrl + photo.getUrlPath())
-                    .photoId(photo.getId())
-                    .photographer(photo.getPhotographer().getDisplayName())
-                    .photographerUrl(photo.getPhotographer().getDisplayUrl())
-                    .createdAt(photo.getCreatedAt() != null ? photo.getCreatedAt().toEpochMilli() : null)
-                    .outdated(photo.isOutdated());
-
-        }
+        station.getPrimaryPhoto()
+                .map(photo -> {
+                    stationDto.license(photo.getLicense().getDisplayName())
+                            .licenseUrl(photo.getLicense().getUrl())
+                            .photoUrl(photoBaseUrl + photo.getUrlPath())
+                            .photoId(photo.getId())
+                            .photographer(photo.getPhotographer().getDisplayName())
+                            .photographerUrl(photo.getPhotographer().getDisplayUrl())
+                            .createdAt(photo.getCreatedAt() != null ? photo.getCreatedAt().toEpochMilli() : null)
+                            .outdated(photo.isOutdated());
+                    return null;
+                });
         return stationDto;
     }
 

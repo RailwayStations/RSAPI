@@ -2,9 +2,13 @@ package org.railwaystations.rsapi.core.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.Value;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Value
 @Builder
@@ -22,43 +26,25 @@ public class Station {
 
     String ds100;
 
-    Photo photo;
+    @Getter
+    List<Photo> photos = new ArrayList<>();
 
     @Builder.Default
     boolean active = true;
 
     public boolean hasPhoto() {
-        return this.photo != null;
+        return this.photos.size() > 0;
     }
 
-    /*
-     * Calculate distance in km between this objects position and the given latitude and longitude.
-     * Uses Haversine method as its base.
-     *
-     * @returns Distance in km
-     */
-    public double distanceTo(double latitude, double longitude) {
-        double latDistance = Math.toRadians(latitude - this.coordinates.getLat());
-        double lonDistance = Math.toRadians(longitude - this.coordinates.getLon());
-        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
-                + Math.cos(Math.toRadians(this.coordinates.getLat())) * Math.cos(Math.toRadians(latitude))
-                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return Station.EARTH_RADIUS * c;
-    }
-
-    public boolean appliesTo(Boolean hasPhoto, String photographer, Boolean active) {
-        boolean result = true;
-        if (hasPhoto != null) {
-            result = this.hasPhoto() == hasPhoto;
-        }
+    public boolean appliesTo(String photographer) {
         if (photographer != null) {
-            result &= hasPhoto() && photographer.equals(photo.getPhotographer().getDisplayName());
+            return photos.stream().anyMatch(photo -> photo.getPhotographer().getDisplayName().equals(photographer));
         }
-        if (active != null) {
-            result &= active == this.active;
-        }
-        return result;
+        return true;
+    }
+
+    public Optional<Photo> getPrimaryPhoto() {
+        return photos.stream().filter(Photo::isPrimary).findAny();
     }
 
     @Value

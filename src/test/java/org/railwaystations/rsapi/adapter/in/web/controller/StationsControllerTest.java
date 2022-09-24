@@ -18,7 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -29,15 +28,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = StationsController.class)
-@ContextConfiguration(classes={WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class})
+@ContextConfiguration(classes = {WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class})
 @AutoConfigureMockMvc(addFilters = false)
 class StationsControllerTest {
 
     @Autowired
-    private MockMvc mvc;
+    MockMvc mvc;
 
     @MockBean
-    private PhotoStationsService photoStationsService;
+    PhotoStationsService photoStationsService;
 
     @BeforeEach
     void setUp() {
@@ -47,14 +46,15 @@ class StationsControllerTest {
                 .title("Lummerland")
                 .coordinates(new Coordinates(50.0, 9.0))
                 .ds100("XYZ")
-                .photo(Photo.builder()
-                    .stationKey(key5)
-                    .urlPath("/xy/5.jpg")
-                    .photographer(createTestPhotographer("Jim Knopf", "photographerUrl", License.CC0_10))
-                    .license(License.CC0_10)
-                    .build())
                 .active(false)
                 .build();
+        stationXY.getPhotos().add(Photo.builder()
+                .stationKey(key5)
+                .urlPath("/xy/5.jpg")
+                .photographer(createTestPhotographer("Jim Knopf", "photographerUrl", License.CC0_10))
+                .license(License.CC0_10)
+                .primary(true)
+                .build());
 
         var key3 = new Station.Key("ab", "3");
         var stationAB = Station.builder()
@@ -62,25 +62,26 @@ class StationsControllerTest {
                 .title("Nimmerland")
                 .coordinates(new Coordinates(40.0, 6.0))
                 .ds100("ABC")
-                .photo(Photo.builder()
-                    .stationKey(key3)
-                    .urlPath("/ab/3.jpg")
-                    .photographer(createTestPhotographer("Peter Pan", "photographerUrl2", License.CC_BY_NC_SA_30_DE))
-                    .license(License.CC_BY_NC_40_INT)
-                    .build())
                 .active(true)
                 .build();
+        stationAB.getPhotos().add(Photo.builder()
+                .stationKey(key3)
+                .urlPath("/ab/3.jpg")
+                .photographer(createTestPhotographer("Peter Pan", "photographerUrl2", License.CC_BY_NC_SA_30_DE))
+                .license(License.CC_BY_NC_40_INT)
+                .primary(true)
+                .build());
 
-        var stationsAll = List.of(stationAB, stationXY);
+        var stationsAll = Set.of(stationAB, stationXY);
 
-        when(photoStationsService.findStationsBy(Collections.singleton("xy"), null, null, null)).thenReturn(List.of(stationXY));
-        when(photoStationsService.findStationsBy(Collections.singleton("ab"), null, null, null)).thenReturn(List.of(stationAB));
-        when(photoStationsService.findStationsBy(null, null, null, null)).thenReturn(stationsAll);
-        when(photoStationsService.findStationsBy(allCountries(), null, null, null)).thenReturn(stationsAll);
+        when(photoStationsService.findByCountry(Collections.singleton("xy"), null, null, null)).thenReturn(Set.of(stationXY));
+        when(photoStationsService.findByCountry(Collections.singleton("ab"), null, null, null)).thenReturn(Set.of(stationAB));
+        when(photoStationsService.findByCountry(null, null, null, null)).thenReturn(stationsAll);
+        when(photoStationsService.findByCountry(allCountries(), null, null, null)).thenReturn(stationsAll);
         when(photoStationsService.findByCountryAndId("ab", "3")).thenReturn(Optional.of(stationAB));
     }
 
-    private Set<String> allCountries() {
+    Set<String> allCountries() {
         return Set.of("ab", "xy");
     }
 
@@ -111,7 +112,7 @@ class StationsControllerTest {
                 .andExpect(jsonPath("$").isEmpty());
     }
 
-    private ResultMatcher validOpenApi() {
+    ResultMatcher validOpenApi() {
         return openApi().isValid("static/openapi.yaml");
     }
 
@@ -169,7 +170,7 @@ class StationsControllerTest {
                 .andExpect(jsonPath("$.[2]").doesNotExist());
     }
 
-    private User createTestPhotographer(String name, String url, License license) {
+    User createTestPhotographer(String name, String url, License license) {
         return User.builder()
                 .id(0)
                 .name(name)

@@ -2,6 +2,8 @@
 
 - reduce amount of integration tests
 
+- restructure testdata database migrations vs. TestFixtures
+
 - package structure:
 
     - app vs. application vs. core
@@ -24,58 +26,25 @@
 
 - InboxEntry: change `@Data` to `@Value` annotation
 
-- Replace `/<country>/*` endpoints with `/*?country=<country>` parameter, see [api.log](api.log)
+- Is there a better way for Country.providerApps and Station.photos?
 
-## Multiple photos per station
+- Use generated openApi DTOs as source directly
 
-- Support photoId for problem reports related to a photo
+```
+sourceSets.main.java.srcDirs files("${buildDir}/openapi/src/main/java").builtBy('openApiGenerate')
+compileJava.dependsOn tasks.openApiGenerate
+```
 
-- New Station API to support multiple photos per station
+- Generate Dtos with lombok annotations:
 
-  - 4 new endpoints needed:
+```
+    configOptions = [
+            ...
 
-    - one station with all photos by `country` and `id`
-
-      ~~`/stations2/{country}/{id}`~~
-
-      ~~`/stationPhotos/{country}/{id}`~~
-
-      `/stationById/{country}/{id}`
-
-    - all stations of a `country` with the primary photo (optional with filter of `hasPhoto` and `active`)
-
-      ~~`/stations2/{country}?hasPhoto=&active=`~~
-
-      ~~`/countryStations/{country}?hasPhoto=&active=`~~
-
-      `/stationsByCountry/{country}?hasPhoto=&active=`
-
-    - all stations with photos of one `photographer` (optional with filter by `country`)
-
-      ~~`/photographers/{photographer}/photos?country={country}`~~
-
-      ~~`/stationPhotosByUser/{photographer}?country={country}`~~
-
-      `/stationsByPhotographer/{photographer}?country={country}`
-
-    - all stations with a photo which was recently imported, with filter by `importedSince` (max one month)
-
-      ~~`/stationPhotos?importedSince={importedSince}`~~
-
-      ~~`/stationsWithPhotosImportedSince?importedSince={importedSince}`~~
-
-      `/stationsByRecentPhotoImports?importedSince={importedSince}`
-
-  - **Or** one for all:
-
-    ~~`/stations2?country=&id=&photographer=&importedSince&hasPhoto=&active=`~~
-
-    valid combinations:
-
-      - `country`, `id`
-
-      - `country`, (`hasPhoto`), (`active`)
-
-      - `photographer`, (`country`)
-
-      - `createdSince`
+            additionalModelTypeAnnotations:
+                    "@lombok.Builder;" +
+                            "@lombok.AllArgsConstructor;" +
+                            "@lombok.Data;" +
+                            "@lombok.NoArgsConstructor"
+    ]
+```

@@ -11,100 +11,104 @@ group = 'org.railwaystations'
 version = '0.0.1-SNAPSHOT'
 
 java {
-	sourceCompatibility = "18"
-	targetCompatibility = "18"
+    sourceCompatibility = "18"
+    targetCompatibility = "18"
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 bootJar {
-	mainClass.set('org.railwaystations.rsapi.app.RsapiApplication')
+    mainClass.set('org.railwaystations.rsapi.app.RsapiApplication')
 }
 
 openApiValidate {
-	inputSpec = "$rootDir/src/main/resources/static/openapi.yaml".toString()
-	recommend = true
+    inputSpec = "$rootDir/src/main/resources/static/openapi.yaml".toString()
+    recommend = true
 }
 
 openApiGenerate {
-	generatorName = "spring"
-	inputSpec = "$rootDir/src/main/resources/static/openapi.yaml".toString()
-	outputDir = "$buildDir/generated".toString()
-	apiPackage = "org.railwaystations.rsapi.adapter.in.web.api"
-	modelPackage = "org.railwaystations.rsapi.adapter.in.web.model"
-	modelNameSuffix = "Dto"
-	configOptions = [
-			interfaceOnly: "true",
-			openApiNullable: "false",
-			skipDefaultInterface: "true",
-			dateLibrary: "java8"
-	]
+    generatorName = "spring"
+    inputSpec = "$rootDir/src/main/resources/static/openapi.yaml".toString()
+    outputDir = "$buildDir/openapi".toString()
+    apiPackage = "org.railwaystations.rsapi.adapter.in.web.api"
+    modelPackage = "org.railwaystations.rsapi.adapter.in.web.model"
+    modelNameSuffix = "Dto"
+    configOptions = [
+            interfaceOnly        : "true",
+            openApiNullable      : "false",
+            skipDefaultInterface : "true",
+            dateLibrary          : "java8",
+            documentationProvider: "none",
+            annotationLibrary    : "none",
+            useTags              : "true",
+            useBeanValidation    : "true",
+    ]
 }
 
 ext {
-	testContainersVersion = '1.17.3'
-	jdbiVersion = '3.32.0'
-	swaggerRequestValidatorVersion = '2.30.0'
+    testContainersVersion = '1.17.3'
+    jdbiVersion = '3.32.0'
+    swaggerRequestValidatorVersion = '2.30.0'
 }
 
 dependencies {
-	implementation "org.springframework.boot:spring-boot-starter-mail"
-	implementation "org.springframework.boot:spring-boot-starter-security"
-	implementation "org.springframework.boot:spring-boot-starter-web"
-	implementation "org.springframework.boot:spring-boot-starter-validation"
-	implementation "org.springframework.boot:spring-boot-starter-jdbc"
-	implementation "org.springframework.boot:spring-boot-starter-actuator"
-	implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
-	implementation 'org.liquibase:liquibase-core:4.16.1'
-	implementation "org.jdbi:jdbi3-spring5:$jdbiVersion"
-	implementation "org.jdbi:jdbi3-sqlobject:$jdbiVersion"
-	implementation "com.goterl:lazysodium-java:5.1.1"
-	implementation "net.java.dev.jna:jna:5.12.1"
-	implementation "commons-codec:commons-codec:1.15"
-	implementation "commons-io:commons-io:2.11.0"
-	implementation "org.apache.commons:commons-lang3:3.12.0"
-	implementation "javax.validation:validation-api:2.0.1.Final"
-	implementation 'io.swagger.core.v3:swagger-annotations:2.2.2'
-	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.4'
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	runtimeOnly "org.mariadb.jdbc:mariadb-java-client:3.0.8"
-	testImplementation "org.springframework.boot:spring-boot-starter-test"
-	testImplementation "org.springframework.security:spring-security-test:5.7.3"
-	testImplementation "org.awaitility:awaitility:4.2.0"
-	testImplementation "org.testcontainers:testcontainers:$testContainersVersion"
-	testImplementation "org.testcontainers:junit-jupiter:$testContainersVersion"
-	testImplementation "org.testcontainers:mariadb:$testContainersVersion"
-	testImplementation "com.atlassian.oai:swagger-request-validator-core:$swaggerRequestValidatorVersion"
-	testImplementation "com.atlassian.oai:swagger-request-validator-springmvc:$swaggerRequestValidatorVersion"
-	testImplementation "com.atlassian.oai:swagger-request-validator-mockmvc:$swaggerRequestValidatorVersion"
-	testImplementation 'org.assertj:assertj-core:3.23.1'
-	testImplementation 'com.github.tomakehurst:wiremock-jre8:2.34.0'
-	testImplementation 'org.xmlunit:xmlunit-assertj3:2.9.0'
-	testImplementation 'org.mockito:mockito-core:4.8.0'
+    implementation "org.springframework.boot:spring-boot-starter-mail"
+    implementation "org.springframework.boot:spring-boot-starter-security"
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-starter-validation"
+    implementation "org.springframework.boot:spring-boot-starter-jdbc"
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
+    implementation 'org.liquibase:liquibase-core:4.16.1'
+    implementation "org.jdbi:jdbi3-spring5:$jdbiVersion"
+    implementation "org.jdbi:jdbi3-sqlobject:$jdbiVersion"
+    implementation "com.goterl:lazysodium-java:5.1.1"
+    implementation "net.java.dev.jna:jna:5.12.1"
+    implementation "commons-codec:commons-codec:1.15"
+    implementation "commons-io:commons-io:2.11.0"
+    implementation "org.apache.commons:commons-lang3:3.12.0"
+    implementation "javax.validation:validation-api:2.0.1.Final"
+    implementation 'io.swagger.core.v3:swagger-annotations:2.2.2'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.4'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    runtimeOnly "org.mariadb.jdbc:mariadb-java-client:3.0.8"
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation "org.springframework.security:spring-security-test:5.7.3"
+    testImplementation "org.awaitility:awaitility:4.2.0"
+    testImplementation "org.testcontainers:testcontainers:$testContainersVersion"
+    testImplementation "org.testcontainers:junit-jupiter:$testContainersVersion"
+    testImplementation "org.testcontainers:mariadb:$testContainersVersion"
+    testImplementation "com.atlassian.oai:swagger-request-validator-core:$swaggerRequestValidatorVersion"
+    testImplementation "com.atlassian.oai:swagger-request-validator-springmvc:$swaggerRequestValidatorVersion"
+    testImplementation "com.atlassian.oai:swagger-request-validator-mockmvc:$swaggerRequestValidatorVersion"
+    testImplementation 'org.assertj:assertj-core:3.23.1'
+    testImplementation 'com.github.tomakehurst:wiremock-jre8:2.34.0'
+    testImplementation 'org.xmlunit:xmlunit-assertj3:2.9.0'
+    testImplementation 'org.mockito:mockito-core:4.8.0'
 }
 
 test {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
 
 pmd {
-	ruleSets = ["category/java/errorprone.xml", "category/java/bestpractices.xml"]
-	ignoreFailures = true
+    ruleSets = ["category/java/errorprone.xml", "category/java/bestpractices.xml"]
+    ignoreFailures = true
 }
 
 spotbugs {
-	ignoreFailures.set(true)
+    ignoreFailures.set(true)
 }
 
 spotbugsTest {
-	ignoreFailures = true
+    ignoreFailures = true
 }

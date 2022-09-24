@@ -8,7 +8,8 @@ and [iOS](https://github.com/RailwayStations/Bahnhofsfotos) of
 the [Bahnhofsfotos opendata Project](https://github.com/RailwayStations).
 
 This API is hosted at https://api.railway-stations.org or at the Deutsche Bahn developer
-site: https://developer.deutschebahn.com/store/apis/list where you can also find an online and executable version of the OpenAPI documentation.
+site: https://developer.deutschebahn.com/store/apis/list where you can also find an online and executable version of the
+OpenAPI documentation.
 
 ## build
 
@@ -62,17 +63,16 @@ Enter mariadb CLI:
 
 `docker exec -it mariadb mysql -ursapi -prsapi rsapi --default-character-set=utf8mb4`
 
-## Useage
+## Usage
 
-Point your browser to `http://localhost:8080/stations?country=de`, where `country` can be "de", "ch", "fi", "uk", ...
+Point your browser to `http://localhost:8080/photoStationsByCountry/de`, where the last path segment is the `country`
+selector and can be "de", "ch", "fi", "uk", ...
 
 With the following query parameter:
 
-- `hasPhoto`: boolean, indicates if only trainstations with or without a photo should be selected
+- `hasPhoto`: boolean, indicates if only railwaystations with or without a photo should be selected
 
-- `photographer`: (nick)name of a photographer, select only trainstations with photos from her
-
-- `country`: select trainstations from a given country, this parameter is an alternative to the `{country}` path
+- `isActive`: select only railwaystations which are active
 
 A more detailed API documentation can be found in the [OpenAPI](src/main/resources/static/openapi.yaml) file or online
 at [developer.deutschebahn.com](https://developer.deutschebahn.com/store/apis/list).
@@ -81,13 +81,14 @@ at [developer.deutschebahn.com](https://developer.deutschebahn.com/store/apis/li
 
 - all supported countries: https://api.railway-stations.org/countries
 
-- all german trainstations: https://api.railway-stations.org/stations?country=de
+- all german railwaystations: https://api.railway-stations.org/photoStationsByCountry/de
 
-- german trainstations without photo: https://api.railway-stations.org/stations?country=de&hasPhoto=false
+- german railwaystations without photo: https://api.railway-stations.org/photoStationsByCountry/de?hasPhoto=false
 
-- austrian trainsations from photographer
+- one railwaystation with all its photos: https://api.railway-stations.org/photoStationById/de/1973
 
-  @pokipsie: https://api.railway-stations.org/stations?country=ch&photographer=@pokipsie
+- austrian trainsations from photographer @pokipsie:
+  https://api.railway-stations.org/photoStationsByPhotographer/@pokipsie?country=ch
 
 - all photographers with count of photos: https://api.railway-stations.org/photographers
 

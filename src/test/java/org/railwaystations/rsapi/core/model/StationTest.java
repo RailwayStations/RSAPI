@@ -1,55 +1,40 @@
 package org.railwaystations.rsapi.core.model;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
 
 class StationTest {
 
     private static final Station.Key TEST_KEY = new Station.Key("", "0");
-    public static final Coordinates TEST_COORDINATES = new Coordinates(50.554550, 9.683787);
 
-    @Test
-    void distanceTo() {
+    @ParameterizedTest
+    @CsvSource({
+            "test,    false",
+            ",        true"
+    })
+    void appliesToNullPhotographer(String photographer, boolean expectedAppliesTo) {
         var station = createStationTestFixtureBuilder()
-                .coordinates(TEST_COORDINATES)
                 .build();
-        assertThat(station.distanceTo(50.196580, 9.189395)).isCloseTo(53.1, within(0.1));
+        assertThat(station.appliesTo(photographer)).isEqualTo(expectedAppliesTo);
     }
 
-    @Test
-    void appliesToNullPhotographer() {
-        var station = createStationTestFixtureBuilder()
-                .build();
-        assertThat(station.appliesTo(null, "test", null)).isEqualTo(false);
-        assertThat(station.appliesTo(false, null, null)).isEqualTo(true);
-        assertThat(station.appliesTo(true, null, null)).isEqualTo(false);
-    }
-
-    @Test
-    void appliesToPhotographer() {
-        var station = createStationTestFixtureBuilder()
-                .photo(createTestPhoto())
-                .build();
-        assertThat(station.appliesTo(null, "test", null)).isEqualTo(true);
-        assertThat(station.appliesTo(false, null, null)).isEqualTo(false);
-        assertThat(station.appliesTo(true, null, null)).isEqualTo(true);
+    @ParameterizedTest
+    @CsvSource({
+            "test,    true",
+            ",        true"
+    })
+    void appliesToPhotographer(String photographer, boolean expectedAppliesTo) {
+        var station = createStationTestFixtureBuilder().build();
+        station.getPhotos().add(createTestPhoto());
+        assertThat(station.appliesTo(photographer)).isEqualTo(expectedAppliesTo);
     }
 
     private Station.StationBuilder createStationTestFixtureBuilder() {
         return Station.builder()
                 .key(TEST_KEY)
                 .title("");
-    }
-
-    @Test
-    void appliesToActive() {
-        var station = createStationTestFixtureBuilder()
-                .coordinates(TEST_COORDINATES)
-                .photo(createTestPhoto())
-                .build();
-        assertThat(station.appliesTo(null, "test", true)).isEqualTo(true);
     }
 
     private Photo createTestPhoto() {

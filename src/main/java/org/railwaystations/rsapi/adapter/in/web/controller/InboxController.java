@@ -108,7 +108,7 @@ public class InboxController {
             if (authentication == null || !authentication.isAuthenticated()) {
                 return createIFrameAnswer(consumeBodyAndReturn(file.getInputStream(),
                                 new InboxResponseDto().state(InboxResponseDto.StateEnum.UNAUTHORIZED)),
-                                refererUri);
+                        refererUri);
             }
 
             InboxResponseDto response;
@@ -126,7 +126,7 @@ public class InboxController {
         }
     }
 
-    @PostMapping(consumes = MediaType.ALL_VALUE ,produces = MediaType.APPLICATION_JSON_VALUE, value = "/photoUpload")
+    @PostMapping(consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE, value = "/photoUpload")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<InboxResponseDto> photoUpload(HttpServletRequest request,
                                                         @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
@@ -172,8 +172,8 @@ public class InboxController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE, value = "/reportProblem")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<InboxResponseDto> reportProblem(@RequestHeader(HttpHeaders.USER_AGENT) String userAgent,
-                                       @RequestBody @NotNull() ProblemReportDto problemReport,
-                                       @AuthenticationPrincipal AuthUser user) {
+                                                          @RequestBody @NotNull() ProblemReportDto problemReport,
+                                                          @AuthenticationPrincipal AuthUser user) {
         InboxResponseDto inboxResponse = toDto(manageInboxUseCase.reportProblem(toDomain(problemReport), user.getUser(), userAgent));
         return new ResponseEntity<>(inboxResponse, toHttpStatus(inboxResponse.getState()));
     }
@@ -182,6 +182,7 @@ public class InboxController {
         return ProblemReport.builder()
                 .countryCode(problemReport.getCountryCode())
                 .stationId(problemReport.getStationId())
+                .photoId(problemReport.getPhotoId())
                 .type(toDomain(problemReport.getType()))
                 .comment(problemReport.getComment())
                 .coordinates(mapCoordinates(problemReport.getLat(), problemReport.getLon()))
@@ -333,12 +334,13 @@ public class InboxController {
                 case ACTIVATE_STATION -> manageInboxUseCase.updateStationActiveState(command, true);
                 case DEACTIVATE_STATION -> manageInboxUseCase.updateStationActiveState(command, false);
                 case DELETE_STATION -> manageInboxUseCase.deleteStation(command);
-                case DELETE_PHOTO -> manageInboxUseCase.deletePrimaryPhoto(command);
+                case DELETE_PHOTO -> manageInboxUseCase.deletePhoto(command);
                 case MARK_SOLVED -> manageInboxUseCase.markProblemReportSolved(command);
                 case CHANGE_NAME -> manageInboxUseCase.changeStationTitle(command);
                 case UPDATE_LOCATION -> manageInboxUseCase.updateLocation(command);
-                case PHOTO_OUTDATED -> manageInboxUseCase.markPrimaryPhotoOutdated(command);
-                default -> throw new IllegalArgumentException("Unexpected commandDto value: " + commandDto.getCommand());
+                case PHOTO_OUTDATED -> manageInboxUseCase.markPhotoOutdated(command);
+                default ->
+                        throw new IllegalArgumentException("Unexpected commandDto value: " + commandDto.getCommand());
             }
         } catch (IllegalArgumentException e) {
             log.warn("adminInbox commandDto {} failed", commandDto, e);
@@ -387,9 +389,9 @@ public class InboxController {
     }
 
     private InboxResponseDto uploadPhoto(String userAgent, InputStream body, String stationId,
-                                      String countryCode, String contentType, String stationTitle,
-                                      Double latitude, Double longitude, String comment,
-                                      Boolean active, AuthUser user) {
+                                         String countryCode, String contentType, String stationTitle,
+                                         Double latitude, Double longitude, String comment,
+                                         Boolean active, AuthUser user) {
         InboxResponse inboxResponse = manageInboxUseCase.uploadPhoto(userAgent, body, StringUtils.trimToNull(stationId), StringUtils.trimToNull(countryCode),
                 StringUtils.trimToEmpty(contentType).split(";")[0], stationTitle,
                 latitude, longitude, comment, active != null ? active : true, user.getUser());
