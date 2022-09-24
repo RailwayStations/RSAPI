@@ -200,18 +200,19 @@ class PhotoStationsControllerTest {
                 .andExpect(jsonPath("$.stations[0].lon").value(6.0))
                 .andExpect(jsonPath("$.stations[0].shortCode").value("ABC"))
                 .andExpect(jsonPath("$.stations[0].inactive").doesNotExist())
-                .andExpect(jsonPath("$.stations[0].photos[0].id").value(1L))
-                .andExpect(jsonPath("$.stations[0].photos[0].photographer").value("Peter Pan"))
-                .andExpect(jsonPath("$.stations[0].photos[0].path").value("/ab/3_1.jpg"))
-                .andExpect(jsonPath("$.stations[0].photos[0].license").value("CC_BY_NC_40_INT"))
+                .andExpect(jsonPath("$.stations[0].photos[0].id").value(2L))
+                .andExpect(jsonPath("$.stations[0].photos[0].photographer").value("Jim Knopf"))
+                .andExpect(jsonPath("$.stations[0].photos[0].path").value("/ab/3_2.jpg"))
+                .andExpect(jsonPath("$.stations[0].photos[0].license").value("CC0_10"))
                 .andExpect(jsonPath("$.stations[0].photos[0].createdAt").value(CREATED_AT.toEpochMilli()))
-                .andExpect(jsonPath("$.stations[0].photos[0].outdated").doesNotExist())
-                .andExpect(jsonPath("$.stations[0].photos[1].id").value(2L))
-                .andExpect(jsonPath("$.stations[0].photos[1].photographer").value("Jim Knopf"))
-                .andExpect(jsonPath("$.stations[0].photos[1].path").value("/ab/3_2.jpg"))
-                .andExpect(jsonPath("$.stations[0].photos[1].license").value("CC0_10"))
+                .andExpect(jsonPath("$.stations[0].photos[0].outdated").value(true))
+                .andExpect(jsonPath("$.stations[0].photos[1].id").value(1L))
+                .andExpect(jsonPath("$.stations[0].photos[1].photographer").value("Peter Pan"))
+                .andExpect(jsonPath("$.stations[0].photos[1].path").value("/ab/3_1.jpg"))
+                .andExpect(jsonPath("$.stations[0].photos[1].license").value("CC_BY_NC_40_INT"))
                 .andExpect(jsonPath("$.stations[0].photos[1].createdAt").value(CREATED_AT.toEpochMilli()))
-                .andExpect(jsonPath("$.stations[0].photos[1].outdated").value(true))
+                .andExpect(jsonPath("$.stations[0].photos[1].outdated").doesNotExist())
+                .andExpect(jsonPath("$.stations[0].photos[2]").doesNotExist())
                 .andExpect(jsonPath("$.stations[1]").doesNotExist());
     }
 
@@ -364,6 +365,7 @@ class PhotoStationsControllerTest {
                 .license(License.CC0_10)
                 .createdAt(CREATED_AT)
                 .outdated(true)
+                .primary(true)
                 .build();
     }
 

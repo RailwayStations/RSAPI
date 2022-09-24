@@ -89,7 +89,7 @@ public class PhotoStationsController {
 
     private List<PhotoDto> mapPhotos(Station station) {
         return station.getPhotos().stream()
-                // TODO: sort by primary
+                .sorted()
                 .map(photo -> new PhotoDto()
                         .id(photo.getId())
                         .path(photo.getUrlPath())
