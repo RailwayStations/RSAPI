@@ -57,7 +57,7 @@ public class PhotoFileStorage implements PhotoStorage {
     }
 
     private Path getDestinationFile(Path destinationDir, String stationId, String extension) {
-        for (int sequence = 1; sequence < 100; sequence ++) {
+        for (int sequence = 1; sequence < 100; sequence++) {
             var destinationFile = destinationDir.resolve(sanitizeFilename(stationId + "_" + sequence + "." + extension));
             if (Files.notExists(destinationFile)) {
                 return destinationFile;
@@ -68,10 +68,12 @@ public class PhotoFileStorage implements PhotoStorage {
 
     @Override
     public void reject(InboxEntry inboxEntry) throws IOException {
-        var file = getUploadFile(inboxEntry.getFilename());
-        Files.move(file, workDir.getInboxRejectedDir().resolve(file.getFileName()), REPLACE_EXISTING);
-        Files.deleteIfExists(workDir.getInboxToProcessDir().resolve(inboxEntry.getFilename()));
-        Files.deleteIfExists(workDir.getInboxProcessedDir().resolve(inboxEntry.getFilename()));
+        if (inboxEntry.getFilename() != null) {
+            var file = getUploadFile(inboxEntry.getFilename());
+            Files.move(file, workDir.getInboxRejectedDir().resolve(file.getFileName()), REPLACE_EXISTING);
+            Files.deleteIfExists(workDir.getInboxToProcessDir().resolve(inboxEntry.getFilename()));
+            Files.deleteIfExists(workDir.getInboxProcessedDir().resolve(inboxEntry.getFilename()));
+        }
     }
 
     @Override
@@ -126,11 +128,11 @@ public class PhotoFileStorage implements PhotoStorage {
     }
 
     static void cleanupOldCopiesFrom(Path dir, Instant maxAge) {
-        try (var pathStream = Files.list(dir)){
+        try (var pathStream = Files.list(dir)) {
             pathStream
-                .filter(Files::isRegularFile)
-                .filter(f -> isOlderThan(f, maxAge))
-                .forEach(PhotoFileStorage::deleteSilently);
+                    .filter(Files::isRegularFile)
+                    .filter(f -> isOlderThan(f, maxAge))
+                    .forEach(PhotoFileStorage::deleteSilently);
         } catch (Exception e) {
             log.error("Failed to cleanup old copies from {}", dir, e);
         }

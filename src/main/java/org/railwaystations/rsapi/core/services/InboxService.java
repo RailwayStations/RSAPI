@@ -170,8 +170,8 @@ public class InboxService implements ManageInboxUseCase {
 
     private void updateInboxEntry(InboxEntry inboxEntry) {
         var filename = inboxEntry.getFilename();
-        inboxEntry.setProcessed(photoStorage.isProcessed(filename));
-        if (!inboxEntry.isProblemReport()) {
+        if (filename != null) {
+            inboxEntry.setProcessed(photoStorage.isProcessed(filename));
             inboxEntry.setInboxUrl(getInboxUrl(filename, inboxEntry.isProcessed()));
         }
         if (inboxEntry.getStationId() == null && !inboxEntry.getCoordinates().hasZeroCoords()) {
@@ -180,7 +180,7 @@ public class InboxService implements ManageInboxUseCase {
     }
 
     private String getInboxUrl(String filename, boolean processed) {
-        return inboxBaseUrl + (processed ? "/processed/" : "/") + filename;
+        return filename != null ? inboxBaseUrl + (processed ? "/processed/" : "/") + filename : null;
     }
 
     public void markPhotoOutdated(InboxCommand command) {
