@@ -110,12 +110,6 @@ paths:
         Returns only the recently imported photos of a station, defined by the sinceHours parameter.
         Can return several photos per station, not necessarily the primary photo.
       parameters:
-        - name: photographer
-          in: query
-          description: photographer name
-          required: true
-          schema:
-            type: string
         - name: sinceHours
           in: query
           description: |
