@@ -111,7 +111,7 @@ paths:
         Can return several photos per station, not necessarily the primary photo.
       parameters:
         - name: photographer
-          in: path
+          in: query
           description: photographer name
           required: true
           schema:
@@ -1234,7 +1234,7 @@ components:
           example: "CC0 1.0 Universell (CC0 1.0)"
         url:
           type: string
-          format: url
+          format: uri
           description: URL of the license to link to from the photo
           example: "https://creativecommons.org/publicdomain/zero/1.0/"
       required:
@@ -1251,7 +1251,7 @@ components:
           description: Username of the photographer
         url:
           type: string
-          format: url
+          format: uri
           description: Link to the photographers social media account or homepage
       required:
         - "name"
