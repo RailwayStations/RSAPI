@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20220921.2140"
+  version: "20220930.1000"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -110,12 +110,6 @@ paths:
         Returns only the recently imported photos of a station, defined by the sinceHours parameter.
         Can return several photos per station, not necessarily the primary photo.
       parameters:
-        - name: photographer
-          in: path
-          description: photographer name
-          required: true
-          schema:
-            type: string
         - name: sinceHours
           in: query
           description: |
@@ -1234,7 +1228,7 @@ components:
           example: "CC0 1.0 Universell (CC0 1.0)"
         url:
           type: string
-          format: url
+          format: uri
           description: URL of the license to link to from the photo
           example: "https://creativecommons.org/publicdomain/zero/1.0/"
       required:
@@ -1251,7 +1245,7 @@ components:
           description: Username of the photographer
         url:
           type: string
-          format: url
+          format: uri
           description: Link to the photographers social media account or homepage
       required:
         - "name"
