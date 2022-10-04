@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import javax.annotation.Generated;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.net.URI;
 import java.util.Objects;
 
 /**
@@ -12,7 +14,7 @@ import java.util.Objects;
  */
 
 @JsonTypeName("PhotoLicense")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-09-21T21:45:29.210227244+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-10-04T21:43:45.819674334+02:00[Europe/Berlin]")
 public class PhotoLicenseDto {
 
     @JsonProperty("id")
@@ -22,7 +24,7 @@ public class PhotoLicenseDto {
     private String name;
 
     @JsonProperty("url")
-    private String url;
+    private URI url;
 
     public PhotoLicenseDto id(String id) {
         this.id = id;
@@ -62,7 +64,7 @@ public class PhotoLicenseDto {
         this.name = name;
     }
 
-    public PhotoLicenseDto url(String url) {
+    public PhotoLicenseDto url(URI url) {
         this.url = url;
         return this;
     }
@@ -73,11 +75,12 @@ public class PhotoLicenseDto {
      * @return url
      */
     @NotNull
-    public String getUrl() {
+    @Valid
+    public URI getUrl() {
         return url;
     }
 
-    public void setUrl(String url) {
+    public void setUrl(URI url) {
         this.url = url;
     }
 

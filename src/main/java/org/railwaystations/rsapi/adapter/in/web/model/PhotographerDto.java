@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import javax.annotation.Generated;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.net.URI;
 import java.util.Objects;
 
 /**
@@ -12,14 +14,14 @@ import java.util.Objects;
  */
 
 @JsonTypeName("Photographer")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-09-21T21:45:29.210227244+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-10-04T21:43:45.819674334+02:00[Europe/Berlin]")
 public class PhotographerDto {
 
     @JsonProperty("name")
     private String name;
 
     @JsonProperty("url")
-    private String url;
+    private URI url;
 
     public PhotographerDto name(String name) {
         this.name = name;
@@ -40,7 +42,7 @@ public class PhotographerDto {
         this.name = name;
     }
 
-    public PhotographerDto url(String url) {
+    public PhotographerDto url(URI url) {
         this.url = url;
         return this;
     }
@@ -50,12 +52,12 @@ public class PhotographerDto {
      *
      * @return url
      */
-
-    public String getUrl() {
+    @Valid
+    public URI getUrl() {
         return url;
     }
 
-    public void setUrl(String url) {
+    public void setUrl(URI url) {
         this.url = url;
     }
 

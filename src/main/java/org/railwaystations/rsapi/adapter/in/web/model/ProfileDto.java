@@ -7,6 +7,7 @@ import javax.annotation.Generated;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import java.net.URI;
 import java.util.Objects;
 
 /**
@@ -14,7 +15,7 @@ import java.util.Objects;
  */
 
 @JsonTypeName("Profile")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-09-21T21:45:29.210227244+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-10-04T21:43:45.819674334+02:00[Europe/Berlin]")
 public class ProfileDto {
 
     @JsonProperty("nickname")
@@ -30,16 +31,13 @@ public class ProfileDto {
     private Boolean photoOwner;
 
     @JsonProperty("link")
-    private String link;
+    private URI link;
 
     @JsonProperty("anonymous")
     private Boolean anonymous;
 
     @JsonProperty("admin")
     private Boolean admin;
-
-    @JsonProperty("newPassword")
-    private String newPassword;
 
     @JsonProperty("emailVerified")
     private Boolean emailVerified;
@@ -124,7 +122,7 @@ public class ProfileDto {
         this.photoOwner = photoOwner;
     }
 
-    public ProfileDto link(String link) {
+    public ProfileDto link(URI link) {
         this.link = link;
         return this;
     }
@@ -134,12 +132,12 @@ public class ProfileDto {
      *
      * @return link
      */
-
-    public String getLink() {
+    @Valid
+    public URI getLink() {
         return link;
     }
 
-    public void setLink(String link) {
+    public void setLink(URI link) {
         this.link = link;
     }
 
@@ -179,25 +177,6 @@ public class ProfileDto {
 
     public void setAdmin(Boolean admin) {
         this.admin = admin;
-    }
-
-    public ProfileDto newPassword(String newPassword) {
-        this.newPassword = newPassword;
-        return this;
-    }
-
-    /**
-     * Get newPassword
-     *
-     * @return newPassword
-     */
-
-    public String getNewPassword() {
-        return newPassword;
-    }
-
-    public void setNewPassword(String newPassword) {
-        this.newPassword = newPassword;
     }
 
     public ProfileDto emailVerified(Boolean emailVerified) {
@@ -254,14 +233,13 @@ public class ProfileDto {
                 Objects.equals(this.link, profile.link) &&
                 Objects.equals(this.anonymous, profile.anonymous) &&
                 Objects.equals(this.admin, profile.admin) &&
-                Objects.equals(this.newPassword, profile.newPassword) &&
                 Objects.equals(this.emailVerified, profile.emailVerified) &&
                 Objects.equals(this.sendNotifications, profile.sendNotifications);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(nickname, email, license, photoOwner, link, anonymous, admin, newPassword, emailVerified, sendNotifications);
+        return Objects.hash(nickname, email, license, photoOwner, link, anonymous, admin, emailVerified, sendNotifications);
     }
 
     @Override
@@ -275,7 +253,6 @@ public class ProfileDto {
         sb.append("    link: ").append(toIndentedString(link)).append("\n");
         sb.append("    anonymous: ").append(toIndentedString(anonymous)).append("\n");
         sb.append("    admin: ").append(toIndentedString(admin)).append("\n");
-        sb.append("    newPassword: ").append(toIndentedString(newPassword)).append("\n");
         sb.append("    emailVerified: ").append(toIndentedString(emailVerified)).append("\n");
         sb.append("    sendNotifications: ").append(toIndentedString(sendNotifications)).append("\n");
         sb.append("}");

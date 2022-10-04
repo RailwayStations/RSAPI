@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20220930.1000"
+  version: "20221004.2100"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -610,18 +610,10 @@ paths:
   /photoUpload:
     post:
       summary: Upload a new Photo
-      security:
-        - basicAuth: [ ]
-        - uploadToken: [ ]
       parameters:
-        - name: Email
-          in: header
-          description: |
-            Email or name of the user, used together with the uploadToken security
-          deprecated: true
-          required: false
-          schema:
-            type: string
+        - $ref: '#/components/parameters/Authorization'
+        - $ref: '#/components/parameters/Upload-Token'
+        - $ref: '#/components/parameters/Email'
         - name: Country
           in: header
           description: country code
@@ -721,8 +713,8 @@ paths:
   /reportProblem:
     post:
       summary: Report a for a Railway-Station
-      security:
-        - basicAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
       requestBody:
         description: The problem report
         content:
@@ -757,8 +749,8 @@ paths:
   /userInbox:
     post:
       summary: Query the state of photo uploads of the authorized user
-      security:
-        - basicAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
       requestBody:
         content:
           application/json:
@@ -816,8 +808,8 @@ paths:
   /adminInbox:
     get:
       summary: Get the current inbox, photos and problem reports under review.
-      security:
-        - basicAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
       responses:
         200:
           description: array of inbox objects
@@ -836,8 +828,8 @@ paths:
     post:
       summary: |
         Import or reject an uploaded photo or a problem report from the inbox
-      security:
-        - basicAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
       requestBody:
         content:
           application/json:
@@ -919,8 +911,8 @@ paths:
   /resendEmailVerification:
     post:
       summary: Sends a new eMail-Verification mail
-      security:
-        - basicAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
       responses:
         200:
           description: email successfully sent
@@ -950,9 +942,8 @@ paths:
   /changePassword:
     post:
       summary: Change user password
-      security:
-        - basicAuth: [ ]
       parameters:
+        - $ref: '#/components/parameters/Authorization'
         - name: New-Password
           in: header
           description: new password, deprecated use body message for proper encoding
@@ -990,18 +981,10 @@ paths:
   /myProfile:
     get:
       summary: Get the users profile
-      security:
-        - basicAuth: [ ]
-        - uploadToken: [ ]
       parameters:
-        - name: Email
-          in: header
-          description: |
-            Email or name of the user, used together with the uploadToken security
-          deprecated: true
-          required: false
-          schema:
-            type: string
+        - $ref: '#/components/parameters/Authorization'
+        - $ref: '#/components/parameters/Upload-Token'
+        - $ref: '#/components/parameters/Email'
       responses:
         200:
           description: ok
@@ -1019,18 +1002,10 @@ paths:
       summary: Update the users profile.
       description: |
         In case the email has been changed, only the email is saved and a new password is send.
-      security:
-        - basicAuth: [ ]
-        - uploadToken: [ ]
       parameters:
-        - name: Email
-          in: header
-          description: |
-            Email or name of the user, used together with the uploadToken security
-          deprecated: true
-          required: false
-          schema:
-            type: string
+        - $ref: '#/components/parameters/Authorization'
+        - $ref: '#/components/parameters/Upload-Token'
+        - $ref: '#/components/parameters/Email'
       requestBody:
         description: Userprofile
         content:
@@ -1171,18 +1146,35 @@ paths:
           content: { }
 
 components:
-  securitySchemes:
-    basicAuth:
-      description: HTTP Basic Authentication
-      type: http
-      scheme: basic
-    uploadToken:
+  parameters:
+    Authorization:
+      name: Authorization
+      in: header
+      description: |
+        HTTP basic authorization
+      required: false
+      schema:
+        type: string
+    Upload-Token:
+      name: Upload-Token
+      in: header
       description: |
         DEPRECATED authentication via personal Upload-Token!
         Used together with Email header.
-      type: apiKey
+      deprecated: true
+      required: false
+      schema:
+        type: string      
+    Email:
+      name: Email
       in: header
-      name: Upload-Token
+      description: |
+        DEPRECATED, use basic authorization! 
+        Email or name of the user, used together with the Upload-Token.
+      deprecated: true
+      required: false
+      schema:
+        type: string    
 
   schemas:
     PhotoStations:
@@ -1509,6 +1501,7 @@ components:
           type: boolean
         link:
           type: string
+          format: uri
         anonymous:
           type: boolean
         sendNotifications:
@@ -1534,6 +1527,7 @@ components:
           type: boolean
         link:
           type: string
+          format: uri
         anonymous:
           type: boolean
         sendNotifications:
@@ -1561,12 +1555,11 @@ components:
           type: boolean
         link:
           type: string
+          format: uri
         anonymous:
           type: boolean
         admin:
           type: boolean
-        newPassword:
-          type: string
         emailVerified:
           type: boolean
         sendNotifications:

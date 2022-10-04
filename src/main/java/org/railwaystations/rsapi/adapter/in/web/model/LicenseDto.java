@@ -9,7 +9,7 @@ import javax.annotation.Generated;
  * the only accepted type is \"CC0 1.0 Universell (CC0 1.0)\", the others are listed for backward compatibility
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-09-21T21:45:29.210227244+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-10-04T21:43:45.819674334+02:00[Europe/Berlin]")
 public enum LicenseDto {
 
     CC0("CC0"),

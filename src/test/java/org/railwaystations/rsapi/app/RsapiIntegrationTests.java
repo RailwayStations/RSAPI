@@ -44,6 +44,7 @@ import javax.imageio.ImageIO;
 import javax.servlet.Filter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -111,10 +112,10 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         assertThat(photoStationsDto.getPhotoBaseUrl()).isEqualTo("https://api.railway-stations.org/photos");
 
         var licenses = photoStationsDto.getLicenses();
-        assertThat(licenses).containsExactly(new PhotoLicenseDto().id("CC0_10").name("CC0 1.0 Universell (CC0 1.0)").url("https://creativecommons.org/publicdomain/zero/1.0/"));
+        assertThat(licenses).containsExactly(new PhotoLicenseDto().id("CC0_10").name("CC0 1.0 Universell (CC0 1.0)").url(URI.create("https://creativecommons.org/publicdomain/zero/1.0/")));
 
         var photographers = photoStationsDto.getPhotographers();
-        assertThat(photographers).containsExactly(new PhotographerDto().name("@user10").url("https://www.example.com/user10"));
+        assertThat(photographers).containsExactly(new PhotographerDto().name("@user10").url(URI.create("https://www.example.com/user10")));
 
         var station = photoStationsDto.getStations().get(0);
         assertThat(station.getCountry()).isEqualTo("de");
@@ -183,11 +184,11 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         assertThat(photoStationsDto).isNotNull();
 
         var licenses = photoStationsDto.getLicenses();
-        assertThat(licenses).containsExactlyInAnyOrder(new PhotoLicenseDto().id("CC0_10").name("CC0 1.0 Universell (CC0 1.0)").url("https://creativecommons.org/publicdomain/zero/1.0/"),
-                new PhotoLicenseDto().id("CC_BY_SA_40").name("CC BY-SA 4.0").url("https://creativecommons.org/licenses/by-sa/4.0/"));
+        assertThat(licenses).containsExactlyInAnyOrder(new PhotoLicenseDto().id("CC0_10").name("CC0 1.0 Universell (CC0 1.0)").url(URI.create("https://creativecommons.org/publicdomain/zero/1.0/")),
+                new PhotoLicenseDto().id("CC_BY_SA_40").name("CC BY-SA 4.0").url(URI.create("https://creativecommons.org/licenses/by-sa/4.0/")));
 
         var photographers = photoStationsDto.getPhotographers();
-        assertThat(photographers).containsExactly(new PhotographerDto().name("@user10").url("https://www.example.com/user10"));
+        assertThat(photographers).containsExactly(new PhotographerDto().name("@user10").url(URI.create("https://www.example.com/user10")));
         assertThat(photographers).noneMatch(photographerDto -> !photographerDto.getName().equals("@user10"));
         assertThat(photoStationsDto.getStations()).noneMatch(stationDto -> !stationDto.getCountry().equals("de"));
         assertThat(photoStationsDto.getStations().stream().flatMap(photoStationDto -> photoStationDto.getPhotos().stream())).noneMatch(photoDto -> !photoDto.getPhotographer().equals("@user10"));
@@ -224,10 +225,10 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         assertThat(photoStationsDto).isNotNull();
 
         var licenses = photoStationsDto.getLicenses();
-        assertThat(licenses).containsExactlyInAnyOrder(new PhotoLicenseDto().id("CC0_10").name("CC0 1.0 Universell (CC0 1.0)").url("https://creativecommons.org/publicdomain/zero/1.0/"));
+        assertThat(licenses).containsExactlyInAnyOrder(new PhotoLicenseDto().id("CC0_10").name("CC0 1.0 Universell (CC0 1.0)").url(URI.create("https://creativecommons.org/publicdomain/zero/1.0/")));
 
         var photographers = photoStationsDto.getPhotographers();
-        assertThat(photographers).containsExactly(new PhotographerDto().name("Anonym").url("https://railway-stations.org"));
+        assertThat(photographers).containsExactly(new PhotographerDto().name("Anonym").url(URI.create("https://railway-stations.org")));
         assertThat(photographers).noneMatch(photographerDto -> !photographerDto.getName().equals("Anonym"));
         assertThat(photoStationsDto.getStations().stream().map(PhotoStationDto::getCountry).collect(Collectors.toSet())).containsExactlyInAnyOrder("de", "ch");
         assertThat(photoStationsDto.getStations().stream().flatMap(photoStationDto -> photoStationDto.getPhotos().stream())).noneMatch(photoDto -> !photoDto.getPhotographer().equals("Anonym"));

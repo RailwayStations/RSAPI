@@ -1,7 +1,6 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.railwaystations.rsapi.adapter.in.web.model.ChangePasswordDto;
 import org.railwaystations.rsapi.adapter.in.web.model.LicenseDto;
 import org.railwaystations.rsapi.adapter.in.web.model.ProfileDto;
@@ -26,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotNull;
+import java.net.URI;
 
 @RestController
 @Slf4j
@@ -68,7 +68,7 @@ public class ProfileController {
         return User.builder()
                 .name(registerProfileDto.getNickname())
                 .email(registerProfileDto.getEmail())
-                .url(StringUtils.trimToEmpty(registerProfileDto.getLink()))
+                .url(registerProfileDto.getLink() != null ? registerProfileDto.getLink().toString() : null)
                 .ownPhotos(registerProfileDto.getPhotoOwner())
                 .anonymous(registerProfileDto.getAnonymous() != null && registerProfileDto.getAnonymous())
                 .license(toLicense(registerProfileDto.getLicense()))
@@ -103,7 +103,7 @@ public class ProfileController {
                 .emailVerified(user.isEmailVerified())
                 .sendNotifications(user.isSendNotifications())
                 .license(toLicenseDto(user.getLicense()))
-                .link(user.getUrl())
+                .link(user.getUrl() != null ? URI.create(user.getUrl()) : null)
                 .nickname(user.getName())
                 .photoOwner(user.isOwnPhotos());
     }
@@ -133,7 +133,7 @@ public class ProfileController {
         return User.builder()
                 .name(updateProfileDto.getNickname())
                 .email(updateProfileDto.getEmail())
-                .url(StringUtils.trimToEmpty(updateProfileDto.getLink()))
+                .url(updateProfileDto.getLink() != null ? updateProfileDto.getLink().toString() : null)
                 .ownPhotos(updateProfileDto.getPhotoOwner())
                 .anonymous(updateProfileDto.getAnonymous() != null && updateProfileDto.getAnonymous())
                 .license(toLicense(updateProfileDto.getLicense()))

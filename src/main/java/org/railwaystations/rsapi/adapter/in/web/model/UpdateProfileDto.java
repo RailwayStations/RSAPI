@@ -7,6 +7,7 @@ import javax.annotation.Generated;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import java.net.URI;
 import java.util.Objects;
 
 /**
@@ -14,7 +15,7 @@ import java.util.Objects;
  */
 
 @JsonTypeName("UpdateProfile")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-09-21T21:45:29.210227244+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-10-04T21:43:45.819674334+02:00[Europe/Berlin]")
 public class UpdateProfileDto {
 
     @JsonProperty("nickname")
@@ -30,7 +31,7 @@ public class UpdateProfileDto {
     private Boolean photoOwner;
 
     @JsonProperty("link")
-    private String link;
+    private URI link;
 
     @JsonProperty("anonymous")
     private Boolean anonymous;
@@ -116,7 +117,7 @@ public class UpdateProfileDto {
         this.photoOwner = photoOwner;
     }
 
-    public UpdateProfileDto link(String link) {
+    public UpdateProfileDto link(URI link) {
         this.link = link;
         return this;
     }
@@ -126,12 +127,12 @@ public class UpdateProfileDto {
      *
      * @return link
      */
-
-    public String getLink() {
+    @Valid
+    public URI getLink() {
         return link;
     }
 
-    public void setLink(String link) {
+    public void setLink(URI link) {
         this.link = link;
     }
 

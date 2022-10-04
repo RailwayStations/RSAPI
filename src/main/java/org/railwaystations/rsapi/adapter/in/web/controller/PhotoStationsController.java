@@ -22,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import java.net.URI;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
@@ -108,7 +109,7 @@ public class PhotoStationsController {
                 .values().stream()
                 .map(user -> new PhotographerDto()
                         .name(user.getDisplayName())
-                        .url(user.getDisplayUrl()))
+                        .url(URI.create(user.getDisplayUrl())))
                 .toList();
     }
 
@@ -121,7 +122,7 @@ public class PhotoStationsController {
                 .map(license -> new PhotoLicenseDto()
                         .id(license.name())
                         .name(license.getDisplayName())
-                        .url(license.getUrl()))
+                        .url(URI.create(license.getUrl())))
                 .toList();
     }
 
