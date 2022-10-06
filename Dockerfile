@@ -1,4 +1,4 @@
-FROM amazoncorretto:19-alpine@sha256:04680e785628895f65473f9d51b7b4f05fbf7b0c453b90c3c6fc9d04addce9af
+FROM amazoncorretto:19-alpine@sha256:7f44001170267d97203ecf4cab6b4787a3a68b457c7179a1e21abb65f2742357
 ENV RSAPI_HOME=/opt/services
 ENV RSAPI_WORK=/var/rsapi
 ENV ARTIFACT_NAME=rsapi-0.0.1-SNAPSHOT.jar
