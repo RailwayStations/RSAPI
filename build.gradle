@@ -76,7 +76,7 @@ dependencies {
     implementation "commons-io:commons-io:2.11.0"
     implementation "org.apache.commons:commons-lang3:3.12.0"
     implementation "javax.validation:validation-api:2.0.1.Final"
-    implementation 'io.swagger.core.v3:swagger-annotations:2.2.4'
+    implementation 'io.swagger.core.v3:swagger-annotations:2.2.6'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.4'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
