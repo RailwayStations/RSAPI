@@ -1,7 +1,5 @@
 package org.railwaystations.rsapi.app;
 
-import com.atlassian.oai.validator.springmvc.OpenApiValidationFilter;
-import com.atlassian.oai.validator.springmvc.OpenApiValidationInterceptor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,25 +21,19 @@ import org.railwaystations.rsapi.core.model.Station;
 import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.ports.out.Monitor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.EncodedResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.imageio.ImageIO;
-import javax.servlet.Filter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
@@ -301,7 +293,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 
     @Test
     void stationByIdNotFound() {
-        loadRaw("/de/stations/11111111111", 404, String.class);
+        loadRaw("/de/stations/11111111111", HttpStatus.NOT_FOUND, String.class);
     }
 
     @Test
@@ -352,7 +344,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 
     @Test
     void stationsJson() throws IOException {
-        var response = loadRaw("/de/stations.json", 200, String.class);
+        var response = loadRaw("/de/stations.json", HttpStatus.OK, String.class);
         var jsonNode = mapper.readTree(response.getBody());
         assertThat(jsonNode).isNotNull();
         assertThat(jsonNode.isArray()).isTrue();
@@ -360,19 +352,19 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
     }
 
     StationDto[] assertLoadStationsOk(String path) {
-        var response = loadRaw(path, 200, StationDto[].class);
+        var response = loadRaw(path, HttpStatus.OK, StationDto[].class);
 
-        if (response.getStatusCodeValue() != 200) {
+        if (response.getStatusCode() != HttpStatus.OK) {
             return new StationDto[0];
         }
         return response.getBody();
     }
 
-    <T> ResponseEntity<T> loadRaw(String path, int expectedStatus, Class<T> responseType) {
+    <T> ResponseEntity<T> loadRaw(String path, HttpStatus expectedStatus, Class<T> responseType) {
         var response = restTemplate.getForEntity(String.format("http://localhost:%d%s", port, path),
                 responseType);
 
-        assertThat(response.getStatusCodeValue()).isEqualTo(expectedStatus);
+        assertThat(response.getStatusCode()).isEqualTo(expectedStatus);
         return response;
     }
 
@@ -382,7 +374,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 
     @Test
     void photographersDeJson() throws IOException {
-        var response = loadRaw("/de/photographers.json", 200, String.class);
+        var response = loadRaw("/de/photographers.json", HttpStatus.OK, String.class);
         var jsonNode = mapper.readTree(response.getBody());
         assertThat(jsonNode).isNotNull();
         assertThat(jsonNode.isObject()).isTrue();
@@ -395,7 +387,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 
     @Test
     void photographersDeTxt() {
-        var response = loadRaw("/de/photographers.txt", 200, String.class);
+        var response = loadRaw("/de/photographers.txt", HttpStatus.OK, String.class);
         assertThat(response.getBody()).isEqualTo("""
                 count	photographer
                 31	@user27
@@ -410,12 +402,12 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
     }
 
     StationDto loadDeStationByStationId(String stationId) {
-        return loadRaw("/de/stations/" + stationId, 200, StationDto.class).getBody();
+        return loadRaw("/de/stations/" + stationId, HttpStatus.OK, StationDto.class).getBody();
     }
 
     @Test
     void statisticDeJson() throws IOException {
-        var response = loadRaw("/de/stats.json", 200, String.class);
+        var response = loadRaw("/de/stats.json", HttpStatus.OK, String.class);
         var jsonNode = mapper.readTree(response.getBody());
         assertThat(jsonNode).isNotNull();
         assertThat(jsonNode.get("total").asInt()).isEqualTo(729);
@@ -438,7 +430,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         var response = restTemplate.postForEntity(
                 String.format("http://localhost:%d%s", port, "/photoUpload"), request, String.class);
 
-        assertThat(response.getStatusCodeValue()).isEqualTo(401);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     final byte[] IMAGE = Base64.getDecoder().decode("/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=");
@@ -446,7 +438,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
     @Test
     void photoUploadUnknownStationThenDeletePhotoThenDeleteStation() throws IOException {
         var headers = new HttpHeaders();
-        headers.add("Station-Title", URLEncoder.encode("Hintertupfingen", StandardCharsets.UTF_8.toString()));
+        headers.add("Station-Title", URLEncoder.encode("Hintertupfingen", StandardCharsets.UTF_8));
         headers.add("Latitude", "50.123");
         headers.add("Longitude", "9.123");
         headers.add("Comment", "Missing Station");
@@ -455,7 +447,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         var uploadResponse = restTemplateWithBasicAuthUser10().postForEntity(
                 String.format("http://localhost:%d%s", port, "/photoUpload"), request, String.class);
 
-        assertThat(uploadResponse.getStatusCodeValue()).isEqualTo(202);
+        assertThat(uploadResponse.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
         var inboxResponse = mapper.readTree(uploadResponse.getBody());
         var uploadId = inboxResponse.get("id").asInt();
         var filename = inboxResponse.get("filename").asText();
@@ -529,7 +521,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         sendInboxCommand("{\"id\": " + idStationNonExistent + ", \"command\": \"DELETE_STATION\"}");
 
         // assert station doesn't exist anymore
-        loadRaw("/de/stations/" + stationId, 404, StationDto.class);
+        loadRaw("/de/stations/" + stationId, HttpStatus.NOT_FOUND, StationDto.class);
     }
 
     @Test
@@ -537,7 +529,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         var response = restTemplate.withBasicAuth("@user27", "blahblubb")
                 .getForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), String.class);
 
-        assertThat(response.getStatusCodeValue()).isEqualTo(401);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
@@ -562,7 +554,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
     int sendProblemReport(String problemReportJson) throws JsonProcessingException {
         var responsePostProblem = restTemplateWithBasicAuthUser10()
                 .postForEntity(String.format("http://localhost:%d%s", port, "/reportProblem"), new HttpEntity<>(problemReportJson, createJsonHeaders()), String.class);
-        assertThat(responsePostProblem.getStatusCodeValue()).isEqualTo(202);
+        assertThat(responsePostProblem.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
         var jsonNodePostProblemReponse = mapper.readTree(responsePostProblem.getBody());
         assertThat(jsonNodePostProblemReponse).isNotNull();
         assertThat(jsonNodePostProblemReponse.get("state").asText()).isEqualTo("REVIEW");
@@ -626,7 +618,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
     void sendInboxCommand(String inboxCommand) throws JsonProcessingException {
         var responseInboxCommand = restTemplateWithBasicAuthUser10()
                 .postForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), new HttpEntity<>(inboxCommand, createJsonHeaders()), String.class);
-        assertThat(responseInboxCommand.getStatusCodeValue()).isEqualTo(200);
+        assertThat(responseInboxCommand.getStatusCode()).isEqualTo(HttpStatus.OK);
         var jsonNodeInboxCommandReponse = mapper.readTree(responseInboxCommand.getBody());
         assertThat(jsonNodeInboxCommandReponse).isNotNull();
         assertThat(jsonNodeInboxCommandReponse.get("status").asInt()).isEqualTo(200);
@@ -649,7 +641,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         var response = restTemplate.withBasicAuth("@user27", "y89zFqkL6hro")
                 .getForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), String.class);
 
-        assertThat(response.getStatusCodeValue()).isEqualTo(403);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
@@ -657,7 +649,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         var response = restTemplateWithBasicAuthUser10()
                 .getForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), String.class);
 
-        assertThat(response.getStatusCodeValue()).isEqualTo(200);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         var jsonNode = mapper.readTree(response.getBody());
         assertThat(jsonNode).isNotNull();
         assertThat(jsonNode.isArray()).isTrue();
@@ -669,7 +661,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         var response = restTemplateWithBasicAuthUser10()
                 .postForEntity(String.format("http://localhost:%d%s", port, "/adminInbox"), new HttpEntity<>("{\"id\": -1, \"command\": \"IMPORT_PHOTO\"}", headers), String.class);
 
-        assertThat(response.getStatusCodeValue()).isEqualTo(400);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         var jsonNode = mapper.readTree(response.getBody());
         assertThat(jsonNode.get("status").asInt()).isEqualTo(400);
         assertThat(jsonNode.get("message").asText()).isEqualTo("No pending inbox entry found");
@@ -678,7 +670,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
     @ParameterizedTest
     @ValueSource(strings = {"/countries", "/countries.json"})
     void countries(String path) throws IOException {
-        var response = loadRaw(path, 200, String.class);
+        var response = loadRaw(path, HttpStatus.OK, String.class);
         var jsonNode = mapper.readTree(response.getBody());
         assertThat(jsonNode).isNotNull();
         assertThat(jsonNode.isArray()).isTrue();
@@ -713,7 +705,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
     @ParameterizedTest
     @ValueSource(strings = {"/countries", "/countries.json"})
     void countriesAll(String path) throws IOException {
-        var response = loadRaw(path + "?onlyActive=false", 200, String.class);
+        var response = loadRaw(path + "?onlyActive=false", HttpStatus.OK, String.class);
         var jsonNode = mapper.readTree(response.getBody());
         assertThat(jsonNode).isNotNull();
         assertThat(jsonNode.isArray()).isTrue();
@@ -748,6 +740,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
             }
         }
 
+        /* TODO: OpenApiValidationInterceptor not compatible with Spring Boot 3
         @Bean
         public Filter openApiValidationFilter() {
             return new OpenApiValidationFilter(true, true);
@@ -764,6 +757,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
                 }
             };
         }
+         */
     }
 
 }

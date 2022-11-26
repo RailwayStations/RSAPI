@@ -28,25 +28,24 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         var authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class)
-                        .authenticationProvider(authenticationProvider);
+                .authenticationProvider(authenticationProvider);
         authenticationManagerBuilder.userDetailsService(userDetailsService);
         var authenticationManager = authenticationManagerBuilder.build();
 
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
+                .and()
                 .csrf().disable()
                 .headers()
-                    .frameOptions().disable()
-            .and()
-                .authorizeRequests()
-                .antMatchers("/**").permitAll()
-                .antMatchers("/adminInbox", "/adminInboxCount", "/userInbox", "/photoUpload",
-                        "/resendEmailVerification", "/reportProblem", "/changePassword", "/myProfile",
-                        "/resendEmailVerification").authenticated()
-            .and()
+                .frameOptions().disable()
+                .and()
+                .authorizeHttpRequests((authorize) -> authorize
+                        .requestMatchers("/**").permitAll()
+                        .requestMatchers("/adminInbox", "/adminInboxCount", "/userInbox", "/photoUpload",
+                                "/resendEmailVerification", "/reportProblem", "/changePassword", "/myProfile",
+                                "/resendEmailVerification").authenticated())
                 .exceptionHandling()
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-            .and()
+                .and()
                 .addFilterBefore(uploadTokenAuthenticationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new BasicAuthenticationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)
                 .authenticationManager(authenticationManager);

@@ -1,10 +1,10 @@
 plugins {
-	id 'org.springframework.boot' version '2.7.6'
-	id 'io.spring.dependency-management' version '1.1.0'
-	id 'java'
-	id 'pmd'
-	id "com.github.spotbugs" version "5.0.13"
-	id "org.openapi.generator" version "6.2.1"
+    id 'org.springframework.boot' version '3.0.0'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id 'java'
+    id 'pmd'
+    id "com.github.spotbugs" version "5.0.13"
+    id "org.openapi.generator" version "6.2.1"
 }
 
 group = 'org.railwaystations'
@@ -50,6 +50,7 @@ openApiGenerate {
             annotationLibrary    : "none",
             useTags              : "true",
             useBeanValidation    : "true",
+            useSpringBoot3       : "true"
     ]
 }
 
@@ -78,11 +79,16 @@ dependencies {
     implementation "javax.validation:validation-api:2.0.1.Final"
     implementation 'io.swagger.core.v3:swagger-annotations:2.2.7'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.14.1'
+
     compileOnly 'org.projectlombok:lombok'
+
     annotationProcessor 'org.projectlombok:lombok'
+
     runtimeOnly "org.mariadb.jdbc:mariadb-java-client:3.1.0"
+    runtimeOnly "org.springframework.boot:spring-boot-properties-migrator"
+
     testImplementation "org.springframework.boot:spring-boot-starter-test"
-    testImplementation "org.springframework.security:spring-security-test:5.7.5"
+    testImplementation "org.springframework.security:spring-security-test"
     testImplementation "org.awaitility:awaitility:4.2.0"
     testImplementation "org.testcontainers:testcontainers:$testContainersVersion"
     testImplementation "org.testcontainers:junit-jupiter:$testContainersVersion"
@@ -91,7 +97,7 @@ dependencies {
     testImplementation "com.atlassian.oai:swagger-request-validator-springmvc:$swaggerRequestValidatorVersion"
     testImplementation "com.atlassian.oai:swagger-request-validator-mockmvc:$swaggerRequestValidatorVersion"
     testImplementation 'org.assertj:assertj-core:3.23.1'
-    testImplementation 'com.github.tomakehurst:wiremock-jre8:2.35.0'
+    testImplementation 'com.github.tomakehurst:wiremock-jre8:2.35.0' // TODO: doesn't support jakarta namespace yet
     testImplementation 'org.xmlunit:xmlunit-assertj3:2.9.0'
     testImplementation 'org.mockito:mockito-core:4.9.0'
 }
