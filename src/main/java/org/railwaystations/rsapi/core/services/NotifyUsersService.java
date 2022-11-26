@@ -1,5 +1,6 @@
 package org.railwaystations.rsapi.core.services;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.railwaystations.rsapi.adapter.out.db.InboxDao;
 import org.railwaystations.rsapi.adapter.out.db.UserDao;
@@ -9,7 +10,6 @@ import org.railwaystations.rsapi.core.ports.in.NotifyUsersUseCase;
 import org.railwaystations.rsapi.core.ports.out.Mailer;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,23 +58,23 @@ public class NotifyUsersService implements NotifyUsersUseCase {
 
         var text = String.format("""
                 Hello %1$s,
-                
+                                
                 thank you for your contributions.
-                
+                                
                 Cheers
                 Your Railway-Stations-Team
-                
+                                
                 ---
                 Hallo %1$s,
-                
+                                
                 vielen Dank für Deine Beiträge.
-                
+                                
                 Viele Grüße
                 Dein Bahnhofsfoto-Team
-                
+                                
                 ---------------------------------
-                
-                %2$s""" , user.getName(), report);
+                                
+                %2$s""", user.getName(), report);
         mailer.send(user.getEmail(), "Railway-Stations.org review result", text);
         log.info("Email notification sent to {}", user.getEmail());
     }

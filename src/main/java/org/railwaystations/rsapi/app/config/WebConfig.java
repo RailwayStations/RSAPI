@@ -9,6 +9,7 @@ import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -35,8 +36,8 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry
                 .addMapping("/**")
-                .allowedHeaders("X-Requested-With","Content-Type","Accept","Origin","Authorization","Comment","Country","Station-Id","NameOrEmail","New-Password")
-                .allowedMethods("OPTIONS","GET","PUT","POST","DELETE","HEAD")
+                .allowedHeaders("X-Requested-With", "Content-Type", "Accept", "Origin", "Authorization", "Comment", "Country", "Station-Id", "NameOrEmail", "New-Password")
+                .allowedMethods("OPTIONS", "GET", "PUT", "POST", "DELETE", "HEAD")
                 .allowedOriginPatterns("*");
     }
 
@@ -45,6 +46,11 @@ public class WebConfig implements WebMvcConfigurer {
         var arrayHttpMessageConverter = new ByteArrayHttpMessageConverter();
         arrayHttpMessageConverter.setSupportedMediaTypes(getSupportedMediaTypes());
         return arrayHttpMessageConverter;
+    }
+
+    @Bean
+    public MethodValidationPostProcessor methodValidationPostProcessor() {
+        return new MethodValidationPostProcessor();
     }
 
     private List<MediaType> getSupportedMediaTypes() {

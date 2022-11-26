@@ -1,5 +1,6 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
+import jakarta.validation.constraints.Size;
 import org.railwaystations.rsapi.adapter.in.web.model.StatisticDto;
 import org.railwaystations.rsapi.core.model.Statistic;
 import org.railwaystations.rsapi.core.ports.in.GetStatisticUseCase;
@@ -10,8 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.constraints.Size;
 
 @RestController
 @Validated
