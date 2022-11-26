@@ -109,7 +109,7 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
     }
 
     @Test
-    void getMyProfileWithEmail() throws IOException {
+    void getMyProfileWithEmailAndUploadToken() throws IOException {
         var headers = new HttpHeaders();
         headers.add("Upload-Token", "uON60I7XWTIN");
         headers.add("Email", "user10@example.com");
@@ -120,7 +120,7 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
     }
 
     @Test
-    void getMyProfileWithName() throws IOException {
+    void getMyProfileWithNameAndUploadToken() throws IOException {
         var headers = new HttpHeaders();
         headers.add("Upload-Token", "uON60I7XWTIN");
         headers.add("Email", "@user10");
