@@ -25,8 +25,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.verify;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = {RsapiApplication.class},
-        properties = {"server.error.include-message=always", "spring.jackson.default-property-inclusion=non_null"})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = {"server.error.include-message=always"})
 @ActiveProfiles("test")
 class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
 
@@ -203,7 +203,6 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
         assertThat(responseGetAfter.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseGetAfter.getBody()).isNotNull();
         assertProfile(responseGetAfter, "user14", null, true, "user14@example.com");
-
 
         var secondPassword = "!\"$%&/()=?-1234567890";
         changePassword(firstPassword, secondPassword, true);
