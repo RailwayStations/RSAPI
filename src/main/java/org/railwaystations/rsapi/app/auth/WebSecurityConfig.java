@@ -54,7 +54,7 @@ public class WebSecurityConfig {
     }
 
     public RSAuthenticationFilter uploadTokenAuthenticationFilter(AuthenticationManager authenticationManager) {
-        return new RSAuthenticationFilter();
+        return new RSAuthenticationFilter(authenticationManager);
     }
 
 }

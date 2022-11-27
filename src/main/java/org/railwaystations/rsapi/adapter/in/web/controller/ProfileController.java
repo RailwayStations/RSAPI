@@ -36,12 +36,19 @@ public class ProfileController {
     @Autowired
     private ManageProfileUseCase manageProfileUseCase;
 
-    @PostMapping("/changePassword")
+    @PostMapping(value = "/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> changePassword(@AuthenticationPrincipal AuthUser authUser,
-                                                 @RequestHeader(value = "New-Password", required = false) String newPassword,
-                                                 @RequestBody(required = false) ChangePasswordDto changePasswordDto) {
-        manageProfileUseCase.changePassword(authUser.getUser(), changePasswordDto != null ? changePasswordDto.getNewPassword() : newPassword);
+                                                 @RequestBody ChangePasswordDto changePasswordDto) {
+        manageProfileUseCase.changePassword(authUser.getUser(), changePasswordDto.getNewPassword());
+        return ResponseEntity.ok("Password changed");
+    }
+
+    @PostMapping(value = "/changePassword")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<String> changePassword(@AuthenticationPrincipal AuthUser authUser,
+                                                 @RequestHeader(value = "New-Password") String newPassword) {
+        manageProfileUseCase.changePassword(authUser.getUser(), newPassword);
         return ResponseEntity.ok("Password changed");
     }
 
