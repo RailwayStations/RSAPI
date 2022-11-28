@@ -1,5 +1,6 @@
 package org.railwaystations.rsapi.app.auth;
 
+import lombok.AllArgsConstructor;
 import org.railwaystations.rsapi.adapter.out.db.UserDao;
 import org.railwaystations.rsapi.core.model.User;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -10,13 +11,10 @@ import org.springframework.stereotype.Service;
 import static java.util.stream.Collectors.toList;
 
 @Service
+@AllArgsConstructor
 public class RSUserDetailsService implements UserDetailsService {
 
     private final UserDao userDao;
-
-    public RSUserDetailsService(UserDao userDao) {
-        this.userDao = userDao;
-    }
 
     @Override
     public AuthUser loadUserByUsername(String username) throws UsernameNotFoundException {

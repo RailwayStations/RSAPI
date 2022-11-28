@@ -1,5 +1,6 @@
 package org.railwaystations.rsapi.core.services;
 
+import lombok.AllArgsConstructor;
 import org.railwaystations.rsapi.adapter.out.db.CountryDao;
 import org.railwaystations.rsapi.adapter.out.db.StationDao;
 import org.railwaystations.rsapi.core.model.Country;
@@ -10,16 +11,11 @@ import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
 
 @Service
+@AllArgsConstructor
 public class StatisticService implements org.railwaystations.rsapi.core.ports.in.GetStatisticUseCase {
 
     private final CountryDao countryDao;
     private final StationDao stationDao;
-
-    public StatisticService(CountryDao countryDao, StationDao stationDao) {
-        super();
-        this.countryDao = countryDao;
-        this.stationDao = stationDao;
-    }
 
     @Override
     public String getCountryStatisticMessage() {
@@ -32,6 +28,9 @@ public class StatisticService implements org.railwaystations.rsapi.core.ports.in
 
     @Override
     public Statistic getStatistic(String country) {
+        if (country != null && countryDao.findById(country).isEmpty()) {
+            throw new IllegalArgumentException("Country " + country + " does not exist");
+        }
         return stationDao.getStatistic(country);
     }
 

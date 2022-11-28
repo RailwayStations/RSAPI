@@ -1,9 +1,9 @@
 package org.railwaystations.rsapi.core.model;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Value;
 
-import javax.validation.constraints.NotNull;
 import java.time.Instant;
 
 @Value
@@ -19,10 +19,6 @@ public class Photo implements Comparable<Photo> {
     License license;
     boolean outdated;
 
-    private Long getCreatedAtEpochMilli() {
-        return createdAt != null ? createdAt.toEpochMilli() : null;
-    }
-    
     @Override
     public int compareTo(@NotNull Photo o) {
         if (primary && !o.isPrimary()) {

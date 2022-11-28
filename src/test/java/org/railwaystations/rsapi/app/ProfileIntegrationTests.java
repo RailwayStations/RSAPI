@@ -13,6 +13,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
@@ -24,8 +25,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.verify;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = {RsapiApplication.class},
-        properties = {"server.error.include-message=always", "spring.jackson.default-property-inclusion=non_null"})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = {"server.error.include-message=always"})
 @ActiveProfiles("test")
 class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
 
@@ -57,7 +58,7 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
                         }
                         """, headers), String.class);
 
-        assertThat(response.getStatusCodeValue()).isEqualTo(202);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
 
         verify(mailer, Mockito.times(1))
                 .send(eq("nick.name@example.com"),
@@ -93,7 +94,7 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
                         	"link": "link"
                         }""", headers), String.class);
 
-        assertThat(response.getStatusCodeValue()).isEqualTo(409);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
     }
 
     @Test
@@ -104,28 +105,28 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
         headers.add("Upload-Token", "wrong");
         var response = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
 
-        assertThat(response.getStatusCodeValue()).isEqualTo(401);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
-    void getMyProfileWithEmail() throws IOException {
+    void getMyProfileWithEmailAndUploadToken() throws IOException {
         var headers = new HttpHeaders();
         headers.add("Upload-Token", "uON60I7XWTIN");
         headers.add("Email", "user10@example.com");
         var response = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
 
-        assertThat(response.getStatusCodeValue()).isEqualTo(200);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertProfile(response, "@user10", "https://www.example.com/user10", false, "user10@example.com");
     }
 
     @Test
-    void getMyProfileWithName() throws IOException {
+    void getMyProfileWithNameAndUploadToken() throws IOException {
         var headers = new HttpHeaders();
         headers.add("Upload-Token", "uON60I7XWTIN");
         headers.add("Email", "@user10");
         var response = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
 
-        assertThat(response.getStatusCodeValue()).isEqualTo(200);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertProfile(response, "@user10", "https://www.example.com/user10", false, "user10@example.com");
     }
 
@@ -134,7 +135,7 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
         var response = restTemplate.withBasicAuth("@user10", "uON60I7XWTIN")
                 .getForEntity(String.format("http://localhost:%d%s", port, "/myProfile"), String.class);
 
-        assertThat(response.getStatusCodeValue()).isEqualTo(200);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertProfile(response, "@user10", "https://www.example.com/user10", false, "user10@example.com");
     }
 
@@ -143,7 +144,7 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
         var response = restTemplate.withBasicAuth("@user27", "y89zFqkL6hro")
                 .getForEntity(String.format("http://localhost:%d%s", port, "/myProfile"), String.class);
 
-        assertThat(response.getStatusCodeValue()).isEqualTo(200);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertProfile(response, "@user27", "https://www.example.com/user27", false, null);
     }
 
@@ -152,7 +153,7 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
         var response = restTemplate.withBasicAuth("@user27", "blahblubb")
                 .getForEntity(String.format("http://localhost:%d%s", port, "/myProfile"), String.class);
 
-        assertThat(response.getStatusCodeValue()).isEqualTo(401);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     private void assertProfile(ResponseEntity<String> response, String name, String link, boolean anonymous, String email) throws IOException {
@@ -181,7 +182,7 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
         headers.add("Upload-Token", firstPassword);
         headers.add("Email", "user14@example.com");
         var responseGetBefore = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
-        assertThat(responseGetBefore.getStatusCodeValue()).isEqualTo(200);
+        assertThat(responseGetBefore.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseGetBefore.getBody()).isNotNull();
         assertProfile(responseGetBefore, "@user14", "https://www.example.com/user14", false, "user14@example.com");
 
@@ -195,14 +196,13 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
                         	"photoOwner": true,
                         	"anonymous": true
                         }""", headers), String.class);
-        assertThat(responsePostUpdate.getStatusCodeValue()).isEqualTo(200);
+        assertThat(responsePostUpdate.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responsePostUpdate.getBody()).isNotNull();
 
         var responseGetAfter = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
-        assertThat(responseGetAfter.getStatusCodeValue()).isEqualTo(200);
+        assertThat(responseGetAfter.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseGetAfter.getBody()).isNotNull();
         assertProfile(responseGetAfter, "user14", null, true, "user14@example.com");
-
 
         var secondPassword = "!\"$%&/()=?-1234567890";
         changePassword(firstPassword, secondPassword, true);
@@ -226,15 +226,15 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
 
         var responseChangePassword = restTemplate.postForEntity(
                 String.format("http://localhost:%d%s", port, "/changePassword"), changePasswordRequest, String.class);
-        assertThat(responseChangePassword.getStatusCodeValue()).isEqualTo(200);
+        assertThat(responseChangePassword.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         var responseAfterChangedPassword = restTemplate
                 .withBasicAuth("user14@example.com", newPassword)
                 .getForEntity(String.format("http://localhost:%d%s", port, "/myProfile"), String.class);
-        assertThat(responseAfterChangedPassword.getStatusCodeValue()).isEqualTo(200);
+        assertThat(responseAfterChangedPassword.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         var responseWithOldPassword = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
-        assertThat(responseWithOldPassword.getStatusCodeValue()).isEqualTo(401);
+        assertThat(responseWithOldPassword.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
 }

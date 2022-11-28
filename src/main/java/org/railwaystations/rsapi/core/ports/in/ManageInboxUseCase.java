@@ -1,5 +1,6 @@
 package org.railwaystations.rsapi.core.ports.in;
 
+import jakarta.validation.constraints.NotNull;
 import org.railwaystations.rsapi.core.model.InboxCommand;
 import org.railwaystations.rsapi.core.model.InboxEntry;
 import org.railwaystations.rsapi.core.model.InboxResponse;
@@ -8,7 +9,6 @@ import org.railwaystations.rsapi.core.model.ProblemReport;
 import org.railwaystations.rsapi.core.model.PublicInboxEntry;
 import org.railwaystations.rsapi.core.model.User;
 
-import javax.validation.constraints.NotNull;
 import java.io.InputStream;
 import java.util.List;
 

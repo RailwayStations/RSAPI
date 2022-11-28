@@ -1,5 +1,7 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.railwaystations.rsapi.adapter.in.web.model.PhotoDto;
 import org.railwaystations.rsapi.adapter.in.web.model.PhotoLicenseDto;
 import org.railwaystations.rsapi.adapter.in.web.model.PhotoStationDto;
@@ -14,14 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import java.net.URI;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +31,7 @@ import java.util.function.Function;
 import static java.util.stream.Collectors.toMap;
 
 @RestController
+@Validated
 public class PhotoStationsController {
 
     @Autowired

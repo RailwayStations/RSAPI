@@ -1,10 +1,14 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.railwaystations.rsapi.adapter.in.web.ErrorHandlingControllerAdvice;
 import org.railwaystations.rsapi.adapter.in.web.writer.StatisticTxtWriter;
+import org.railwaystations.rsapi.adapter.out.db.CountryDao;
+import org.railwaystations.rsapi.adapter.out.db.StationDao;
+import org.railwaystations.rsapi.core.model.Country;
 import org.railwaystations.rsapi.core.model.Statistic;
-import org.railwaystations.rsapi.core.ports.in.GetStatisticUseCase;
+import org.railwaystations.rsapi.core.services.StatisticService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -12,6 +16,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
+
+import java.util.Optional;
 
 import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
 import static org.mockito.Mockito.when;
@@ -21,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = StatisticController.class)
-@ContextConfiguration(classes={WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class, StatisticTxtWriter.class})
+@ContextConfiguration(classes = {WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class, StatisticTxtWriter.class, StatisticService.class})
 @AutoConfigureMockMvc(addFilters = false)
 class StatisticControllerTest {
 
@@ -29,7 +35,15 @@ class StatisticControllerTest {
     private MockMvc mvc;
 
     @MockBean
-    private GetStatisticUseCase getStatisticUseCase;
+    private StationDao stationDao;
+
+    @MockBean
+    private CountryDao countryDao;
+
+    @BeforeEach
+    void setup() {
+        when(countryDao.findById("de")).thenReturn(Optional.of(Country.builder().name("de").build()));
+    }
 
     @Test
     void whenCountryIsInvalidThenReturnsStatus400() throws Exception {
@@ -40,7 +54,7 @@ class StatisticControllerTest {
 
     @Test
     void statisticAllJson() throws Exception {
-        when(getStatisticUseCase.getStatistic(null)).thenReturn(new Statistic(null, 954, 91, 6));
+        when(stationDao.getStatistic(null)).thenReturn(new Statistic(null, 954, 91, 6));
 
         mvc.perform(get("/stats.json"))
                 .andExpect(status().isOk())
@@ -58,7 +72,7 @@ class StatisticControllerTest {
 
     @Test
     void statisticDeJson() throws Exception {
-        when(getStatisticUseCase.getStatistic("de")).thenReturn(new Statistic("de", 729, 84, 4));
+        when(stationDao.getStatistic("de")).thenReturn(new Statistic("de", 729, 84, 4));
 
         mvc.perform(get("/de/stats.json"))
                 .andExpect(status().isOk())
@@ -72,19 +86,19 @@ class StatisticControllerTest {
 
     @Test
     void statisticDeTxt() throws Exception {
-        when(getStatisticUseCase.getStatistic("de")).thenReturn(new Statistic("de", 729, 84, 4));
+        when(stationDao.getStatistic("de")).thenReturn(new Statistic("de", 729, 84, 4));
 
         mvc.perform(get("/de/stats.txt"))
-            .andExpect(status().isOk())
-            .andExpect(validOpenApi())
-            .andExpect(content().string("""
-                  name	value
-                  total	729
-                  withPhoto	84
-                  withoutPhoto	645
-                  photographers	4
-                  countryCode	de
-                  """));
+                .andExpect(status().isOk())
+                .andExpect(validOpenApi())
+                .andExpect(content().string("""
+                        name	value
+                        total	729
+                        withPhoto	84
+                        withoutPhoto	645
+                        photographers	4
+                        countryCode	de
+                        """));
     }
 
 }

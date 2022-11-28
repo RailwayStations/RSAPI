@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20221004.2100"
+  version: "20221126.2100"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -281,9 +281,9 @@ paths:
         400:
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                type: object
         404:
           description: Country not found
           content: { }
@@ -309,9 +309,9 @@ paths:
         400:
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                type: object
         404:
           description: Country not found
           content: { }
@@ -337,9 +337,9 @@ paths:
         400:
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                type: object
         404:
           description: Country not found
           content: { }
@@ -367,9 +367,9 @@ paths:
         400:
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                type: object
 
   /photographers.json:
     get:
@@ -391,9 +391,9 @@ paths:
         400:
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                type: object
 
   /photographers.txt:
     get:
@@ -415,9 +415,9 @@ paths:
         400:
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                type: object
 
   /{country}/stats:
     get:
@@ -443,9 +443,9 @@ paths:
         400:
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                type: object
         404:
           description: Country not found
           content: { }
@@ -471,9 +471,9 @@ paths:
         400:
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                type: object
         404:
           description: Country not found
           content: { }
@@ -499,9 +499,9 @@ paths:
         400:
           description: Bad Request
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                type: object
         404:
           description: Country not found
           content: { }
@@ -1164,7 +1164,7 @@ components:
       deprecated: true
       required: false
       schema:
-        type: string      
+        type: string
     Email:
       name: Email
       in: header
@@ -1174,7 +1174,7 @@ components:
       deprecated: true
       required: false
       schema:
-        type: string    
+        type: string
 
   schemas:
     PhotoStations:

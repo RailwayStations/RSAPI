@@ -24,6 +24,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.util.Optional;
@@ -48,7 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = ProfileController.class, properties = {"mailVerificationUrl=EMAIL_VERIFICATION_URL"})
-@ContextConfiguration(classes={WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class, MockMvcTestConfiguration.class, WebSecurityConfig.class})
+@ContextConfiguration(classes = {WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class, MockMvcTestConfiguration.class, WebSecurityConfig.class})
 @Import({ProfileService.class, RSUserDetailsService.class, RSAuthenticationProvider.class, LazySodiumPasswordEncoder.class})
 @ActiveProfiles("mockMvcTest")
 class ProfileControllerTest {
@@ -113,22 +114,22 @@ class ProfileControllerTest {
 
     private void assertNewPasswordEmail() {
         verify(mailer, times(1))
-            .send(anyString(),
-                anyString(),matches("""
-                    Hello,
-                    
-                    your new password is: .*
-                    
-                    Cheers
-                    Your Railway-Stations-Team
-                    
-                    ---
-                    Hallo,
-                    
-                    Dein neues Passwort lautet: .*
-                    
-                    Viele Grüße
-                    Dein Bahnhofsfoto-Team"""));
+                .send(anyString(),
+                        anyString(), matches("""
+                                Hello,
+                                                    
+                                your new password is: .*
+                                                    
+                                Cheers
+                                Your Railway-Stations-Team
+                                                    
+                                ---
+                                Hallo,
+                                                    
+                                Dein neues Passwort lautet: .*
+                                                    
+                                Viele Grüße
+                                Dein Bahnhofsfoto-Team"""));
     }
 
     @Test
@@ -151,22 +152,22 @@ class ProfileControllerTest {
 
     private void assertVerificationEmail() {
         verify(mailer, times(1))
-            .send(anyString(),
-                anyString(),matches("""
-                    Hello,
+                .send(anyString(),
+                        anyString(), matches("""
+                                Hello,
 
-                    please click on EMAIL_VERIFICATION_URL.* to verify your eMail-Address.
+                                please click on EMAIL_VERIFICATION_URL.* to verify your eMail-Address.
 
-                    Cheers
-                    Your Railway-Stations-Team
+                                Cheers
+                                Your Railway-Stations-Team
 
-                    ---
-                    Hallo,
+                                ---
+                                Hallo,
 
-                    bitte klicke auf EMAIL_VERIFICATION_URL.*, um Deine eMail-Adresse zu verifizieren.
+                                bitte klicke auf EMAIL_VERIFICATION_URL.*, um Deine eMail-Adresse zu verifizieren.
 
-                    Viele Grüße
-                    Dein Bahnhofsfoto-Team"""));
+                                Viele Grüße
+                                Dein Bahnhofsfoto-Team"""));
     }
 
     @Test
@@ -248,7 +249,7 @@ class ProfileControllerTest {
     void testChangePasswordTooShortHeader() throws Exception {
         givenExistingUser();
 
-        postChangePassword("secret", "")
+        postChangePassword("secret", null)
                 .andExpect(status().isBadRequest());
 
         verify(userDao, never()).updateCredentials(anyInt(), anyString());
@@ -256,22 +257,30 @@ class ProfileControllerTest {
 
     @NotNull
     private ResultActions postChangePassword(String newPasswordHeader, String newPasswordBody) throws Exception {
-        return mvc.perform(post("/changePassword")
-                        .header("User-Agent", "UserAgent")
-                        .header("New-Password", newPasswordHeader)
-                        .contentType("application/json")
-                        .content(newPasswordBody)
-                        .secure(true)
-                        .with(basicHttpAuthForExistingUser())
-                        .with(csrf()))
-                .andExpect(validOpenApi());
+        MockHttpServletRequestBuilder action = post("/changePassword")
+                .header("User-Agent", "UserAgent")
+                .secure(true)
+                .with(basicHttpAuthForExistingUser())
+                .with(csrf());
+
+        if (newPasswordHeader != null) {
+            action = action.header("New-Password", newPasswordHeader);
+        }
+
+        if (newPasswordBody != null) {
+            action = action.contentType("application/json")
+                    .content(newPasswordBody);
+
+        }
+
+        return mvc.perform(action).andExpect(validOpenApi());
     }
 
     @Test
     void testChangePasswordTooShortBody() throws Exception {
         givenExistingUser();
 
-        postChangePassword("", "{\"newPassword\": \"secret\"}")
+        postChangePassword(null, "{\"newPassword\": \"secret\"}")
                 .andExpect(status().isBadRequest());
 
         verify(userDao, never()).updateCredentials(anyInt(), anyString());
@@ -282,7 +291,7 @@ class ProfileControllerTest {
     void testChangePasswordHeader() throws Exception {
         givenExistingUser();
 
-        postChangePassword("secretlong", "")
+        postChangePassword("secretlong", null)
                 .andExpect(status().isOk());
 
         var idCaptor = ArgumentCaptor.forClass(Integer.class);
@@ -297,7 +306,7 @@ class ProfileControllerTest {
     void testChangePasswordBody() throws Exception {
         givenExistingUser();
 
-        postChangePassword("", "{\"newPassword\": \"secretlong\"}")
+        postChangePassword(null, "{\"newPassword\": \"secretlong\"}")
                 .andExpect(status().isOk());
 
         var idCaptor = ArgumentCaptor.forClass(Integer.class);

@@ -1,5 +1,6 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.railwaystations.rsapi.adapter.in.web.model.ChangePasswordDto;
 import org.railwaystations.rsapi.adapter.in.web.model.LicenseDto;
@@ -17,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,22 +26,29 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.constraints.NotNull;
 import java.net.URI;
 
 @RestController
 @Slf4j
+@Validated
 public class ProfileController {
 
     @Autowired
     private ManageProfileUseCase manageProfileUseCase;
 
-    @PostMapping("/changePassword")
+    @PostMapping(value = "/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> changePassword(@AuthenticationPrincipal AuthUser authUser,
-                                                 @RequestHeader(value = "New-Password", required = false) String newPassword,
-                                                 @RequestBody(required = false) ChangePasswordDto changePasswordDto) {
-        manageProfileUseCase.changePassword(authUser.getUser(), changePasswordDto != null ? changePasswordDto.getNewPassword() : newPassword);
+                                                 @RequestBody ChangePasswordDto changePasswordDto) {
+        manageProfileUseCase.changePassword(authUser.getUser(), changePasswordDto.getNewPassword());
+        return ResponseEntity.ok("Password changed");
+    }
+
+    @PostMapping(value = "/changePassword")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<String> changePassword(@AuthenticationPrincipal AuthUser authUser,
+                                                 @RequestHeader(value = "New-Password") String newPassword) {
+        manageProfileUseCase.changePassword(authUser.getUser(), newPassword);
         return ResponseEntity.ok("Password changed");
     }
 
