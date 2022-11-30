@@ -39,7 +39,7 @@ public interface StationDao {
                 LEFT JOIN users u ON u.id = p.photographerId
             """;
 
-    @SqlQuery(JOIN_QUERY + " WHERE s.countryCode IN (<countryCodes>) AND ((s.active = true AND :active IS NULL) OR s.active = :active) AND (:hasPhoto IS NULL OR (p.urlPath IS NULL AND :hasPhoto = false) OR (p.urlPath IS NOT NULL AND :hasPhoto = true))")
+    @SqlQuery(JOIN_QUERY + " WHERE s.countryCode IN (<countryCodes>) AND (:active IS NULL OR s.active = :active) AND (:hasPhoto IS NULL OR (p.urlPath IS NULL AND :hasPhoto = false) OR (p.urlPath IS NOT NULL AND :hasPhoto = true))")
     @RegisterRowMapper(StationMapper.class)
     Set<Station> findByCountryCodes(@BindList("countryCodes") Set<String> countryCodes, @Bind("hasPhoto") Boolean hasPhoto, @Bind("active") Boolean active);
 
