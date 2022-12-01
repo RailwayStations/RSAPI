@@ -774,7 +774,7 @@
         </addColumn>
     </changeSet>
 
-    <changeSet id="44" author="pstorch">
+    <changeSet id="44" author="pstorch" context="junit or test">
         <insert tableName="stations">
             <column name="id" value="Z1191"/>
             <column name="countryCode" value="de"/>
