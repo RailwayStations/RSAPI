@@ -774,4 +774,15 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="44" author="pstorch">
+        <insert tableName="stations">
+            <column name="id" value="Z1191"/>
+            <column name="countryCode" value="de"/>
+            <column name="title" value="Inaktiver Bahnhof"/>
+            <column name="lat" valueNumeric="50.290996091106"/>
+            <column name="lon" valueNumeric="9.287252426147"/>
+            <column name="active" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>

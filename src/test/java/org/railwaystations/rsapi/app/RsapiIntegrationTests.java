@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.railwaystations.rsapi.adapter.in.web.model.PhotoLicenseDto;
 import org.railwaystations.rsapi.adapter.in.web.model.PhotoStationDto;
@@ -75,7 +76,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
     @Test
     void stationsAllCountries() {
         var stations = assertLoadStationsOk("/stations");
-        assertThat(stations.length).isEqualTo(954);
+        assertThat(stations.length).isEqualTo(955);
         assertThat(findByKey(stations, new Station.Key("de", "6721"))).isNotNull();
         assertThat(findByKey(stations, new Station.Key("ch", "8500126"))).isNotNull();
     }
@@ -141,6 +142,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         var photoStationsDto = response.getBody();
         assertThat(photoStationsDto).isNotNull();
+        assertThat(photoStationsDto.getStations()).hasSize(730);
         assertThat(photoStationsDto.getStations())
                 .anyMatch(photoStationDto -> photoStationDto.getCountry().equals("de") && photoStationDto.getId().equals("6721"));
         assertThat(photoStationsDto.getStations())
@@ -151,6 +153,23 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         assertThat(stationWithPhoto).isPresent();
         assertThat(photoStationsDto.getLicenses()).anyMatch(photoLicenseDto -> photoLicenseDto.getId().equals(stationWithPhoto.get().getPhotos().get(0).getLicense()));
         assertThat(photoStationsDto.getPhotographers()).anyMatch(photographerDto -> photographerDto.getName().equals(stationWithPhoto.get().getPhotos().get(0).getPhotographer()));
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+            "true,  729",
+            "false, 1",
+    })
+    void photoStationsByCountryDeActive(boolean active, int numberOfStations) {
+        var response = restTemplate.getForEntity(String.format("http://localhost:%d/photoStationsByCountry/de?isActive=" + active, port),
+                PhotoStationsDto.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        var photoStationsDto = response.getBody();
+        assertThat(photoStationsDto).isNotNull();
+        assertThat(photoStationsDto.getStations()).hasSize(numberOfStations);
+        assertThat(photoStationsDto.getStations())
+                .allMatch(photoStationDto -> photoStationDto.getCountry().equals("de") && photoStationDto.getInactive() != active);
     }
 
     @Test
@@ -348,7 +367,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         var jsonNode = mapper.readTree(response.getBody());
         assertThat(jsonNode).isNotNull();
         assertThat(jsonNode.isArray()).isTrue();
-        assertThat(jsonNode.size()).isEqualTo(729);
+        assertThat(jsonNode.size()).isEqualTo(730);
     }
 
     StationDto[] assertLoadStationsOk(String path) {
@@ -410,9 +429,9 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         var response = loadRaw("/de/stats.json", HttpStatus.OK, String.class);
         var jsonNode = mapper.readTree(response.getBody());
         assertThat(jsonNode).isNotNull();
-        assertThat(jsonNode.get("total").asInt()).isEqualTo(729);
+        assertThat(jsonNode.get("total").asInt()).isEqualTo(730);
         assertThat(jsonNode.get("withPhoto").asInt()).isEqualTo(84);
-        assertThat(jsonNode.get("withoutPhoto").asInt()).isEqualTo(645);
+        assertThat(jsonNode.get("withoutPhoto").asInt()).isEqualTo(646);
         assertThat(jsonNode.get("photographers").asInt()).isEqualTo(4);
         assertThat(jsonNode.get("countryCode").asText()).isEqualTo("de");
     }
