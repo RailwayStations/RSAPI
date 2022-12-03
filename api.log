@@ -1,5 +1,15 @@
 GET /.env
 GET /.svn
+GET /1index.php
+GET /1index.php?f=
+GET /2index.php
+GET /2index.php?f=
+GET /3index.php
+GET /3index.php?f=
+GET /2018/wp-includes/wlwmanifest.xml
+GET /2019/wp-includes/wlwmanifest.xml
+GET /2020/wp-includes/wlwmanifest.xml
+GET /2021/wp-includes/wlwmanifest.xml
 GET /about
 GET /abruzi.php4
 GET /admin.php
@@ -56,6 +66,7 @@ GET /old/
 GET /old-index.php
 GET /plugins/content/apismtp/apismtp.php.suspected?test=
 GET /plugins/content/apismtp/apismtp.php?test=
+GET /pl/
 GET /portal/      
 GET /robots.txt
 GET /server-status
