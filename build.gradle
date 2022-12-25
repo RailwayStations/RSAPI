@@ -68,6 +68,8 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-jdbc"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
+    implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server"
+    implementation "org.springframework.security:spring-security-oauth2-authorization-server:1.0.0"
     implementation 'org.liquibase:liquibase-core:4.19.0'
     implementation "org.jdbi:jdbi3-spring5:$jdbiVersion"
     implementation "org.jdbi:jdbi3-sqlobject:$jdbiVersion"
@@ -85,7 +87,6 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     runtimeOnly "org.mariadb.jdbc:mariadb-java-client:3.1.2"
-    runtimeOnly "org.springframework.boot:spring-boot-properties-migrator"
 
     testImplementation "org.springframework.boot:spring-boot-starter-test"
     testImplementation "org.springframework.security:spring-security-test"
