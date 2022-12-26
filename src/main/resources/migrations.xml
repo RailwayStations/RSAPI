@@ -792,4 +792,25 @@
         </update>
     </changeSet>
 
+    <changeSet id="46" author="pstorch">
+        <sqlFile path="oauth2-authorization-schema.sql"
+                 relativeToChangelogFile="true"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+
+    <changeSet id="47" author="pstorch">
+        <sqlFile path="oauth2-authorization-consent-schema.sql"
+                 relativeToChangelogFile="true"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+
+    <changeSet id="48" author="pstorch">
+        <sqlFile path="oauth2-registered-client-schema.sql"
+                 relativeToChangelogFile="true"
+                 splitStatements="true"
+                 stripComments="true"/>
+    </changeSet>
+
 </databaseChangeLog>

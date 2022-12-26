@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import java.io.Serial;
 import java.util.Collection;
 
+
 public class AuthUser extends org.springframework.security.core.userdetails.User {
 
     @Serial
