@@ -29,10 +29,9 @@ server:
 logging:
   level:
     root: DEBUG
-    org.springframework.web: DEBUG
-    org.springframework.security: DEBUG
-    org.springframework.security.oauth2: DEBUG
-    org.springframework.boot.autoconfigure: DEBUG
+    org.springframework.security: INFO
+    org.springframework.security.oauth2: INFO
+    org.springframework.boot.autoconfigure: INFO
 
 management:
   server:
@@ -49,6 +48,7 @@ keepFileCopiesInDays: 60
 photoBaseUrl: http://localhost:8080/photos
 inboxBaseUrl: http://localhost:8080/inbox
 mailVerificationUrl: http://localhost:8088/emailVerification.php?token=
+jwkSourceKeyFile: jwkSourceTestKeys.json
 
 # mailer
 mailer:

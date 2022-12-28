@@ -14,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.authentication.NullRememberMeServices;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.www.BasicAuthenticationConverter;
@@ -22,8 +23,8 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.Instant;
 
-@SuppressWarnings("PMD.BeanMembersShouldSerialize")
 public class RSAuthenticationFilter extends OncePerRequestFilter {
 
     private SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder
@@ -37,8 +38,11 @@ public class RSAuthenticationFilter extends OncePerRequestFilter {
 
     private SecurityContextRepository securityContextRepository = new RequestAttributeSecurityContextRepository();
 
-    public RSAuthenticationFilter(AuthenticationManager authenticationManager) {
+    private final JwtDecoder jwtDecoder;
+
+    public RSAuthenticationFilter(AuthenticationManager authenticationManager, JwtDecoder jwtDecoder) {
         this.authenticationManager = authenticationManager;
+        this.jwtDecoder = jwtDecoder;
     }
 
     public void setSecurityContextRepository(SecurityContextRepository securityContextRepository) {
@@ -61,10 +65,14 @@ public class RSAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain)
             throws ServletException, IOException {
-        var authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+        var authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         UsernamePasswordAuthenticationToken authentication = null;
-        if (StringUtils.isNotBlank(authorization)) {
-            authentication = authenticationConverter.convert(request);
+        if (StringUtils.isNotBlank(authorizationHeader)) {
+            if (authorizationHeader.startsWith("Bearer ")) {
+                authentication = getJwtAuthentication(authorizationHeader);
+            } else if (authorizationHeader.startsWith("Basic ")) {
+                authentication = authenticationConverter.convert(request);
+            }
         }
 
         if (authentication == null) {
@@ -98,6 +106,23 @@ public class RSAuthenticationFilter extends OncePerRequestFilter {
         }
 
         chain.doFilter(request, response);
+    }
+
+    private UsernamePasswordAuthenticationToken getJwtAuthentication(String authorizationHeader) {
+        try {
+            var jwtToken = authorizationHeader.substring(7);
+            var jwt = jwtDecoder.decode(jwtToken);
+            if (jwt.getIssuer().toString().equals(WebSecurityConfig.ISSUER)
+                    && jwt.getIssuedAt() != null && Instant.now().isAfter(jwt.getIssuedAt())
+                    && jwt.getExpiresAt() != null && Instant.now().isBefore(jwt.getExpiresAt())) {
+                var user = jwt.getSubject();
+                return new UsernamePasswordAuthenticationToken(user, jwt);
+            }
+            return null;
+        } catch (Exception e) {
+            logger.error("Failed to parse JWT Bearer token", e);
+        }
+        return null;
     }
 
 }

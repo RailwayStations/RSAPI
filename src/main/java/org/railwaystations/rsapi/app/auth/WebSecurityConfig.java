@@ -6,9 +6,12 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -37,8 +40,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
@@ -48,8 +53,10 @@ import java.util.UUID;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@Slf4j
 public class WebSecurityConfig {
 
+    public static final String ISSUER = "https://railway-stations.org";
     @Autowired
     private RSAuthenticationProvider authenticationProvider;
 
@@ -58,6 +65,7 @@ public class WebSecurityConfig {
 
     @Bean
     @Order(1)
+    @Profile("!mockMvcTest")
     public SecurityFilterChain oauthFilterChain(HttpSecurity http)
             throws Exception {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
@@ -76,6 +84,7 @@ public class WebSecurityConfig {
 
     @Bean
     @Order(2)
+    @Profile("!mockMvcTest")
     public SecurityFilterChain loginFilterChain(HttpSecurity http)
             throws Exception {
         http
@@ -93,7 +102,7 @@ public class WebSecurityConfig {
 
     @Bean
     @Order(3)
-    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain apiFilterChain(HttpSecurity http, JwtDecoder jwtDecoder) throws Exception {
         var authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class)
                 .authenticationProvider(authenticationProvider);
         authenticationManagerBuilder.userDetailsService(userDetailsService);
@@ -113,23 +122,24 @@ public class WebSecurityConfig {
                 .exceptionHandling()
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 .and()
-                .addFilterBefore(uploadTokenAuthenticationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new BasicAuthenticationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(uploadTokenAuthenticationFilter(authenticationManager, jwtDecoder), UsernamePasswordAuthenticationFilter.class)
                 .authenticationManager(authenticationManager);
 
         return http.build();
     }
 
-    public RSAuthenticationFilter uploadTokenAuthenticationFilter(AuthenticationManager authenticationManager) {
-        return new RSAuthenticationFilter(authenticationManager);
+    public RSAuthenticationFilter uploadTokenAuthenticationFilter(AuthenticationManager authenticationManager, JwtDecoder jwtDecoder) {
+        return new RSAuthenticationFilter(authenticationManager, jwtDecoder);
     }
 
     @Bean
+    @Profile("!mockMvcTest")
     public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
         return new JdbcRegisteredClientRepository(jdbcTemplate);
     }
 
     @Bean
+    @Profile("!mockMvcTest")
     public OAuth2AuthorizationService authorizationService(JdbcTemplate jdbcTemplate, RegisteredClientRepository registeredClientRepository) {
         var service = new JdbcOAuth2AuthorizationService(jdbcTemplate, registeredClientRepository);
         var rowMapper = new JdbcOAuth2AuthorizationService.OAuth2AuthorizationRowMapper(registeredClientRepository);
@@ -147,19 +157,35 @@ public class WebSecurityConfig {
     }
 
     @Bean
+    @Profile("!mockMvcTest")
     public OAuth2AuthorizationConsentService authorizationConsentService(JdbcTemplate jdbcTemplate, RegisteredClientRepository registeredClientRepository) {
         return new JdbcOAuth2AuthorizationConsentService(jdbcTemplate, registeredClientRepository);
     }
 
     @Bean
-    public JWKSource<SecurityContext> jwkSource() {
-        var keyPair = generateRsaKey();
-        var publicKey = (RSAPublicKey) keyPair.getPublic();
-        var privateKey = (RSAPrivateKey) keyPair.getPrivate();
-        var rsaKey = new RSAKey.Builder(publicKey)
-                .privateKey(privateKey)
-                .keyID(UUID.randomUUID().toString())
-                .build();
+    public JWKSource<SecurityContext> jwkSource(@Value("${jwkSourceKeyFile}") String jwkSourceKeyFile) {
+        RSAKey rsaKey = null;
+        if (jwkSourceKeyFile != null) {
+            try {
+                var path = Path.of(jwkSourceKeyFile);
+                var json = Files.readString(path, Charset.defaultCharset());
+                rsaKey = RSAKey.parse(json);
+            } catch (Exception e) {
+                log.error("Error loading jwkSourceKeyFile from " + jwkSourceKeyFile, e);
+            }
+        }
+
+        if (rsaKey == null) {
+            log.info("Generating new RSAKey for jwkSource");
+            var keyPair = generateRsaKey();
+            var publicKey = (RSAPublicKey) keyPair.getPublic();
+            var privateKey = (RSAPrivateKey) keyPair.getPrivate();
+            rsaKey = new RSAKey.Builder(publicKey)
+                    .privateKey(privateKey)
+                    .keyID(UUID.randomUUID().toString())
+                    .build();
+            //System.out.println(rsaKey.toJSONString());
+        }
         var jwkSet = new JWKSet(rsaKey);
         return new ImmutableJWKSet<>(jwkSet);
     }
@@ -183,9 +209,10 @@ public class WebSecurityConfig {
     }
 
     @Bean
+    @Profile("!mockMvcTest")
     public AuthorizationServerSettings authorizationServerSettings() {
         return AuthorizationServerSettings.builder()
-                .issuer("https://railway-stations.org")
+                .issuer(ISSUER)
                 .build();
     }
 
