@@ -2,6 +2,7 @@ package org.railwaystations.rsapi.app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
+import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.railwaystations.rsapi.core.ports.out.Mailer;
@@ -16,9 +17,14 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -146,6 +152,72 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertProfile(response, "@user27", "https://www.example.com/user27", false, null);
+    }
+
+    @Test
+    void getMyProfileWithOAuth() throws IOException {
+        var headers = new HttpHeaders();
+        var response = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/oauth2/authorize?client_id=testClientId&scope=all&response_type=code&redirect_uri=http://127.0.0.1:8000/authorized"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        var pattern = Pattern.compile("<input name=\"_csrf\" type=\"hidden\" value=\"(.*)\" />");
+        var matcher = pattern.matcher(response.getBody());
+        assertThat(matcher.find()).isTrue();
+        var csrfToken = matcher.group(1);
+
+        var map = new LinkedMultiValueMap<String, String>();
+        map.add("username", "@user27");
+        map.add("password", "y89zFqkL6hro");
+        map.add("_csrf", csrfToken);
+
+        headers.add("Cookie", response.getHeaders().get("Set-Cookie").get(0));
+
+        response = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/login"), HttpMethod.POST, new HttpEntity<>(map, headers), String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
+
+        headers.clear();
+        headers.add("Cookie", response.getHeaders().get("Set-Cookie").get(0));
+
+        var nonRedirectingRestTemplate = nonRedirectingRestTemplate();
+        response = nonRedirectingRestTemplate.exchange(String.format("http://localhost:%d%s", port, "/oauth2/authorize?client_id=testClientId&scope=all&response_type=code&continue&redirect_uri=http://127.0.0.1:8000/authorized"), HttpMethod.GET, new HttpEntity<>(map, headers), String.class);
+        var location = response.getHeaders().get("Location").get(0);
+        assertThat(location).startsWith("http://127.0.0.1:8000/authorized?code=");
+        var code = location.substring(38);
+
+        map.add("grant_type", "authorization_code");
+        map.add("code", code);
+        map.add("redirect_uri", "http://127.0.0.1:8000/authorized");
+        map.add("client_id", "testClientId");
+        response = restTemplate.withBasicAuth("testClientId", "secret")
+                .exchange(String.format("http://localhost:%d%s", port, "/oauth2/token"), HttpMethod.POST, new HttpEntity<>(map, headers), String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        var jsonNode = mapper.readTree(response.getBody());
+        var accessToken = jsonNode.get("access_token").asText();
+        assertThat(accessToken).isNotNull();
+        assertThat(jsonNode.get("refresh_token").asText()).isNotNull();
+        assertThat(jsonNode.get("scope").asText()).isEqualTo("all");
+        assertThat(jsonNode.get("token_type").asText()).isEqualTo("Bearer");
+        assertThat(jsonNode.get("expires_in").asInt()).isNotNull();
+
+        headers.add("Authorization", "Bearer " + accessToken);
+        response = nonRedirectingRestTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(map, headers), String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertProfile(response, "@user27", "https://www.example.com/user27", false, null);
+    }
+
+    private RestTemplate nonRedirectingRestTemplate() {
+        var restTemplate = new RestTemplate();
+        var factory =
+                new SimpleClientHttpRequestFactory() {
+                    public void prepareConnection(@NotNull HttpURLConnection connection, @NotNull String httpMethod) throws IOException {
+                        super.prepareConnection(connection, httpMethod);
+                        connection.setInstanceFollowRedirects(false);
+                    }
+                };
+
+        restTemplate.setRequestFactory(factory);
+        return restTemplate;
     }
 
     @Test
