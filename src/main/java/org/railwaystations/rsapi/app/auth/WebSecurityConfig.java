@@ -41,14 +41,8 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
-import java.util.UUID;
+import static org.railwaystations.rsapi.utils.JwtUtil.generateRsaKey;
+import static org.railwaystations.rsapi.utils.JwtUtil.loadRsaKey;
 
 @Configuration
 @EnableWebSecurity
@@ -167,40 +161,18 @@ public class WebSecurityConfig {
         RSAKey rsaKey = null;
         if (jwkSourceKeyFile != null) {
             try {
-                var path = Path.of(jwkSourceKeyFile);
-                var json = Files.readString(path, Charset.defaultCharset());
-                rsaKey = RSAKey.parse(json);
+                rsaKey = loadRsaKey(jwkSourceKeyFile);
             } catch (Exception e) {
                 log.error("Error loading jwkSourceKeyFile from " + jwkSourceKeyFile, e);
             }
         }
 
         if (rsaKey == null) {
-            log.info("Generating new RSAKey for jwkSource");
-            var keyPair = generateRsaKey();
-            var publicKey = (RSAPublicKey) keyPair.getPublic();
-            var privateKey = (RSAPrivateKey) keyPair.getPrivate();
-            rsaKey = new RSAKey.Builder(publicKey)
-                    .privateKey(privateKey)
-                    .keyID(UUID.randomUUID().toString())
-                    .build();
-            //System.out.println(rsaKey.toJSONString());
+            log.warn("No jwkSourceKeyFile provided, generating new RSAKey for jwkSource");
+            rsaKey = generateRsaKey();
         }
         var jwkSet = new JWKSet(rsaKey);
         return new ImmutableJWKSet<>(jwkSet);
-    }
-
-    private static KeyPair generateRsaKey() {
-        KeyPair keyPair;
-        try {
-            KeyPairGenerator keyPairGenerator =
-                    KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(2048);
-            keyPair = keyPairGenerator.generateKeyPair();
-        } catch (Exception ex) {
-            throw new IllegalStateException(ex);
-        }
-        return keyPair;
     }
 
     @Bean
