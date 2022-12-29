@@ -1,5 +1,6 @@
 package org.railwaystations.rsapi.app;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 import jakarta.validation.constraints.NotNull;
@@ -18,12 +19,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -184,26 +188,68 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
         assertThat(location).startsWith("http://127.0.0.1:8000/authorized?code=");
         var code = location.substring(38);
 
-        map.add("grant_type", "authorization_code");
-        map.add("code", code);
-        map.add("redirect_uri", "http://127.0.0.1:8000/authorized");
-        map.add("client_id", "testClientId");
-        response = restTemplate.withBasicAuth("testClientId", "secret")
-                .exchange(String.format("http://localhost:%d%s", port, "/oauth2/token"), HttpMethod.POST, new HttpEntity<>(map, headers), String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        var jsonNode = mapper.readTree(response.getBody());
-        var accessToken = jsonNode.get("access_token").asText();
-        assertThat(accessToken).isNotNull();
-        assertThat(jsonNode.get("refresh_token").asText()).isNotNull();
-        assertThat(jsonNode.get("scope").asText()).isEqualTo("all");
-        assertThat(jsonNode.get("token_type").asText()).isEqualTo("Bearer");
-        assertThat(jsonNode.get("expires_in").asInt()).isNotNull();
+        // request myProfile with first token
+        var tokenResponse = requestToken(code, "authorization_code", HttpStatus.OK);
+        assertMyProfileRequestWithOAuthToken(tokenResponse);
 
-        headers.add("Authorization", "Bearer " + accessToken);
-        response = nonRedirectingRestTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(map, headers), String.class);
+        // request myProfile with refreshed token
+        tokenResponse = requestToken(tokenResponse.getRefreshToken().getTokenValue(), "refresh_token", HttpStatus.OK);
+        assertMyProfileRequestWithOAuthToken(tokenResponse);
 
+        // revoke refresh_token
+        revokeRefreshToken(tokenResponse.getRefreshToken().getTokenValue());
+        tokenResponse = requestToken(tokenResponse.getRefreshToken().getTokenValue(), "refresh_token", HttpStatus.BAD_REQUEST);
+        assertThat(tokenResponse).isNull();
+    }
+
+    private void assertMyProfileRequestWithOAuthToken(OAuth2AccessTokenResponse tokenResponse) throws IOException {
+        var headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + tokenResponse.getAccessToken().getTokenValue());
+        var response = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertProfile(response, "@user27", "https://www.example.com/user27", false, null);
+    }
+
+    private void revokeRefreshToken(String token) {
+        var map = new LinkedMultiValueMap<String, String>();
+        map.add("token", token);
+        map.add("token_type_hint", "refresh_token");
+        var response = restTemplate.withBasicAuth("testClientId", "secret")
+                .exchange(String.format("http://localhost:%d%s", port, "/oauth2/revoke"), HttpMethod.POST, new HttpEntity<>(map, new HttpHeaders()), String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    private OAuth2AccessTokenResponse requestToken(String code, String grantType, HttpStatus expectedHttpStatus) throws JsonProcessingException {
+        var map = new LinkedMultiValueMap<String, String>();
+        map.add("grant_type", grantType);
+        if ("refresh_token".equals(grantType)) {
+            map.add(grantType, code);
+        } else {
+            map.add("code", code);
+            map.add("client_id", "testClientId");
+            map.add("redirect_uri", "http://127.0.0.1:8000/authorized");
+        }
+        var response = restTemplate.withBasicAuth("testClientId", "secret")
+                .exchange(String.format("http://localhost:%d%s", port, "/oauth2/token"), HttpMethod.POST, new HttpEntity<>(map, new HttpHeaders()), String.class);
+        assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
+        if (expectedHttpStatus != HttpStatus.OK) {
+            return null;
+        }
+        var jsonNode = mapper.readTree(response.getBody());
+        var tokenResponseBuilder = OAuth2AccessTokenResponse.withToken(jsonNode.get("access_token").asText());
+        tokenResponseBuilder.refreshToken(jsonNode.get("refresh_token").asText());
+        tokenResponseBuilder.scopes(Set.of(jsonNode.get("scope").asText()));
+        var tokenType = jsonNode.get("token_type").asText();
+        assertThat(tokenType).isEqualTo("Bearer");
+        tokenResponseBuilder.tokenType(OAuth2AccessToken.TokenType.BEARER);
+        tokenResponseBuilder.expiresIn(jsonNode.get("expires_in").asInt());
+        var accessTokenResponse = tokenResponseBuilder.build();
+        assertThat(accessTokenResponse).isNotNull();
+        assertThat(accessTokenResponse.getAccessToken()).isNotNull();
+        assertThat(accessTokenResponse.getAccessToken().getScopes()).contains("all");
+        assertThat(accessTokenResponse.getAccessToken().getTokenType()).isEqualTo(OAuth2AccessToken.TokenType.BEARER);
+        assertThat(accessTokenResponse.getRefreshToken()).isNotNull();
+        return accessTokenResponse;
     }
 
     private RestTemplate nonRedirectingRestTemplate() {
