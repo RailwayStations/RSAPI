@@ -57,7 +57,7 @@ openApiGenerate {
 ext {
     testContainersVersion = '1.17.6'
     jdbiVersion = '3.36.0'
-    swaggerRequestValidatorVersion = '2.31.0'
+    swaggerRequestValidatorVersion = '2.31.1'
 }
 
 dependencies {
