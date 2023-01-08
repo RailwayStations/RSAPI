@@ -914,18 +914,45 @@
     <changeSet id="49" author="pstorch">
         <insert tableName="oauth2_registered_client">
             <column name="id" value="fe75349f-324d-4292-beb8-8179a0017b40"/>
-            <column name="client_id" value="rsAndroidDebug"/>
-            <column name="client_secret"
-                    value="246172676F6E32696424763D3139246D3D36353533362C743D322C703D3124723636696E497437472F41745537344847687259516724754B364C32314B68584935442B5047612F4C30524F7A6363785273576B794247762B46377852517039693400000000000000000000000000000000000000000000000000000000000000"/>
-            <column name="client_name" value="Railway-Stations Android App (debug)"/>
+            <column name="client_id" value="RailwayStationsAndroidApp"/>
+            <column name="client_secret" value=""/>
+            <column name="client_name" value="Railway-Stations Android App"/>
             <column name="client_authentication_methods" value="none"/>
-            <column name="authorization_grant_types" value="refresh_token,client_credentials,authorization_code"/>
-            <column name="redirect_uris" value="rsandroiddebug://authorized"/>
+            <column name="authorization_grant_types" value="authorization_code"/>
+            <column name="redirect_uris" value="railwaystations://de.bahnhoefe.deutschlands.bahnhofsfotos"/>
             <column name="scopes" value="all"/>
             <column name="client_settings"
-                    value="{&quot;@class&quot;:&quot;java.util.Collections$UnmodifiableMap&quot;,&quot;settings.client.require-proof-key&quot;:true,&quot;settings.client.require-authorization-consent&quot;:false}"/>
+                    value="{&quot;@class&quot;:&quot;java.util.Collections$UnmodifiableMap&quot;,&quot;settings.client.require-proof-key&quot;:true,&quot;settings.client.require-authorization-consent&quot;:true}"/>
             <column name="token_settings"
-                    value="{&quot;@class&quot;:&quot;java.util.Collections$UnmodifiableMap&quot;,&quot;settings.token.reuse-refresh-tokens&quot;:true,&quot;settings.token.id-token-signature-algorithm&quot;:[&quot;org.springframework.security.oauth2.jose.jws.SignatureAlgorithm&quot;,&quot;RS256&quot;],&quot;settings.token.access-token-time-to-live&quot;:[&quot;java.time.Duration&quot;,300.000000000],&quot;settings.token.access-token-format&quot;:{&quot;@class&quot;:&quot;org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat&quot;,&quot;value&quot;:&quot;self-contained&quot;},&quot;settings.token.refresh-token-time-to-live&quot;:[&quot;java.time.Duration&quot;,17280000.000000000],&quot;settings.token.authorization-code-time-to-live&quot;:[&quot;java.time.Duration&quot;,300.000000000]}"/>
+                    value="{&quot;@class&quot;:&quot;java.util.Collections$UnmodifiableMap&quot;,&quot;settings.token.reuse-refresh-tokens&quot;:true,&quot;settings.token.id-token-signature-algorithm&quot;:[&quot;org.springframework.security.oauth2.jose.jws.SignatureAlgorithm&quot;,&quot;RS256&quot;],&quot;settings.token.access-token-time-to-live&quot;:[&quot;java.time.Duration&quot;,17280000.000000000],&quot;settings.token.access-token-format&quot;:{&quot;@class&quot;:&quot;org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat&quot;,&quot;value&quot;:&quot;self-contained&quot;},&quot;settings.token.refresh-token-time-to-live&quot;:[&quot;java.time.Duration&quot;,300.000000000],&quot;settings.token.authorization-code-time-to-live&quot;:[&quot;java.time.Duration&quot;,300.000000000]}"/>
+        </insert>
+        <insert tableName="oauth2_registered_client">
+            <column name="id" value="159409d9-74c0-4028-bc93-7c9bc95a1a7b"/>
+            <column name="client_id" value="RailwayStationsAndroidAppDebug"/>
+            <column name="client_secret" value=""/>
+            <column name="client_name" value="Railway-Stations Android App (debug)"/>
+            <column name="client_authentication_methods" value="none"/>
+            <column name="authorization_grant_types" value="authorization_code"/>
+            <column name="redirect_uris" value="railwaystations://de.bahnhoefe.deutschlands.bahnhofsfotos.debug"/>
+            <column name="scopes" value="all"/>
+            <column name="client_settings"
+                    value="{&quot;@class&quot;:&quot;java.util.Collections$UnmodifiableMap&quot;,&quot;settings.client.require-proof-key&quot;:true,&quot;settings.client.require-authorization-consent&quot;:true}"/>
+            <column name="token_settings"
+                    value="{&quot;@class&quot;:&quot;java.util.Collections$UnmodifiableMap&quot;,&quot;settings.token.reuse-refresh-tokens&quot;:true,&quot;settings.token.id-token-signature-algorithm&quot;:[&quot;org.springframework.security.oauth2.jose.jws.SignatureAlgorithm&quot;,&quot;RS256&quot;],&quot;settings.token.access-token-time-to-live&quot;:[&quot;java.time.Duration&quot;,17280000.000000000],&quot;settings.token.access-token-format&quot;:{&quot;@class&quot;:&quot;org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat&quot;,&quot;value&quot;:&quot;self-contained&quot;},&quot;settings.token.refresh-token-time-to-live&quot;:[&quot;java.time.Duration&quot;,300.000000000],&quot;settings.token.authorization-code-time-to-live&quot;:[&quot;java.time.Duration&quot;,300.000000000]}"/>
+        </insert>
+        <insert tableName="oauth2_registered_client">
+            <column name="id" value="a8907db0-2319-49f5-bf0b-21fe9eea6da2"/>
+            <column name="client_id" value="RailwayStationsAndroidAppNightly"/>
+            <column name="client_secret" value=""/>
+            <column name="client_name" value="Railway-Stations Android App (nightly)"/>
+            <column name="client_authentication_methods" value="none"/>
+            <column name="authorization_grant_types" value="authorization_code"/>
+            <column name="redirect_uris" value="railwaystations://de.bahnhoefe.deutschlands.bahnhofsfotos.nightly"/>
+            <column name="scopes" value="all"/>
+            <column name="client_settings"
+                    value="{&quot;@class&quot;:&quot;java.util.Collections$UnmodifiableMap&quot;,&quot;settings.client.require-proof-key&quot;:true,&quot;settings.client.require-authorization-consent&quot;:true}"/>
+            <column name="token_settings"
+                    value="{&quot;@class&quot;:&quot;java.util.Collections$UnmodifiableMap&quot;,&quot;settings.token.reuse-refresh-tokens&quot;:true,&quot;settings.token.id-token-signature-algorithm&quot;:[&quot;org.springframework.security.oauth2.jose.jws.SignatureAlgorithm&quot;,&quot;RS256&quot;],&quot;settings.token.access-token-time-to-live&quot;:[&quot;java.time.Duration&quot;,17280000.000000000],&quot;settings.token.access-token-format&quot;:{&quot;@class&quot;:&quot;org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat&quot;,&quot;value&quot;:&quot;self-contained&quot;},&quot;settings.token.refresh-token-time-to-live&quot;:[&quot;java.time.Duration&quot;,300.000000000],&quot;settings.token.authorization-code-time-to-live&quot;:[&quot;java.time.Duration&quot;,300.000000000]}"/>
         </insert>
     </changeSet>
 
