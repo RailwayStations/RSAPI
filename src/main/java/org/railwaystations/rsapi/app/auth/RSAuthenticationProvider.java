@@ -6,7 +6,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -35,9 +35,9 @@ public class RSAuthenticationProvider implements AuthenticationProvider {
             return null;
         }
 
-        if (token.getCredentials() instanceof Jwt jwt) {
+        if (token.getCredentials() instanceof OAuth2Authorization oAuth2Authorization) {
             // try to verify jwt
-            log.info("User verified by jwt '{}'", jwt.getSubject());
+            log.info("User verified by jwt '{}'", oAuth2Authorization.getPrincipalName());
             userDetailsService.updateEmailVerification(user.getUser());
 
             return new UsernamePasswordAuthenticationToken(user, token.getCredentials(), user.getAuthorities());

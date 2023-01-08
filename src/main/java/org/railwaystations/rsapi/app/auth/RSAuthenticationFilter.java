@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.log.LogMessage;
 import org.springframework.http.HttpHeaders;
@@ -14,7 +15,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
+import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.web.authentication.NullRememberMeServices;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.www.BasicAuthenticationConverter;
@@ -23,8 +25,8 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.time.Instant;
 
+@RequiredArgsConstructor
 public class RSAuthenticationFilter extends OncePerRequestFilter {
 
     private SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder
@@ -38,12 +40,7 @@ public class RSAuthenticationFilter extends OncePerRequestFilter {
 
     private SecurityContextRepository securityContextRepository = new RequestAttributeSecurityContextRepository();
 
-    private final JwtDecoder jwtDecoder;
-
-    public RSAuthenticationFilter(AuthenticationManager authenticationManager, JwtDecoder jwtDecoder) {
-        this.authenticationManager = authenticationManager;
-        this.jwtDecoder = jwtDecoder;
-    }
+    private final OAuth2AuthorizationService oAuth2AuthorizationService;
 
     public void setSecurityContextRepository(SecurityContextRepository securityContextRepository) {
         this.securityContextRepository = securityContextRepository;
@@ -110,13 +107,12 @@ public class RSAuthenticationFilter extends OncePerRequestFilter {
 
     private UsernamePasswordAuthenticationToken getJwtAuthentication(String authorizationHeader) {
         try {
-            var jwtToken = authorizationHeader.substring(7);
-            var jwt = jwtDecoder.decode(jwtToken);
-            if (jwt.getIssuer().toString().equals(WebSecurityConfig.ISSUER)
-                    && jwt.getIssuedAt() != null && Instant.now().isAfter(jwt.getIssuedAt())
-                    && jwt.getExpiresAt() != null && Instant.now().isBefore(jwt.getExpiresAt())) {
-                var user = jwt.getSubject();
-                return new UsernamePasswordAuthenticationToken(user, jwt);
+            var bearerToken = authorizationHeader.substring(7);
+            var authorization = oAuth2AuthorizationService != null ? oAuth2AuthorizationService.findByToken(bearerToken, OAuth2TokenType.ACCESS_TOKEN) : null;
+            var accessToken = authorization != null ? authorization.getAccessToken() : null;
+            if (accessToken != null && accessToken.isActive()) {
+                var user = authorization.getPrincipalName();
+                return new UsernamePasswordAuthenticationToken(user, authorization);
             }
             return null;
         } catch (Exception e) {

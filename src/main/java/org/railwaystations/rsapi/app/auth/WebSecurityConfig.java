@@ -96,7 +96,7 @@ public class WebSecurityConfig {
 
     @Bean
     @Order(3)
-    public SecurityFilterChain apiFilterChain(HttpSecurity http, JwtDecoder jwtDecoder) throws Exception {
+    public SecurityFilterChain apiFilterChain(HttpSecurity http, @Autowired(required = false) OAuth2AuthorizationService authorizationService) throws Exception {
         var authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class)
                 .authenticationProvider(authenticationProvider);
         authenticationManagerBuilder.userDetailsService(userDetailsService);
@@ -116,14 +116,14 @@ public class WebSecurityConfig {
                 .exceptionHandling()
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 .and()
-                .addFilterBefore(uploadTokenAuthenticationFilter(authenticationManager, jwtDecoder), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(uploadTokenAuthenticationFilter(authenticationManager, authorizationService), UsernamePasswordAuthenticationFilter.class)
                 .authenticationManager(authenticationManager);
 
         return http.build();
     }
 
-    public RSAuthenticationFilter uploadTokenAuthenticationFilter(AuthenticationManager authenticationManager, JwtDecoder jwtDecoder) {
-        return new RSAuthenticationFilter(authenticationManager, jwtDecoder);
+    public RSAuthenticationFilter uploadTokenAuthenticationFilter(AuthenticationManager authenticationManager, OAuth2AuthorizationService authorizationService) {
+        return new RSAuthenticationFilter(authenticationManager, authorizationService);
     }
 
     @Bean

@@ -195,14 +195,18 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
 
         // request myProfile with first token
         var tokenResponse = requestToken(code, "authorization_code", HttpStatus.OK, restTemplateWithBacisAuthTestClient(), null, "testClientId");
-        assertMyProfileRequestWithOAuthToken(tokenResponse);
+        assertMyProfileRequestWithOAuthToken(tokenResponse, HttpStatus.OK);
+
+        // revoke access_token
+        revokeToken(tokenResponse.getAccessToken().getTokenValue(), "access_token");
+        assertMyProfileRequestWithOAuthToken(tokenResponse, HttpStatus.UNAUTHORIZED);
 
         // request myProfile with refreshed token
         tokenResponse = requestToken(tokenResponse.getRefreshToken().getTokenValue(), "refresh_token", HttpStatus.OK, restTemplateWithBacisAuthTestClient(), null, "testClientId");
-        assertMyProfileRequestWithOAuthToken(tokenResponse);
+        assertMyProfileRequestWithOAuthToken(tokenResponse, HttpStatus.OK);
 
         // revoke refresh_token
-        revokeRefreshToken(tokenResponse.getRefreshToken().getTokenValue());
+        revokeToken(tokenResponse.getRefreshToken().getTokenValue(), "refresh_token");
         tokenResponse = requestToken(tokenResponse.getRefreshToken().getTokenValue(), "refresh_token", HttpStatus.BAD_REQUEST, restTemplateWithBacisAuthTestClient(), null, "testClientId");
         assertThat(tokenResponse).isNull();
     }
@@ -242,7 +246,7 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
 
         // request myProfile with first token
         var tokenResponse = requestToken(code, "authorization_code", HttpStatus.OK, restTemplate, codeVerifier, "publicTestClient");
-        assertMyProfileRequestWithOAuthToken(tokenResponse);
+        assertMyProfileRequestWithOAuthToken(tokenResponse, HttpStatus.OK);
 
         // we don't get a refresh token for public clients, so we can't test the refresh token flow
         assertThat(tokenResponse.getRefreshToken()).isNull();
@@ -263,18 +267,20 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(digest);
     }
 
-    private void assertMyProfileRequestWithOAuthToken(OAuth2AccessTokenResponse tokenResponse) throws IOException {
+    private void assertMyProfileRequestWithOAuthToken(OAuth2AccessTokenResponse tokenResponse, HttpStatus expectedHttpStatus) throws IOException {
         var headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + tokenResponse.getAccessToken().getTokenValue());
         var response = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertProfile(response, "@user27", "https://www.example.com/user27", false, null);
+        assertThat(response.getStatusCode()).isEqualTo(expectedHttpStatus);
+        if (expectedHttpStatus == HttpStatus.OK) {
+            assertProfile(response, "@user27", "https://www.example.com/user27", false, null);
+        }
     }
 
-    private void revokeRefreshToken(String token) {
+    private void revokeToken(String token, String tokenType) {
         var map = new LinkedMultiValueMap<String, String>();
         map.add("token", token);
-        map.add("token_type_hint", "refresh_token");
+        map.add("token_type_hint", tokenType);
         var response = restTemplateWithBacisAuthTestClient()
                 .exchange(String.format("http://localhost:%d%s", port, "/oauth2/revoke"), HttpMethod.POST, new HttpEntity<>(map, new HttpHeaders()), String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
