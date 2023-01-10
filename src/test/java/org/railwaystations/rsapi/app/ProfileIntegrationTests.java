@@ -198,7 +198,7 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
         assertMyProfileRequestWithOAuthToken(tokenResponse, HttpStatus.OK);
 
         // revoke access_token
-        revokeToken(restTemplateWithBacisAuthTestClient(), tokenResponse.getAccessToken().getTokenValue(), "access_token");
+        revokeToken(restTemplateWithBacisAuthTestClient(), tokenResponse.getAccessToken().getTokenValue(), "access_token", new HttpHeaders());
         assertMyProfileRequestWithOAuthToken(tokenResponse, HttpStatus.UNAUTHORIZED);
 
         // request myProfile with refreshed token
@@ -206,7 +206,7 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
         assertMyProfileRequestWithOAuthToken(tokenResponse, HttpStatus.OK);
 
         // revoke refresh_token
-        revokeToken(restTemplateWithBacisAuthTestClient(), tokenResponse.getRefreshToken().getTokenValue(), "refresh_token");
+        revokeToken(restTemplateWithBacisAuthTestClient(), tokenResponse.getRefreshToken().getTokenValue(), "refresh_token", new HttpHeaders());
         tokenResponse = requestToken(tokenResponse.getRefreshToken().getTokenValue(), "refresh_token", HttpStatus.BAD_REQUEST, restTemplateWithBacisAuthTestClient(), null, "testClientId");
         assertThat(tokenResponse).isNull();
     }
@@ -252,8 +252,10 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
         assertThat(tokenResponse.getRefreshToken()).isNull();
 
         // revoke access_token not possible without client authentication
-        // revokeToken(restTemplate, tokenResponse.getAccessToken().getTokenValue(), "access_token");
-        // assertMyProfileRequestWithOAuthToken(tokenResponse, HttpStatus.UNAUTHORIZED);
+        //headers.clear();
+        //headers.add("Authorization", "Bearer " + tokenResponse.getAccessToken().getTokenValue());
+        //revokeToken(restTemplate, tokenResponse.getAccessToken().getTokenValue(), "access_token", headers);
+        //assertMyProfileRequestWithOAuthToken(tokenResponse, HttpStatus.UNAUTHORIZED);
     }
 
     private String generateCodeVerifier() {
@@ -281,12 +283,12 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
         }
     }
 
-    private void revokeToken(TestRestTemplate testRestTemplate, String token, String tokenType) {
+    private void revokeToken(TestRestTemplate testRestTemplate, String token, String tokenType, HttpHeaders headers) {
         var map = new LinkedMultiValueMap<String, String>();
         map.add("token", token);
         map.add("token_type_hint", tokenType);
         var response = testRestTemplate
-                .exchange(String.format("http://localhost:%d%s", port, "/oauth2/revoke"), HttpMethod.POST, new HttpEntity<>(map, new HttpHeaders()), String.class);
+                .exchange(String.format("http://localhost:%d%s", port, "/oauth2/revoke"), HttpMethod.POST, new HttpEntity<>(map, headers), String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
