@@ -89,6 +89,9 @@ public class WebSecurityConfig {
                 )
                 // Form login handles the redirect to the login page from the
                 // authorization server filter chain
+                /*.formLogin(httpSecurityFormLoginConfigurer -> {
+                    httpSecurityFormLoginConfigurer.loginPage("/login.html");
+                });*/
                 .formLogin(Customizer.withDefaults());
 
         return http.build();
