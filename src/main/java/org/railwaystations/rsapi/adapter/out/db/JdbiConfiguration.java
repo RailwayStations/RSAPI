@@ -46,4 +46,9 @@ public class JdbiConfiguration {
         return jdbi.onDemand(UserDao.class);
     }
 
+    @Bean
+    public OAuth2AuthorizationDao oAuth2AuthorizationDao(Jdbi jdbi) {
+        return jdbi.onDemand(OAuth2AuthorizationDao.class);
+    }
+    
 }
