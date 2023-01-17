@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x="0px"
+     y="0px"
+     width="50px" height="50px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve">
+<path fill="none" stroke="#FFFFFF" stroke-width="2" stroke-miterlimit="10" d="M32,13c0,0.552-0.447,1-1,1H19c-0.552,0-1-0.448-1-1
+	v-2c0-0.552,0.448-1,1-1h12c0.553,0,1,0.448,1,1V13z"/>
+    <line fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          stroke-miterlimit="10" x1="7.577" y1="49" x2="13.346" y2="44.166"/>
+    <line fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          stroke-miterlimit="10" x1="42.423" y1="49" x2="36.654" y2="44.166"/>
+    <path fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          stroke-miterlimit="10" d="
+	M16.991,4H15c-3.312,0-6,2.56-6,5.714v28.572C9,41.439,11.688,44,15,44h20c3.313,0,6-2.561,6-5.714V9.714C41,6.56,38.313,4,35,4
+	h-1.932 M28.033,4h-5.91"/>
+    <circle fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            stroke-miterlimit="10" cx="30.5" cy="3.5" r="2.5"/>
+    <circle fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            stroke-miterlimit="10" cx="19.5" cy="3.5" r="2.5"/>
+    <path fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          stroke-miterlimit="10" d="
+	M13,15.833C13,14.821,13.896,14,15,14h20c1.104,0,2,0.821,2,1.833v8.333C37,25.178,36.104,26,35,26H15c-1.104,0-2-0.822-2-1.834
+	V15.833z"/>
+    <circle fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            stroke-miterlimit="10" cx="16" cy="36" r="3"/>
+    <circle fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            stroke-miterlimit="10" cx="34" cy="36" r="3"/>
+</svg>

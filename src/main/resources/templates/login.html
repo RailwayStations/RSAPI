@@ -3,10 +3,21 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#9F0C35">
     <title>Please Log In</title>
     <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.3/css/bootstrap.min.css}"/>
+    <link th:rel="stylesheet" th:href="style.css"/>
 </head>
 <body>
+<nav class="navbar navbar-expand-md navbar-dark fixed-top" style="background-color: #9F0C35;">
+    <div class="container-fluid">
+        <a class="navbar-brand" active>
+            <img src="logo_white.svg" width="30" height="30" class="d-inline-block align-top" alt="">
+            Railway<strong>Stations</strong>
+        </a>
+    </div>
+</nav>
+
 <div class="container">
     <form class="form-signin" th:action="@{/login}" method="post">
         <h2 class="form-signin-heading">Please sign in</h2>
