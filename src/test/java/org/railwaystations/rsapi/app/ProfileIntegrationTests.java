@@ -169,7 +169,7 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
         var response = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/oauth2/authorize?client_id=testClient&scope=all&response_type=code&redirect_uri=http://127.0.0.1:8000/authorized"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        var pattern = Pattern.compile("<input name=\"_csrf\" type=\"hidden\" value=\"(.*)\" />");
+        var pattern = Pattern.compile("<input name=\"_csrf\" type=\"hidden\" value=\"(.*)\"");
         var matcher = pattern.matcher(response.getBody());
         assertThat(matcher.find()).isTrue();
         var csrfToken = matcher.group(1);
@@ -220,7 +220,7 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
         var response = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/oauth2/authorize?client_id=publicTestClient&scope=all&response_type=code&code_challenge=" + codeChallenge + "&code_challenge_method=S256&redirect_uri=http://127.0.0.1:8000/authorized"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        var pattern = Pattern.compile("<input name=\"_csrf\" type=\"hidden\" value=\"(.*)\" />");
+        var pattern = Pattern.compile("<input name=\"_csrf\" type=\"hidden\" value=\"(.*)\"");
         var matcher = pattern.matcher(response.getBody());
         assertThat(matcher.find()).isTrue();
         var csrfToken = matcher.group(1);

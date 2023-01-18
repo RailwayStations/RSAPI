@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="theme-color" content="#9F0C35">
-    <title>Please Log In</title>
+    <title th:text="#{login.title}"></title>
     <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.3/css/bootstrap.min.css}"/>
     <link th:rel="stylesheet" th:href="style.css"/>
 </head>
@@ -12,30 +12,31 @@
 <nav class="navbar navbar-expand-md navbar-dark fixed-top" style="background-color: #9F0C35;">
     <div class="container-fluid">
         <a class="navbar-brand" active>
-            <img src="logo_white.svg" width="30" height="30" class="d-inline-block align-top" alt="">
-            Railway<strong>Stations</strong>
+            <img src="logo_white.svg" width="30" height="30" class="d-inline-block align-top" alt=""/>
+            <span th:text="#{app.title}"></span>
         </a>
     </div>
 </nav>
 
 <div class="container">
     <form class="form-signin" th:action="@{/login}" method="post">
-        <h2 class="form-signin-heading">Please sign in</h2>
-        <div th:if="${param.error}" class="alert alert-danger" role="alert">
-            Invalid login or password.
-        </div>
-        <div th:if="${param.logout}" class="alert alert-info" role="alert">
-            You have been logged out.
+        <input th:name="${_csrf.parameterName}" type="hidden" th:value="${_csrf.token}"/>
+        <h2 class="form-signin-heading" th:text="#{login.title}"></h2>
+        <div th:if="${param.error}" class="alert alert-danger" role="alert" th:text="#{login.invalid}"></div>
+        <div th:if="${param.logout}" class="alert alert-info" role="alert" th:text="#{login.logged_out}"></div>
+        <div>
+            <label for="username" class="sr-only" th:placeholder="#{login.username}"></label>
+            <input id="username" type="text" name="username" th:placeholder="#{login.username}" class="form-control"
+                   required/>
         </div>
         <div>
-            <label for="username" class="sr-only">Username</label>
-            <input id="username" type="text" name="username" placeholder="Username" class="form-control" required/>
+            <label for="password" class="sr-only" th:placeholder="#{login.password}"></label>
+            <input id="password" type="password" name="password" th:placeholder="#{login.password}" class="form-control"
+                   required/>
         </div>
         <div>
-            <label for="password" class="sr-only">Password</label>
-            <input id="password" type="password" name="password" placeholder="Password" class="form-control" required/>
+            <button class="btn btn-lg btn-primary btn-block" type="submit" th:text="#{login.log_in.button}"></button>
         </div>
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
     </form>
 </div>
 </body>
