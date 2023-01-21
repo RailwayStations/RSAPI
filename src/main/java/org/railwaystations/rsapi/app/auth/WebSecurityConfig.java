@@ -6,6 +6,7 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,6 +41,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.RegexRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import static org.railwaystations.rsapi.utils.JwtUtil.generateRsaKey;
 import static org.railwaystations.rsapi.utils.JwtUtil.loadRsaKey;
@@ -85,6 +88,7 @@ public class WebSecurityConfig {
                 .securityMatcher("/login**")
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/login").permitAll()
+                        .requestMatchers("/loginResetPassword").permitAll()
                         .anyRequest().authenticated()
                 )
                 // Form login handles the redirect to the login page from the
@@ -108,10 +112,14 @@ public class WebSecurityConfig {
 
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .csrf().disable()
+                .csrf()
+                .requireCsrfProtectionMatcher(createCsrfRequestMatcher())
+                .and()
+
                 .headers()
                 .frameOptions().disable()
                 .and()
+
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/**").permitAll()
                         .requestMatchers("/adminInbox", "/adminInboxCount", "/userInbox", "/photoUpload",
@@ -124,6 +132,20 @@ public class WebSecurityConfig {
                 .authenticationManager(authenticationManager);
 
         return http.build();
+    }
+
+    private static RequestMatcher createCsrfRequestMatcher() {
+        return new RequestMatcher() {
+
+            private final RegexRequestMatcher requestMatcher =
+                    new RegexRequestMatcher("/login*", null);
+
+            @Override
+            public boolean matches(HttpServletRequest request) {
+                return requestMatcher.matches(request);
+            }
+
+        };
     }
 
     public RSAuthenticationFilter uploadTokenAuthenticationFilter(AuthenticationManager authenticationManager, OAuth2AuthorizationService authorizationService) {

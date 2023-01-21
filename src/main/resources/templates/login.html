@@ -24,6 +24,10 @@
         <h2 class="form-signin-heading" th:text="#{login.title}"></h2>
         <div th:if="${param.error}" class="alert alert-danger" role="alert" th:text="#{login.invalid}"></div>
         <div th:if="${param.logout}" class="alert alert-info" role="alert" th:text="#{login.logged_out}"></div>
+        <div th:if="${param.reset_password_error}" class="alert alert-danger" role="alert"
+             th:text="#{login.reset_password.error}"></div>
+        <div th:if="${param.reset_password_success}" class="alert alert-info" role="alert"
+             th:text="#{login.reset_password.success}"></div>
         <div>
             <label for="username" class="sr-only" th:placeholder="#{login.username}"></label>
             <input id="username" type="text" name="username" th:placeholder="#{login.username}" class="form-control"
@@ -31,11 +35,14 @@
         </div>
         <div>
             <label for="password" class="sr-only" th:placeholder="#{login.password}"></label>
-            <input id="password" type="password" name="password" th:placeholder="#{login.password}" class="form-control"
-                   required/>
+            <input id="password" type="password" name="password" th:placeholder="#{login.password}"
+                   class="form-control"/>
         </div>
+        <div>&nbsp;</div>
         <div>
             <button class="btn btn-lg btn-primary btn-block" type="submit" th:text="#{login.log_in.button}"></button>
+            <button class="btn btn-lg btn-primary btn-block" type="submit" th:text="#{login.reset_password.button}"
+                    th:formaction="@{/loginResetPassword}"></button>
         </div>
     </form>
 </div>

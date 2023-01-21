@@ -412,7 +412,7 @@ public class InboxController {
     }
 
     private ModelAndView createIFrameAnswer(InboxResponseDto response, URI referer) throws JsonProcessingException {
-        ModelAndView modelAndView = new ModelAndView();
+        var modelAndView = new ModelAndView();
         modelAndView.setViewName("iframe");
         modelAndView.getModel().put("response", mapper.writeValueAsString(response));
         modelAndView.getModel().put("referer", referer);
