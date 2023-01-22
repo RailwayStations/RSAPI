@@ -1,22 +1,8 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="theme-color" content="#9F0C35">
-    <title th:text="#{login.title}"></title>
-    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/5.2.3/css/bootstrap.min.css}"/>
-    <link th:rel="stylesheet" th:href="style.css"/>
-</head>
+<header th:replace="fragments/general.html :: headerfiles(#{login.title})"></header>
 <body>
-<nav class="navbar navbar-expand-md navbar-dark fixed-top" style="background-color: #9F0C35;">
-    <div class="container-fluid">
-        <a class="navbar-brand" active>
-            <img src="logo_white.svg" width="30" height="30" class="d-inline-block align-top" alt=""/>
-            <span th:text="#{app.title}"></span>
-        </a>
-    </div>
-</nav>
+<nav th:replace="fragments/general.html :: navbar"></nav>
 
 <div class="container">
     <form class="form-signin" th:action="@{/login}" method="post">

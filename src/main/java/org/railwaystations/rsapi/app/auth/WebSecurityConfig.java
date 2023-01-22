@@ -54,6 +54,9 @@ import static org.railwaystations.rsapi.utils.JwtUtil.loadRsaKey;
 public class WebSecurityConfig {
 
     public static final String ISSUER = "https://railway-stations.org";
+
+    private static final String CUSTOM_CONSENT_PAGE_URI = "/oauth2/consent";
+
     @Autowired
     private RSAuthenticationProvider authenticationProvider;
 
@@ -74,7 +77,9 @@ public class WebSecurityConfig {
                 )
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .getConfigurer(OAuth2AuthorizationServerConfigurer.class)
-                .oidc(Customizer.withDefaults());
+                .oidc(Customizer.withDefaults())
+                .authorizationEndpoint(authorizationEndpoint ->
+                        authorizationEndpoint.consentPage(CUSTOM_CONSENT_PAGE_URI));
 
         return http.build();
     }
