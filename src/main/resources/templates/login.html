@@ -30,7 +30,9 @@
              th:text="#{login.reset_password.success}"></div>
         <div>
             <label for="username" class="sr-only" th:placeholder="#{login.username}"></label>
-            <input id="username" type="text" name="username" th:placeholder="#{login.username}" class="form-control"
+            <input id="username" type="text" name="username" th:placeholder="#{login.username}"
+                   th:value="${param.username}"
+                   class="form-control"
                    required/>
         </div>
         <div>

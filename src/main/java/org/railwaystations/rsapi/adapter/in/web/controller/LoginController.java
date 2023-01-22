@@ -26,9 +26,9 @@ public class LoginController {
         try {
             manageProfileUseCase.resetPassword(username, userAgent);
         } catch (Exception e) {
-            return new ModelAndView("redirect:/login?reset_password_error");
+            return new ModelAndView("redirect:/login?reset_password_error&username=" + username);
         }
-        return new ModelAndView("redirect:/login?reset_password_success");
+        return new ModelAndView("redirect:/login?reset_password_success&username=" + username);
     }
 
 }
