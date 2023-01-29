@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
-<header th:replace="fragments/general.html :: headerfiles(#{login.title})"></header>
+<header th:replace="~{fragments/general.html :: headerfiles(#{login.title})}"></header>
 <body>
-<nav th:replace="fragments/general.html :: navbar"></nav>
+<nav th:replace="~{fragments/general.html :: navbar}"></nav>
 
 <div class="container">
     <form class="form-signin" th:action="@{/login}" method="post">
@@ -29,8 +29,10 @@
         <div>&nbsp;</div>
         <div>
             <button class="btn btn-lg btn-primary btn-block" type="submit" th:text="#{login.log_in.button}"></button>
-            <button class="btn btn-lg btn-primary btn-block" type="submit" th:text="#{login.reset_password.button}"
+            <button class="btn btn-lg btn-secondary btn-block" type="submit" th:text="#{login.reset_password.button}"
                     th:formaction="@{/loginResetPassword}"></button>
+            <a th:href="@{/loginRegister}" class="btn btn-lg btn-secondary btn-block"
+               th:text="#{login.register.button}"></a>
         </div>
     </form>
 </div>
