@@ -61,7 +61,7 @@ public class User {
     }
 
     public static String normalizeName(String name) {
-        return StringUtils.trimToEmpty(name).toLowerCase(Locale.ENGLISH).replaceAll("[^a-z\\d]","");
+        return StringUtils.trimToEmpty(name).toLowerCase(Locale.ENGLISH).replaceAll("[^a-z\\d]", "");
     }
 
     public static String normalizeEmail(String email) {
@@ -93,7 +93,7 @@ public class User {
         if (StringUtils.isNotBlank(url)) {
             URL validatedUrl;
             try {
-                validatedUrl = new URL( url );
+                validatedUrl = new URL(url);
             } catch (MalformedURLException e) {
                 return false;
             }
@@ -107,6 +107,10 @@ public class User {
         }
 
         return License.CC0_10.equals(license);
+    }
+
+    public boolean isEligableForContributions() {
+        return isEmailVerified() && isValid();
     }
 
     public boolean isEmailVerified() {

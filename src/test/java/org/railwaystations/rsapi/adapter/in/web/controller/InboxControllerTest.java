@@ -201,7 +201,7 @@ class InboxControllerTest {
         return mvc.perform(post("/photoUpload")
                         .headers(headers)
                         .content(inputBytes)
-                        .with(user(new AuthUser(User.builder().name(nickname).license(License.CC0_10).id(userId).email(email).emailVerification(emailVerification).build(), Collections.emptyList())))
+                        .with(user(new AuthUser(User.builder().name(nickname).license(License.CC0_10).id(userId).email(email).ownPhotos(true).emailVerification(emailVerification).build(), Collections.emptyList())))
                         .with(csrf()))
                 .andExpect(validOpenApi());
     }
@@ -233,7 +233,7 @@ class InboxControllerTest {
         var response = whenPostImageIframe("someuser@example.com", "http://localhost/uploadPage.php");
 
         assertThat(response).contains("UNAUTHORIZED");
-        assertThat(response).contains("Email not verified");
+        assertThat(response).contains("Profile incomplete, not allowed to upload photos");
         verify(inboxDao, never()).insert(any());
         assertThat(monitor.getMessages().size()).isEqualTo(0);
     }

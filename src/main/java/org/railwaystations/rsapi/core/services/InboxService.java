@@ -66,9 +66,9 @@ public class InboxService implements ManageInboxUseCase {
 
     @Override
     public InboxResponse reportProblem(ProblemReport problemReport, User user, String clientInfo) {
-        if (!user.isEmailVerified()) {
-            log.info("New problem report failed for user {}, email {} not verified", user.getName(), user.getEmail());
-            return InboxResponse.of(InboxResponse.InboxResponseState.UNAUTHORIZED, "Email not verified");
+        if (!user.isEligableForContributions()) {
+            log.info("New problem report failed for user {}, profile incomplete", user.getName());
+            return InboxResponse.of(InboxResponse.InboxResponseState.UNAUTHORIZED, "Profile incomplete");
         }
 
         log.info("New problem report: Nickname: {}; Country: {}; Station-Id: {}",
@@ -446,9 +446,9 @@ public class InboxService implements ManageInboxUseCase {
                                      String countryCode, String contentType, String stationTitle,
                                      Double latitude, Double longitude, String comment,
                                      boolean active, User user) {
-        if (!user.isEmailVerified()) {
-            log.info("Photo upload failed for user {}, email not verified", user.getName());
-            return InboxResponse.of(InboxResponse.InboxResponseState.UNAUTHORIZED, "Email not verified");
+        if (!user.isEligableForContributions()) {
+            log.info("Photo upload failed for user {}, profile incomplete", user.getName());
+            return InboxResponse.of(InboxResponse.InboxResponseState.UNAUTHORIZED, "Profile incomplete, not allowed to upload photos");
         }
 
         var station = findStationByCountryAndId(countryCode, stationId);
