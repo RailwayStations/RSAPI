@@ -97,19 +97,17 @@ public class User {
             } catch (MalformedURLException e) {
                 return false;
             }
-            if (!validatedUrl.getProtocol().matches("https?")) {
-                return false;
-            }
+            return validatedUrl.getProtocol().matches("https?");
         }
 
-        if (!ownPhotos) {
-            return false;
-        }
-
-        return License.CC0_10.equals(license);
+        return true;
     }
 
-    public boolean isEligableForContributions() {
+    public boolean isEligibleToUploadPhoto() {
+        return isValid() && isEmailVerified() && ownPhotos && License.CC0_10.equals(license);
+    }
+
+    public boolean isEligibleToReportProblem() {
         return isEmailVerified() && isValid();
     }
 

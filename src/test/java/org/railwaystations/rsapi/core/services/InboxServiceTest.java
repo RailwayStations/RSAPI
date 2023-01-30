@@ -522,7 +522,7 @@ class InboxServiceTest {
         }
 
         @ParameterizedTest
-        @MethodSource("invalidUsers")
+        @MethodSource("invalidUsersForReportProblem")
         void reportProblemWithInvalidUser(User invalidUser) {
             var problemReport = createWrongPhotoProblemReport(EXISTING_PHOTO_ID);
 
@@ -532,13 +532,11 @@ class InboxServiceTest {
             assertThat(inboxResponse.getMessage()).isEqualTo("Profile incomplete");
         }
 
-        static List<Arguments> invalidUsers() {
+        static List<Arguments> invalidUsersForReportProblem() {
             return List.of(
-                    Arguments.of(createValidUser().license(License.CC_BY_30).build()),
                     Arguments.of(createValidUser().name(null).build()),
                     Arguments.of(createValidUser().email(null).build()),
-                    Arguments.of(createValidUser().emailVerification("SOME_TOKEN").build()),
-                    Arguments.of(createValidUser().ownPhotos(false).build())
+                    Arguments.of(createValidUser().emailVerification("SOME_TOKEN").build())
             );
         }
 
