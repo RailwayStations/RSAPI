@@ -14,6 +14,9 @@
              th:text="#{login.reset_password.error}"></div>
         <div th:if="${param.reset_password_success}" class="alert alert-info" role="alert"
              th:text="#{login.reset_password.success}"></div>
+        <div th:if="${param.register_success}" class="alert alert-info" role="alert"
+             th:text="#{login.register.success}"></div>
+
         <div>
             <label for="username" class="sr-only" th:placeholder="#{login.username}"></label>
             <input id="username" type="text" name="username" th:placeholder="#{login.username}"

@@ -5,15 +5,14 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.extern.slf4j.Slf4j;
 import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.ports.in.ManageProfileUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,13 +22,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Objects;
 
 @Controller
+@Slf4j
 public class LoginController {
 
     @Autowired
     private ManageProfileUseCase manageProfileUseCase;
-
-    @Autowired
-    private MessageSource messageSource;
 
     @GetMapping("/login")
     String login() {
@@ -56,8 +53,7 @@ public class LoginController {
 
         if (!bindingResult.hasErrors()) {
             if (!Objects.equals(newAccount.password, newAccount.passwordRepeat)) {
-                var message = messageSource.getMessage("PasswordsDontMatch", null, LocaleContextHolder.getLocale());
-                bindingResult.addError(new FieldError("newAccount", "passwordRepeat", newAccount.passwordRepeat, false, null, null, message));
+                bindingResult.rejectValue("passwordRepeat", "register.passwordsDontMatch");
             }
         }
         if (bindingResult.hasErrors()) {
@@ -71,17 +67,22 @@ public class LoginController {
                     .newPassword(newAccount.password)
                     .build();
             manageProfileUseCase.register(user, userAgent);
+        } catch (ManageProfileUseCase.ProfileConflictException e) {
+            log.warn("Register conflict with {}, '{}", newAccount.username, newAccount.email);
+            bindingResult.reject("register.conflict");
+            return "register";
         } catch (Exception e) {
-            // TODO: map errors
-            return "redirect:/login?username=" + newAccount.username;
+            log.error("Error Registering user {}", newAccount.username, e);
+            bindingResult.addError(new ObjectError("globalError", new String[]{"register.error"}, null, "Register conflict"));
+            return "register";
         }
-        return "redirect:/login?username=" + newAccount.username;
+        return "redirect:/login?register_success&username=" + newAccount.username;
     }
 
-    public record NewAccount(@NotBlank String username,
-                             @NotBlank @Email String email,
+    public record NewAccount(@NotBlank @Size(max = 30) String username,
+                             @NotBlank @Size(max = 100) @Email String email,
                              @NotNull @Size(min = 8) String password,
-                             @NotBlank String passwordRepeat) {
+                             String passwordRepeat) {
     }
 
 }

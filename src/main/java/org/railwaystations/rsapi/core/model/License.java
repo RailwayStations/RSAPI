@@ -18,6 +18,10 @@ public enum License {
         this.url = url;
     }
 
+    public static License of(String licenseName) {
+        return licenseName != null ? valueOf(licenseName) : null;
+    }
+
     public String getDisplayName() {
         return displayName;
     }

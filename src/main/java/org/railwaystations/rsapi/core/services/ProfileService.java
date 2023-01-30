@@ -36,7 +36,7 @@ public class ProfileService implements ManageProfileUseCase {
     public void changePassword(User user, String newPassword) {
         log.info("Password change for '{}'", user.getEmail());
         var trimmedPassword = StringUtils.trimToEmpty(newPassword);
-        if (trimmedPassword.length() < 8 ) {
+        if (trimmedPassword.length() < 8) {
             throw new IllegalArgumentException("Password too short");
         }
         userDao.updateCredentials(user.getId(), passwordEncoder.encode(trimmedPassword));
@@ -113,7 +113,7 @@ public class ProfileService implements ManageProfileUseCase {
 
         monitor.sendMessage(
                 String.format("New registration{nickname='%s', email='%s', license='%s', photoOwner=%s, link='%s', anonymous=%s}%nvia %s",
-                        newUser.getName(), newUser.getEmail(), newUser.getLicense().getDisplayName(), newUser.isOwnPhotos(),
+                        newUser.getName(), newUser.getEmail(), newUser.getLicense(), newUser.isOwnPhotos(),
                         newUser.getUrl(), newUser.isAnonymous(), clientInfo));
     }
 
@@ -181,20 +181,20 @@ public class ProfileService implements ManageProfileUseCase {
 
     private void sendPasswordMail(String email, String newPassword) {
         var text = String.format("""
-                        Hello,
-                        
-                        your new password is: %1$s
-                        
-                        Cheers
-                        Your Railway-Stations-Team
-                        
-                        ---
-                        Hallo,
-                        
-                        Dein neues Passwort lautet: %1$s
-                        
-                        Viele Grüße
-                        Dein Bahnhofsfoto-Team""", newPassword);
+                Hello,
+                                        
+                your new password is: %1$s
+                                        
+                Cheers
+                Your Railway-Stations-Team
+                                        
+                ---
+                Hallo,
+                                        
+                Dein neues Passwort lautet: %1$s
+                                        
+                Viele Grüße
+                Dein Bahnhofsfoto-Team""", newPassword);
         mailer.send(email, "Railway-Stations.org new password", text);
         log.info("Password sent to {}", email);
     }
@@ -202,20 +202,20 @@ public class ProfileService implements ManageProfileUseCase {
     private void sendEmailVerification(String email, String emailVerificationToken) {
         var url = eMailVerificationUrl + emailVerificationToken;
         var text = String.format("""
-                        Hello,
-                        
-                        please click on %1$s to verify your eMail-Address.
-                        
-                        Cheers
-                        Your Railway-Stations-Team
-                        
-                        ---
-                        Hallo,
-                        
-                        bitte klicke auf %1$s, um Deine eMail-Adresse zu verifizieren.
-                        
-                        Viele Grüße
-                        Dein Bahnhofsfoto-Team""", url);
+                Hello,
+                                        
+                please click on %1$s to verify your eMail-Address.
+                                        
+                Cheers
+                Your Railway-Stations-Team
+                                        
+                ---
+                Hallo,
+                                        
+                bitte klicke auf %1$s, um Deine eMail-Adresse zu verifizieren.
+                                        
+                Viele Grüße
+                Dein Bahnhofsfoto-Team""", url);
         mailer.send(email, "Railway-Stations.org eMail verification", text);
         log.info("Email verification sent to {}", email);
     }

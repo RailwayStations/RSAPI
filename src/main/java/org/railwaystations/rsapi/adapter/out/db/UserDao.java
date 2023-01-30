@@ -64,7 +64,7 @@ public interface UserDao {
                     .id(rs.getInt("id"))
                     .name(rs.getString("name"))
                     .url(rs.getString("url"))
-                    .license(License.valueOf(rs.getString("license")))
+                    .license(License.of(rs.getString("license")))
                     .email(rs.getString("email"))
                     .ownPhotos(rs.getBoolean("ownPhotos"))
                     .anonymous(rs.getBoolean("anonymous"))
