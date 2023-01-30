@@ -75,10 +75,10 @@ public class LoginController {
         return "redirect:/login?username=" + newAccount.username;
     }
 
-    public record NewAccount(@NotBlank String username, @NotBlank @Email String email,
+    public record NewAccount(@NotBlank String username,
+                             @NotBlank @Email String email,
                              @NotNull @Size(min = 8) String password,
-                             @NotBlank String passwordRepeat, Boolean photoOwner,
-                             Boolean licenseCc0, Boolean anonymous, Boolean notifications, String url) {
+                             @NotBlank String passwordRepeat) {
     }
 
 }

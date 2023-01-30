@@ -28,28 +28,6 @@
                    required/>
             <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Email Error</div>
         </div>
-        <div>&nbsp;</div>
-        <div>
-            <input th:field="*{photoOwner}" type="checkbox"/>
-            <label for="photoOwner" th:text="#{register.photoOwner}"></label>
-        </div>
-        <div>
-            <input th:field="*{licenseCc0}" type="checkbox"/>
-            <label for="licenseCc0" th:text="#{register.licenseCc0}"></label>
-        </div>
-        <div>
-            <input th:field="*{notifications}" type="checkbox"/>
-            <label for="notifications" th:text="#{register.notifications}"></label>
-        </div>
-        <div>
-            <input th:field="*{anonymous}" type="checkbox"/>
-            <label for="anonymous" th:text="#{register.anonymous}"></label>
-        </div>
-        <div>
-            <label for="url" class="sr-only" th:placeholder="#{register.url}"></label>
-            <input th:field="*{url}" th:placeholder="#{register.url}" class="form-control"/>
-            <div th:if="${#fields.hasErrors('url')}" th:errors="*{url}">URL Error</div>
-        </div>
         <div>
             <label for="password" class="sr-only" th:placeholder="#{register.password}"></label>
             <input type="password" th:field="*{password}" th:placeholder="#{register.password}"
