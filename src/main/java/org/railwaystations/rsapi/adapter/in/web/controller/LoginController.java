@@ -65,8 +65,11 @@ public class LoginController {
         }
 
         try {
-            // TODO: map to User
-            User user = null;
+            var user = User.builder()
+                    .name(newAccount.username)
+                    .email(newAccount.email)
+                    .newPassword(newAccount.password)
+                    .build();
             manageProfileUseCase.register(user, userAgent);
         } catch (Exception e) {
             // TODO: map errors
