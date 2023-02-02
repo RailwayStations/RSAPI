@@ -18,7 +18,7 @@ public class Country {
     String name;
 
     @Builder.Default
-    String email = "bahnhofsfotos@deutschlands-bahnhoefe.de";
+    String email = "info@railway-stations.org";
 
     @Builder.Default
     String twitterTags = "@Bahnhofsoma, #dbHackathon, #dbOpendata, #Bahnhofsfoto, @khgdrn";
