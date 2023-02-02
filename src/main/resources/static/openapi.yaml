@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20221126.2100"
+  version: "20230202.2130"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -19,6 +19,93 @@ tags:
       url: https://www.railway-stations.org
 
 paths:
+  /oauth2/authorize:
+    get:
+      summary: OAuth2 authorization endpoint
+      description: |
+        Redirect the user to this URL to start the authorization code flow.
+        Specification: https://datatracker.ietf.org/doc/html/rfc6749#section-3.1
+        PKCE: https://tools.ietf.org/html/rfc7636
+      parameters:
+        - name: client_id
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: scope
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - all
+        - name: response_type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - code
+              - token
+        - name: redirect_uri
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uri
+        - name: state
+          in: query
+          schema:
+            type: string
+        - name: code_challenge
+          description: BASE64URL-ENCODE(SHA256(ASCII(code_verifier)))
+          in: query
+          schema:
+            type: string
+        - name: code_challenge_method
+          in: query
+          schema:
+            type: string
+            format: enum
+              - S256
+      responses:
+        302:
+          description: redirect to `redirect_uri` with `code` and `state` query parameter
+  /oauth2/token:
+    post:
+      summary: OAuth2 token endpoint
+      description: https://datatracker.ietf.org/doc/html/rfc6749#section-3.2
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OAuthTokenRequest'
+      responses:
+        200:
+          description: successfull token request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OAuthTokenResponse'
+  /oauth2/revoke:
+    post:
+      summary: OAuth2 revoke token endpoint
+      description: https://datatracker.ietf.org/doc/html/rfc7009#section-2.1
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OAuthRevokeTokenRequest'
+      responses:
+        200:
+          description: successfully revoked the token
+
   /photoStationById/{country}/{id}:
     get:
       summary: Get a railway station of a country by its id with all its photos
@@ -859,7 +946,10 @@ paths:
 
   /registration:
     post:
-      summary: Register for an account
+      summary: Register a new account
+      description: |
+        DEPRECATED: use oauth instead
+      deprecated: true
       requestBody:
         description: Registration information
         content:
@@ -921,6 +1011,9 @@ paths:
   /resetPassword:
     post:
       summary: Requests a new password only
+      description: |
+        DEPRECATED: use oauth instead
+      deprecated: true
       parameters:
         - name: NameOrEmail
           in: header
@@ -1177,6 +1270,68 @@ components:
         type: string
 
   schemas:
+    OAuthTokenRequest:
+      description: OAuth2 token request
+      type: object
+      properties:
+        grant_type:
+          type: string
+          format: enum
+            - authorization_code
+            - refresh_token
+        refresh_token:
+          type: string
+        code:
+          type: string
+        client_id:
+          type: string
+        redirect_uri:
+          type: string
+          format: uri
+        code_verifier:
+          type: string
+      required:
+        - grant_type
+        - client_id
+        - redirect_uri
+
+    OAuthTokenResponse:
+      description: OAuth2 token response
+      type: object
+      properties:
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+        scope:
+          type: string
+        token_type:
+          type: string
+          format: enum
+            - Bearer
+        expires_in:
+          type: integer
+          format: int64
+      required:
+        - access_token
+        - scope
+        - token_type
+        - redirect
+
+    OAuthRevokeTokenRequest:
+      description: OAuth2 token revokation request
+      type: object
+      properties:
+        token:
+          type: string
+        token_type_hint:
+          type: string
+          format: enum
+            - access_token
+            - refresh_token
+      required:
+        - token
+
     PhotoStations:
       description: Stations with photos
       type: object
