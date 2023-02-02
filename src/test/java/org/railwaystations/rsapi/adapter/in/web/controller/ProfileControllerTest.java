@@ -106,7 +106,7 @@ class ProfileControllerTest {
         verify(userDao).insert(any(User.class), anyString(), anyString());
         verify(userDao, never()).updateCredentials(anyInt(), anyString());
 
-        assertThat(monitor.getMessages().get(0)).isEqualTo("New registration{nickname='nickname', email='nickname@example.com', license='CC0 1.0 Universell (CC0 1.0)', photoOwner=true, link='https://link@example.com', anonymous=false}\nvia UserAgent");
+        assertThat(monitor.getMessages().get(0)).isEqualTo("New registration{nickname='nickname', email='nickname@example.com', license='CC0_10', photoOwner=true, link='https://link@example.com', anonymous=false}\nvia UserAgent");
         assertNewPasswordEmail();
 
         verifyNoMoreInteractions(userDao);
@@ -144,7 +144,7 @@ class ProfileControllerTest {
         verify(userDao).insert(any(User.class), anyString(), anyString());
         verify(userDao, never()).updateCredentials(anyInt(), anyString());
 
-        assertThat(monitor.getMessages().get(0)).isEqualTo("New registration{nickname='nickname', email='nickname@example.com', license='CC0 1.0 Universell (CC0 1.0)', photoOwner=true, link='https://link@example.com', anonymous=false}\nvia UserAgent");
+        assertThat(monitor.getMessages().get(0)).isEqualTo("New registration{nickname='nickname', email='nickname@example.com', license='CC0_10', photoOwner=true, link='https://link@example.com', anonymous=false}\nvia UserAgent");
         assertVerificationEmail();
 
         verifyNoMoreInteractions(userDao);
@@ -177,7 +177,7 @@ class ProfileControllerTest {
                 """;
         postRegistrationWithApiValidation(givenAnonymousUserProfile).andExpect(status().isAccepted());
 
-        assertThat(monitor.getMessages().get(0)).isEqualTo("New registration{nickname='nickname', email='nickname@example.com', license='CC0 1.0 Universell (CC0 1.0)', photoOwner=true, link='https://link@example.com', anonymous=true}\nvia UserAgent");
+        assertThat(monitor.getMessages().get(0)).isEqualTo("New registration{nickname='nickname', email='nickname@example.com', license='CC0_10', photoOwner=true, link='https://link@example.com', anonymous=true}\nvia UserAgent");
     }
 
     @Test

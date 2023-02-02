@@ -911,7 +911,7 @@
         </insert>
     </changeSet>
 
-    <changeSet id="49" author="pstorch">
+    <changeSet id="50" author="pstorch">
         <insert tableName="oauth2_registered_client">
             <column name="id" value="fe75349f-324d-4292-beb8-8179a0017b40"/>
             <column name="client_id" value="RailwayStationsAndroidApp"/>
