@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.ports.in.ManageProfileUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,8 +63,8 @@ public class LoginController {
 
         try {
             var user = User.builder()
-                    .name(newAccount.username)
-                    .email(newAccount.email)
+                    .name(StringUtils.trimToEmpty(newAccount.username))
+                    .email(StringUtils.trimToEmpty(newAccount.email))
                     .newPassword(newAccount.password)
                     .build();
             manageProfileUseCase.register(user, userAgent);

@@ -1,6 +1,6 @@
 package org.railwaystations.rsapi.core.model;
 
-import java.util.Arrays;
+import static java.util.Arrays.stream;
 
 public enum License {
 
@@ -19,7 +19,10 @@ public enum License {
     }
 
     public static License of(String licenseName) {
-        return licenseName != null ? valueOf(licenseName) : null;
+        return stream(values())
+                .filter(lic -> lic.name().equals(licenseName))
+                .findFirst().
+                orElse(null);
     }
 
     public String getDisplayName() {
@@ -31,7 +34,7 @@ public enum License {
     }
 
     public static License ofDisplayName(String displayName) {
-        return Arrays.stream(values())
+        return stream(values())
                 .filter(l -> l.displayName.equals(displayName))
                 .findFirst()
                 .orElse(null);
