@@ -15,7 +15,7 @@ import java.util.Objects;
  */
 
 @JsonTypeName("PhotoStations")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2022-11-26T11:22:49.165554890+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-05T18:08:36.030268796+01:00[Europe/Berlin]")
 public class PhotoStationsDto {
 
     @JsonProperty("photoBaseUrl")
