@@ -3,6 +3,7 @@ package org.railwaystations.rsapi.core.services;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.railwaystations.rsapi.adapter.out.db.OAuth2AuthorizationDao;
 import org.railwaystations.rsapi.adapter.out.db.UserDao;
 import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.ports.in.ManageProfileUseCase;
@@ -21,13 +22,15 @@ public class ProfileService implements ManageProfileUseCase {
     private final Monitor monitor;
     private final Mailer mailer;
     private final UserDao userDao;
+    private final OAuth2AuthorizationDao authorizationDao;
     private final String eMailVerificationUrl;
     private final PasswordEncoder passwordEncoder;
 
-    public ProfileService(Monitor monitor, Mailer mailer, UserDao userDao, @Value("${mailVerificationUrl}") String eMailVerificationUrl, PasswordEncoder passwordEncoder) {
+    public ProfileService(Monitor monitor, Mailer mailer, UserDao userDao, OAuth2AuthorizationDao authorizationDao, @Value("${mailVerificationUrl}") String eMailVerificationUrl, PasswordEncoder passwordEncoder) {
         this.monitor = monitor;
         this.mailer = mailer;
         this.userDao = userDao;
+        this.authorizationDao = authorizationDao;
         this.eMailVerificationUrl = eMailVerificationUrl;
         this.passwordEncoder = passwordEncoder;
     }
@@ -40,6 +43,7 @@ public class ProfileService implements ManageProfileUseCase {
             throw new IllegalArgumentException("Password too short");
         }
         userDao.updateCredentials(user.getId(), passwordEncoder.encode(trimmedPassword));
+        authorizationDao.deleteAllByUser(user.getName());
     }
 
     @Override
@@ -69,6 +73,7 @@ public class ProfileService implements ManageProfileUseCase {
             // if the email is not yet verified, we can verify it with the next login
             userDao.updateEmailVerification(user.getId(), User.EMAIL_VERIFIED_AT_NEXT_LOGIN);
         }
+        authorizationDao.deleteAllByUser(user.getName());
     }
 
     @Override
