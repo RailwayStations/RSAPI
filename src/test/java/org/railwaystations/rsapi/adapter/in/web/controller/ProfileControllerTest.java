@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.railwaystations.rsapi.adapter.in.web.ErrorHandlingControllerAdvice;
+import org.railwaystations.rsapi.adapter.out.db.OAuth2AuthorizationDao;
 import org.railwaystations.rsapi.adapter.out.db.UserDao;
 import org.railwaystations.rsapi.adapter.out.monitoring.MockMonitor;
 import org.railwaystations.rsapi.app.auth.LazySodiumPasswordEncoder;
@@ -54,6 +55,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("mockMvcTest")
 class ProfileControllerTest {
 
+    public static final String EXISTING_USER_NAME = "existing";
+    public static final String EXISTING_EMAIL = "existing@example.com";
     @Autowired
     private MockMvc mvc;
 
@@ -65,6 +68,9 @@ class ProfileControllerTest {
 
     @MockBean
     private UserDao userDao;
+
+    @MockBean
+    private OAuth2AuthorizationDao authorizationDao;
 
     @BeforeEach
     public void setUp() {
@@ -184,8 +190,8 @@ class ProfileControllerTest {
     void testRegisterUserNameTaken() throws Exception {
         givenExistingUser();
         var givenUserProfileWithSameName = """
-                    { "nickname": "existing", "email": "other@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
-                """;
+                    { "nickname": "%s", "email": "other@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
+                """.formatted(EXISTING_USER_NAME);
         postRegistrationWithApiValidation(givenUserProfileWithSameName).andExpect(status().isConflict());
     }
 
@@ -193,8 +199,8 @@ class ProfileControllerTest {
     void testRegisterExistingUserEmailTaken() throws Exception {
         givenExistingUser();
         var givenUserProfileWithSameEmail = """
-                    { "nickname": "othername", "email": "existing@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
-                """;
+                    { "nickname": "othername", "email": "%s", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
+                """.formatted(EXISTING_EMAIL);
         postRegistrationWithApiValidation(givenUserProfileWithSameEmail).andExpect(status().isConflict());
 
         assertThat(monitor.getMessages().get(0)).isEqualTo("Registration for user 'othername' with eMail 'existing@example.com' failed, eMail is already taken\nvia UserAgent");
@@ -204,8 +210,8 @@ class ProfileControllerTest {
     void testRegisterExistingUserEmptyName() throws Exception {
         givenExistingUser();
         var givenUserProfileWithEmptyName = """
-                    { "nickname": "", "email": "existing@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
-                """;
+                    { "nickname": "", "email": "%s", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
+                """.formatted(EXISTING_EMAIL);
         postRegistrationWithApiValidation(givenUserProfileWithEmptyName).andExpect(status().isBadRequest());
     }
 
@@ -221,16 +227,16 @@ class ProfileControllerTest {
                         .with(csrf()))
                 .andExpect(validOpenApi())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nickname").value("existing"));
+                .andExpect(jsonPath("$.nickname").value(EXISTING_USER_NAME));
     }
 
     private void givenExistingUser() {
         var key = "246172676F6E32696424763D3139246D3D36353533362C743D322C703D3124426D4F637165757646794E44754132726B566A6A3177246A7568362F6E6C2F49437A4B475570446E6B674171754A304F7A486A62694F587442542F2B62584D49476300000000000000000000000000000000000000000000000000000000000000";
         var user = User.builder()
-                .name("existing")
+                .name(EXISTING_USER_NAME)
                 .license(License.CC0_10)
                 .id(42)
-                .email("existing@example.com")
+                .email(EXISTING_EMAIL)
                 .ownPhotos(true)
                 .anonymous(false)
                 .key(key)
@@ -242,7 +248,7 @@ class ProfileControllerTest {
 
     @NotNull
     private RequestPostProcessor basicHttpAuthForExistingUser() {
-        return httpBasic("existing@example.com", "y89zFqkL6hro");
+        return httpBasic(EXISTING_EMAIL, "y89zFqkL6hro");
     }
 
     @Test
@@ -253,6 +259,7 @@ class ProfileControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(userDao, never()).updateCredentials(anyInt(), anyString());
+        verify(authorizationDao, never()).deleteAllByUser(EXISTING_USER_NAME);
     }
 
     @NotNull
@@ -285,6 +292,7 @@ class ProfileControllerTest {
 
         verify(userDao, never()).updateCredentials(anyInt(), anyString());
         verify(userDao, never()).updateCredentials(anyInt(), anyString());
+        verify(authorizationDao, never()).deleteAllByUser(EXISTING_USER_NAME);
     }
 
     @Test
@@ -297,6 +305,7 @@ class ProfileControllerTest {
         var idCaptor = ArgumentCaptor.forClass(Integer.class);
         var keyCaptor = ArgumentCaptor.forClass(String.class);
         verify(userDao).updateCredentials(idCaptor.capture(), keyCaptor.capture());
+        verify(authorizationDao).deleteAllByUser(EXISTING_USER_NAME);
 
         assertThat(idCaptor.getValue()).isEqualTo(42);
         assertThat(new LazySodiumPasswordEncoder().matches("secretlong", keyCaptor.getValue())).isTrue();
@@ -312,6 +321,7 @@ class ProfileControllerTest {
         var idCaptor = ArgumentCaptor.forClass(Integer.class);
         var keyCaptor = ArgumentCaptor.forClass(String.class);
         verify(userDao).updateCredentials(idCaptor.capture(), keyCaptor.capture());
+        verify(authorizationDao).deleteAllByUser(EXISTING_USER_NAME);
 
         assertThat(idCaptor.getValue()).isEqualTo(42);
         assertThat(new LazySodiumPasswordEncoder().matches("secretlong", keyCaptor.getValue())).isTrue();
@@ -327,6 +337,7 @@ class ProfileControllerTest {
         var idCaptor = ArgumentCaptor.forClass(Integer.class);
         var keyCaptor = ArgumentCaptor.forClass(String.class);
         verify(userDao).updateCredentials(idCaptor.capture(), keyCaptor.capture());
+        verify(authorizationDao).deleteAllByUser(EXISTING_USER_NAME);
 
         assertThat(idCaptor.getValue()).isEqualTo(42);
         assertThat(new LazySodiumPasswordEncoder().matches("secretbody", keyCaptor.getValue())).isTrue();
@@ -337,8 +348,8 @@ class ProfileControllerTest {
         when(userDao.findByNormalizedName("newname")).thenReturn(Optional.empty());
         givenExistingUser();
         var newProfileJson = """
-                    { "nickname": "new_name", "email": "existing@example.com", "link": "http://twitter.com/", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
-                """;
+                    { "nickname": "new_name", "email": "%s", "link": "http://twitter.com/", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
+                """.formatted(EXISTING_EMAIL);
 
         postMyProfile(newProfileJson).andExpect(status().isOk());
 
@@ -346,7 +357,7 @@ class ProfileControllerTest {
                 .id(42)
                 .name("new_name")
                 .license(License.CC0_10)
-                .email("existing@example.com")
+                .email(EXISTING_EMAIL)
                 .ownPhotos(true)
                 .url("http://twitter.com/")
                 .anonymous(true)
@@ -375,8 +386,8 @@ class ProfileControllerTest {
         when(userDao.findByNormalizedName("newname")).thenReturn(Optional.of(user));
         givenExistingUser();
         var newProfileJson = """
-                    { "nickname": "new_name", "email": "existing@example.com", "link": "http://twitter.com/", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
-                """;
+                    { "nickname": "new_name", "email": "%s", "link": "http://twitter.com/", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
+                """.formatted(EXISTING_EMAIL);
 
         postMyProfile(newProfileJson).andExpect(status().isConflict());
 
@@ -388,15 +399,15 @@ class ProfileControllerTest {
         when(userDao.findByEmail("newname@example.com")).thenReturn(Optional.empty());
         givenExistingUser();
         var newProfileJson = """
-                    { "nickname": "existing", "email": "newname@example.com", "link": "http://twitter.com/", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
-                """;
+                    { "nickname": "%s", "email": "newname@example.com", "link": "http://twitter.com/", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
+                """.formatted(EXISTING_USER_NAME);
 
         postMyProfile(newProfileJson).andExpect(status().isOk());
 
         assertVerificationEmail();
         var user = User.builder()
                 .id(42)
-                .name("existing")
+                .name(EXISTING_USER_NAME)
                 .license(License.CC0_10)
                 .email("newname@example.com")
                 .ownPhotos(true)
@@ -409,9 +420,9 @@ class ProfileControllerTest {
     @Test
     void testResetPasswordViaEmail() throws Exception {
         var user = User.builder()
-                .name("existing")
+                .name(EXISTING_USER_NAME)
                 .license(License.CC0_10)
-                .email("existing@example.com")
+                .email(EXISTING_EMAIL)
                 .ownPhotos(true)
                 .anonymous(false)
                 .url("https://link@example.com")
@@ -419,9 +430,10 @@ class ProfileControllerTest {
         when(userDao.findByNormalizedName(user.getName())).thenReturn(Optional.of(user));
         when(userDao.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
-        postResetPassword("existing@example.com").andExpect(status().isAccepted());
+        postResetPassword(EXISTING_EMAIL).andExpect(status().isAccepted());
 
-        assertThat(monitor.getMessages().get(0)).isEqualTo("Reset Password for 'existing', email='existing@example.com'");
+        verify(authorizationDao).deleteAllByUser(EXISTING_USER_NAME);
+        assertThat(monitor.getMessages().get(0)).isEqualTo(String.format("Reset Password for '%s', email='%s'", EXISTING_USER_NAME, EXISTING_EMAIL));
     }
 
     @NotNull
@@ -436,9 +448,9 @@ class ProfileControllerTest {
     @Test
     void testResetPasswordViaName() throws Exception {
         var user = User.builder()
-                .name("existing")
+                .name(EXISTING_USER_NAME)
                 .license(License.CC0_10)
-                .email("existing@example.com")
+                .email(EXISTING_EMAIL)
                 .ownPhotos(true)
                 .anonymous(false)
                 .url("https://link@example.com")
@@ -446,26 +458,29 @@ class ProfileControllerTest {
         when(userDao.findByNormalizedName(user.getName())).thenReturn(Optional.of(user));
         when(userDao.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
-        postResetPassword("existing").andExpect(status().isAccepted());
+        postResetPassword(EXISTING_USER_NAME).andExpect(status().isAccepted());
 
-        assertThat(monitor.getMessages().get(0)).isEqualTo("Reset Password for 'existing', email='existing@example.com'");
+        verify(authorizationDao).deleteAllByUser(EXISTING_USER_NAME);
+        assertThat(monitor.getMessages().get(0)).isEqualTo(String.format("Reset Password for '%s', email='%s'", EXISTING_USER_NAME, EXISTING_EMAIL));
     }
 
     @Test
     void testResetPasswordUserNotFound() throws Exception {
         postResetPassword("doesnt-exist").andExpect(status().isBadRequest());
+        verify(authorizationDao, never()).deleteAllByUser("doesnt-exist");
     }
 
     @Test
     void testResetPasswordEmailMissing() throws Exception {
         var user = User.builder()
-                .name("existing")
+                .name(EXISTING_USER_NAME)
                 .build();
         when(userDao.findByNormalizedName(user.getName())).thenReturn(Optional.of(user));
         when(userDao.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
-        postResetPassword("existing")
+        postResetPassword(EXISTING_USER_NAME)
                 .andExpect(status().isBadRequest());
+        verify(authorizationDao, never()).deleteAllByUser(EXISTING_USER_NAME);
     }
 
     @Test
@@ -473,9 +488,9 @@ class ProfileControllerTest {
         var token = "verification";
         var user = User.builder()
                 .id(42)
-                .name("existing")
+                .name(EXISTING_USER_NAME)
                 .license(License.CC0_10)
-                .email("existing@example.com")
+                .email(EXISTING_EMAIL)
                 .ownPhotos(true)
                 .anonymous(false)
                 .url("https://link@example.com")
@@ -486,7 +501,7 @@ class ProfileControllerTest {
         getEmailVerification(token)
                 .andExpect(status().isOk());
 
-        assertThat(monitor.getMessages().get(0)).isEqualTo("Email verified {nickname='existing', email='existing@example.com'}");
+        assertThat(monitor.getMessages().get(0)).isEqualTo(String.format("Email verified {nickname='%s', email='%s'}", EXISTING_USER_NAME, EXISTING_EMAIL));
         verify(userDao).updateEmailVerification(42, User.EMAIL_VERIFIED);
     }
 
@@ -503,9 +518,9 @@ class ProfileControllerTest {
         var token = "verification";
         var user = User.builder()
                 .id(42)
-                .name("existing")
+                .name(EXISTING_USER_NAME)
                 .license(License.CC0_10)
-                .email("existing@example.com")
+                .email(EXISTING_EMAIL)
                 .ownPhotos(true)
                 .anonymous(false)
                 .url("https://link@example.com")
