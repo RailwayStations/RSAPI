@@ -88,11 +88,12 @@ public class ProfileController {
 
     private License toLicense(LicenseDto license) {
         if (license == null) {
-            return null;
+            return License.UNKNOWN;
         }
         return switch (license) {
             case CC0_1_0_UNIVERSELL_CC0_1_0_, CC0 -> License.CC0_10;
             case CC_BY_SA_4_0, CC4 -> License.CC_BY_SA_40;
+            case UNKNOWN -> License.UNKNOWN;
         };
     }
 
@@ -119,12 +120,12 @@ public class ProfileController {
 
     private LicenseDto toLicenseDto(License license) {
         if (license == null) {
-            return null;
+            return LicenseDto.UNKNOWN;
         }
         return switch (license) {
             case CC0_10 -> LicenseDto.CC0_1_0_UNIVERSELL_CC0_1_0_;
             case CC_BY_SA_40 -> LicenseDto.CC_BY_SA_4_0;
-            default -> null;
+            default -> LicenseDto.UNKNOWN;
         };
     }
 

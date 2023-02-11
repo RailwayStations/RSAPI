@@ -4,6 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -31,6 +34,7 @@ import org.railwaystations.rsapi.core.ports.out.PhotoStorage;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -95,28 +99,30 @@ class InboxServiceTest {
 
     @Test
     void licenseOfPhotoShouldBeTheLicenseOfUser() {
-        var licenseForPhoto = InboxService.getLicenseForPhoto(createUserWithCC0License(), createCountryWithOverrideLicense(null));
+        var licenseForPhoto = InboxService.getLicenseForPhoto(createValidUser().build(), createCountryWithOverrideLicense(null));
         assertThat(licenseForPhoto).isEqualTo(License.CC0_10);
     }
 
     @Test
     void licenseOfPhotoShouldBeOverridenByLicenseOfCountry() {
-        var licenseForPhoto = InboxService.getLicenseForPhoto(createUserWithCC0License(), createCountryWithOverrideLicense(License.CC_BY_NC_SA_30_DE));
+        var licenseForPhoto = InboxService.getLicenseForPhoto(createValidUser().build(), createCountryWithOverrideLicense(License.CC_BY_NC_SA_30_DE));
         assertThat(licenseForPhoto).isEqualTo(License.CC_BY_NC_SA_30_DE);
     }
 
-    private Country createCountryWithOverrideLicense(License overrideLicense) {
+    static Country createCountryWithOverrideLicense(License overrideLicense) {
         return Country.builder()
                 .code("xx")
                 .overrideLicense(overrideLicense)
                 .build();
     }
 
-    private User createUserWithCC0License() {
+    static User.UserBuilder createValidUser() {
         return User.builder()
+                .name("name")
+                .email("email@example.com")
                 .license(License.CC0_10)
-                .emailVerification(User.EMAIL_VERIFIED)
-                .build();
+                .ownPhotos(true)
+                .emailVerification(User.EMAIL_VERIFIED);
     }
 
     @Nested
@@ -499,7 +505,7 @@ class InboxServiceTest {
             var problemReport = createWrongPhotoProblemReport(EXISTING_PHOTO_ID);
             whenStation1HasPhoto();
 
-            var inboxResponse = inboxService.reportProblem(problemReport, createUserWithCC0License(), null);
+            var inboxResponse = inboxService.reportProblem(problemReport, createValidUser().build(), null);
 
             assertThat(inboxResponse.getState()).isEqualTo(InboxResponse.InboxResponseState.REVIEW);
         }
@@ -509,10 +515,29 @@ class InboxServiceTest {
             var problemReport = createWrongPhotoProblemReport(0L);
             whenStation1HasPhoto();
 
-            var inboxResponse = inboxService.reportProblem(problemReport, createUserWithCC0License(), null);
+            var inboxResponse = inboxService.reportProblem(problemReport, createValidUser().build(), null);
 
             assertThat(inboxResponse.getState()).isEqualTo(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA);
             assertThat(inboxResponse.getMessage()).isEqualTo("Photo with this id not found at station");
+        }
+
+        @ParameterizedTest
+        @MethodSource("invalidUsersForReportProblem")
+        void reportProblemWithInvalidUser(User invalidUser) {
+            var problemReport = createWrongPhotoProblemReport(EXISTING_PHOTO_ID);
+
+            var inboxResponse = inboxService.reportProblem(problemReport, invalidUser, null);
+
+            assertThat(inboxResponse.getState()).isEqualTo(InboxResponse.InboxResponseState.UNAUTHORIZED);
+            assertThat(inboxResponse.getMessage()).isEqualTo("Profile incomplete");
+        }
+
+        static List<Arguments> invalidUsersForReportProblem() {
+            return List.of(
+                    Arguments.of(createValidUser().name(null).build()),
+                    Arguments.of(createValidUser().email(null).build()),
+                    Arguments.of(createValidUser().emailVerification("SOME_TOKEN").build())
+            );
         }
 
         @Test
@@ -520,7 +545,7 @@ class InboxServiceTest {
             var problemReport = createWrongPhotoProblemReport(EXISTING_PHOTO_ID);
             whenStation1HasNoPhoto();
 
-            var inboxResponse = inboxService.reportProblem(problemReport, createUserWithCC0License(), null);
+            var inboxResponse = inboxService.reportProblem(problemReport, createValidUser().build(), null);
 
             assertThat(inboxResponse.getState()).isEqualTo(InboxResponse.InboxResponseState.NOT_ENOUGH_DATA);
             assertThat(inboxResponse.getMessage()).isEqualTo("Problem type is only applicable to station with photo");

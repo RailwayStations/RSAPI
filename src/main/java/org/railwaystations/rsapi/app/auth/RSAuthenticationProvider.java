@@ -6,11 +6,11 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.oauth2.server.authorization.OAuth2Authorization;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-@SuppressWarnings("PMD.BeanMembersShouldSerialize")
 public class RSAuthenticationProvider implements AuthenticationProvider {
 
     @Autowired
@@ -35,15 +35,23 @@ public class RSAuthenticationProvider implements AuthenticationProvider {
             return null;
         }
 
-        // try to verify user defined password
-        if (passwordEncoder.matches(token.getCredentials().toString(), user.getUser().getKey())) {
-            log.info("User verified by password '{}'", user.getUsername());
+        if (token.getCredentials() instanceof OAuth2Authorization oAuth2Authorization) {
+            // try to verify jwt
+            log.info("User verified by jwt '{}'", oAuth2Authorization.getPrincipalName());
             userDetailsService.updateEmailVerification(user.getUser());
 
             return new UsernamePasswordAuthenticationToken(user, token.getCredentials(), user.getAuthorities());
+        } else if (token.getCredentials() instanceof String password) {
+            // try to verify user defined password
+            if (passwordEncoder.matches(password, user.getUser().getKey())) {
+                log.info("User verified by password '{}'", user.getUsername());
+                userDetailsService.updateEmailVerification(user.getUser());
+
+                return new UsernamePasswordAuthenticationToken(user, token.getCredentials(), user.getAuthorities());
+            }
         }
 
-        log.info("Password failed and UploadToken doesn't fit to user '{}'", token.getPrincipal());
+        log.info("Authentication by JWT, Password or UploadToken failed for user '{}'", token.getPrincipal());
         return null;
     }
 

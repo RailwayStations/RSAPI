@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<header th:replace="~{fragments/general.html :: headerfiles(#{login.title})}"></header>
+<body>
+<nav th:replace="~{fragments/general.html :: navbar}"></nav>
+
+<div class="container">
+    <form class="form-signin" th:action="@{/login}" method="post">
+        <input th:name="${_csrf.parameterName}" type="hidden" th:value="${_csrf.token}"/>
+        <h2 class="form-signin-heading" th:text="#{login.title}"></h2>
+        <div th:if="${param.error}" class="alert alert-danger" role="alert" th:text="#{login.invalid}"></div>
+        <div th:if="${param.logout}" class="alert alert-info" role="alert" th:text="#{login.logged_out}"></div>
+        <div th:if="${param.reset_password_error}" class="alert alert-danger" role="alert"
+             th:text="#{login.reset_password.error}"></div>
+        <div th:if="${param.reset_password_success}" class="alert alert-info" role="alert"
+             th:text="#{login.reset_password.success}"></div>
+        <div th:if="${param.register_success}" class="alert alert-info" role="alert"
+             th:text="#{login.register.success}"></div>
+
+        <div>
+            <label for="username" class="sr-only" th:placeholder="#{login.username}"></label>
+            <input id="username" type="text" name="username" th:placeholder="#{login.username}"
+                   th:value="${param.username}"
+                   class="form-control"
+                   required/>
+        </div>
+        <div>
+            <label for="password" class="sr-only" th:placeholder="#{login.password}"></label>
+            <input id="password" type="password" name="password" th:placeholder="#{login.password}"
+                   class="form-control"/>
+        </div>
+        <div>&nbsp;</div>
+        <div>
+            <button class="btn btn-lg btn-primary btn-block" type="submit" th:text="#{login.log_in.button}"></button>
+            <button class="btn btn-lg btn-secondary btn-block" type="submit" th:text="#{login.reset_password.button}"
+                    th:formaction="@{/loginResetPassword}"></button>
+            <a th:href="@{/loginRegister}" class="btn btn-lg btn-secondary btn-block"
+               th:text="#{login.register.button}"></a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

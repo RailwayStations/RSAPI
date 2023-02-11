@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.log.LogMessage;
 import org.springframework.http.HttpHeaders;
@@ -14,6 +15,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
+import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.web.authentication.NullRememberMeServices;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.www.BasicAuthenticationConverter;
@@ -23,7 +26,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-@SuppressWarnings("PMD.BeanMembersShouldSerialize")
+@RequiredArgsConstructor
 public class RSAuthenticationFilter extends OncePerRequestFilter {
 
     private SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder
@@ -37,9 +40,7 @@ public class RSAuthenticationFilter extends OncePerRequestFilter {
 
     private SecurityContextRepository securityContextRepository = new RequestAttributeSecurityContextRepository();
 
-    public RSAuthenticationFilter(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
-    }
+    private final OAuth2AuthorizationService oAuth2AuthorizationService;
 
     public void setSecurityContextRepository(SecurityContextRepository securityContextRepository) {
         this.securityContextRepository = securityContextRepository;
@@ -61,10 +62,14 @@ public class RSAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain)
             throws ServletException, IOException {
-        var authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+        var authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         UsernamePasswordAuthenticationToken authentication = null;
-        if (StringUtils.isNotBlank(authorization)) {
-            authentication = authenticationConverter.convert(request);
+        if (StringUtils.isNotBlank(authorizationHeader)) {
+            if (authorizationHeader.startsWith("Bearer ")) {
+                authentication = getJwtAuthentication(authorizationHeader);
+            } else if (authorizationHeader.startsWith("Basic ")) {
+                authentication = authenticationConverter.convert(request);
+            }
         }
 
         if (authentication == null) {
@@ -98,6 +103,22 @@ public class RSAuthenticationFilter extends OncePerRequestFilter {
         }
 
         chain.doFilter(request, response);
+    }
+
+    private UsernamePasswordAuthenticationToken getJwtAuthentication(String authorizationHeader) {
+        try {
+            var bearerToken = authorizationHeader.substring(7);
+            var authorization = oAuth2AuthorizationService != null ? oAuth2AuthorizationService.findByToken(bearerToken, OAuth2TokenType.ACCESS_TOKEN) : null;
+            var accessToken = authorization != null ? authorization.getAccessToken() : null;
+            if (accessToken != null && accessToken.isActive()) {
+                var user = authorization.getPrincipalName();
+                return new UsernamePasswordAuthenticationToken(user, authorization);
+            }
+            return null;
+        } catch (Exception e) {
+            logger.error("Failed to parse JWT Bearer token", e);
+        }
+        return null;
     }
 
 }

@@ -61,7 +61,7 @@ public class User {
     }
 
     public static String normalizeName(String name) {
-        return StringUtils.trimToEmpty(name).toLowerCase(Locale.ENGLISH).replaceAll("[^a-z\\d]","");
+        return StringUtils.trimToEmpty(name).toLowerCase(Locale.ENGLISH).replaceAll("[^a-z\\d]", "");
     }
 
     public static String normalizeEmail(String email) {
@@ -93,20 +93,22 @@ public class User {
         if (StringUtils.isNotBlank(url)) {
             URL validatedUrl;
             try {
-                validatedUrl = new URL( url );
+                validatedUrl = new URL(url);
             } catch (MalformedURLException e) {
                 return false;
             }
-            if (!validatedUrl.getProtocol().matches("https?")) {
-                return false;
-            }
+            return validatedUrl.getProtocol().matches("https?");
         }
 
-        if (!ownPhotos) {
-            return false;
-        }
+        return true;
+    }
 
-        return License.CC0_10.equals(license);
+    public boolean isEligibleToUploadPhoto() {
+        return isValid() && isEmailVerified() && ownPhotos && License.CC0_10.equals(license);
+    }
+
+    public boolean isEligibleToReportProblem() {
+        return isEmailVerified() && isValid();
     }
 
     public boolean isEmailVerified() {

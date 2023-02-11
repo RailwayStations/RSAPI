@@ -3,6 +3,7 @@ package org.railwaystations.rsapi.core.services;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.railwaystations.rsapi.adapter.out.db.OAuth2AuthorizationDao;
 import org.railwaystations.rsapi.adapter.out.db.UserDao;
 import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.ports.in.ManageProfileUseCase;
@@ -21,13 +22,15 @@ public class ProfileService implements ManageProfileUseCase {
     private final Monitor monitor;
     private final Mailer mailer;
     private final UserDao userDao;
+    private final OAuth2AuthorizationDao authorizationDao;
     private final String eMailVerificationUrl;
     private final PasswordEncoder passwordEncoder;
 
-    public ProfileService(Monitor monitor, Mailer mailer, UserDao userDao, @Value("${mailVerificationUrl}") String eMailVerificationUrl, PasswordEncoder passwordEncoder) {
+    public ProfileService(Monitor monitor, Mailer mailer, UserDao userDao, OAuth2AuthorizationDao authorizationDao, @Value("${mailVerificationUrl}") String eMailVerificationUrl, PasswordEncoder passwordEncoder) {
         this.monitor = monitor;
         this.mailer = mailer;
         this.userDao = userDao;
+        this.authorizationDao = authorizationDao;
         this.eMailVerificationUrl = eMailVerificationUrl;
         this.passwordEncoder = passwordEncoder;
     }
@@ -36,10 +39,11 @@ public class ProfileService implements ManageProfileUseCase {
     public void changePassword(User user, String newPassword) {
         log.info("Password change for '{}'", user.getEmail());
         var trimmedPassword = StringUtils.trimToEmpty(newPassword);
-        if (trimmedPassword.length() < 8 ) {
+        if (trimmedPassword.length() < 8) {
             throw new IllegalArgumentException("Password too short");
         }
         userDao.updateCredentials(user.getId(), passwordEncoder.encode(trimmedPassword));
+        authorizationDao.deleteAllByUser(user.getName());
     }
 
     @Override
@@ -69,6 +73,7 @@ public class ProfileService implements ManageProfileUseCase {
             // if the email is not yet verified, we can verify it with the next login
             userDao.updateEmailVerification(user.getId(), User.EMAIL_VERIFIED_AT_NEXT_LOGIN);
         }
+        authorizationDao.deleteAllByUser(user.getName());
     }
 
     @Override
@@ -113,7 +118,7 @@ public class ProfileService implements ManageProfileUseCase {
 
         monitor.sendMessage(
                 String.format("New registration{nickname='%s', email='%s', license='%s', photoOwner=%s, link='%s', anonymous=%s}%nvia %s",
-                        newUser.getName(), newUser.getEmail(), newUser.getLicense().getDisplayName(), newUser.isOwnPhotos(),
+                        newUser.getName(), newUser.getEmail(), newUser.getLicense(), newUser.isOwnPhotos(),
                         newUser.getUrl(), newUser.isAnonymous(), clientInfo));
     }
 
@@ -181,20 +186,20 @@ public class ProfileService implements ManageProfileUseCase {
 
     private void sendPasswordMail(String email, String newPassword) {
         var text = String.format("""
-                        Hello,
-                        
-                        your new password is: %1$s
-                        
-                        Cheers
-                        Your Railway-Stations-Team
-                        
-                        ---
-                        Hallo,
-                        
-                        Dein neues Passwort lautet: %1$s
-                        
-                        Viele Grüße
-                        Dein Bahnhofsfoto-Team""", newPassword);
+                Hello,
+                                        
+                your new password is: %1$s
+                                        
+                Cheers
+                Your Railway-Stations-Team
+                                        
+                ---
+                Hallo,
+                                        
+                Dein neues Passwort lautet: %1$s
+                                        
+                Viele Grüße
+                Dein Bahnhofsfoto-Team""", newPassword);
         mailer.send(email, "Railway-Stations.org new password", text);
         log.info("Password sent to {}", email);
     }
@@ -202,20 +207,20 @@ public class ProfileService implements ManageProfileUseCase {
     private void sendEmailVerification(String email, String emailVerificationToken) {
         var url = eMailVerificationUrl + emailVerificationToken;
         var text = String.format("""
-                        Hello,
-                        
-                        please click on %1$s to verify your eMail-Address.
-                        
-                        Cheers
-                        Your Railway-Stations-Team
-                        
-                        ---
-                        Hallo,
-                        
-                        bitte klicke auf %1$s, um Deine eMail-Adresse zu verifizieren.
-                        
-                        Viele Grüße
-                        Dein Bahnhofsfoto-Team""", url);
+                Hello,
+                                        
+                please click on %1$s to verify your eMail-Address.
+                                        
+                Cheers
+                Your Railway-Stations-Team
+                                        
+                ---
+                Hallo,
+                                        
+                bitte klicke auf %1$s, um Deine eMail-Adresse zu verifizieren.
+                                        
+                Viele Grüße
+                Dein Bahnhofsfoto-Team""", url);
         mailer.send(email, "Railway-Stations.org eMail verification", text);
         log.info("Email verification sent to {}", email);
     }

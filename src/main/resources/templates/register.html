@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<header th:replace="~{fragments/general.html :: headerfiles(#{register.title})}"></header>
+<body>
+<nav th:replace="~{fragments/general.html :: navbar}"></nav>
+
+<div class="container">
+    <form th:action="@{/loginRegister}" method="post" th:object="${newAccount}">
+        <input th:name="${_csrf.parameterName}" type="hidden" th:value="${_csrf.token}"/>
+        <h2 class="form-heading" th:text="#{register.title}"></h2>
+
+        <div th:if="${#fields.hasGlobalErrors()}">
+            <div th:each="err : ${#fields.globalErrors()}" th:text="${err}" class="alert alert-danger"
+                 role="alert"></div>
+        </div>
+
+        <div>
+            <label th:for="username" class="sr-only" th:placeholder="#{register.username}"></label>
+            <input type="text" th:field="*{username}" th:placeholder="#{register.username}" class="form-control"
+                   required maxlength="30"/>
+            <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}">Username Error</div>
+        </div>
+        <div>
+            <label th:for="email" class="sr-only" th:placeholder="#{register.email}"></label>
+            <input type="email" th:field="*{email}" th:placeholder="#{register.email}" class="form-control"
+                   required maxlength="100"/>
+            <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Email Error</div>
+        </div>
+        <div>
+            <label th:for="password" class="sr-only" th:placeholder="#{register.password}"></label>
+            <input type="password" th:field="*{password}" th:placeholder="#{register.password}"
+                   class="form-control" maxlength="100"/>
+            <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password Error</div>
+        </div>
+        <div>
+            <label th:for="passwordRepeat" class="sr-only" th:placeholder="#{register.passwordRepeat}"></label>
+            <input type="password" th:field="*{passwordRepeat}"
+                   th:placeholder="#{register.passwordRepeat}"
+                   class="form-control" maxlength="100"/>
+            <div th:if="${#fields.hasErrors('passwordRepeat')}" th:errors="*{passwordRepeat}">PasswordRepeat Error</div>
+        </div>
+        <div>&nbsp;</div>
+        <div>
+            <button class="btn btn-lg btn-primary btn-block" type="submit" th:text="#{register.create.button}"></button>
+        </div>
+    </form>
+</div>
+</body>
+</html>

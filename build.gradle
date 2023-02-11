@@ -68,6 +68,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-jdbc"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
+    implementation "org.springframework.security:spring-security-oauth2-authorization-server:1.0.0"
     implementation 'org.liquibase:liquibase-core:4.19.0'
     implementation "org.jdbi:jdbi3-spring5:$jdbiVersion"
     implementation "org.jdbi:jdbi3-sqlobject:$jdbiVersion"
@@ -79,13 +80,13 @@ dependencies {
     implementation 'io.swagger.core.v3:swagger-annotations:2.2.8'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.14.2'
     implementation 'org.hibernate.validator:hibernate-validator:8.0.0.Final'
+    implementation 'org.webjars:bootstrap:5.2.3'
 
     compileOnly 'org.projectlombok:lombok'
 
     annotationProcessor 'org.projectlombok:lombok'
 
     runtimeOnly "org.mariadb.jdbc:mariadb-java-client:3.1.2"
-    runtimeOnly "org.springframework.boot:spring-boot-properties-migrator"
 
     testImplementation "org.springframework.boot:spring-boot-starter-test"
     testImplementation "org.springframework.security:spring-security-test"
