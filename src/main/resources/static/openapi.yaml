@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20230202.2130"
+  version: "20230211.1245"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -1640,6 +1640,7 @@ components:
         - CC0 1.0 Universell (CC0 1.0)
         - CC4
         - CC BY-SA 4.0
+        - UNKNOWN
 
     UpdateProfile:
       description: User profile information
