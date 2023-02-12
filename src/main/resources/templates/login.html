@@ -5,7 +5,7 @@
 <nav th:replace="~{fragments/general.html :: navbar}"></nav>
 
 <div class="container">
-    <form class="form-signin" th:action="@{/login}" method="post">
+    <form class="form-signin" th:action="@{/login}" method="post" autocomplete="on">
         <input th:name="${_csrf.parameterName}" type="hidden" th:value="${_csrf.token}"/>
         <h2 class="form-signin-heading" th:text="#{login.title}"></h2>
         <div th:if="${param.error}" class="alert alert-danger" role="alert" th:text="#{login.invalid}"></div>
@@ -19,7 +19,7 @@
 
         <div>
             <label for="username" class="sr-only" th:placeholder="#{login.username}"></label>
-            <input id="username" type="text" name="username" th:placeholder="#{login.username}"
+            <input id="username" type="text" name="username" th:placeholder="#{login.username}" autocomplete="username"
                    th:value="${param.username}"
                    class="form-control"
                    required/>
@@ -27,6 +27,7 @@
         <div>
             <label for="password" class="sr-only" th:placeholder="#{login.password}"></label>
             <input id="password" type="password" name="password" th:placeholder="#{login.password}"
+                   autocomplete="password"
                    class="form-control"/>
         </div>
         <div>&nbsp;</div>
