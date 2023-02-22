@@ -17,6 +17,6 @@ jobs:
           java-version: '18'
           distribution: 'temurin'
       - name: Validate Gradle wrapper
-        uses: gradle/wrapper-validation-action@dabb1b52d35733fde278c288e4781d4336d4c29c
+        uses: gradle/wrapper-validation-action@9c75b4d3d1e1ab9cf779938de55702cde22cd29f
       - name: Build with Gradle
         run: ./gradlew --no-daemon build bootJar
