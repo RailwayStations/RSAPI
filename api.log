@@ -37,6 +37,7 @@ GET /config.bak.php
 GET /config.json
 GET /config.php
 GET /core/.env
+GET /de/
 GET /debug/default/view?panel=
 GET /demo/
 GET /dev/
@@ -56,6 +57,7 @@ GET /info.php
 GET /larva.php?idb=
 GET /legion.php
 GET /login.action
+GET /logo_white.svg
 GET /media/wp-includes/wlwmanifest.xml
 GET /media/system/en/core.js
 GET /modules/bamegamenu/ajax_phpcode.php?code=
@@ -72,12 +74,17 @@ GET /plugins/content/apismtp/apismtp.php.suspected?test=
 GET /plugins/content/apismtp/apismtp.php?test=
 GET /pl/
 GET /portal/      
+GET /public/_ignition/health-check/
 GET /robots.txt
 GET /server-status
 GET /sbkmyjvm.php?Fox=
 GET /shop/wp-includes/wlwmanifest.xml
 GET /site
+GET /sitemap.txt
 GET /sitemap.xml
+GET /sitemap.xml.gz
+GET /sitemaps.xml
+GET /sitemap_index.xml
 GET /sites/default/files/
 GET /site/wp-commentin.php
 GET /site/
@@ -85,8 +92,11 @@ GET /site/wp-includes/wlwmanifest.xml
 GET /sito/wp-includes/wlwmanifest.xml
 GET /style.php
 GET /style.php?sig=
+GET /style.css
+GET /style.php?sig=
 GET /s/en
 GET /telescope/requests
+GET /test_404_page/
 GET /test.php?Ghost=
 GET /test/wp-includes/wlwmanifest.xml
 GET /th3_err0r.php?php=
@@ -249,6 +259,7 @@ GET /wp-includes/wpconfig.bak.php?act=
 GET /wp-includes/xleet.php
 GET /wp-json/wp_live_chat_support/en/remote_upload
 GET /wp-login.php
+GET /_ignition/health-check/
 GET /wp/wp-login.php
 GET /xleet.php
 GET /xleet-shell.php
@@ -302,72 +313,90 @@ POST /wp-plain.php
 
 PUT /api/en/cmdb/system/admin/admin
 
-     98 GET /
-     13 GET /adminInbox
-     21 GET /adminInboxCount
-    708 GET /countries
-     25 GET /countries.json
+    129 GET /
+     28 GET /adminInbox
+     44 GET /adminInboxCount
+   1108 GET /countries
+     17 GET /countries.json
       2 GET /countries.json?onlyActive=
       1 GET /countries?onlyActive=
-      6 GET /emailVerification/*
-    215 GET /inbox/processed/*.jpg
-    293 GET /inbox/processed/*.jpg?width=
-     69 GET /inbox/*.jpg
-      5 GET /inbox/*.jpg?width=
-     38 GET /myProfile
-     25 GET /nextZ
-      3 GET /openapi.yaml
-   4257 GET /photoStationById/
-     22 GET /photoStationById/*
-  15647 GET /photoStationById/*/*
-   1433 GET /photoStationsByCountry/*
-     18 GET /photoStationsByCountry/*?hasPhoto=
-      4 GET /photoStationsByCountry/*?hasPhoto=&isActive=
-     10 GET /photoStationsByPhotographer/*
-      3 GET /photoStationsByRecentPhotoImports
-    274 GET /photoStationsByRecentPhotoImports?sinceHours=
-     12 GET /photographers
-      1 GET /photographers.json
+     10 GET /emailVerification/*
+    134 GET /inbox/processed/*.jpg
+    370 GET /inbox/processed/*.jpg?width=
+     77 GET /inbox/*.jpg
+    100 GET /inbox/*.jpg?width=
+     28 GET /login
+    197 GET /myProfile
+     27 GET /nextZ
+      4 GET /oauth2/authorize?client_id=
+     36 GET /oauth2/authorize?client_id=&code_challenge=&code_challenge_method=&scope=&response_type=&redirect_uri=
+     12 GET /oauth2/authorize?client_id=&code_challenge=&code_challenge_method=&scope=&response_type=&redirect_uri=&continue
+      8 GET /oauth2/consent?scope=&client_id=&state=
+      7 GET /openapi.yaml
+     40 GET /photoStationById/
+     40 GET /photoStationById/*
+      1 GET /photoStationById/ch\xe9\x8e\x88&
+      1 GET /photoStationById/convert(int,sys.fn_sqlvarbasetostr(HashBytes(&
+      1 GET /photoStationById/extractvalue(1,concat(char(126),md5(1091526963)))/
+      1 GET /photoStationById/${847558390+822822947}/
+      1 GET /photoStationById/${862237440+866670546}/
+      1 GET /photoStationById/${(886830364+931690527)?c}/
+      1 GET /photoStationById/${@var_dump(md5(390751627))};/
+      1 GET /photoStationById/*1*/{{865621616+944287619}}/
+   9421 GET /photoStationById/*/*
+      1 GET /photoStations
+      1 GET /photoStationsByCountry
+   2248 GET /photoStationsByCountry/*
+     17 GET /photoStationsByCountry/*?hasPhoto=
+     45 GET /photoStationsByPhotographer/*
+    358 GET /photoStationsByRecentPhotoImports?sinceHours=
+      2 GET /photoUpload
+     13 GET /photographers
       2 GET /photographers.txt
-     49 GET /photographers?country=
+    131 GET /photographers?country=
       3 GET /photos
-      1 GET /photos/
-  14649 GET /photos/*/*
-    775 GET /publicInbox
-   6902 GET /stations?country=
-     14 GET /stations?country=&active=
-      4 GET /stations?country=&country=
-      5 GET /stations?country=&country=&country=
-     21 GET /stations?country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=
-      8 GET /stations?country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=
-      1 GET /stations?country=&country=&country=&photographer=
-  21407 GET /stats
-      1 GET /stats.json
-    149 GET /stats.json?country=
-    320 GET /stats?country=
-      1 GET /*/photographers
-      7 GET /*/photographers.json
-   4303 GET /*/stations
-      1 GET /*/stations.json
-   8845 GET /*/stations/*
+      1 GET /photos/Argentina/Cory%20Jensen
+  12547 GET /photos/*/*
+   1427 GET /publicInbox
+      2 GET /stations
+   7388 GET /stations?country=
+     15 GET /stations?country=&active=
+      2 GET /stations?country=&country=
+      4 GET /stations?country=&country=&country=
+      4 GET /stations?country=&country=&country=&country=
+  21364 GET /stats
+    358 GET /stats?country=
+      2 GET /*/photographers.json
+      1 GET /*/photographers.txt
+   4336 GET /*/stations
+      1 GET /*/stations.txt?hasPhoto=
+   9894 GET /*/stations/*
+      1 GET /*/stations?hasPhoto=
       1 GET /*/stations?maxDistance=&lat=&lon=
-    191 GET /*/stats
-      1 GET /*/stats.txt
+      3 GET /*/stations?photographer=
+     48 GET /*/stats
+     35 GET /webjars/bootstrap/5.2.3/css/bootstrap.min.css
 
-      7 HEAD /
-      4 HEAD /photos/*/*
+      3 HEAD /
+      3 HEAD /photos/*/*
 
-    217 OPTIONS /adminInbox
-     20 OPTIONS /adminInboxCount
-     21 OPTIONS /myProfile
-      2 OPTIONS /registration
+    167 OPTIONS /adminInbox
+     44 OPTIONS /adminInboxCount
+      1 OPTIONS /changePassword
+    130 OPTIONS /myProfile
+      4 OPTIONS /registration
+      1 OPTIONS /resendEmailVerification
+      4 OPTIONS /resetPassword
 
-      3 POST /
-    210 POST /adminInbox
-      3 POST /changePassword
-      3 POST /myProfile
-    233 POST /photoUpload
-      9 POST /registration
-      1 POST /reportProblem
-      2 POST /resetPassword
-    261 POST /userInbox
+      2 POST /
+    142 POST /adminInbox
+      1 POST /changePassword
+     12 POST /login
+     12 POST /myProfile
+      4 POST /oauth2/authorize
+     26 POST /oauth2/token
+     79 POST /photoUpload
+     11 POST /registration
+      2 POST /resendEmailVerification
+      4 POST /resetPassword
+     58 POST /userInbox
