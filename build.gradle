@@ -69,7 +69,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
     implementation "org.springframework.security:spring-security-oauth2-authorization-server:1.0.1"
-    implementation 'org.liquibase:liquibase-core:4.19.0'
+    implementation 'org.liquibase:liquibase-core:4.19.1'
     implementation "org.jdbi:jdbi3-spring5:$jdbiVersion"
     implementation "org.jdbi:jdbi3-sqlobject:$jdbiVersion"
     implementation "com.goterl:lazysodium-java:5.1.4"
