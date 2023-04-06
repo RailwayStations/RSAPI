@@ -12,26 +12,41 @@ import java.util.Objects;
  */
 
 @JsonTypeName("Photo")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class PhotoDto {
 
-    @JsonProperty("id")
     private Long id;
 
-    @JsonProperty("photographer")
     private String photographer;
 
-    @JsonProperty("path")
     private String path;
 
-    @JsonProperty("createdAt")
     private Long createdAt;
 
-    @JsonProperty("license")
     private String license;
 
-    @JsonProperty("outdated")
     private Boolean outdated = false;
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link PhotoDto#PhotoDto(Long, String, String, Long, String)}
+     */
+    @Deprecated
+    public PhotoDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public PhotoDto(Long id, String photographer, String path, Long createdAt, String license) {
+        this.id = id;
+        this.photographer = photographer;
+        this.path = path;
+        this.createdAt = createdAt;
+        this.license = license;
+    }
 
     public PhotoDto id(Long id) {
         this.id = id;
@@ -44,6 +59,7 @@ public class PhotoDto {
      * @return id
      */
     @NotNull
+    @JsonProperty("id")
     public Long getId() {
         return id;
     }
@@ -63,6 +79,7 @@ public class PhotoDto {
      * @return photographer
      */
     @NotNull
+    @JsonProperty("photographer")
     public String getPhotographer() {
         return photographer;
     }
@@ -82,6 +99,7 @@ public class PhotoDto {
      * @return path
      */
     @NotNull
+    @JsonProperty("path")
     public String getPath() {
         return path;
     }
@@ -101,6 +119,7 @@ public class PhotoDto {
      * @return createdAt
      */
     @NotNull
+    @JsonProperty("createdAt")
     public Long getCreatedAt() {
         return createdAt;
     }
@@ -120,6 +139,7 @@ public class PhotoDto {
      * @return license
      */
     @NotNull
+    @JsonProperty("license")
     public String getLicense() {
         return license;
     }
@@ -139,6 +159,7 @@ public class PhotoDto {
      * @return outdated
      */
 
+    @JsonProperty("outdated")
     public Boolean getOutdated() {
         return outdated;
     }

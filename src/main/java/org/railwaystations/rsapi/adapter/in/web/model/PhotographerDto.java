@@ -14,14 +14,29 @@ import java.util.Objects;
  */
 
 @JsonTypeName("Photographer")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class PhotographerDto {
 
-    @JsonProperty("name")
     private String name;
 
-    @JsonProperty("url")
     private URI url;
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link PhotographerDto#PhotographerDto(String)}
+     */
+    @Deprecated
+    public PhotographerDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public PhotographerDto(String name) {
+        this.name = name;
+    }
 
     public PhotographerDto name(String name) {
         this.name = name;
@@ -34,6 +49,7 @@ public class PhotographerDto {
      * @return name
      */
     @NotNull
+    @JsonProperty("name")
     public String getName() {
         return name;
     }
@@ -53,6 +69,7 @@ public class PhotographerDto {
      * @return url
      */
     @Valid
+    @JsonProperty("url")
     public URI getUrl() {
         return url;
     }

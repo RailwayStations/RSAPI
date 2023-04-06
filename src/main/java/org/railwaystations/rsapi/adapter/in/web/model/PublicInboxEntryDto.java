@@ -12,23 +12,39 @@ import java.util.Objects;
  */
 
 @JsonTypeName("PublicInboxEntry")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class PublicInboxEntryDto {
 
-    @JsonProperty("countryCode")
     private String countryCode;
 
-    @JsonProperty("stationId")
     private String stationId;
 
-    @JsonProperty("title")
     private String title;
 
-    @JsonProperty("lat")
     private Double lat;
 
-    @JsonProperty("lon")
     private Double lon;
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link PublicInboxEntryDto#PublicInboxEntryDto(String, String, String, Double, Double)}
+     */
+    @Deprecated
+    public PublicInboxEntryDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public PublicInboxEntryDto(String countryCode, String stationId, String title, Double lat, Double lon) {
+        this.countryCode = countryCode;
+        this.stationId = stationId;
+        this.title = title;
+        this.lat = lat;
+        this.lon = lon;
+    }
 
     public PublicInboxEntryDto countryCode(String countryCode) {
         this.countryCode = countryCode;
@@ -41,6 +57,7 @@ public class PublicInboxEntryDto {
      * @return countryCode
      */
     @NotNull
+    @JsonProperty("countryCode")
     public String getCountryCode() {
         return countryCode;
     }
@@ -60,6 +77,7 @@ public class PublicInboxEntryDto {
      * @return stationId
      */
     @NotNull
+    @JsonProperty("stationId")
     public String getStationId() {
         return stationId;
     }
@@ -79,6 +97,7 @@ public class PublicInboxEntryDto {
      * @return title
      */
     @NotNull
+    @JsonProperty("title")
     public String getTitle() {
         return title;
     }
@@ -98,6 +117,7 @@ public class PublicInboxEntryDto {
      * @return lat
      */
     @NotNull
+    @JsonProperty("lat")
     public Double getLat() {
         return lat;
     }
@@ -117,6 +137,7 @@ public class PublicInboxEntryDto {
      * @return lon
      */
     @NotNull
+    @JsonProperty("lon")
     public Double getLon() {
         return lon;
     }

@@ -12,11 +12,27 @@ import java.util.Objects;
  */
 
 @JsonTypeName("InboxCountResponse")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class InboxCountResponseDto {
 
-    @JsonProperty("pendingInboxEntries")
     private Long pendingInboxEntries;
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link InboxCountResponseDto#InboxCountResponseDto(Long)}
+     */
+    @Deprecated
+    public InboxCountResponseDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public InboxCountResponseDto(Long pendingInboxEntries) {
+        this.pendingInboxEntries = pendingInboxEntries;
+    }
 
     public InboxCountResponseDto pendingInboxEntries(Long pendingInboxEntries) {
         this.pendingInboxEntries = pendingInboxEntries;
@@ -29,6 +45,7 @@ public class InboxCountResponseDto {
      * @return pendingInboxEntries
      */
     @NotNull
+    @JsonProperty("pendingInboxEntries")
     public Long getPendingInboxEntries() {
         return pendingInboxEntries;
     }

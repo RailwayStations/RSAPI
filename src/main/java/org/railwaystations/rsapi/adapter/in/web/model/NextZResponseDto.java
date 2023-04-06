@@ -12,11 +12,27 @@ import java.util.Objects;
  */
 
 @JsonTypeName("NextZResponse")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class NextZResponseDto {
 
-    @JsonProperty("nextZ")
     private String nextZ;
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link NextZResponseDto#NextZResponseDto(String)}
+     */
+    @Deprecated
+    public NextZResponseDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public NextZResponseDto(String nextZ) {
+        this.nextZ = nextZ;
+    }
 
     public NextZResponseDto nextZ(String nextZ) {
         this.nextZ = nextZ;
@@ -29,6 +45,7 @@ public class NextZResponseDto {
      * @return nextZ
      */
     @NotNull
+    @JsonProperty("nextZ")
     public String getNextZ() {
         return nextZ;
     }

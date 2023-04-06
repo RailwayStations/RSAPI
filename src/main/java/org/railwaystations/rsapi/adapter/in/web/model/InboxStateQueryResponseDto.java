@@ -14,34 +14,25 @@ import java.util.Objects;
  */
 
 @JsonTypeName("InboxStateQueryResponse")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class InboxStateQueryResponseDto {
 
-    @JsonProperty("id")
     private Long id;
 
-    @JsonProperty("countryCode")
     private String countryCode;
 
-    @JsonProperty("stationId")
     private String stationId;
 
-    @JsonProperty("lat")
     private Double lat;
 
-    @JsonProperty("lon")
     private Double lon;
 
-    @JsonProperty("rejectedReason")
     private String rejectedReason;
 
-    @JsonProperty("filename")
     private String filename;
 
-    @JsonProperty("inboxUrl")
     private String inboxUrl;
 
-    @JsonProperty("crc32")
     private Long crc32;
 
     /**
@@ -85,8 +76,25 @@ public class InboxStateQueryResponseDto {
         }
     }
 
-    @JsonProperty("state")
     private StateEnum state;
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link InboxStateQueryResponseDto#InboxStateQueryResponseDto(Long, StateEnum)}
+     */
+    @Deprecated
+    public InboxStateQueryResponseDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public InboxStateQueryResponseDto(Long id, StateEnum state) {
+        this.id = id;
+        this.state = state;
+    }
 
     public InboxStateQueryResponseDto id(Long id) {
         this.id = id;
@@ -99,6 +107,7 @@ public class InboxStateQueryResponseDto {
      * @return id
      */
     @NotNull
+    @JsonProperty("id")
     public Long getId() {
         return id;
     }
@@ -118,6 +127,7 @@ public class InboxStateQueryResponseDto {
      * @return countryCode
      */
 
+    @JsonProperty("countryCode")
     public String getCountryCode() {
         return countryCode;
     }
@@ -137,6 +147,7 @@ public class InboxStateQueryResponseDto {
      * @return stationId
      */
 
+    @JsonProperty("stationId")
     public String getStationId() {
         return stationId;
     }
@@ -156,6 +167,7 @@ public class InboxStateQueryResponseDto {
      * @return lat
      */
 
+    @JsonProperty("lat")
     public Double getLat() {
         return lat;
     }
@@ -175,6 +187,7 @@ public class InboxStateQueryResponseDto {
      * @return lon
      */
 
+    @JsonProperty("lon")
     public Double getLon() {
         return lon;
     }
@@ -194,6 +207,7 @@ public class InboxStateQueryResponseDto {
      * @return rejectedReason
      */
 
+    @JsonProperty("rejectedReason")
     public String getRejectedReason() {
         return rejectedReason;
     }
@@ -213,6 +227,7 @@ public class InboxStateQueryResponseDto {
      * @return filename
      */
 
+    @JsonProperty("filename")
     public String getFilename() {
         return filename;
     }
@@ -232,6 +247,7 @@ public class InboxStateQueryResponseDto {
      * @return inboxUrl
      */
 
+    @JsonProperty("inboxUrl")
     public String getInboxUrl() {
         return inboxUrl;
     }
@@ -251,6 +267,7 @@ public class InboxStateQueryResponseDto {
      * @return crc32
      */
 
+    @JsonProperty("crc32")
     public Long getCrc32() {
         return crc32;
     }
@@ -270,6 +287,7 @@ public class InboxStateQueryResponseDto {
      * @return state
      */
     @NotNull
+    @JsonProperty("state")
     public StateEnum getState() {
         return state;
     }

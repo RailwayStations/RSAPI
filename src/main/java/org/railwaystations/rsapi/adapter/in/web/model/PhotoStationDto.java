@@ -15,33 +15,47 @@ import java.util.Objects;
  */
 
 @JsonTypeName("PhotoStation")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class PhotoStationDto {
 
-    @JsonProperty("country")
     private String country;
 
-    @JsonProperty("id")
     private String id;
 
-    @JsonProperty("title")
     private String title;
 
-    @JsonProperty("lat")
     private Double lat;
 
-    @JsonProperty("lon")
     private Double lon;
 
-    @JsonProperty("shortCode")
     private String shortCode;
 
-    @JsonProperty("inactive")
     private Boolean inactive = false;
 
-    @JsonProperty("photos")
     @Valid
-    private List<PhotoDto> photos = new ArrayList<>();
+    private List<@Valid PhotoDto> photos = new ArrayList<>();
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link PhotoStationDto#PhotoStationDto(String, String, String, Double, Double, List<@Valid PhotoDto>)}
+     */
+    @Deprecated
+    public PhotoStationDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public PhotoStationDto(String country, String id, String title, Double lat, Double lon, List<@Valid PhotoDto> photos) {
+        this.country = country;
+        this.id = id;
+        this.title = title;
+        this.lat = lat;
+        this.lon = lon;
+        this.photos = photos;
+    }
 
     public PhotoStationDto country(String country) {
         this.country = country;
@@ -54,6 +68,7 @@ public class PhotoStationDto {
      * @return country
      */
     @NotNull
+    @JsonProperty("country")
     public String getCountry() {
         return country;
     }
@@ -73,6 +88,7 @@ public class PhotoStationDto {
      * @return id
      */
     @NotNull
+    @JsonProperty("id")
     public String getId() {
         return id;
     }
@@ -92,6 +108,7 @@ public class PhotoStationDto {
      * @return title
      */
     @NotNull
+    @JsonProperty("title")
     public String getTitle() {
         return title;
     }
@@ -111,6 +128,7 @@ public class PhotoStationDto {
      * @return lat
      */
     @NotNull
+    @JsonProperty("lat")
     public Double getLat() {
         return lat;
     }
@@ -130,6 +148,7 @@ public class PhotoStationDto {
      * @return lon
      */
     @NotNull
+    @JsonProperty("lon")
     public Double getLon() {
         return lon;
     }
@@ -149,6 +168,7 @@ public class PhotoStationDto {
      * @return shortCode
      */
 
+    @JsonProperty("shortCode")
     public String getShortCode() {
         return shortCode;
     }
@@ -168,6 +188,7 @@ public class PhotoStationDto {
      * @return inactive
      */
 
+    @JsonProperty("inactive")
     public Boolean getInactive() {
         return inactive;
     }
@@ -176,7 +197,7 @@ public class PhotoStationDto {
         this.inactive = inactive;
     }
 
-    public PhotoStationDto photos(List<PhotoDto> photos) {
+    public PhotoStationDto photos(List<@Valid PhotoDto> photos) {
         this.photos = photos;
         return this;
     }
@@ -196,11 +217,12 @@ public class PhotoStationDto {
      */
     @NotNull
     @Valid
-    public List<PhotoDto> getPhotos() {
+    @JsonProperty("photos")
+    public List<@Valid PhotoDto> getPhotos() {
         return photos;
     }
 
-    public void setPhotos(List<PhotoDto> photos) {
+    public void setPhotos(List<@Valid PhotoDto> photos) {
         this.photos = photos;
     }
 

@@ -14,19 +14,15 @@ import java.util.Objects;
  */
 
 @JsonTypeName("ProblemReport")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class ProblemReportDto {
 
-    @JsonProperty("countryCode")
     private String countryCode;
 
-    @JsonProperty("stationId")
     private String stationId;
 
-    @JsonProperty("photoId")
     private Long photoId;
 
-    @JsonProperty("comment")
     private String comment;
 
     /**
@@ -76,14 +72,31 @@ public class ProblemReportDto {
         }
     }
 
-    @JsonProperty("type")
     private TypeEnum type;
 
-    @JsonProperty("lat")
     private Double lat;
 
-    @JsonProperty("lon")
     private Double lon;
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link ProblemReportDto#ProblemReportDto(String, String, String, TypeEnum)}
+     */
+    @Deprecated
+    public ProblemReportDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public ProblemReportDto(String countryCode, String stationId, String comment, TypeEnum type) {
+        this.countryCode = countryCode;
+        this.stationId = stationId;
+        this.comment = comment;
+        this.type = type;
+    }
 
     public ProblemReportDto countryCode(String countryCode) {
         this.countryCode = countryCode;
@@ -96,6 +109,7 @@ public class ProblemReportDto {
      * @return countryCode
      */
     @NotNull
+    @JsonProperty("countryCode")
     public String getCountryCode() {
         return countryCode;
     }
@@ -115,6 +129,7 @@ public class ProblemReportDto {
      * @return stationId
      */
     @NotNull
+    @JsonProperty("stationId")
     public String getStationId() {
         return stationId;
     }
@@ -134,6 +149,7 @@ public class ProblemReportDto {
      * @return photoId
      */
 
+    @JsonProperty("photoId")
     public Long getPhotoId() {
         return photoId;
     }
@@ -153,6 +169,7 @@ public class ProblemReportDto {
      * @return comment
      */
     @NotNull
+    @JsonProperty("comment")
     public String getComment() {
         return comment;
     }
@@ -172,6 +189,7 @@ public class ProblemReportDto {
      * @return type
      */
     @NotNull
+    @JsonProperty("type")
     public TypeEnum getType() {
         return type;
     }
@@ -191,6 +209,7 @@ public class ProblemReportDto {
      * @return lat
      */
 
+    @JsonProperty("lat")
     public Double getLat() {
         return lat;
     }
@@ -210,6 +229,7 @@ public class ProblemReportDto {
      * @return lon
      */
 
+    @JsonProperty("lon")
     public Double getLon() {
         return lon;
     }

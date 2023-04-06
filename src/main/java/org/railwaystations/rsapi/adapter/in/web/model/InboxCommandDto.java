@@ -14,34 +14,25 @@ import java.util.Objects;
  */
 
 @JsonTypeName("InboxCommand")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class InboxCommandDto {
 
-    @JsonProperty("id")
     private Long id;
 
-    @JsonProperty("countryCode")
     private String countryCode;
 
-    @JsonProperty("stationId")
     private String stationId;
 
-    @JsonProperty("title")
     private String title;
 
-    @JsonProperty("lat")
     private Double lat;
 
-    @JsonProperty("lon")
     private Double lon;
 
-    @JsonProperty("rejectReason")
     private String rejectReason;
 
-    @JsonProperty("DS100")
     private String DS100;
 
-    @JsonProperty("active")
     private Boolean active;
 
     /**
@@ -85,7 +76,6 @@ public class InboxCommandDto {
         }
     }
 
-    @JsonProperty("conflictResolution")
     private ConflictResolutionEnum conflictResolution;
 
     /**
@@ -141,8 +131,25 @@ public class InboxCommandDto {
         }
     }
 
-    @JsonProperty("command")
     private CommandEnum command;
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link InboxCommandDto#InboxCommandDto(Long, CommandEnum)}
+     */
+    @Deprecated
+    public InboxCommandDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public InboxCommandDto(Long id, CommandEnum command) {
+        this.id = id;
+        this.command = command;
+    }
 
     public InboxCommandDto id(Long id) {
         this.id = id;
@@ -155,6 +162,7 @@ public class InboxCommandDto {
      * @return id
      */
     @NotNull
+    @JsonProperty("id")
     public Long getId() {
         return id;
     }
@@ -174,6 +182,7 @@ public class InboxCommandDto {
      * @return countryCode
      */
 
+    @JsonProperty("countryCode")
     public String getCountryCode() {
         return countryCode;
     }
@@ -193,6 +202,7 @@ public class InboxCommandDto {
      * @return stationId
      */
 
+    @JsonProperty("stationId")
     public String getStationId() {
         return stationId;
     }
@@ -212,6 +222,7 @@ public class InboxCommandDto {
      * @return title
      */
 
+    @JsonProperty("title")
     public String getTitle() {
         return title;
     }
@@ -231,6 +242,7 @@ public class InboxCommandDto {
      * @return lat
      */
 
+    @JsonProperty("lat")
     public Double getLat() {
         return lat;
     }
@@ -250,6 +262,7 @@ public class InboxCommandDto {
      * @return lon
      */
 
+    @JsonProperty("lon")
     public Double getLon() {
         return lon;
     }
@@ -269,6 +282,7 @@ public class InboxCommandDto {
      * @return rejectReason
      */
 
+    @JsonProperty("rejectReason")
     public String getRejectReason() {
         return rejectReason;
     }
@@ -288,6 +302,7 @@ public class InboxCommandDto {
      * @return DS100
      */
 
+    @JsonProperty("DS100")
     public String getDS100() {
         return DS100;
     }
@@ -307,6 +322,7 @@ public class InboxCommandDto {
      * @return active
      */
 
+    @JsonProperty("active")
     public Boolean getActive() {
         return active;
     }
@@ -326,6 +342,7 @@ public class InboxCommandDto {
      * @return conflictResolution
      */
 
+    @JsonProperty("conflictResolution")
     public ConflictResolutionEnum getConflictResolution() {
         return conflictResolution;
     }
@@ -345,6 +362,7 @@ public class InboxCommandDto {
      * @return command
      */
     @NotNull
+    @JsonProperty("command")
     public CommandEnum getCommand() {
         return command;
     }

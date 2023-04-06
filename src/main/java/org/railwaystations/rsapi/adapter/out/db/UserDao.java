@@ -58,6 +58,32 @@ public interface UserDao {
     @SqlUpdate("UPDATE users SET emailVerification = :emailVerification WHERE id = :id")
     void updateEmailVerification(@Bind("id") int id, @Bind("emailVerification") String emailVerification);
 
+    @SqlUpdate("""
+            UPDATE users
+             SET name = CONCAT('deleteduser', id),
+                 url = NULL,
+                 normalizedName = CONCAT('deleteduser', id),
+                 anonymous = true,
+                 email = NULL,
+                 emailVerification = NULL,
+                 ownPhotos = false,
+                 license = NULL,
+                 `key` = NULL,
+                 sendNotifications = false,
+                 admin = false
+             WHERE id = :id
+            """)
+    void anonymizeUser(@Bind("id") int id);
+
+    @SqlUpdate("""
+            INSERT INTO blocked_usernames (normalizedName)
+                VALUES (:normalizedName)
+            """)
+    void addUsernameToBlocklist(@Bind("normalizedName") String normalizedName);
+
+    @SqlQuery("SELECT COUNT(*) FROM blocked_usernames WHERE normalizedName = :normalizedName")
+    int countBlockedUsername(@Bind("normalizedName") String normalizedName);
+
     class UserMapper implements RowMapper<User> {
         public User map(ResultSet rs, StatementContext ctx) throws SQLException {
             return User.builder()

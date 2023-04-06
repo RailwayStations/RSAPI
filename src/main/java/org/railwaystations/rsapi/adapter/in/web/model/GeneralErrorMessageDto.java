@@ -12,23 +12,36 @@ import java.util.Objects;
  */
 
 @JsonTypeName("GeneralErrorMessage")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class GeneralErrorMessageDto {
 
-    @JsonProperty("timestamp")
     private Long timestamp;
 
-    @JsonProperty("status")
     private Integer status;
 
-    @JsonProperty("error")
     private String error;
 
-    @JsonProperty("message")
     private String message;
 
-    @JsonProperty("path")
     private String path;
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link GeneralErrorMessageDto#GeneralErrorMessageDto(Integer, String)}
+     */
+    @Deprecated
+    public GeneralErrorMessageDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public GeneralErrorMessageDto(Integer status, String message) {
+        this.status = status;
+        this.message = message;
+    }
 
     public GeneralErrorMessageDto timestamp(Long timestamp) {
         this.timestamp = timestamp;
@@ -41,6 +54,7 @@ public class GeneralErrorMessageDto {
      * @return timestamp
      */
 
+    @JsonProperty("timestamp")
     public Long getTimestamp() {
         return timestamp;
     }
@@ -60,6 +74,7 @@ public class GeneralErrorMessageDto {
      * @return status
      */
     @NotNull
+    @JsonProperty("status")
     public Integer getStatus() {
         return status;
     }
@@ -79,6 +94,7 @@ public class GeneralErrorMessageDto {
      * @return error
      */
 
+    @JsonProperty("error")
     public String getError() {
         return error;
     }
@@ -98,6 +114,7 @@ public class GeneralErrorMessageDto {
      * @return message
      */
     @NotNull
+    @JsonProperty("message")
     public String getMessage() {
         return message;
     }
@@ -117,6 +134,7 @@ public class GeneralErrorMessageDto {
      * @return path
      */
 
+    @JsonProperty("path")
     public String getPath() {
         return path;
     }

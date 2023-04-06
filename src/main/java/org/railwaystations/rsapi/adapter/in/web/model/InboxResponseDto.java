@@ -14,7 +14,7 @@ import java.util.Objects;
  */
 
 @JsonTypeName("InboxResponse")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class InboxResponseDto {
 
     /**
@@ -64,23 +64,34 @@ public class InboxResponseDto {
         }
     }
 
-    @JsonProperty("state")
     private StateEnum state;
 
-    @JsonProperty("message")
     private String message;
 
-    @JsonProperty("id")
     private Long id;
 
-    @JsonProperty("filename")
     private String filename;
 
-    @JsonProperty("inboxUrl")
     private String inboxUrl;
 
-    @JsonProperty("crc32")
     private Long crc32;
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link InboxResponseDto#InboxResponseDto(StateEnum)}
+     */
+    @Deprecated
+    public InboxResponseDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public InboxResponseDto(StateEnum state) {
+        this.state = state;
+    }
 
     public InboxResponseDto state(StateEnum state) {
         this.state = state;
@@ -93,6 +104,7 @@ public class InboxResponseDto {
      * @return state
      */
     @NotNull
+    @JsonProperty("state")
     public StateEnum getState() {
         return state;
     }
@@ -112,6 +124,7 @@ public class InboxResponseDto {
      * @return message
      */
 
+    @JsonProperty("message")
     public String getMessage() {
         return message;
     }
@@ -131,6 +144,7 @@ public class InboxResponseDto {
      * @return id
      */
 
+    @JsonProperty("id")
     public Long getId() {
         return id;
     }
@@ -150,6 +164,7 @@ public class InboxResponseDto {
      * @return filename
      */
 
+    @JsonProperty("filename")
     public String getFilename() {
         return filename;
     }
@@ -169,6 +184,7 @@ public class InboxResponseDto {
      * @return inboxUrl
      */
 
+    @JsonProperty("inboxUrl")
     public String getInboxUrl() {
         return inboxUrl;
     }
@@ -188,6 +204,7 @@ public class InboxResponseDto {
      * @return crc32
      */
 
+    @JsonProperty("crc32")
     public Long getCrc32() {
         return crc32;
     }

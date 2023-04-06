@@ -15,35 +15,45 @@ import java.util.Objects;
  */
 
 @JsonTypeName("Profile")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class ProfileDto {
 
-    @JsonProperty("nickname")
     private String nickname;
 
-    @JsonProperty("email")
     private String email;
 
-    @JsonProperty("license")
     private LicenseDto license;
 
-    @JsonProperty("photoOwner")
     private Boolean photoOwner;
 
-    @JsonProperty("link")
     private URI link;
 
-    @JsonProperty("anonymous")
     private Boolean anonymous;
 
-    @JsonProperty("admin")
     private Boolean admin;
 
-    @JsonProperty("emailVerified")
     private Boolean emailVerified;
 
-    @JsonProperty("sendNotifications")
     private Boolean sendNotifications;
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link ProfileDto#ProfileDto(String, LicenseDto, Boolean)}
+     */
+    @Deprecated
+    public ProfileDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public ProfileDto(String nickname, LicenseDto license, Boolean photoOwner) {
+        this.nickname = nickname;
+        this.license = license;
+        this.photoOwner = photoOwner;
+    }
 
     public ProfileDto nickname(String nickname) {
         this.nickname = nickname;
@@ -56,6 +66,7 @@ public class ProfileDto {
      * @return nickname
      */
     @NotNull
+    @JsonProperty("nickname")
     public String getNickname() {
         return nickname;
     }
@@ -75,6 +86,7 @@ public class ProfileDto {
      * @return email
      */
     @Email
+    @JsonProperty("email")
     public String getEmail() {
         return email;
     }
@@ -95,6 +107,7 @@ public class ProfileDto {
      */
     @NotNull
     @Valid
+    @JsonProperty("license")
     public LicenseDto getLicense() {
         return license;
     }
@@ -114,6 +127,7 @@ public class ProfileDto {
      * @return photoOwner
      */
     @NotNull
+    @JsonProperty("photoOwner")
     public Boolean getPhotoOwner() {
         return photoOwner;
     }
@@ -133,6 +147,7 @@ public class ProfileDto {
      * @return link
      */
     @Valid
+    @JsonProperty("link")
     public URI getLink() {
         return link;
     }
@@ -152,6 +167,7 @@ public class ProfileDto {
      * @return anonymous
      */
 
+    @JsonProperty("anonymous")
     public Boolean getAnonymous() {
         return anonymous;
     }
@@ -171,6 +187,7 @@ public class ProfileDto {
      * @return admin
      */
 
+    @JsonProperty("admin")
     public Boolean getAdmin() {
         return admin;
     }
@@ -190,6 +207,7 @@ public class ProfileDto {
      * @return emailVerified
      */
 
+    @JsonProperty("emailVerified")
     public Boolean getEmailVerified() {
         return emailVerified;
     }
@@ -209,6 +227,7 @@ public class ProfileDto {
      * @return sendNotifications
      */
 
+    @JsonProperty("sendNotifications")
     public Boolean getSendNotifications() {
         return sendNotifications;
     }

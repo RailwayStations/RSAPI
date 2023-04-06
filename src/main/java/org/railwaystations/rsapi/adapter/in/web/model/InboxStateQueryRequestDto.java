@@ -12,11 +12,27 @@ import java.util.Objects;
  */
 
 @JsonTypeName("InboxStateQueryRequest")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class InboxStateQueryRequestDto {
 
-    @JsonProperty("id")
     private Long id;
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link InboxStateQueryRequestDto#InboxStateQueryRequestDto(Long)}
+     */
+    @Deprecated
+    public InboxStateQueryRequestDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public InboxStateQueryRequestDto(Long id) {
+        this.id = id;
+    }
 
     public InboxStateQueryRequestDto id(Long id) {
         this.id = id;
@@ -29,6 +45,7 @@ public class InboxStateQueryRequestDto {
      * @return id
      */
     @NotNull
+    @JsonProperty("id")
     public Long getId() {
         return id;
     }

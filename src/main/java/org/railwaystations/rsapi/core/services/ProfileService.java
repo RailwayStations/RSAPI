@@ -92,6 +92,13 @@ public class ProfileService implements ManageProfileUseCase {
             throw new ProfileConflictException();
         }
 
+        if (userDao.countBlockedUsername(newUser.getNormalizedName()) != 0) {
+            monitor.sendMessage(
+                    String.format("Registration for user '%s' with eMail '%s' failed, name is blocked%nvia %s",
+                            newUser.getName(), newUser.getEmail(), clientInfo));
+            throw new ProfileConflictException();
+        }
+
         if (userDao.findByEmail(newUser.getEmail()).isPresent()) {
             monitor.sendMessage(
                     String.format("Registration for user '%s' with eMail '%s' failed, eMail is already taken%nvia %s",
@@ -182,6 +189,14 @@ public class ProfileService implements ManageProfileUseCase {
                             String.format("Email verified {nickname='%s', email='%s'}", user.getName(), user.getEmail()));
                     return user;
                 });
+    }
+
+    @Override
+    public void deleteProfile(User user, String userAgent) {
+        var normalizedName = user.getNormalizedName();
+        userDao.anonymizeUser(user.getId());
+        userDao.addUsernameToBlocklist(normalizedName);
+        authorizationDao.deleteAllByUser(user.getName());
     }
 
     private void sendPasswordMail(String email, String newPassword) {

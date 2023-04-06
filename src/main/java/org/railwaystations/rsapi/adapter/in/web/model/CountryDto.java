@@ -15,33 +15,44 @@ import java.util.Objects;
  */
 
 @JsonTypeName("Country")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class CountryDto {
 
-    @JsonProperty("code")
     private String code;
 
-    @JsonProperty("name")
     private String name;
 
-    @JsonProperty("email")
     private String email;
 
-    @JsonProperty("twitterTags")
     private String twitterTags;
 
-    @JsonProperty("timetableUrlTemplate")
     private String timetableUrlTemplate;
 
-    @JsonProperty("overrideLicense")
     private String overrideLicense;
 
-    @JsonProperty("active")
     private Boolean active;
 
-    @JsonProperty("providerApps")
     @Valid
-    private List<ProviderAppDto> providerApps = null;
+    private List<@Valid ProviderAppDto> providerApps;
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link CountryDto#CountryDto(String, String, Boolean)}
+     */
+    @Deprecated
+    public CountryDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public CountryDto(String code, String name, Boolean active) {
+        this.code = code;
+        this.name = name;
+        this.active = active;
+    }
 
     public CountryDto code(String code) {
         this.code = code;
@@ -54,6 +65,7 @@ public class CountryDto {
      * @return code
      */
     @NotNull
+    @JsonProperty("code")
     public String getCode() {
         return code;
     }
@@ -73,6 +85,7 @@ public class CountryDto {
      * @return name
      */
     @NotNull
+    @JsonProperty("name")
     public String getName() {
         return name;
     }
@@ -92,6 +105,7 @@ public class CountryDto {
      * @return email
      */
 
+    @JsonProperty("email")
     public String getEmail() {
         return email;
     }
@@ -111,6 +125,7 @@ public class CountryDto {
      * @return twitterTags
      */
 
+    @JsonProperty("twitterTags")
     public String getTwitterTags() {
         return twitterTags;
     }
@@ -130,6 +145,7 @@ public class CountryDto {
      * @return timetableUrlTemplate
      */
 
+    @JsonProperty("timetableUrlTemplate")
     public String getTimetableUrlTemplate() {
         return timetableUrlTemplate;
     }
@@ -149,6 +165,7 @@ public class CountryDto {
      * @return overrideLicense
      */
 
+    @JsonProperty("overrideLicense")
     public String getOverrideLicense() {
         return overrideLicense;
     }
@@ -168,6 +185,7 @@ public class CountryDto {
      * @return active
      */
     @NotNull
+    @JsonProperty("active")
     public Boolean getActive() {
         return active;
     }
@@ -176,7 +194,7 @@ public class CountryDto {
         this.active = active;
     }
 
-    public CountryDto providerApps(List<ProviderAppDto> providerApps) {
+    public CountryDto providerApps(List<@Valid ProviderAppDto> providerApps) {
         this.providerApps = providerApps;
         return this;
     }
@@ -195,11 +213,12 @@ public class CountryDto {
      * @return providerApps
      */
     @Valid
-    public List<ProviderAppDto> getProviderApps() {
+    @JsonProperty("providerApps")
+    public List<@Valid ProviderAppDto> getProviderApps() {
         return providerApps;
     }
 
-    public void setProviderApps(List<ProviderAppDto> providerApps) {
+    public void setProviderApps(List<@Valid ProviderAppDto> providerApps) {
         this.providerApps = providerApps;
     }
 

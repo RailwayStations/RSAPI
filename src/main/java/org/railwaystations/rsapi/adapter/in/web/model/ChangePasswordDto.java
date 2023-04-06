@@ -12,11 +12,27 @@ import java.util.Objects;
  */
 
 @JsonTypeName("ChangePassword")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class ChangePasswordDto {
 
-    @JsonProperty("newPassword")
     private String newPassword;
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link ChangePasswordDto#ChangePasswordDto(String)}
+     */
+    @Deprecated
+    public ChangePasswordDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public ChangePasswordDto(String newPassword) {
+        this.newPassword = newPassword;
+    }
 
     public ChangePasswordDto newPassword(String newPassword) {
         this.newPassword = newPassword;
@@ -29,6 +45,7 @@ public class ChangePasswordDto {
      * @return newPassword
      */
     @NotNull
+    @JsonProperty("newPassword")
     public String getNewPassword() {
         return newPassword;
     }

@@ -18,6 +18,8 @@ public interface ManageProfileUseCase {
 
     Optional<User> emailVerification(String token);
 
+    void deleteProfile(User user, String userAgent);
+
     class ProfileConflictException extends RuntimeException {
 
         public ProfileConflictException() {

@@ -1,7 +1,9 @@
 package org.railwaystations.rsapi.adapter.in.web.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import jakarta.annotation.Generated;
 import jakarta.validation.constraints.NotNull;
 
@@ -12,23 +14,70 @@ import java.util.Objects;
  */
 
 @JsonTypeName("OAuthTokenResponse")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class OAuthTokenResponseDto {
 
-    @JsonProperty("access_token")
     private String accessToken;
 
-    @JsonProperty("refresh_token")
     private String refreshToken;
 
-    @JsonProperty("scope")
     private String scope;
 
-    @JsonProperty("token_type")
-    private String tokenType;
+    /**
+     * Gets or Sets tokenType
+     */
+    public enum TokenTypeEnum {
+        BEARER("Bearer");
 
-    @JsonProperty("expires_in")
+        private String value;
+
+        TokenTypeEnum(String value) {
+            this.value = value;
+        }
+
+        @JsonValue
+        public String getValue() {
+            return value;
+        }
+
+        @Override
+        public String toString() {
+            return String.valueOf(value);
+        }
+
+        @JsonCreator
+        public static TokenTypeEnum fromValue(String value) {
+            for (TokenTypeEnum b : TokenTypeEnum.values()) {
+                if (b.value.equals(value)) {
+                    return b;
+                }
+            }
+            throw new IllegalArgumentException("Unexpected value '" + value + "'");
+        }
+    }
+
+    private TokenTypeEnum tokenType;
+
     private Long expiresIn;
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link OAuthTokenResponseDto#OAuthTokenResponseDto(String, String, TokenTypeEnum)}
+     */
+    @Deprecated
+    public OAuthTokenResponseDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public OAuthTokenResponseDto(String accessToken, String scope, TokenTypeEnum tokenType) {
+        this.accessToken = accessToken;
+        this.scope = scope;
+        this.tokenType = tokenType;
+    }
 
     public OAuthTokenResponseDto accessToken(String accessToken) {
         this.accessToken = accessToken;
@@ -41,6 +90,7 @@ public class OAuthTokenResponseDto {
      * @return accessToken
      */
     @NotNull
+    @JsonProperty("access_token")
     public String getAccessToken() {
         return accessToken;
     }
@@ -60,6 +110,7 @@ public class OAuthTokenResponseDto {
      * @return refreshToken
      */
 
+    @JsonProperty("refresh_token")
     public String getRefreshToken() {
         return refreshToken;
     }
@@ -79,6 +130,7 @@ public class OAuthTokenResponseDto {
      * @return scope
      */
     @NotNull
+    @JsonProperty("scope")
     public String getScope() {
         return scope;
     }
@@ -87,7 +139,7 @@ public class OAuthTokenResponseDto {
         this.scope = scope;
     }
 
-    public OAuthTokenResponseDto tokenType(String tokenType) {
+    public OAuthTokenResponseDto tokenType(TokenTypeEnum tokenType) {
         this.tokenType = tokenType;
         return this;
     }
@@ -98,11 +150,12 @@ public class OAuthTokenResponseDto {
      * @return tokenType
      */
     @NotNull
-    public String getTokenType() {
+    @JsonProperty("token_type")
+    public TokenTypeEnum getTokenType() {
         return tokenType;
     }
 
-    public void setTokenType(String tokenType) {
+    public void setTokenType(TokenTypeEnum tokenType) {
         this.tokenType = tokenType;
     }
 
@@ -117,6 +170,7 @@ public class OAuthTokenResponseDto {
      * @return expiresIn
      */
 
+    @JsonProperty("expires_in")
     public Long getExpiresIn() {
         return expiresIn;
     }

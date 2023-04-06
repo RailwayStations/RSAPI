@@ -12,14 +12,30 @@ import java.util.Objects;
  */
 
 @JsonTypeName("AdminInboxCommandResponse")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class AdminInboxCommandResponseDto {
 
-    @JsonProperty("status")
     private Integer status;
 
-    @JsonProperty("message")
     private String message;
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link AdminInboxCommandResponseDto#AdminInboxCommandResponseDto(Integer, String)}
+     */
+    @Deprecated
+    public AdminInboxCommandResponseDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public AdminInboxCommandResponseDto(Integer status, String message) {
+        this.status = status;
+        this.message = message;
+    }
 
     public AdminInboxCommandResponseDto status(Integer status) {
         this.status = status;
@@ -32,6 +48,7 @@ public class AdminInboxCommandResponseDto {
      * @return status
      */
     @NotNull
+    @JsonProperty("status")
     public Integer getStatus() {
         return status;
     }
@@ -51,6 +68,7 @@ public class AdminInboxCommandResponseDto {
      * @return message
      */
     @NotNull
+    @JsonProperty("message")
     public String getMessage() {
         return message;
     }

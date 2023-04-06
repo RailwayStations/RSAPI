@@ -44,6 +44,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -57,6 +58,7 @@ class ProfileControllerTest {
 
     public static final String EXISTING_USER_NAME = "existing";
     public static final String EXISTING_EMAIL = "existing@example.com";
+    public static final int EXISTING_USER_ID = 42;
     @Autowired
     private MockMvc mvc;
 
@@ -108,6 +110,7 @@ class ProfileControllerTest {
         postRegistrationWithApiValidation(givenUserProfile).andExpect(status().isAccepted());
 
         verify(userDao).findByNormalizedName("nickname");
+        verify(userDao).countBlockedUsername("nickname");
         verify(userDao).findByEmail("nickname@example.com");
         verify(userDao).insert(any(User.class), anyString(), anyString());
         verify(userDao, never()).updateCredentials(anyInt(), anyString());
@@ -146,6 +149,7 @@ class ProfileControllerTest {
         postRegistrationWithApiValidation(givenUserProfileWithPassword).andExpect(status().isAccepted());
 
         verify(userDao).findByNormalizedName("nickname");
+        verify(userDao).countBlockedUsername("nickname");
         verify(userDao).findByEmail("nickname@example.com");
         verify(userDao).insert(any(User.class), anyString(), anyString());
         verify(userDao, never()).updateCredentials(anyInt(), anyString());
@@ -196,6 +200,16 @@ class ProfileControllerTest {
     }
 
     @Test
+    void testRegisterUserNameBlocked() throws Exception {
+        when(userDao.countBlockedUsername("blockedname")).thenReturn(1);
+        givenExistingUser();
+        var givenUserProfileWithBlockedName = """
+                    { "nickname": "%s", "email": "other@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
+                """.formatted("Blocked Name");
+        postRegistrationWithApiValidation(givenUserProfileWithBlockedName).andExpect(status().isConflict());
+    }
+
+    @Test
     void testRegisterExistingUserEmailTaken() throws Exception {
         givenExistingUser();
         var givenUserProfileWithSameEmail = """
@@ -235,7 +249,7 @@ class ProfileControllerTest {
         var user = User.builder()
                 .name(EXISTING_USER_NAME)
                 .license(License.CC0_10)
-                .id(42)
+                .id(EXISTING_USER_ID)
                 .email(EXISTING_EMAIL)
                 .ownPhotos(true)
                 .anonymous(false)
@@ -307,7 +321,7 @@ class ProfileControllerTest {
         verify(userDao).updateCredentials(idCaptor.capture(), keyCaptor.capture());
         verify(authorizationDao).deleteAllByUser(EXISTING_USER_NAME);
 
-        assertThat(idCaptor.getValue()).isEqualTo(42);
+        assertThat(idCaptor.getValue()).isEqualTo(EXISTING_USER_ID);
         assertThat(new LazySodiumPasswordEncoder().matches("secretlong", keyCaptor.getValue())).isTrue();
     }
 
@@ -323,7 +337,7 @@ class ProfileControllerTest {
         verify(userDao).updateCredentials(idCaptor.capture(), keyCaptor.capture());
         verify(authorizationDao).deleteAllByUser(EXISTING_USER_NAME);
 
-        assertThat(idCaptor.getValue()).isEqualTo(42);
+        assertThat(idCaptor.getValue()).isEqualTo(EXISTING_USER_ID);
         assertThat(new LazySodiumPasswordEncoder().matches("secretlong", keyCaptor.getValue())).isTrue();
     }
 
@@ -339,7 +353,7 @@ class ProfileControllerTest {
         verify(userDao).updateCredentials(idCaptor.capture(), keyCaptor.capture());
         verify(authorizationDao).deleteAllByUser(EXISTING_USER_NAME);
 
-        assertThat(idCaptor.getValue()).isEqualTo(42);
+        assertThat(idCaptor.getValue()).isEqualTo(EXISTING_USER_ID);
         assertThat(new LazySodiumPasswordEncoder().matches("secretbody", keyCaptor.getValue())).isTrue();
     }
 
@@ -354,7 +368,7 @@ class ProfileControllerTest {
         postMyProfile(newProfileJson).andExpect(status().isOk());
 
         var user = User.builder()
-                .id(42)
+                .id(EXISTING_USER_ID)
                 .name("new_name")
                 .license(License.CC0_10)
                 .email(EXISTING_EMAIL)
@@ -406,7 +420,7 @@ class ProfileControllerTest {
 
         assertVerificationEmail();
         var user = User.builder()
-                .id(42)
+                .id(EXISTING_USER_ID)
                 .name(EXISTING_USER_NAME)
                 .license(License.CC0_10)
                 .email("newname@example.com")
@@ -487,7 +501,7 @@ class ProfileControllerTest {
     void testVerifyEmailSuccess() throws Exception {
         var token = "verification";
         var user = User.builder()
-                .id(42)
+                .id(EXISTING_USER_ID)
                 .name(EXISTING_USER_NAME)
                 .license(License.CC0_10)
                 .email(EXISTING_EMAIL)
@@ -502,7 +516,7 @@ class ProfileControllerTest {
                 .andExpect(status().isOk());
 
         assertThat(monitor.getMessages().get(0)).isEqualTo(String.format("Email verified {nickname='%s', email='%s'}", EXISTING_USER_NAME, EXISTING_EMAIL));
-        verify(userDao).updateEmailVerification(42, User.EMAIL_VERIFIED);
+        verify(userDao).updateEmailVerification(EXISTING_USER_ID, User.EMAIL_VERIFIED);
     }
 
     @NotNull
@@ -517,7 +531,7 @@ class ProfileControllerTest {
     void testVerifyEmailFailed() throws Exception {
         var token = "verification";
         var user = User.builder()
-                .id(42)
+                .id(EXISTING_USER_ID)
                 .name(EXISTING_USER_NAME)
                 .license(License.CC0_10)
                 .email(EXISTING_EMAIL)
@@ -531,7 +545,7 @@ class ProfileControllerTest {
         getEmailVerification("wrong_token").andExpect(status().isNotFound());
 
         assertThat(monitor.getMessages().isEmpty()).isTrue();
-        verify(userDao, never()).updateEmailVerification(42, User.EMAIL_VERIFIED);
+        verify(userDao, never()).updateEmailVerification(EXISTING_USER_ID, User.EMAIL_VERIFIED);
     }
 
     @Test
@@ -546,7 +560,24 @@ class ProfileControllerTest {
                 .andExpect(status().isOk());
 
         assertVerificationEmail();
-        verify(userDao).updateEmailVerification(eq(42), anyString());
+        verify(userDao).updateEmailVerification(eq(EXISTING_USER_ID), anyString());
+    }
+
+    @Test
+    void testDeleteMyProfile() throws Exception {
+        givenExistingUser();
+
+        mvc.perform(delete("/myProfile")
+                        .header("User-Agent", "UserAgent")
+                        .secure(true)
+                        .with(basicHttpAuthForExistingUser())
+                        .with(csrf()))
+                .andExpect(status().isNoContent())
+                .andExpect(validOpenApi());
+
+        verify(userDao).anonymizeUser(eq(EXISTING_USER_ID));
+        verify(userDao).addUsernameToBlocklist(EXISTING_USER_NAME);
+        verify(authorizationDao).deleteAllByUser(EXISTING_USER_NAME);
     }
 
     private ResultMatcher validOpenApi() {

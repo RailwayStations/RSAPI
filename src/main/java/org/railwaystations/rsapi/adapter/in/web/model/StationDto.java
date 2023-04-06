@@ -12,56 +12,62 @@ import java.util.Objects;
  */
 
 @JsonTypeName("Station")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class StationDto {
 
-    @JsonProperty("idStr")
     private String idStr;
 
-    @JsonProperty("id")
     private Long id;
 
-    @JsonProperty("country")
     private String country;
 
-    @JsonProperty("title")
     private String title;
 
-    @JsonProperty("photographer")
     private String photographer;
 
-    @JsonProperty("photographerUrl")
     private String photographerUrl;
 
-    @JsonProperty("photoUrl")
     private String photoUrl;
 
-    @JsonProperty("photoId")
     private Long photoId;
 
-    @JsonProperty("license")
     private String license;
 
-    @JsonProperty("licenseUrl")
     private String licenseUrl;
 
-    @JsonProperty("lat")
     private Double lat;
 
-    @JsonProperty("lon")
     private Double lon;
 
-    @JsonProperty("createdAt")
     private Long createdAt;
 
-    @JsonProperty("DS100")
-    private String ds100;
+    private String DS100;
 
-    @JsonProperty("active")
     private Boolean active;
 
-    @JsonProperty("outdated")
     private Boolean outdated;
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link StationDto#StationDto(String, String, String, Double, Double, Boolean)}
+     */
+    @Deprecated
+    public StationDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public StationDto(String idStr, String country, String title, Double lat, Double lon, Boolean active) {
+        this.idStr = idStr;
+        this.country = country;
+        this.title = title;
+        this.lat = lat;
+        this.lon = lon;
+        this.active = active;
+    }
 
     public StationDto idStr(String idStr) {
         this.idStr = idStr;
@@ -74,6 +80,7 @@ public class StationDto {
      * @return idStr
      */
     @NotNull
+    @JsonProperty("idStr")
     public String getIdStr() {
         return idStr;
     }
@@ -93,6 +100,7 @@ public class StationDto {
      * @return id
      */
 
+    @JsonProperty("id")
     public Long getId() {
         return id;
     }
@@ -112,6 +120,7 @@ public class StationDto {
      * @return country
      */
     @NotNull
+    @JsonProperty("country")
     public String getCountry() {
         return country;
     }
@@ -131,6 +140,7 @@ public class StationDto {
      * @return title
      */
     @NotNull
+    @JsonProperty("title")
     public String getTitle() {
         return title;
     }
@@ -150,6 +160,7 @@ public class StationDto {
      * @return photographer
      */
 
+    @JsonProperty("photographer")
     public String getPhotographer() {
         return photographer;
     }
@@ -169,6 +180,7 @@ public class StationDto {
      * @return photographerUrl
      */
 
+    @JsonProperty("photographerUrl")
     public String getPhotographerUrl() {
         return photographerUrl;
     }
@@ -188,6 +200,7 @@ public class StationDto {
      * @return photoUrl
      */
 
+    @JsonProperty("photoUrl")
     public String getPhotoUrl() {
         return photoUrl;
     }
@@ -207,6 +220,7 @@ public class StationDto {
      * @return photoId
      */
 
+    @JsonProperty("photoId")
     public Long getPhotoId() {
         return photoId;
     }
@@ -226,6 +240,7 @@ public class StationDto {
      * @return license
      */
 
+    @JsonProperty("license")
     public String getLicense() {
         return license;
     }
@@ -245,6 +260,7 @@ public class StationDto {
      * @return licenseUrl
      */
 
+    @JsonProperty("licenseUrl")
     public String getLicenseUrl() {
         return licenseUrl;
     }
@@ -264,6 +280,7 @@ public class StationDto {
      * @return lat
      */
     @NotNull
+    @JsonProperty("lat")
     public Double getLat() {
         return lat;
     }
@@ -283,6 +300,7 @@ public class StationDto {
      * @return lon
      */
     @NotNull
+    @JsonProperty("lon")
     public Double getLon() {
         return lon;
     }
@@ -302,6 +320,7 @@ public class StationDto {
      * @return createdAt
      */
 
+    @JsonProperty("createdAt")
     public Long getCreatedAt() {
         return createdAt;
     }
@@ -310,8 +329,8 @@ public class StationDto {
         this.createdAt = createdAt;
     }
 
-    public StationDto DS100(String ds100) {
-        this.ds100 = ds100;
+    public StationDto DS100(String DS100) {
+        this.DS100 = DS100;
         return this;
     }
 
@@ -321,12 +340,13 @@ public class StationDto {
      * @return DS100
      */
 
-    public String getDs100() {
-        return ds100;
+    @JsonProperty("DS100")
+    public String getDS100() {
+        return DS100;
     }
 
-    public void setDs100(String ds100) {
-        this.ds100 = ds100;
+    public void setDS100(String DS100) {
+        this.DS100 = DS100;
     }
 
     public StationDto active(Boolean active) {
@@ -340,6 +360,7 @@ public class StationDto {
      * @return active
      */
     @NotNull
+    @JsonProperty("active")
     public Boolean getActive() {
         return active;
     }
@@ -359,6 +380,7 @@ public class StationDto {
      * @return outdated
      */
 
+    @JsonProperty("outdated")
     public Boolean getOutdated() {
         return outdated;
     }
@@ -389,14 +411,14 @@ public class StationDto {
                 Objects.equals(this.lat, station.lat) &&
                 Objects.equals(this.lon, station.lon) &&
                 Objects.equals(this.createdAt, station.createdAt) &&
-                Objects.equals(this.ds100, station.ds100) &&
+                Objects.equals(this.DS100, station.DS100) &&
                 Objects.equals(this.active, station.active) &&
                 Objects.equals(this.outdated, station.outdated);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idStr, id, country, title, photographer, photographerUrl, photoUrl, photoId, license, licenseUrl, lat, lon, createdAt, ds100, active, outdated);
+        return Objects.hash(idStr, id, country, title, photographer, photographerUrl, photoUrl, photoId, license, licenseUrl, lat, lon, createdAt, DS100, active, outdated);
     }
 
     @Override
@@ -416,7 +438,7 @@ public class StationDto {
         sb.append("    lat: ").append(toIndentedString(lat)).append("\n");
         sb.append("    lon: ").append(toIndentedString(lon)).append("\n");
         sb.append("    createdAt: ").append(toIndentedString(createdAt)).append("\n");
-        sb.append("    DS100: ").append(toIndentedString(ds100)).append("\n");
+        sb.append("    DS100: ").append(toIndentedString(DS100)).append("\n");
         sb.append("    active: ").append(toIndentedString(active)).append("\n");
         sb.append("    outdated: ").append(toIndentedString(outdated)).append("\n");
         sb.append("}");

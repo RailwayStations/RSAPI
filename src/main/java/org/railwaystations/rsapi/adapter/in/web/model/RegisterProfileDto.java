@@ -15,32 +15,44 @@ import java.util.Objects;
  */
 
 @JsonTypeName("RegisterProfile")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class RegisterProfileDto {
 
-    @JsonProperty("nickname")
     private String nickname;
 
-    @JsonProperty("email")
     private String email;
 
-    @JsonProperty("license")
     private LicenseDto license;
 
-    @JsonProperty("photoOwner")
     private Boolean photoOwner;
 
-    @JsonProperty("link")
     private URI link;
 
-    @JsonProperty("anonymous")
     private Boolean anonymous;
 
-    @JsonProperty("sendNotifications")
     private Boolean sendNotifications;
 
-    @JsonProperty("newPassword")
     private String newPassword;
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link RegisterProfileDto#RegisterProfileDto(String, String, LicenseDto, Boolean)}
+     */
+    @Deprecated
+    public RegisterProfileDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public RegisterProfileDto(String nickname, String email, LicenseDto license, Boolean photoOwner) {
+        this.nickname = nickname;
+        this.email = email;
+        this.license = license;
+        this.photoOwner = photoOwner;
+    }
 
     public RegisterProfileDto nickname(String nickname) {
         this.nickname = nickname;
@@ -53,6 +65,7 @@ public class RegisterProfileDto {
      * @return nickname
      */
     @NotNull
+    @JsonProperty("nickname")
     public String getNickname() {
         return nickname;
     }
@@ -73,6 +86,7 @@ public class RegisterProfileDto {
      */
     @NotNull
     @Email
+    @JsonProperty("email")
     public String getEmail() {
         return email;
     }
@@ -93,6 +107,7 @@ public class RegisterProfileDto {
      */
     @NotNull
     @Valid
+    @JsonProperty("license")
     public LicenseDto getLicense() {
         return license;
     }
@@ -112,6 +127,7 @@ public class RegisterProfileDto {
      * @return photoOwner
      */
     @NotNull
+    @JsonProperty("photoOwner")
     public Boolean getPhotoOwner() {
         return photoOwner;
     }
@@ -131,6 +147,7 @@ public class RegisterProfileDto {
      * @return link
      */
     @Valid
+    @JsonProperty("link")
     public URI getLink() {
         return link;
     }
@@ -150,6 +167,7 @@ public class RegisterProfileDto {
      * @return anonymous
      */
 
+    @JsonProperty("anonymous")
     public Boolean getAnonymous() {
         return anonymous;
     }
@@ -169,6 +187,7 @@ public class RegisterProfileDto {
      * @return sendNotifications
      */
 
+    @JsonProperty("sendNotifications")
     public Boolean getSendNotifications() {
         return sendNotifications;
     }
@@ -188,6 +207,7 @@ public class RegisterProfileDto {
      * @return newPassword
      */
 
+    @JsonProperty("newPassword")
     public String getNewPassword() {
         return newPassword;
     }

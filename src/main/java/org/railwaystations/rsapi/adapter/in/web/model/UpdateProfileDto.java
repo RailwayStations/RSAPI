@@ -15,29 +15,42 @@ import java.util.Objects;
  */
 
 @JsonTypeName("UpdateProfile")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class UpdateProfileDto {
 
-    @JsonProperty("nickname")
     private String nickname;
 
-    @JsonProperty("email")
     private String email;
 
-    @JsonProperty("license")
     private LicenseDto license;
 
-    @JsonProperty("photoOwner")
     private Boolean photoOwner;
 
-    @JsonProperty("link")
     private URI link;
 
-    @JsonProperty("anonymous")
     private Boolean anonymous;
 
-    @JsonProperty("sendNotifications")
     private Boolean sendNotifications;
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link UpdateProfileDto#UpdateProfileDto(String, String, LicenseDto, Boolean)}
+     */
+    @Deprecated
+    public UpdateProfileDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public UpdateProfileDto(String nickname, String email, LicenseDto license, Boolean photoOwner) {
+        this.nickname = nickname;
+        this.email = email;
+        this.license = license;
+        this.photoOwner = photoOwner;
+    }
 
     public UpdateProfileDto nickname(String nickname) {
         this.nickname = nickname;
@@ -50,6 +63,7 @@ public class UpdateProfileDto {
      * @return nickname
      */
     @NotNull
+    @JsonProperty("nickname")
     public String getNickname() {
         return nickname;
     }
@@ -70,6 +84,7 @@ public class UpdateProfileDto {
      */
     @NotNull
     @Email
+    @JsonProperty("email")
     public String getEmail() {
         return email;
     }
@@ -90,6 +105,7 @@ public class UpdateProfileDto {
      */
     @NotNull
     @Valid
+    @JsonProperty("license")
     public LicenseDto getLicense() {
         return license;
     }
@@ -109,6 +125,7 @@ public class UpdateProfileDto {
      * @return photoOwner
      */
     @NotNull
+    @JsonProperty("photoOwner")
     public Boolean getPhotoOwner() {
         return photoOwner;
     }
@@ -128,6 +145,7 @@ public class UpdateProfileDto {
      * @return link
      */
     @Valid
+    @JsonProperty("link")
     public URI getLink() {
         return link;
     }
@@ -147,6 +165,7 @@ public class UpdateProfileDto {
      * @return anonymous
      */
 
+    @JsonProperty("anonymous")
     public Boolean getAnonymous() {
         return anonymous;
     }
@@ -166,6 +185,7 @@ public class UpdateProfileDto {
      * @return sendNotifications
      */
 
+    @JsonProperty("sendNotifications")
     public Boolean getSendNotifications() {
         return sendNotifications;
     }

@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -135,8 +136,15 @@ public class ProfileController {
                                                   @RequestBody @NotNull UpdateProfileDto updateProfileDto,
                                                   @AuthenticationPrincipal AuthUser authUser) {
         manageProfileUseCase.updateProfile(authUser.getUser(), toUser(updateProfileDto), userAgent);
-
         return ResponseEntity.ok("Profile updated");
+    }
+
+    @DeleteMapping(value = "/myProfile")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> deleteMyProfile(@RequestHeader(HttpHeaders.USER_AGENT) String userAgent,
+                                             @AuthenticationPrincipal AuthUser authUser) {
+        manageProfileUseCase.deleteProfile(authUser.getUser(), userAgent);
+        return ResponseEntity.noContent().build();
     }
 
     private User toUser(UpdateProfileDto updateProfileDto) {

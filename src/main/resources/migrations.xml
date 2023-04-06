@@ -956,4 +956,30 @@
         </insert>
     </changeSet>
 
+    <changeSet id="51" author="pstorch">
+        <createTable tableName="blocked_usernames">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="normalizedName" type="varchar(30)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="52" author="pstorch" context="junit or test">
+        <update tableName="users">
+            <column name="key"
+                    value="246172676F6E32696424763D3139246D3D36353533362C743D322C703D312432634C6B4C6949415958584E52742B6C7A3062614541242B706C7463365A4371386D534551772B4139374B304E37544B386A7072582F774141614B525933456D783400000000000000000000000000000000000000000000000000000000000000"/>
+            <column name="email"
+                    value="user21@example.com"/>
+            <column name="url"
+                    value="https://www.example.com/user21"/>
+            <where>id = 22</where>
+        </update>
+    </changeSet>
+
 </databaseChangeLog>

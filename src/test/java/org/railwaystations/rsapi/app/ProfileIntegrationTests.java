@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.railwaystations.rsapi.adapter.out.db.UserDao;
+import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.ports.out.Mailer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -53,6 +55,9 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @Autowired
+    private UserDao userDao;
 
     @MockBean
     private Mailer mailer;
@@ -435,6 +440,38 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
 
         var responseWithOldPassword = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
         assertThat(responseWithOldPassword.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+    }
+
+    @Test
+    void deleteMyProfileWithBasicAuth() throws IOException {
+        // given
+        var responseGet1 = restTemplate.withBasicAuth("@user21", "uON60I7XWTIN")
+                .getForEntity(String.format("http://localhost:%d%s", port, "/myProfile"), String.class);
+        assertThat(responseGet1.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertProfile(responseGet1, "@user21", "https://www.example.com/user21", false, "user21@example.com");
+
+        // when
+        var responseDelete = restTemplate.withBasicAuth("@user21", "uON60I7XWTIN")
+                .exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.DELETE, null, Void.class);
+
+        // then
+        assertThat(responseDelete.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        var user = userDao.findById(22).get();
+        assertThat(user).usingRecursiveComparison().isEqualTo(User.builder()
+                .id(22)
+                .name("deleteduser22")
+                .anonymous(true)
+                .ownPhotos(false)
+                .license(null)
+                .url(null)
+                .email(null)
+                .key(null)
+                .sendNotifications(false)
+                .admin(false)
+                .build());
+        var responseGet2 = restTemplate.withBasicAuth("@user21", "uON60I7XWTIN")
+                .getForEntity(String.format("http://localhost:%d%s", port, "/myProfile"), String.class);
+        assertThat(responseGet2.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
 }

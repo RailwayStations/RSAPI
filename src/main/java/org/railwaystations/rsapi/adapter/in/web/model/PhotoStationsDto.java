@@ -15,23 +15,39 @@ import java.util.Objects;
  */
 
 @JsonTypeName("PhotoStations")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class PhotoStationsDto {
 
-    @JsonProperty("photoBaseUrl")
     private String photoBaseUrl;
 
-    @JsonProperty("licenses")
     @Valid
-    private List<PhotoLicenseDto> licenses = new ArrayList<>();
+    private List<@Valid PhotoLicenseDto> licenses = new ArrayList<>();
 
-    @JsonProperty("photographers")
     @Valid
-    private List<PhotographerDto> photographers = new ArrayList<>();
+    private List<@Valid PhotographerDto> photographers = new ArrayList<>();
 
-    @JsonProperty("stations")
     @Valid
-    private List<PhotoStationDto> stations = new ArrayList<>();
+    private List<@Valid PhotoStationDto> stations = new ArrayList<>();
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link PhotoStationsDto#PhotoStationsDto(String, List<@Valid PhotoLicenseDto>, List<@Valid PhotographerDto>, List<@Valid PhotoStationDto>)}
+     */
+    @Deprecated
+    public PhotoStationsDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public PhotoStationsDto(String photoBaseUrl, List<@Valid PhotoLicenseDto> licenses, List<@Valid PhotographerDto> photographers, List<@Valid PhotoStationDto> stations) {
+        this.photoBaseUrl = photoBaseUrl;
+        this.licenses = licenses;
+        this.photographers = photographers;
+        this.stations = stations;
+    }
 
     public PhotoStationsDto photoBaseUrl(String photoBaseUrl) {
         this.photoBaseUrl = photoBaseUrl;
@@ -44,6 +60,7 @@ public class PhotoStationsDto {
      * @return photoBaseUrl
      */
     @NotNull
+    @JsonProperty("photoBaseUrl")
     public String getPhotoBaseUrl() {
         return photoBaseUrl;
     }
@@ -52,7 +69,7 @@ public class PhotoStationsDto {
         this.photoBaseUrl = photoBaseUrl;
     }
 
-    public PhotoStationsDto licenses(List<PhotoLicenseDto> licenses) {
+    public PhotoStationsDto licenses(List<@Valid PhotoLicenseDto> licenses) {
         this.licenses = licenses;
         return this;
     }
@@ -72,15 +89,16 @@ public class PhotoStationsDto {
      */
     @NotNull
     @Valid
-    public List<PhotoLicenseDto> getLicenses() {
+    @JsonProperty("licenses")
+    public List<@Valid PhotoLicenseDto> getLicenses() {
         return licenses;
     }
 
-    public void setLicenses(List<PhotoLicenseDto> licenses) {
+    public void setLicenses(List<@Valid PhotoLicenseDto> licenses) {
         this.licenses = licenses;
     }
 
-    public PhotoStationsDto photographers(List<PhotographerDto> photographers) {
+    public PhotoStationsDto photographers(List<@Valid PhotographerDto> photographers) {
         this.photographers = photographers;
         return this;
     }
@@ -100,15 +118,16 @@ public class PhotoStationsDto {
      */
     @NotNull
     @Valid
-    public List<PhotographerDto> getPhotographers() {
+    @JsonProperty("photographers")
+    public List<@Valid PhotographerDto> getPhotographers() {
         return photographers;
     }
 
-    public void setPhotographers(List<PhotographerDto> photographers) {
+    public void setPhotographers(List<@Valid PhotographerDto> photographers) {
         this.photographers = photographers;
     }
 
-    public PhotoStationsDto stations(List<PhotoStationDto> stations) {
+    public PhotoStationsDto stations(List<@Valid PhotoStationDto> stations) {
         this.stations = stations;
         return this;
     }
@@ -128,11 +147,12 @@ public class PhotoStationsDto {
      */
     @NotNull
     @Valid
-    public List<PhotoStationDto> getStations() {
+    @JsonProperty("stations")
+    public List<@Valid PhotoStationDto> getStations() {
         return stations;
     }
 
-    public void setStations(List<PhotoStationDto> stations) {
+    public void setStations(List<@Valid PhotoStationDto> stations) {
         this.stations = stations;
     }
 

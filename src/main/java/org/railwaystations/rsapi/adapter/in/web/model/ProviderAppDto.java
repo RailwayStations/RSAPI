@@ -14,7 +14,7 @@ import java.util.Objects;
  */
 
 @JsonTypeName("ProviderApp")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class ProviderAppDto {
 
     /**
@@ -54,14 +54,30 @@ public class ProviderAppDto {
         }
     }
 
-    @JsonProperty("type")
     private TypeEnum type;
 
-    @JsonProperty("name")
     private String name;
 
-    @JsonProperty("url")
     private String url;
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link ProviderAppDto#ProviderAppDto(TypeEnum, String, String)}
+     */
+    @Deprecated
+    public ProviderAppDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public ProviderAppDto(TypeEnum type, String name, String url) {
+        this.type = type;
+        this.name = name;
+        this.url = url;
+    }
 
     public ProviderAppDto type(TypeEnum type) {
         this.type = type;
@@ -74,6 +90,7 @@ public class ProviderAppDto {
      * @return type
      */
     @NotNull
+    @JsonProperty("type")
     public TypeEnum getType() {
         return type;
     }
@@ -93,6 +110,7 @@ public class ProviderAppDto {
      * @return name
      */
     @NotNull
+    @JsonProperty("name")
     public String getName() {
         return name;
     }
@@ -112,6 +130,7 @@ public class ProviderAppDto {
      * @return url
      */
     @NotNull
+    @JsonProperty("url")
     public String getUrl() {
         return url;
     }

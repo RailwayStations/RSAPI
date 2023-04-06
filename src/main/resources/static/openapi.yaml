@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20230211.1245"
+  version: "20230406.2100"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -1135,6 +1135,26 @@ paths:
               schema:
                 type: string
       x-codegen-request-body-name: profile
+    delete:
+      summary: Delete the users profile.
+      description: |
+        The delete request closes the account of the logged in user on railway-stations.org.
+        The account will be changed to anonymous. 
+        The email-address, nickname, link and credentials will be removed from the account.
+        All OAuth tokens will be removed as well. No further login will be possible.
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
+        - $ref: '#/components/parameters/Upload-Token'
+        - $ref: '#/components/parameters/Email'
+      responses:
+        204:
+          description: delete action has been enacted, no further information
+        401:
+          description: authorization failed
+          content: { }
+        403:
+          description: forbidden
+          content: { }
 
   /photos/{country}/{filename}:
     get:

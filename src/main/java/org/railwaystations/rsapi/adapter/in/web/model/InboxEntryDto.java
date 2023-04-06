@@ -14,55 +14,39 @@ import java.util.Objects;
  */
 
 @JsonTypeName("InboxEntry")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class InboxEntryDto {
 
-    @JsonProperty("id")
     private Long id;
 
-    @JsonProperty("countryCode")
     private String countryCode;
 
-    @JsonProperty("stationId")
     private String stationId;
 
-    @JsonProperty("title")
     private String title;
 
-    @JsonProperty("lat")
     private Double lat;
 
-    @JsonProperty("lon")
     private Double lon;
 
-    @JsonProperty("photographerNickname")
     private String photographerNickname;
 
-    @JsonProperty("photographerEmail")
     private String photographerEmail;
 
-    @JsonProperty("photoId")
     private Long photoId;
 
-    @JsonProperty("comment")
     private String comment;
 
-    @JsonProperty("createdAt")
     private Long createdAt;
 
-    @JsonProperty("done")
     private Boolean done;
 
-    @JsonProperty("filename")
     private String filename;
 
-    @JsonProperty("inboxUrl")
     private String inboxUrl;
 
-    @JsonProperty("hasPhoto")
     private Boolean hasPhoto;
 
-    @JsonProperty("hasConflict")
     private Boolean hasConflict;
 
     /**
@@ -112,14 +96,33 @@ public class InboxEntryDto {
         }
     }
 
-    @JsonProperty("problemReportType")
     private ProblemReportTypeEnum problemReportType;
 
-    @JsonProperty("isProcessed")
     private Boolean isProcessed;
 
-    @JsonProperty("active")
     private Boolean active;
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link InboxEntryDto#InboxEntryDto(Long, String, String, Long, Boolean, Boolean)}
+     */
+    @Deprecated
+    public InboxEntryDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public InboxEntryDto(Long id, String photographerNickname, String comment, Long createdAt, Boolean done, Boolean hasPhoto) {
+        this.id = id;
+        this.photographerNickname = photographerNickname;
+        this.comment = comment;
+        this.createdAt = createdAt;
+        this.done = done;
+        this.hasPhoto = hasPhoto;
+    }
 
     public InboxEntryDto id(Long id) {
         this.id = id;
@@ -132,6 +135,7 @@ public class InboxEntryDto {
      * @return id
      */
     @NotNull
+    @JsonProperty("id")
     public Long getId() {
         return id;
     }
@@ -151,6 +155,7 @@ public class InboxEntryDto {
      * @return countryCode
      */
 
+    @JsonProperty("countryCode")
     public String getCountryCode() {
         return countryCode;
     }
@@ -170,6 +175,7 @@ public class InboxEntryDto {
      * @return stationId
      */
 
+    @JsonProperty("stationId")
     public String getStationId() {
         return stationId;
     }
@@ -189,6 +195,7 @@ public class InboxEntryDto {
      * @return title
      */
 
+    @JsonProperty("title")
     public String getTitle() {
         return title;
     }
@@ -208,6 +215,7 @@ public class InboxEntryDto {
      * @return lat
      */
 
+    @JsonProperty("lat")
     public Double getLat() {
         return lat;
     }
@@ -227,6 +235,7 @@ public class InboxEntryDto {
      * @return lon
      */
 
+    @JsonProperty("lon")
     public Double getLon() {
         return lon;
     }
@@ -246,6 +255,7 @@ public class InboxEntryDto {
      * @return photographerNickname
      */
     @NotNull
+    @JsonProperty("photographerNickname")
     public String getPhotographerNickname() {
         return photographerNickname;
     }
@@ -265,6 +275,7 @@ public class InboxEntryDto {
      * @return photographerEmail
      */
 
+    @JsonProperty("photographerEmail")
     public String getPhotographerEmail() {
         return photographerEmail;
     }
@@ -284,6 +295,7 @@ public class InboxEntryDto {
      * @return photoId
      */
 
+    @JsonProperty("photoId")
     public Long getPhotoId() {
         return photoId;
     }
@@ -303,6 +315,7 @@ public class InboxEntryDto {
      * @return comment
      */
     @NotNull
+    @JsonProperty("comment")
     public String getComment() {
         return comment;
     }
@@ -322,6 +335,7 @@ public class InboxEntryDto {
      * @return createdAt
      */
     @NotNull
+    @JsonProperty("createdAt")
     public Long getCreatedAt() {
         return createdAt;
     }
@@ -341,6 +355,7 @@ public class InboxEntryDto {
      * @return done
      */
     @NotNull
+    @JsonProperty("done")
     public Boolean getDone() {
         return done;
     }
@@ -360,6 +375,7 @@ public class InboxEntryDto {
      * @return filename
      */
 
+    @JsonProperty("filename")
     public String getFilename() {
         return filename;
     }
@@ -379,6 +395,7 @@ public class InboxEntryDto {
      * @return inboxUrl
      */
 
+    @JsonProperty("inboxUrl")
     public String getInboxUrl() {
         return inboxUrl;
     }
@@ -398,6 +415,7 @@ public class InboxEntryDto {
      * @return hasPhoto
      */
     @NotNull
+    @JsonProperty("hasPhoto")
     public Boolean getHasPhoto() {
         return hasPhoto;
     }
@@ -417,6 +435,7 @@ public class InboxEntryDto {
      * @return hasConflict
      */
 
+    @JsonProperty("hasConflict")
     public Boolean getHasConflict() {
         return hasConflict;
     }
@@ -436,6 +455,7 @@ public class InboxEntryDto {
      * @return problemReportType
      */
 
+    @JsonProperty("problemReportType")
     public ProblemReportTypeEnum getProblemReportType() {
         return problemReportType;
     }
@@ -455,6 +475,7 @@ public class InboxEntryDto {
      * @return isProcessed
      */
 
+    @JsonProperty("isProcessed")
     public Boolean getIsProcessed() {
         return isProcessed;
     }
@@ -474,6 +495,7 @@ public class InboxEntryDto {
      * @return active
      */
 
+    @JsonProperty("active")
     public Boolean getActive() {
         return active;
     }

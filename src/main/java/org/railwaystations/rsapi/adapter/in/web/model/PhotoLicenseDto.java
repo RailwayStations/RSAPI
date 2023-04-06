@@ -14,17 +14,33 @@ import java.util.Objects;
  */
 
 @JsonTypeName("PhotoLicense")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class PhotoLicenseDto {
 
-    @JsonProperty("id")
     private String id;
 
-    @JsonProperty("name")
     private String name;
 
-    @JsonProperty("url")
     private URI url;
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link PhotoLicenseDto#PhotoLicenseDto(String, String, URI)}
+     */
+    @Deprecated
+    public PhotoLicenseDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public PhotoLicenseDto(String id, String name, URI url) {
+        this.id = id;
+        this.name = name;
+        this.url = url;
+    }
 
     public PhotoLicenseDto id(String id) {
         this.id = id;
@@ -37,6 +53,7 @@ public class PhotoLicenseDto {
      * @return id
      */
     @NotNull
+    @JsonProperty("id")
     public String getId() {
         return id;
     }
@@ -56,6 +73,7 @@ public class PhotoLicenseDto {
      * @return name
      */
     @NotNull
+    @JsonProperty("name")
     public String getName() {
         return name;
     }
@@ -76,6 +94,7 @@ public class PhotoLicenseDto {
      */
     @NotNull
     @Valid
+    @JsonProperty("url")
     public URI getUrl() {
         return url;
     }

@@ -12,23 +12,38 @@ import java.util.Objects;
  */
 
 @JsonTypeName("Statistic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-02-11T12:49:48.980080334+01:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
 public class StatisticDto {
 
-    @JsonProperty("total")
     private Long total;
 
-    @JsonProperty("withPhoto")
     private Long withPhoto;
 
-    @JsonProperty("withoutPhoto")
     private Long withoutPhoto;
 
-    @JsonProperty("photographers")
     private Long photographers;
 
-    @JsonProperty("countryCode")
     private String countryCode = null;
+
+    /**
+     * Default constructor
+     *
+     * @deprecated Use {@link StatisticDto#StatisticDto(Long, Long, Long, Long)}
+     */
+    @Deprecated
+    public StatisticDto() {
+        super();
+    }
+
+    /**
+     * Constructor with only required parameters
+     */
+    public StatisticDto(Long total, Long withPhoto, Long withoutPhoto, Long photographers) {
+        this.total = total;
+        this.withPhoto = withPhoto;
+        this.withoutPhoto = withoutPhoto;
+        this.photographers = photographers;
+    }
 
     public StatisticDto total(Long total) {
         this.total = total;
@@ -41,6 +56,7 @@ public class StatisticDto {
      * @return total
      */
     @NotNull
+    @JsonProperty("total")
     public Long getTotal() {
         return total;
     }
@@ -60,6 +76,7 @@ public class StatisticDto {
      * @return withPhoto
      */
     @NotNull
+    @JsonProperty("withPhoto")
     public Long getWithPhoto() {
         return withPhoto;
     }
@@ -79,6 +96,7 @@ public class StatisticDto {
      * @return withoutPhoto
      */
     @NotNull
+    @JsonProperty("withoutPhoto")
     public Long getWithoutPhoto() {
         return withoutPhoto;
     }
@@ -98,6 +116,7 @@ public class StatisticDto {
      * @return photographers
      */
     @NotNull
+    @JsonProperty("photographers")
     public Long getPhotographers() {
         return photographers;
     }
@@ -117,6 +136,7 @@ public class StatisticDto {
      * @return countryCode
      */
 
+    @JsonProperty("countryCode")
     public String getCountryCode() {
         return countryCode;
     }
