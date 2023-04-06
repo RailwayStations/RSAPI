@@ -11,8 +11,8 @@ group = 'org.railwaystations'
 version = '0.0.1-SNAPSHOT'
 
 java {
-    sourceCompatibility = "18"
-    targetCompatibility = "18"
+    sourceCompatibility = "19"
+    targetCompatibility = "19"
 }
 
 configurations {
