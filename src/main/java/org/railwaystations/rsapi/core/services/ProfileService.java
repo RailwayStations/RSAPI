@@ -197,6 +197,8 @@ public class ProfileService implements ManageProfileUseCase {
         userDao.anonymizeUser(user.getId());
         userDao.addUsernameToBlocklist(normalizedName);
         authorizationDao.deleteAllByUser(user.getName());
+        monitor.sendMessage(
+                String.format("Closed account %d - %s", user.getId(), user.getName()));
     }
 
     private void sendPasswordMail(String email, String newPassword) {
