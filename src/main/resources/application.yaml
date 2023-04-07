@@ -47,7 +47,7 @@ workDir: /var/rsapi
 keepFileCopiesInDays: 60
 photoBaseUrl: http://localhost:8080/photos
 inboxBaseUrl: http://localhost:8080/inbox
-mailVerificationUrl: http://localhost:8088/emailVerification.php?token=
+mailVerificationUrl: http://localhost:8000/emailVerification.php?token=
 jwkSourceKeyFile: jwkSourceTestKeys.json
 
 # mailer
