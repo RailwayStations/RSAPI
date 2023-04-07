@@ -45,3 +45,4 @@ target
 /src/main/resources/application-peter.yaml
 /.rewrite-cache/
 /spring-boot-migrator.log
+/.run/RsapiApplication.run.xml
