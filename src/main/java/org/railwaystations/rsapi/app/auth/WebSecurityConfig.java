@@ -43,6 +43,9 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+
+import java.util.List;
 
 import static org.railwaystations.rsapi.utils.JwtUtil.generateRsaKey;
 import static org.railwaystations.rsapi.utils.JwtUtil.loadRsaKey;
@@ -71,6 +74,15 @@ public class WebSecurityConfig {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         http
                 .securityMatcher("/oauth2/**")
+                .cors()
+                .configurationSource(request -> {
+                    var cors = new CorsConfiguration();
+                    cors.setAllowedOriginPatterns(List.of("*"));
+                    cors.setAllowedMethods(List.of("GET", "POST", "OPTIONS"));
+                    cors.setAllowedHeaders(List.of("*"));
+                    cors.setAllowCredentials(true);
+                    return cors;
+                }).and()
                 .exceptionHandling((exceptions) -> exceptions
                         .authenticationEntryPoint(
                                 new LoginUrlAuthenticationEntryPoint("/login"))
@@ -103,7 +115,6 @@ public class WebSecurityConfig {
                         .loginPage("/login")
                         .permitAll()
                 );
-        //.formLogin(Customizer.withDefaults());
 
         return http.build();
     }

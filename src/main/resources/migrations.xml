@@ -982,4 +982,35 @@
         </update>
     </changeSet>
 
+    <changeSet id="53" author="pstorch">
+        <insert tableName="oauth2_registered_client">
+            <column name="id" value="3ec0f550-ad5f-4f07-9272-5304b161335b"/>
+            <column name="client_id" value="RailwayStationsWebsiteLocal"/>
+            <column name="client_secret" value=""/>
+            <column name="client_name" value="Railway-Stations.org website for local testing"/>
+            <column name="client_authentication_methods" value="none"/>
+            <column name="authorization_grant_types" value="authorization_code"/>
+            <column name="redirect_uris" value="http://127.0.0.1:8000/map/settings.php"/>
+            <column name="scopes" value="all"/>
+            <column name="client_settings"
+                    value="{&quot;@class&quot;:&quot;java.util.Collections$UnmodifiableMap&quot;,&quot;settings.client.require-proof-key&quot;:true,&quot;settings.client.require-authorization-consent&quot;:true}"/>
+            <column name="token_settings"
+                    value="{&quot;@class&quot;:&quot;java.util.Collections$UnmodifiableMap&quot;,&quot;settings.token.reuse-refresh-tokens&quot;:true,&quot;settings.token.id-token-signature-algorithm&quot;:[&quot;org.springframework.security.oauth2.jose.jws.SignatureAlgorithm&quot;,&quot;RS256&quot;],&quot;settings.token.access-token-time-to-live&quot;:[&quot;java.time.Duration&quot;,300.000000000],&quot;settings.token.access-token-format&quot;:{&quot;@class&quot;:&quot;org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat&quot;,&quot;value&quot;:&quot;self-contained&quot;},&quot;settings.token.refresh-token-time-to-live&quot;:[&quot;java.time.Duration&quot;,300.000000000],&quot;settings.token.authorization-code-time-to-live&quot;:[&quot;java.time.Duration&quot;,300.000000000]}"/>
+        </insert>
+        <insert tableName="oauth2_registered_client">
+            <column name="id" value="2d4cf1c7-43f2-41c5-85bf-e37d54923cec"/>
+            <column name="client_id" value="RailwayStationsWebsite"/>
+            <column name="client_secret" value=""/>
+            <column name="client_name" value="Railway-Stations.org website"/>
+            <column name="client_authentication_methods" value="none"/>
+            <column name="authorization_grant_types" value="authorization_code"/>
+            <column name="redirect_uris" value="https://map.railway-stations.org/settings.php"/>
+            <column name="scopes" value="all"/>
+            <column name="client_settings"
+                    value="{&quot;@class&quot;:&quot;java.util.Collections$UnmodifiableMap&quot;,&quot;settings.client.require-proof-key&quot;:true,&quot;settings.client.require-authorization-consent&quot;:true}"/>
+            <column name="token_settings"
+                    value="{&quot;@class&quot;:&quot;java.util.Collections$UnmodifiableMap&quot;,&quot;settings.token.reuse-refresh-tokens&quot;:true,&quot;settings.token.id-token-signature-algorithm&quot;:[&quot;org.springframework.security.oauth2.jose.jws.SignatureAlgorithm&quot;,&quot;RS256&quot;],&quot;settings.token.access-token-time-to-live&quot;:[&quot;java.time.Duration&quot;,17280000.000000000],&quot;settings.token.access-token-format&quot;:{&quot;@class&quot;:&quot;org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat&quot;,&quot;value&quot;:&quot;self-contained&quot;},&quot;settings.token.refresh-token-time-to-live&quot;:[&quot;java.time.Duration&quot;,300.000000000],&quot;settings.token.authorization-code-time-to-live&quot;:[&quot;java.time.Duration&quot;,300.000000000]}"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>
