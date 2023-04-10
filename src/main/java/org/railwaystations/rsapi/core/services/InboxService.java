@@ -34,6 +34,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -122,6 +123,7 @@ public class InboxService implements ManageInboxUseCase {
         log.info("Query uploadStatus for Nickname: {}", user.getName());
 
         return ids.stream()
+                .filter(Objects::nonNull)
                 .map(inboxDao::findById)
                 .filter(inboxEntry -> inboxEntry != null && inboxEntry.getPhotographerId() == user.getId())
                 .map(this::mapToInboxStateQuery)
