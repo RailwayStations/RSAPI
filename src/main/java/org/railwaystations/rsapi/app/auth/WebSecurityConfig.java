@@ -139,7 +139,8 @@ public class WebSecurityConfig {
 
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/**").permitAll()
-                        .requestMatchers("/adminInbox", "/adminInboxCount", "/userInbox", "/photoUpload",
+                        .requestMatchers("/adminInbox", "/adminInboxCount", "/userInbox",
+                                "/photoUpload", "/photoUploadMultipartFormdata",
                                 "/resendEmailVerification", "/reportProblem", "/changePassword", "/myProfile",
                                 "/resendEmailVerification").authenticated())
                 .exceptionHandling()

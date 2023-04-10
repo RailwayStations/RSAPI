@@ -109,7 +109,7 @@ public class InboxController {
             var authentication = authenticator.authenticate(new UsernamePasswordAuthenticationToken(email, uploadToken));
             if (authentication == null || !authentication.isAuthenticated()) {
                 return createIFrameAnswer(consumeBodyAndReturn(file.getInputStream(),
-                                new InboxResponseDto().state(InboxResponseDto.StateEnum.UNAUTHORIZED)),
+                                new InboxResponseDto(InboxResponseDto.StateEnum.UNAUTHORIZED)),
                         refererUri);
             }
 
@@ -124,9 +124,56 @@ public class InboxController {
             return createIFrameAnswer(response, refererUri);
         } catch (Exception e) {
             log.error("FormUpload error", e);
-            return createIFrameAnswer(new InboxResponseDto().state(InboxResponseDto.StateEnum.ERROR), refererUri);
+            return createIFrameAnswer(new InboxResponseDto(InboxResponseDto.StateEnum.ERROR), refererUri);
         }
     }
+
+    /**
+     * Not part of the "official" API.
+     * Supports upload of photos via the website.
+     */
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE + ";charset=UTF-8"}, value = "/photoUploadMultipartFormdata", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<InboxResponseDto> photoUploadMultipartFormdata(@RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
+                                           @AuthenticationPrincipal AuthUser user,
+                                           @RequestParam(value = STATION_ID, required = false) String stationId,
+                                           @RequestParam(value = COUNTRY_CODE, required = false) String countryCode,
+                                           @RequestParam(value = STATION_TITLE, required = false) String stationTitle,
+                                           @RequestParam(value = LATITUDE, required = false) Double latitude,
+                                           @RequestParam(value = LONGITUDE, required = false) Double longitude,
+                                           @RequestParam(value = COMMENT, required = false) String comment,
+                                           @RequestParam(value = ACTIVE, required = false) Boolean active,
+                                           @RequestParam(value = FILE) MultipartFile file) {
+        log.info("MultipartFormData2: user={}, station={}, country={}, file={}", user.getUsername(), stationId, countryCode, file.getName());
+
+        try {
+            InboxResponseDto response;
+            if (file.isEmpty()) {
+                response = uploadPhoto(userAgent, null, StringUtils.trimToNull(stationId),
+                        countryCode, null, stationTitle, latitude, longitude, comment, active, user);
+            } else {
+                response = uploadPhoto(userAgent, file.getInputStream(), StringUtils.trimToNull(stationId),
+                        countryCode, file.getContentType(), stationTitle, latitude, longitude, comment, active, user);
+            }
+            return new ResponseEntity<>(response, toHttpStatusMultipartFormdata(response.getState()));
+        } catch (Exception e) {
+            log.error("FormUpload error", e);
+            return new ResponseEntity<>(new InboxResponseDto(InboxResponseDto.StateEnum.ERROR), toHttpStatus(InboxResponseDto.StateEnum.ERROR));
+        }
+    }
+
+    /**
+     * jQuery.ajax treats anything different to 2xx as error, so we have to simplify the response codes
+     */
+    private HttpStatus toHttpStatusMultipartFormdata(InboxResponseDto.StateEnum state) {
+        return switch (state) {
+            case REVIEW, CONFLICT -> HttpStatus.ACCEPTED;
+            case PHOTO_TOO_LARGE, LAT_LON_OUT_OF_RANGE, NOT_ENOUGH_DATA, UNSUPPORTED_CONTENT_TYPE -> HttpStatus.OK;
+            default -> HttpStatus.INTERNAL_SERVER_ERROR;
+        };
+    }
+
 
     @PostMapping(consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE, value = "/photoUpload")
     @PreAuthorize("isAuthenticated()")
@@ -149,10 +196,9 @@ public class InboxController {
     }
 
     private InboxResponseDto toDto(InboxResponse inboxResponse) {
-        return new InboxResponseDto()
+        return new InboxResponseDto(toDto(inboxResponse.getState()))
                 .id(inboxResponse.getId())
                 .crc32(inboxResponse.getCrc32())
-                .state(toDto(inboxResponse.getState()))
                 .filename(inboxResponse.getFilename())
                 .inboxUrl(inboxResponse.getInboxUrl())
                 .message(inboxResponse.getMessage());
@@ -223,12 +269,11 @@ public class InboxController {
     }
 
     private PublicInboxEntryDto toDto(PublicInboxEntry publicInboxEntry) {
-        return new PublicInboxEntryDto()
-                .countryCode(publicInboxEntry.getCountryCode())
-                .stationId(publicInboxEntry.getStationId())
-                .title(publicInboxEntry.getTitle())
-                .lat(publicInboxEntry.getLat())
-                .lon(publicInboxEntry.getLon());
+        return new PublicInboxEntryDto(publicInboxEntry.getCountryCode(),
+                publicInboxEntry.getStationId(),
+                publicInboxEntry.getTitle(),
+                publicInboxEntry.getLat(),
+                publicInboxEntry.getLon());
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE, value = "/userInbox")
@@ -250,8 +295,7 @@ public class InboxController {
     }
 
     private InboxStateQueryResponseDto toDto(InboxStateQuery inboxStateQuery) {
-        return new InboxStateQueryResponseDto()
-                .id(inboxStateQuery.getId())
+        return new InboxStateQueryResponseDto(inboxStateQuery.getId(), toDto(inboxStateQuery.getState()))
                 .countryCode(inboxStateQuery.getCountryCode())
                 .stationId(inboxStateQuery.getStationId())
                 .inboxUrl(inboxStateQuery.getInboxUrl())
@@ -259,8 +303,7 @@ public class InboxController {
                 .lon(inboxStateQuery.getCoordinates() != null ? inboxStateQuery.getCoordinates().getLon() : null)
                 .filename(inboxStateQuery.getFilename())
                 .crc32(inboxStateQuery.getCrc32())
-                .rejectedReason(inboxStateQuery.getRejectedReason())
-                .state(toDto(inboxStateQuery.getState()));
+                .rejectedReason(inboxStateQuery.getRejectedReason());
     }
 
     public InboxStateQueryResponseDto.StateEnum toDto(InboxStateQuery.InboxState inboxState) {
@@ -286,24 +329,23 @@ public class InboxController {
     }
 
     private InboxEntryDto toDto(InboxEntry inboxEntry) {
-        return new InboxEntryDto()
-                .id(inboxEntry.getId())
+        return new InboxEntryDto(inboxEntry.getId(),
+                inboxEntry.getPhotographerNickname(),
+                inboxEntry.getComment(),
+                inboxEntry.getCreatedAt().toEpochMilli(),
+                inboxEntry.isDone(),
+                inboxEntry.isHasPhoto())
                 .countryCode(inboxEntry.getCountryCode())
                 .stationId(inboxEntry.getStationId())
                 .title(inboxEntry.getTitle())
                 .lat(inboxEntry.getLat())
                 .lon(inboxEntry.getLon())
                 .active(inboxEntry.getActive())
-                .comment(inboxEntry.getComment())
                 .inboxUrl(inboxEntry.getInboxUrl())
-                .createdAt(inboxEntry.getCreatedAt().toEpochMilli())
-                .done(inboxEntry.isDone())
                 .filename(inboxEntry.getFilename())
                 .hasConflict(inboxEntry.isConflict())
-                .hasPhoto(inboxEntry.isHasPhoto())
                 .isProcessed(inboxEntry.isProcessed())
                 .photographerEmail(inboxEntry.getPhotographerEmail())
-                .photographerNickname(inboxEntry.getPhotographerNickname())
                 .problemReportType(toDto(inboxEntry.getProblemReportType()));
     }
 
@@ -346,10 +388,10 @@ public class InboxController {
             }
         } catch (IllegalArgumentException e) {
             log.warn("adminInbox commandDto {} failed", commandDto, e);
-            return new ResponseEntity<>(new AdminInboxCommandResponseDto().status(HttpStatus.BAD_REQUEST.value()).message(e.getMessage()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new AdminInboxCommandResponseDto(HttpStatus.BAD_REQUEST.value(), e.getMessage()), HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<>(new AdminInboxCommandResponseDto().status(HttpStatus.OK.value()).message("ok"), HttpStatus.OK);
+        return new ResponseEntity<>(new AdminInboxCommandResponseDto(HttpStatus.OK.value(), "ok"), HttpStatus.OK);
     }
 
     private InboxCommand toDomain(InboxCommandDto command) {
@@ -382,12 +424,12 @@ public class InboxController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/adminInboxCount")
     @PreAuthorize("hasRole('ADMIN')")
     public InboxCountResponseDto adminInboxCount(@AuthenticationPrincipal AuthUser user) {
-        return new InboxCountResponseDto().pendingInboxEntries(manageInboxUseCase.countPendingInboxEntries());
+        return new InboxCountResponseDto(manageInboxUseCase.countPendingInboxEntries());
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/nextZ")
     public NextZResponseDto nextZ() {
-        return new NextZResponseDto().nextZ(manageInboxUseCase.getNextZ());
+        return new NextZResponseDto(manageInboxUseCase.getNextZ());
     }
 
     private InboxResponseDto uploadPhoto(String userAgent, InputStream body, String stationId,
