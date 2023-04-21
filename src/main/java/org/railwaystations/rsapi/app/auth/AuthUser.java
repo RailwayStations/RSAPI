@@ -17,7 +17,7 @@ public class AuthUser extends org.springframework.security.core.userdetails.User
     private final User user;
 
     public AuthUser(@NotNull User user, Collection<? extends GrantedAuthority> authorities) {
-        super(user.getDisplayName(), StringUtils.defaultString(user.getKey()), authorities);
+        super(user.getName(), StringUtils.defaultString(user.getKey()), authorities);
         this.user = user;
     }
 
