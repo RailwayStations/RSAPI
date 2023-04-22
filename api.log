@@ -18,11 +18,13 @@ GET /BbSAMbjaNJnDlU/photographers
 GET /CZnpMYqusFQ/stats
 GET /CdorKKdcwLce/stats.json
 GET /CoLOGcb/photographers.json
+GET /DE/Stations
 GET /DUEU/stats
 GET /EIxfq/stats.json
 GET /EwWcJLshyVHt/stats.json
 GET /FKWFqnlI/stats.txt
 GET /FQjYDvCuDC/photographers
+GET /Germany/photographers.json
 GET /GijttN/stats
 GET /HlkvFEpn/stats
 GET /HsnskhUONVuOMx/photographers
@@ -45,12 +47,14 @@ GET /QwvS/stations/*
 GET /RAhy/stats.txt
 GET /SKQmlwcvKEvfkP/stations.gpx
 GET /SObCGtFX/stats.json
+GET /Switzerland/photographers.json
 GET /VKOUqEMDCdHTBQW/stats
 GET /VoJIc/stats.json
 GET /YtWiHyKJ/stats.json
 GET /ZqoLewi/photographers
 GET /about
 GET /abruzi.php4
+GET /admin/filemanager/dialog.php
 GET /admin.php
 GET /admin.php?f=
 GET /admin/controller/extension/extension/
@@ -59,9 +63,22 @@ GET /ads.txt
 GET /alfa.php
 GET /alfindex.php
 GET /api/index.php/v1/config/application?public=
+GET /api/routes/?format=&from=
 GET /api/search?folde
 GET /api/search?folderIds=
 GET /apple-touch-icon.png
+GET /assets/admin/js/tinymce/plugins/filemanager/dialog.php
+GET /assets/admin/tinymce/plugins/filemanager/dialog.php
+GET /assets/elfinder/elfinder.html
+GET /assets/filemanager/dialog.php
+GET /assets/js/kcfinder/upload.php
+GET /assets/kcfinder/upload.php
+GET /assets/plugins/elfinder/elfinder.html
+GET /assets/plugins/filemanager/dialog.php
+GET /assets/plugins/kcfinder/upload.php
+GET /assets/scripts/filemanager/dialog.php
+GET /assets/tinymce/plugins/filemanager/dialog.php
+GET /asset/kcfinder/upload.php
 GET /backup/
 GET /blog/
 GET /blog/wp-commentin.php
@@ -90,6 +107,9 @@ GET /etc/passwd/stations/
 GET /etc/passwd/stations/*
 GET /favicon.ico
 GET /feed/
+GET /filemanager/dialog.php
+GET /filemanager/filemanager/dialog.php
+GET /inbox/Bertie%20Maxwell?width=
 GET /files/
 GET /fotos/RiYAdBgiEcdcQlRe/cFVwarZdtSesm
 GET /fotos/TRUhTaUfHT/BYbyPewKznTvBJCH
@@ -108,6 +128,9 @@ GET /images/
 GET /index.php?3x=
 GET /inbox/DAgdXaXUZ
 GET /inbox/NInYrTaiUObMGm
+GET /inbox/Grace%20Reed?width=
+GET /inbox/Helena%20Holmes?width=
+GET /inbox/Kyle%20Terry?width=
 GET /inbox/aXPfrZgZCd
 GET /inbox/baNwSfhn
 GET /inbox/cuwAYKIpwsSgXEM
@@ -123,7 +146,10 @@ GET /inbox/processed/tytHyqRGILDBT
 GET /inbox/processed/xdBUdajPsF
 GET /info.php
 GET /ivIScVm/stats.txt
+GET /js/kcfinder/upload.php
+GET /js/tinymce4/plugins/filemanager/dialog.php
 GET /kFMupAmHVeQ/photographers.txt
+GET /kcfinder/upload.php
 GET /kmYhIQCtW/stats.txt
 GET /lRwvbibw/photographers.json
 GET /larva.php?idb=
@@ -154,19 +180,24 @@ GET /photoStationById/${@var_dump(md5(390751627))};/
 GET /photoStationById/*1*/{{865621616+944287619}}/
 GET /photoStationById/Bahrain/7672743818428416
 GET /photoStationById/Bayern/220
-GET /photoStationById/Deutschland/1099
-GET /photoStationById/Deutschland/5941
+GET /photoStationById/Bulgaria/3229468300673024
+GET /photoStationById/Deutschland/*
 GET /photoStationById/ExVrbfqJYjvxGZU/OIIg
+GET /photoStationById/France/8484154641481728
 GET /photoStationById/GCClUlBZJhhIm/LQjJhzJJcZyAK
 GET /photoStationById/Germany/*
+GET /photoStationById/Guatemala/3696039942946816
 GET /photoStationById/South%20Africa/6229430257057792
+GET /photoStationById/Swaziland/*
 GET /photoStationById/YuAigCscAFU/HrkmQlRyftzMH
+GET /photoStationById/Zambia/7518210519728128
 GET /photoStationById/ch\xe9\x8e\x88&
 GET /photoStationById/ch&
 GET /photoStationById/convert(int,sys.fn_sqlvarbasetostr(HashBytes(&
+GET /photoStationById/etc/passwd/*
 GET /photoStationById/extractvalue(1,concat(char(126),md5(1091526963)))/
+GET /photoStationById/http:/www.google.com/*
 GET /photoStationById/%7Bcountry%7D/%7Bid%7D
-GET /photoStationById/&
 GET /photoStationById/./.
 GET /photoStationsByCountry/Berlin?hasPhoto=&isActive=
 GET /photoStationsByCountry/Cambodia?hasPhoto=&isActive=
@@ -174,18 +205,29 @@ GET /photoStationsByCountry/Denmark
 GET /photoStationsByCountry/Deutschland
 GET /photoStationsByCountry/Deutschland?hasPhoto=&isActive=
 GET /photoStationsByCountry/Dominica
+GET /photoStationsByCountry/Faroe%20Islands
+GET /photoStationsByCountry/Faroe%20Islands?hasPhoto=&isActive=
 GET /photoStationsByCountry/French%20Southern%20Territories
 GET /photoStationsByCountry/Germany
+GET /photoStationsByCountry/Germany?hasPhotos=&isActive=
 GET /photoStationsByCountry/Germany?hasPhoto=&isActive=
+GET /photoStationsByCountry/Germany?isActive=
+GET /photoStationsByCountry/Guatemala?hasPhoto=&isActive=
 GET /photoStationsByCountry/Iceland
 GET /photoStationsByCountry/ind
 GET /photoStationsByCountry/Montenegro?hasPhoto=&isActive=
 GET /photoStationsByCountry/M%C3%BCnster?hasPhoto=&isActive=
+GET /photoStationsByCountry/Netherlands?hasPhoto=&isActive=
+GET /photoStationsByCountry/Schweiz
 GET /photoStationsByCountry/Slovenia
+GET /photoStationsByCountry/Syrien?hasPhoto=&isActive=
+GET /photoStationsByCountry/Timor-Leste
+GET /photoStationsByCountry/Timor-Leste?hasPhoto=&isActive=
 GET /photoStationsByCountry/fYmLVLXDMTk
 GET /photoStationsByCountry/germany
 GET /photos/3881
 GET /photos/Argentina/Cory%20Jensen
+GET /photos/Dominica/GaryTodd?width=
 GET /photos/Germany/*
 GET /photos/Germany/*?width=
 GET /photos/KAYogcs/gFKiwXD
@@ -195,11 +237,13 @@ GET /photos/phxJFMYGgQDGhw/tJADZVCclDUwOmIh
 GET /photos/subzu
 GET /photos/tIauVaSxomgM/tTDreedvZg
 GET /photos/ugzalumubomaco
+GET /phpformbuilder/plugins/filemanager/dialog.php
 GET /phpinfo.php
 GET /plKBtCkOCguBdcW/photographers
 GET /planner/rail_miles/?from=&to=
 GET /plugins/content/apismtp/apismtp.php.suspected?test=
 GET /plugins/content/apismtp/apismtp.php?test=
+GET /plugins/kcfinder/upload.php
 GET /pl/
 GET /portal/      
 GET /public/_ignition/health-check/
@@ -210,6 +254,7 @@ GET /rCZsQSHRR/stats.txt
 GET /rNwGzRBRfk/stats.json
 GET /rzCblbQryVIaFPB/stations
 GET /robots.txt
+GET /scripts/filemanager/dialog.php
 GET /server-status
 GET /sbkmyjvm.php?Fox=
 GET /shop/wp-includes/wlwmanifest.xml
@@ -238,12 +283,19 @@ GET /test_404_page/
 GET /test.php?Ghost=
 GET /test/wp-includes/wlwmanifest.xml
 GET /th3_err0r.php?php=
+GET /tinymce/filemanager/dialog.php
+GET /tinymce/plugins/filemanager/dialog.php
 GET /tmp/
 GET /tnaVdMHCn/stats.json
 GET /uHKFAbYaTogX/stats
 GET /up.php
 GET /upload.php
 GET /uploads/
+GET /v2/departures/8400050
+GET /v2/departures/8400058
+GET /v2/departures/8400170
+GET /v2/departures/8400621
+GET /v2/departures/8400644
 GET /vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php
 GET /vslifiak.php?Fox=
 GET /v2/_catalog
@@ -471,77 +523,82 @@ POST /wp-plain.php
 
 PUT /api/en/cmdb/system/admin/admin
 
-    101 GET /adminInbox
-     40 GET /adminInboxCount
-   1009 GET /countries
-     16 GET /countries.json
-      2 GET /countries.json?onlyActive=
-      1 GET /countries?canada
-      2 GET /countries?canada=
-     12 GET /countries?onlyActive=
-      9 GET /emailVerification/*
-    299 GET /inbox/processed/*.jpg
-   1702 GET /inbox/processed/*.jpg?width=
-    118 GET /inbox/*.jpg
-    632 GET /inbox/*.jpg?width=
-     72 GET /login
-     26 GET /loginRegister
-     12 GET /login?error
-      7 GET /login?register_success&username=
-      2 GET /login?reset_password_error&username=
-      2 GET /login?reset_password_success&username=
-    103 GET /logo_white.svg
-     99 GET /myProfile
-     14 GET /nextZ
-     55 GET /oauth2/authorize?client_id=&code_challenge=&code_challenge_method=&scope=&response_type=&redirect_uri=
-     15 GET /oauth2/authorize?client_id=&code_challenge=&code_challenge_method=&scope=&response_type=&redirect_uri=&continue
-     19 GET /oauth2/consent?scope=&client_id=&state=
-     11 GET /openapi.yaml
-  21815 GET /photoStationById/*/*
-   1965 GET /photoStationsByCountry/*
-     23 GET /photoStationsByCountry/*?hasPhoto=
-     31 GET /photoStationsByPhotographer/*
-      1 GET /photoStationsByRecentPhotoImports
-    446 GET /photoStationsByRecentPhotoImports?sinceHours=
-     22 GET /photographers
+      1 DELETE /myProfile
+
+    128 GET /
+     27 GET /adminInbox
+    114 GET /adminInboxCount
+   1212 GET /countries
+     21 GET /countries.json
+     23 GET /countries?onlyActive=
+     17 GET /emailVerification/*
+    186 GET /inbox/processed/*.jpg
+    653 GET /inbox/processed/*.jpg?width=
+     97 GET /inbox/*.jpg
+    119 GET /inbox/*.jpg?width=
+    112 GET /login
+     24 GET /loginRegister
+     10 GET /login?error
+     19 GET /login?register_success&username=
+      4 GET /login?reset_password_success&username=
+    204 GET /logo_white.svg
+    219 GET /myProfile
+      5 GET /nextZ
+     48 GET /oauth2/authorize?client_id=&code_challenge=&code_challenge_method=&scope=&response_type=&redirect_uri=
+     17 GET /oauth2/authorize?client_id=&code_challenge=&code_challenge_method=&scope=&response_type=&redirect_uri=&continue
+     46 GET /oauth2/authorize?client_id=&scope=&response_type=&code_challenge=&code_challenge_method=&redirect_uri=&state=
+     29 GET /oauth2/authorize?client_id=&scope=&response_type=&code_challenge=&code_challenge_method=&redirect_uri=&state=&continue
+     48 GET /oauth2/consent?scope=&client_id=&state=
+      7 GET /openapi.yaml
+     33 GET /photoStationById/
+  14589 GET /photoStationById/*/*
+   3148 GET /photoStationsByCountry/*
+     19 GET /photoStationsByCountry/*?hasPhoto=
+      1 GET /photoStationsByCountry/*?hasPhoto=&isActive=
+     32 GET /photoStationsByPhotographer/*
+    355 GET /photoStationsByRecentPhotoImports?sinceHours=
+      1 GET /photoUpload
+     23 GET /photographers
       1 GET /photographers.json
-      2 GET /photographers.txt
-    191 GET /photographers?country=
-      3 GET /photos
+      1 GET /photographers.txt
+     16 GET /photographers.txt?country=
+    108 GET /photographers?country=
+      2 GET /photos
       1 GET /photos/
-  20959 GET /photos/*/*
-   1111 GET /publicInbox
-      1 GET /stations
-   6036 GET /stations?country=
-     13 GET /stations?country=&active=
-      9 GET /stations?country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=&country=
-  20673 GET /stats
-      1 GET /stats.txt
-    548 GET /stats?country=
-    116 GET /style.css
-    116 GET /webjars/bootstrap/5.2.3/css/bootstrap.min.css
-      2 GET /*/photographers.json
-   4158 GET /*/stations
-   8683 GET /*/stations/*
-      2 GET /*/stations/*?limit=
-     93 GET /*/stats
-      1 GET /*/stats.txt
+  14743 GET /photos/*/*
+   1309 GET /publicInbox
+   6391 GET /stations?country=
+     14 GET /stations?country=&active=
+  21010 GET /stats
+    817 GET /stats?country=
+    213 GET /style.css
+    213 GET /webjars/bootstrap/5.2.3/css/bootstrap.min.css
+   4226 GET /*/stations
+   6794 GET /*/stations/*
+     10 GET /*/stats
 
-    335 OPTIONS /adminInbox
-     40 OPTIONS /adminInboxCount
-     21 OPTIONS /myProfile
-      1 OPTIONS /reportProblem
+      7 HEAD /
+      2 HEAD /photos/*/*
 
-    278 POST /adminInbox
-      4 POST /changePassword
-     24 POST /login
-      7 POST /loginRegister
+    204 OPTIONS /adminInbox
+    114 OPTIONS /adminInboxCount
+    176 OPTIONS /myProfile
+     20 OPTIONS /photoUploadMultipartFormdata
+      2 OPTIONS /reportProblem
+     18 OPTIONS /resendEmailVerification
+
+      5 POST /
+    177 POST /adminInbox
+     55 POST /login
+     21 POST /loginRegister
       4 POST /loginResetPassword
-     24 POST /myProfile
-     14 POST /oauth2/authorize
-     19 POST /oauth2/token
-    232 POST /photoUpload
-      4 POST /registration
-      8 POST /reportProblem
-      7 POST /resendEmailVerification
-    432 POST /userInbox
+     40 POST /myProfile
+     37 POST /oauth2/authorize
+     58 POST /oauth2/token
+    169 POST /photoUpload
+     20 POST /photoUploadMultipartFormdata
+      3 POST /reportProblem
+     20 POST /resendEmailVerification
+      1 POST /resetPassword
+    299 POST /userInbox
+    
