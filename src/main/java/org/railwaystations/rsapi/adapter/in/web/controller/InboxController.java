@@ -1,7 +1,5 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +17,6 @@ import org.railwaystations.rsapi.adapter.in.web.model.NextZResponseDto;
 import org.railwaystations.rsapi.adapter.in.web.model.ProblemReportDto;
 import org.railwaystations.rsapi.adapter.in.web.model.PublicInboxEntryDto;
 import org.railwaystations.rsapi.app.auth.AuthUser;
-import org.railwaystations.rsapi.app.auth.RSAuthenticationProvider;
-import org.railwaystations.rsapi.app.auth.RSUserDetailsService;
 import org.railwaystations.rsapi.core.model.Coordinates;
 import org.railwaystations.rsapi.core.model.InboxCommand;
 import org.railwaystations.rsapi.core.model.InboxEntry;
@@ -36,7 +32,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,11 +42,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -61,8 +54,6 @@ import java.util.List;
 @Validated
 public class InboxController {
 
-    public static final String EMAIL = "email";
-    public static final String UPLOAD_TOKEN = "uploadToken";
     public static final String STATION_ID = "stationId";
     public static final String COUNTRY_CODE = "countryCode";
     public static final String STATION_TITLE = "stationTitle";
@@ -73,60 +64,7 @@ public class InboxController {
     public static final String FILE = "file";
 
     @Autowired
-    private ObjectMapper mapper;
-
-    @Autowired
     private ManageInboxUseCase manageInboxUseCase;
-
-    @Autowired
-    private RSAuthenticationProvider authenticator;
-
-    @Autowired
-    private RSUserDetailsService userDetailsService;
-
-    /**
-     * Not part of the "official" API.
-     * Supports upload of photos via the website.
-     */
-    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE + ";charset=UTF-8"}, value = "/photoUpload", produces = MediaType.TEXT_HTML_VALUE)
-    @ResponseBody
-    public ModelAndView photoUploadIframe(@RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
-                                          @RequestParam(EMAIL) String email,
-                                          @RequestParam(UPLOAD_TOKEN) String uploadToken,
-                                          @RequestParam(value = STATION_ID, required = false) String stationId,
-                                          @RequestParam(value = COUNTRY_CODE, required = false) String countryCode,
-                                          @RequestParam(value = STATION_TITLE, required = false) String stationTitle,
-                                          @RequestParam(value = LATITUDE, required = false) Double latitude,
-                                          @RequestParam(value = LONGITUDE, required = false) Double longitude,
-                                          @RequestParam(value = COMMENT, required = false) String comment,
-                                          @RequestParam(value = ACTIVE, required = false) Boolean active,
-                                          @RequestParam(value = FILE) MultipartFile file,
-                                          @RequestHeader(value = HttpHeaders.REFERER) String referer) throws JsonProcessingException {
-        log.info("MultipartFormData: email={}, station={}, country={}, file={}", email, stationId, countryCode, file.getName());
-        var refererUri = URI.create(referer);
-
-        try {
-            var authentication = authenticator.authenticate(new UsernamePasswordAuthenticationToken(email, uploadToken));
-            if (authentication == null || !authentication.isAuthenticated()) {
-                return createIFrameAnswer(consumeBodyAndReturn(file.getInputStream(),
-                                new InboxResponseDto(InboxResponseDto.StateEnum.UNAUTHORIZED)),
-                        refererUri);
-            }
-
-            InboxResponseDto response;
-            if (file.isEmpty()) {
-                response = uploadPhoto(userAgent, null, StringUtils.trimToNull(stationId),
-                        countryCode, null, stationTitle, latitude, longitude, comment, active, userDetailsService.loadUserByUsername(email));
-            } else {
-                response = uploadPhoto(userAgent, file.getInputStream(), StringUtils.trimToNull(stationId),
-                        countryCode, file.getContentType(), stationTitle, latitude, longitude, comment, active, userDetailsService.loadUserByUsername(email));
-            }
-            return createIFrameAnswer(response, refererUri);
-        } catch (Exception e) {
-            log.error("FormUpload error", e);
-            return createIFrameAnswer(new InboxResponseDto(InboxResponseDto.StateEnum.ERROR), refererUri);
-        }
-    }
 
     /**
      * Not part of the "official" API.
@@ -451,14 +389,6 @@ public class InboxController {
             case UNAUTHORIZED -> HttpStatus.UNAUTHORIZED;
             case ERROR -> HttpStatus.INTERNAL_SERVER_ERROR;
         };
-    }
-
-    private ModelAndView createIFrameAnswer(InboxResponseDto response, URI referer) throws JsonProcessingException {
-        var modelAndView = new ModelAndView();
-        modelAndView.setViewName("iframe");
-        modelAndView.getModel().put("response", mapper.writeValueAsString(response));
-        modelAndView.getModel().put("referer", referer);
-        return modelAndView;
     }
 
     private InboxResponseDto consumeBodyAndReturn(InputStream body, InboxResponseDto response) {

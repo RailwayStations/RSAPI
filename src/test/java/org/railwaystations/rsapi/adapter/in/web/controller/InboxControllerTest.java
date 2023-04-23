@@ -216,21 +216,10 @@ class InboxControllerTest {
     }
 
     @Test
-    void testPostIframeUnauthorized() throws Exception {
-        when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("unknown@example.com", "secretUploadToken"))).thenReturn(null);
-        when(inboxDao.insert(any())).thenReturn(1L);
-        var response = whenPostImageIframe("unknown@example.com", "http://localhost/uploadPage.php");
-
-        assertThat(response).contains("UNAUTHORIZED");
-        verify(inboxDao, never()).insert(any());
-        assertThat(monitor.getMessages().size()).isEqualTo(0);
-    }
-
-    @Test
-    void testPostIframeEmailNotVerified() throws Exception {
+    void testPostMultipartFormdataEmailNotVerified() throws Exception {
         when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("someuser@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("", "", Collections.emptyList()));
         when(inboxDao.insert(any())).thenReturn(1L);
-        var response = whenPostImageIframe("someuser@example.com", "http://localhost/uploadPage.php");
+        var response = whenPostImageMultipartFormdata("someuser@example.com", "some_verification_token");
 
         assertThat(response).contains("UNAUTHORIZED");
         assertThat(response).contains("Profile incomplete, not allowed to upload photos");
@@ -239,23 +228,10 @@ class InboxControllerTest {
     }
 
     @Test
-    void testPostIframeMaliciousReferer() throws Exception {
-        when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("nickname@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("", "", Collections.emptyList()));
-        when(inboxDao.insert(any())).thenReturn(1L);
-
-        var response = whenPostImageIframe("nickname@example.com", "http://localhost/uploadPage.php<script>alert('FooBar!');</script>");
-
-        assertThat(response).isEqualTo("Illegal character in path at index 31: http://localhost/uploadPage.php<script>alert('FooBar!');</script>");
-        verify(inboxDao, never()).insert(any());
-        assertThat(monitor.getMessages().size()).isEqualTo(0);
-    }
-
-    @Test
-    void testPostPhotoForExistingStationViaIframe() throws Exception {
+    void testPostPhotoForExistingStationViaMultipartFormdata() throws Exception {
         var uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
-        when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("nickname@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("", "", Collections.emptyList()));
         when(inboxDao.insert(any())).thenReturn(1L);
-        var response = whenPostImageIframe("nickname@example.com", "http://localhost/uploadPage.php");
+        var response = whenPostImageMultipartFormdata("nickname@example.com", User.EMAIL_VERIFIED);
 
         assertThat(response).contains("REVIEW");
         assertFileWithContentExistsInInbox("image-content", "1.jpg");
@@ -270,31 +246,28 @@ class InboxControllerTest {
                 via UserAgent""");
     }
 
-    private String whenPostImageIframe(String email,
-                                       String referer) throws Exception {
-        return mvc.perform(multipart("/photoUpload")
+    private String whenPostImageMultipartFormdata(String email,
+                                                  String emailVerified) throws Exception {
+        return mvc.perform(multipart("/photoUploadMultipartFormdata")
                         .file(new MockMultipartFile("file", "1.jpg", "image/jpeg", "image-content".getBytes(Charset.defaultCharset())))
-                        .param("email", email)
-                        .param("uploadToken", "secretUploadToken")
+                        .with(user(new AuthUser(User.builder().name("nickname").license(License.CC0_10).id(42).email(email).ownPhotos(true).emailVerification(emailVerified).build(), Collections.emptyList())))
                         .param("stationId", "4711")
                         .param("countryCode", "de")
                         .param("comment", "Some Comment")
                         .header("User-Agent", "UserAgent")
-                        .header("Referer", referer)
-                        .header("Accept", "text/html")
+                        .header("Referer", "http://localhost/uploadPage.php")
+                        .header("Accept", "application/json")
                         .with(csrf()))
                 .andReturn().getResponse().getContentAsString();
     }
 
     @Test
-    void testRepostMissingStationWithoutPhotoViaIframe() throws Exception {
+    void testRepostMissingStationWithoutPhotoViaMultipartFormdata() throws Exception {
         var uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
-        when(authenticator.authenticate(new UsernamePasswordAuthenticationToken("nickname@example.com", "secretUploadToken"))).thenReturn(new UsernamePasswordAuthenticationToken("", "", Collections.emptyList()));
         when(inboxDao.insert(any())).thenReturn(1L);
-        var response = mvc.perform(multipart("/photoUpload")
+        var response = mvc.perform(multipart("/photoUploadMultipartFormdata")
                         .file(new MockMultipartFile("file", null, "application/octet-stream", (byte[]) null))
-                        .param("email", "nickname@example.com")
-                        .param("uploadToken", "secretUploadToken")
+                        .with(user(new AuthUser(User.builder().name("nickname").license(License.CC0_10).id(42).email("nickname@example.com").ownPhotos(true).emailVerification(User.EMAIL_VERIFIED).build(), Collections.emptyList())))
                         .param("stationTitle", "Missing Station")
                         .param("latitude", "10")
                         .param("longitude", "20")
@@ -303,7 +276,7 @@ class InboxControllerTest {
                         .param("comment", "Some Comment")
                         .header("User-Agent", "UserAgent")
                         .header("Referer", "http://localhost/uploadPage.php")
-                        .header("Accept", "text/html")
+                        .header("Accept", "application/json")
                         .with(csrf()))
                 .andReturn().getResponse().getContentAsString();
 
