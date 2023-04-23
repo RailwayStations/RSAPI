@@ -80,7 +80,7 @@ public class LoginController {
         return "redirect:/login?register_success&username=" + newAccount.username;
     }
 
-    public record NewAccount(@NotBlank @Size(max = 30) String username,
+    public record NewAccount(@NotBlank @Size(max = 50) String username,
                              @NotBlank @Size(max = 100) @Email String email,
                              @NotNull @Size(min = 8) String password,
                              String passwordRepeat) {
