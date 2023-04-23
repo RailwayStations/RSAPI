@@ -381,6 +381,24 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
     }
 
     @Test
+    void testUpdateMyProfileNameTooLong() {
+        var headers = new HttpHeaders();
+        headers.setBasicAuth("@user27", "y89zFqkL6hro");
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        var responsePostUpdate = restTemplate.postForEntity(
+                String.format("http://localhost:%d%s", port, "/myProfile"), new HttpEntity<>("""
+                        {
+                        	"nickname": "A very long name with a lot of extra words to overfill the database column",
+                        	"email": "user27@example.com",
+                        	"license": "CC0",
+                        	"photoOwner": true,
+                        	"anonymous": true
+                        }""", headers), String.class);
+        assertThat(responsePostUpdate.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
     void updateMyProfileAndChangePassword() throws IOException {
         var firstPassword = "GDAkhaeU2vrK";
         var headers = new HttpHeaders();

@@ -1013,4 +1013,9 @@
         </insert>
     </changeSet>
 
+    <changeSet id="54" author="pstorch">
+        <modifyDataType tableName="users" columnName="name" newDataType="varchar(50)"/>
+        <modifyDataType tableName="users" columnName="normalizedName" newDataType="varchar(50)"/>
+    </changeSet>
+
 </databaseChangeLog>

@@ -365,7 +365,7 @@ class ProfileControllerTest {
                     { "nickname": "new_name", "email": "%s", "link": "http://twitter.com/", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
                 """.formatted(EXISTING_EMAIL);
 
-        postMyProfile(newProfileJson).andExpect(status().isOk());
+        postMyProfileWithOpenApiValidation(newProfileJson).andExpect(status().isOk());
 
         var user = User.builder()
                 .id(EXISTING_USER_ID)
@@ -380,15 +380,20 @@ class ProfileControllerTest {
     }
 
     @NotNull
+    private ResultActions postMyProfileWithOpenApiValidation(String newProfileJson) throws Exception {
+        return postMyProfile(newProfileJson)
+                .andExpect(validOpenApi());
+    }
+
+    @NotNull
     private ResultActions postMyProfile(String newProfileJson) throws Exception {
         return mvc.perform(post("/myProfile")
-                        .header("User-Agent", "UserAgent")
-                        .contentType("application/json")
-                        .content(newProfileJson)
-                        .secure(true)
-                        .with(basicHttpAuthForExistingUser())
-                        .with(csrf()))
-                .andExpect(validOpenApi());
+                .header("User-Agent", "UserAgent")
+                .contentType("application/json")
+                .content(newProfileJson)
+                .secure(true)
+                .with(basicHttpAuthForExistingUser())
+                .with(csrf()));
     }
 
     @Test
@@ -403,7 +408,23 @@ class ProfileControllerTest {
                     { "nickname": "new_name", "email": "%s", "link": "http://twitter.com/", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
                 """.formatted(EXISTING_EMAIL);
 
-        postMyProfile(newProfileJson).andExpect(status().isConflict());
+        postMyProfileWithOpenApiValidation(newProfileJson).andExpect(status().isConflict());
+
+        verify(userDao, never()).update(eq(user.getId()), any(User.class));
+    }
+
+    @Test
+    void testUpdateMyProfileNameTooLong() throws Exception {
+        var user = User.builder()
+                .name("@New name")
+                .email("newname@example.com")
+                .sendNotifications(true).build();
+        givenExistingUser();
+        var newProfileJson = """
+                    { "nickname": "A very long name with a lot of extra words to overfill the database column", "email": "%s", "link": "http://twitter.com/", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
+                """.formatted(EXISTING_EMAIL);
+
+        postMyProfile(newProfileJson).andExpect(status().isBadRequest());
 
         verify(userDao, never()).update(eq(user.getId()), any(User.class));
     }
@@ -416,7 +437,7 @@ class ProfileControllerTest {
                     { "nickname": "%s", "email": "newname@example.com", "link": "http://twitter.com/", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
                 """.formatted(EXISTING_USER_NAME);
 
-        postMyProfile(newProfileJson).andExpect(status().isOk());
+        postMyProfileWithOpenApiValidation(newProfileJson).andExpect(status().isOk());
 
         assertVerificationEmail();
         var user = User.builder()

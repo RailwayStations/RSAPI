@@ -6,6 +6,7 @@ import jakarta.annotation.Generated;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.net.URI;
 import java.util.Objects;
@@ -15,7 +16,7 @@ import java.util.Objects;
  */
 
 @JsonTypeName("UpdateProfile")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-23T18:54:33.312547466+02:00[Europe/Berlin]")
 public class UpdateProfileDto {
 
     private String nickname;
@@ -63,6 +64,7 @@ public class UpdateProfileDto {
      * @return nickname
      */
     @NotNull
+    @Size(min = 3, max = 50)
     @JsonProperty("nickname")
     public String getNickname() {
         return nickname;
@@ -83,6 +85,7 @@ public class UpdateProfileDto {
      * @return email
      */
     @NotNull
+    @Size(min = 3, max = 100)
     @Email
     @JsonProperty("email")
     public String getEmail() {

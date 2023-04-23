@@ -8,7 +8,7 @@ import jakarta.annotation.Generated;
  * the only accepted type is \"CC0 1.0 Universell (CC0 1.0)\", the others are listed for backward compatibility
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-23T18:41:39.638497575+02:00[Europe/Berlin]")
 public enum LicenseDto {
 
     CC0("CC0"),

@@ -1,5 +1,6 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.railwaystations.rsapi.adapter.in.web.model.ChangePasswordDto;
@@ -133,7 +134,7 @@ public class ProfileController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, value = "/myProfile")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<String> updateMyProfile(@RequestHeader(HttpHeaders.USER_AGENT) String userAgent,
-                                                  @RequestBody @NotNull UpdateProfileDto updateProfileDto,
+                                                  @RequestBody @Valid UpdateProfileDto updateProfileDto,
                                                   @AuthenticationPrincipal AuthUser authUser) {
         manageProfileUseCase.updateProfile(authUser.getUser(), toUser(updateProfileDto), userAgent);
         return ResponseEntity.ok("Profile updated");

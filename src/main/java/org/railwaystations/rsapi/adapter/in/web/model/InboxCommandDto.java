@@ -14,7 +14,7 @@ import java.util.Objects;
  */
 
 @JsonTypeName("InboxCommand")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-06T21:00:36.711673187+02:00[Europe/Berlin]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-04-23T18:41:39.638497575+02:00[Europe/Berlin]")
 public class InboxCommandDto {
 
     private Long id;
