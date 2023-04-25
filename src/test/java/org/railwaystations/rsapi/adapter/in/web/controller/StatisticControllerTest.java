@@ -3,7 +3,6 @@ package org.railwaystations.rsapi.adapter.in.web.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.railwaystations.rsapi.adapter.in.web.ErrorHandlingControllerAdvice;
-import org.railwaystations.rsapi.adapter.in.web.writer.StatisticTxtWriter;
 import org.railwaystations.rsapi.adapter.out.db.CountryDao;
 import org.railwaystations.rsapi.adapter.out.db.StationDao;
 import org.railwaystations.rsapi.core.model.Country;
@@ -22,12 +21,11 @@ import java.util.Optional;
 import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = StatisticController.class)
-@ContextConfiguration(classes = {WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class, StatisticTxtWriter.class, StatisticService.class})
+@ContextConfiguration(classes = {WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class, StatisticService.class})
 @AutoConfigureMockMvc(addFilters = false)
 class StatisticControllerTest {
 
@@ -48,15 +46,14 @@ class StatisticControllerTest {
     @Test
     void whenCountryIsInvalidThenReturnsStatus400() throws Exception {
         mvc.perform(get("/x/stats"))
-                .andExpect(validOpenApi())
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    void statisticAllJson() throws Exception {
+    void statisticAll() throws Exception {
         when(stationDao.getStatistic(null)).thenReturn(new Statistic(null, 954, 91, 6));
 
-        mvc.perform(get("/stats.json"))
+        mvc.perform(get("/stats"))
                 .andExpect(status().isOk())
                 .andExpect(validOpenApi())
                 .andExpect(jsonPath("$.total").value(954))
@@ -71,10 +68,10 @@ class StatisticControllerTest {
     }
 
     @Test
-    void statisticDeJson() throws Exception {
+    void statisticDe() throws Exception {
         when(stationDao.getStatistic("de")).thenReturn(new Statistic("de", 729, 84, 4));
 
-        mvc.perform(get("/de/stats.json"))
+        mvc.perform(get("/de/stats"))
                 .andExpect(status().isOk())
                 .andExpect(validOpenApi())
                 .andExpect(jsonPath("$.total").value(729))
@@ -82,23 +79,6 @@ class StatisticControllerTest {
                 .andExpect(jsonPath("$.withoutPhoto").value(645))
                 .andExpect(jsonPath("$.photographers").value(4))
                 .andExpect(jsonPath("$.countryCode").value("de"));
-    }
-
-    @Test
-    void statisticDeTxt() throws Exception {
-        when(stationDao.getStatistic("de")).thenReturn(new Statistic("de", 729, 84, 4));
-
-        mvc.perform(get("/de/stats.txt"))
-                .andExpect(status().isOk())
-                .andExpect(validOpenApi())
-                .andExpect(content().string("""
-                        name	value
-                        total	729
-                        withPhoto	84
-                        withoutPhoto	645
-                        photographers	4
-                        countryCode	de
-                        """));
     }
 
 }

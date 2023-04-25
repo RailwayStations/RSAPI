@@ -23,7 +23,6 @@ import java.util.Optional;
 import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -47,12 +46,9 @@ class PhotographersControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"/x/photographers", "/xyz/photographers", "/photographers?country=x", "/photographers?country=xyz",
-            "/x/photographers.json", "/xyz/photographers.json", "/photographers.json?country=x", "/photographers.json?country=xyz",
-            "/x/photographers.txt", "/xyz/photographers.txt", "/photographers.txt?country=x", "/photographers.txt?country=xyz"})
+    @ValueSource(strings = {"/x/photographers", "/xyz/photographers", "/photographers?country=x", "/photographers?country=xyz"})
     void whenCountryIsInvalidThenReturnsStatus400(String urlTemplate) throws Exception {
         mvc.perform(get(urlTemplate))
-                .andExpect(validOpenApi())
                 .andExpect(status().isBadRequest());
     }
 
@@ -61,8 +57,8 @@ class PhotographersControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"/de/photographers.json", "/de/photographers", "/photographers?country=de", "/photographers.json?country=de"})
-    void photographersDeJson(String urlTemplate) throws Exception {
+    @ValueSource(strings = {"/de/photographers", "/photographers?country=de"})
+    void photographersDe(String urlTemplate) throws Exception {
         when(stationDao.getPhotographerMap("de")).thenReturn(createPhotographersResponse());
 
         mvc.perform(get(urlTemplate))
@@ -75,8 +71,8 @@ class PhotographersControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"/photographers.json", "/photographers"})
-    void photographersAllJson(String urlTemplate) throws Exception {
+    @ValueSource(strings = {"/photographers"})
+    void photographersAll(String urlTemplate) throws Exception {
         when(stationDao.getPhotographerMap(null)).thenReturn(createPhotographersResponse());
 
         mvc.perform(get(urlTemplate))
@@ -86,23 +82,6 @@ class PhotographersControllerTest {
                 .andExpect(jsonPath("$.@user10").value(15))
                 .andExpect(jsonPath("$.@user0").value(9))
                 .andExpect(validOpenApi());
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"/de/photographers.txt", "/de/photographers.txt?country=de"})
-    void photographersDeTxt(String urlTemplate) throws Exception {
-        when(stationDao.getPhotographerMap("de")).thenReturn(createPhotographersResponse());
-
-        mvc.perform(get(urlTemplate))
-                .andExpect(status().isOk())
-                .andExpect(validOpenApi())
-                .andExpect(content().string("""
-                        count	photographer
-                        31	@user27
-                        29	@user8
-                        15	@user10
-                        9	@user0
-                        """));
     }
 
     @NotNull

@@ -1,7 +1,6 @@
 package org.railwaystations.rsapi.app.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.railwaystations.rsapi.adapter.in.web.writer.StatisticTxtWriter;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +27,6 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.add(new StatisticTxtWriter());
         var builder = new Jackson2ObjectMapperBuilder();
         builder.serializationInclusion(JsonInclude.Include.NON_NULL);
         converters.add(new MappingJackson2HttpMessageConverter(builder.build()));

@@ -392,8 +392,8 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
     }
 
     @Test
-    void photographersDeJson() throws IOException {
-        var response = loadRaw("/de/photographers.json", HttpStatus.OK, String.class);
+    void photographersDe() throws IOException {
+        var response = loadRaw("/de/photographers", HttpStatus.OK, String.class);
         var jsonNode = mapper.readTree(response.getBody());
         assertThat(jsonNode).isNotNull();
         assertThat(jsonNode.isObject()).isTrue();
@@ -402,18 +402,6 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         assertThat(jsonNode.get("@user8").asInt()).isEqualTo(29);
         assertThat(jsonNode.get("@user10").asInt()).isEqualTo(15);
         assertThat(jsonNode.get("@user0").asInt()).isEqualTo(9);
-    }
-
-    @Test
-    void photographersDeTxt() {
-        var response = loadRaw("/de/photographers.txt", HttpStatus.OK, String.class);
-        assertThat(response.getBody()).isEqualTo("""
-                count	photographer
-                31	@user27
-                29	@user8
-                15	@user10
-                9	@user0
-                """);
     }
 
     StationDto loadStationDe6932() {
@@ -426,7 +414,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 
     @Test
     void statisticDeJson() throws IOException {
-        var response = loadRaw("/de/stats.json", HttpStatus.OK, String.class);
+        var response = loadRaw("/de/stats", HttpStatus.OK, String.class);
         var jsonNode = mapper.readTree(response.getBody());
         assertThat(jsonNode).isNotNull();
         assertThat(jsonNode.get("total").asInt()).isEqualTo(730);
