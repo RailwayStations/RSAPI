@@ -2,6 +2,7 @@ package org.railwaystations.rsapi.adapter.in.web.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
@@ -26,7 +27,6 @@ import org.railwaystations.rsapi.core.model.ProblemReport;
 import org.railwaystations.rsapi.core.model.ProblemReportType;
 import org.railwaystations.rsapi.core.model.PublicInboxEntry;
 import org.railwaystations.rsapi.core.ports.in.ManageInboxUseCase;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -52,6 +52,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @Validated
+@RequiredArgsConstructor
 public class InboxController {
 
     public static final String STATION_ID = "stationId";
@@ -63,8 +64,7 @@ public class InboxController {
     public static final String ACTIVE = "active";
     public static final String FILE = "file";
 
-    @Autowired
-    private ManageInboxUseCase manageInboxUseCase;
+    private final ManageInboxUseCase manageInboxUseCase;
 
     /**
      * Not part of the "official" API.
@@ -74,15 +74,15 @@ public class InboxController {
     @ResponseBody
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<InboxResponseDto> photoUploadMultipartFormdata(@RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
-                                           @AuthenticationPrincipal AuthUser user,
-                                           @RequestParam(value = STATION_ID, required = false) String stationId,
-                                           @RequestParam(value = COUNTRY_CODE, required = false) String countryCode,
-                                           @RequestParam(value = STATION_TITLE, required = false) String stationTitle,
-                                           @RequestParam(value = LATITUDE, required = false) Double latitude,
-                                           @RequestParam(value = LONGITUDE, required = false) Double longitude,
-                                           @RequestParam(value = COMMENT, required = false) String comment,
-                                           @RequestParam(value = ACTIVE, required = false) Boolean active,
-                                           @RequestParam(value = FILE) MultipartFile file) {
+                                                                         @AuthenticationPrincipal AuthUser user,
+                                                                         @RequestParam(value = STATION_ID, required = false) String stationId,
+                                                                         @RequestParam(value = COUNTRY_CODE, required = false) String countryCode,
+                                                                         @RequestParam(value = STATION_TITLE, required = false) String stationTitle,
+                                                                         @RequestParam(value = LATITUDE, required = false) Double latitude,
+                                                                         @RequestParam(value = LONGITUDE, required = false) Double longitude,
+                                                                         @RequestParam(value = COMMENT, required = false) String comment,
+                                                                         @RequestParam(value = ACTIVE, required = false) Boolean active,
+                                                                         @RequestParam(value = FILE) MultipartFile file) {
         log.info("MultipartFormData2: user={}, station={}, country={}, file={}", user.getUsername(), stationId, countryCode, file.getName());
 
         try {
@@ -374,7 +374,7 @@ public class InboxController {
                                          String countryCode, String contentType, String stationTitle,
                                          Double latitude, Double longitude, String comment,
                                          Boolean active, AuthUser user) {
-        InboxResponse inboxResponse = manageInboxUseCase.uploadPhoto(userAgent, body, StringUtils.trimToNull(stationId), StringUtils.trimToNull(countryCode),
+        var inboxResponse = manageInboxUseCase.uploadPhoto(userAgent, body, StringUtils.trimToNull(stationId), StringUtils.trimToNull(countryCode),
                 StringUtils.trimToEmpty(contentType).split(";")[0], stationTitle,
                 latitude, longitude, comment, active != null ? active : true, user.getUser());
         return consumeBodyAndReturn(body, toDto(inboxResponse));

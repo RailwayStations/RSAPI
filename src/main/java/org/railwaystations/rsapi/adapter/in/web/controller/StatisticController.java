@@ -1,5 +1,6 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.railwaystations.rsapi.adapter.in.web.api.StatisticApi;
 import org.railwaystations.rsapi.adapter.in.web.model.StatisticDto;
 import org.railwaystations.rsapi.core.model.Statistic;
@@ -8,13 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequiredArgsConstructor
 public class StatisticController implements StatisticApi {
 
     private final GetStatisticUseCase getStatisticUseCase;
-
-    public StatisticController(GetStatisticUseCase getStatisticUseCase) {
-        this.getStatisticUseCase = getStatisticUseCase;
-    }
 
     private StatisticDto getStatisticMap(String country) {
         return toDto(getStatisticUseCase.getStatistic(country));

@@ -363,7 +363,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 
     @Test
     void stationsJson() throws IOException {
-        var response = loadRaw("/de/stations.json", HttpStatus.OK, String.class);
+        var response = loadRaw("/de/stations", HttpStatus.OK, String.class);
         var jsonNode = mapper.readTree(response.getBody());
         assertThat(jsonNode).isNotNull();
         assertThat(jsonNode.isArray()).isTrue();

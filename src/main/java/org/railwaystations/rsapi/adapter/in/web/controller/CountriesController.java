@@ -1,37 +1,25 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
+import lombok.RequiredArgsConstructor;
+import org.railwaystations.rsapi.adapter.in.web.api.CountriesApi;
 import org.railwaystations.rsapi.adapter.in.web.model.CountryDto;
 import org.railwaystations.rsapi.adapter.in.web.model.ProviderAppDto;
 import org.railwaystations.rsapi.core.model.Country;
 import org.railwaystations.rsapi.core.model.ProviderApp;
 import org.railwaystations.rsapi.core.ports.in.ListCountriesUseCase;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collection;
 import java.util.List;
 
 @RestController
-public class CountriesController {
+@RequiredArgsConstructor
+public class CountriesController implements CountriesApi {
 
-    private static final String ONLY_ACTIVE = "onlyActive";
-
-    @Autowired
-    private ListCountriesUseCase listCountriesUseCase;
-
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = {"/countries", "/countries.json"})
-    public Collection<CountryDto> list(@RequestParam(value = ONLY_ACTIVE, required = false) Boolean onlyActive) {
-        return listCountriesUseCase.list(onlyActive).stream().map(this::toDto).toList();
-    }
+    private final ListCountriesUseCase listCountriesUseCase;
 
     private CountryDto toDto(Country country) {
-        return new CountryDto()
-                .code(country.getCode())
-                .name(country.getName())
-                .active(country.isActive())
+        return new CountryDto(country.getCode(), country.getName(), country.isActive())
                 .email(country.getEmail())
                 .overrideLicense(country.getOverrideLicense() != null ? country.getOverrideLicense().getDisplayName() : null)
                 .timetableUrlTemplate(country.getTimetableUrlTemplate())
@@ -41,8 +29,18 @@ public class CountriesController {
 
     private List<ProviderAppDto> toDto(List<ProviderApp> providerApps) {
         return providerApps.stream()
-                .map(p -> new ProviderAppDto().name(p.getName()).type(ProviderAppDto.TypeEnum.fromValue(p.getType())).url(p.getUrl()))
+                .map(p -> new ProviderAppDto(ProviderAppDto.TypeEnum.fromValue(p.getType()), p.getName(), p.getUrl()))
                 .toList();
+    }
+
+    @Override
+    public ResponseEntity<List<CountryDto>> countriesGet(Boolean onlyActive) {
+        return ResponseEntity.ok(listCountriesUseCase.list(onlyActive).stream().map(this::toDto).toList());
+    }
+
+    @Override
+    public ResponseEntity<List<CountryDto>> countriesJsonGet(Boolean onlyActive) {
+        return countriesGet(onlyActive);
     }
 
 }

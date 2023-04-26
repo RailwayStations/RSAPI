@@ -2,6 +2,7 @@ package org.railwaystations.rsapi.adapter.in.web.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.railwaystations.rsapi.adapter.in.web.model.ChangePasswordDto;
 import org.railwaystations.rsapi.adapter.in.web.model.LicenseDto;
@@ -12,7 +13,6 @@ import org.railwaystations.rsapi.app.auth.AuthUser;
 import org.railwaystations.rsapi.core.model.License;
 import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.ports.in.ManageProfileUseCase;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -33,10 +33,10 @@ import java.net.URI;
 @RestController
 @Slf4j
 @Validated
+@RequiredArgsConstructor
 public class ProfileController {
 
-    @Autowired
-    private ManageProfileUseCase manageProfileUseCase;
+    private final ManageProfileUseCase manageProfileUseCase;
 
     @PostMapping(value = "/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("isAuthenticated()")
@@ -109,14 +109,14 @@ public class ProfileController {
 
     private ProfileDto toProfileDto(User user) {
         return new ProfileDto()
+                .nickname(user.getName())
+                .license(toLicenseDto(user.getLicense()))
                 .admin(user.isAdmin())
                 .email(user.getEmail())
                 .anonymous(user.isAnonymous())
                 .emailVerified(user.isEmailVerified())
                 .sendNotifications(user.isSendNotifications())
-                .license(toLicenseDto(user.getLicense()))
                 .link(user.getUrl() != null ? URI.create(user.getUrl()) : null)
-                .nickname(user.getName())
                 .photoOwner(user.isOwnPhotos());
     }
 

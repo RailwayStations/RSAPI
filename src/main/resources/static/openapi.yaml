@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20230425.2200"
+  version: "20230426.2200"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -116,7 +116,7 @@ paths:
     get:
       summary: Get a railway station of a country by its id with all its photos
       tags:
-        - stations
+        - photoStations
       parameters:
         - name: country
           in: path
@@ -148,7 +148,7 @@ paths:
         Returns only the primary photo of each station.
         Stations can optionally be filtered by 'hasPhoto' and/or 'isActive' flag.
       tags:
-        - stations
+        - photoStations
       parameters:
         - name: country
           in: path
@@ -181,7 +181,7 @@ paths:
         Returns only the photos of a station which belong to the photographer.
         Can return several photos per station, not necessarily the primary photo.
       tags:
-        - stations
+        - photoStations
       parameters:
         - name: photographer
           in: path
@@ -209,7 +209,7 @@ paths:
         Returns only the recently imported photos of a station, defined by the sinceHours parameter.
         Can return several photos per station, not necessarily the primary photo.
       tags:
-        - stations
+        - photoStations
       parameters:
         - name: sinceHours
           in: query
@@ -364,7 +364,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Station'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Station'
 
   /{country}/photographers:
     get:
