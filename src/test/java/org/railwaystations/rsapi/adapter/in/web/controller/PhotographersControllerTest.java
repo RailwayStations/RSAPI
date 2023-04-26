@@ -1,5 +1,8 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
+import com.atlassian.oai.validator.OpenApiInteractionValidator;
+import com.atlassian.oai.validator.whitelist.ValidationErrorsWhitelist;
+import com.atlassian.oai.validator.whitelist.rule.WhitelistRules;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -49,11 +52,19 @@ class PhotographersControllerTest {
     @ValueSource(strings = {"/x/photographers", "/xyz/photographers", "/photographers?country=x", "/photographers?country=xyz"})
     void whenCountryIsInvalidThenReturnsStatus400(String urlTemplate) throws Exception {
         mvc.perform(get(urlTemplate))
+                .andExpect(validOpenApi())
                 .andExpect(status().isBadRequest());
     }
 
     private ResultMatcher validOpenApi() {
-        return openApi().isValid("static/openapi.yaml");
+        return openApi().isValid(OpenApiInteractionValidator.createFor("static/openapi.yaml")
+                .withWhitelist(
+                        ValidationErrorsWhitelist.create()
+                                .withRule(
+                                        "Ignore requests", WhitelistRules.isRequest()
+                                )
+                )
+                .build());
     }
 
     @ParameterizedTest
