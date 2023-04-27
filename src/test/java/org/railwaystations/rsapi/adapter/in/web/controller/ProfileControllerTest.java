@@ -24,13 +24,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.util.Optional;
 
-import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -42,6 +40,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.railwaystations.rsapi.utils.OpenApiValidatorUtil.validOpenApiResponse;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -88,18 +87,13 @@ class ProfileControllerTest {
     }
 
     @NotNull
-    private ResultActions postRegistrationWithApiValidation(String userProfileJson) throws Exception {
-        return postRegistration(userProfileJson)
-                .andExpect(validOpenApi());
-    }
-
-    @NotNull
     private ResultActions postRegistration(String userProfileJson) throws Exception {
         return mvc.perform(post("/registration")
-                .header("User-Agent", "UserAgent")
-                .contentType("application/json")
-                .content(userProfileJson)
-                .with(csrf()));
+                        .header("User-Agent", "UserAgent")
+                        .contentType("application/json")
+                        .content(userProfileJson)
+                        .with(csrf()))
+                .andExpect(validOpenApiResponse());
     }
 
     @Test
@@ -107,7 +101,7 @@ class ProfileControllerTest {
         var givenUserProfile = """
                     { "nickname": "nickname", "email": "nickname@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """;
-        postRegistrationWithApiValidation(givenUserProfile).andExpect(status().isAccepted());
+        postRegistration(givenUserProfile).andExpect(status().isAccepted());
 
         verify(userDao).findByNormalizedName("nickname");
         verify(userDao).countBlockedUsername("nickname");
@@ -146,7 +140,7 @@ class ProfileControllerTest {
         var givenUserProfileWithPassword = """
                     { "nickname": "nickname", "email": "nickname@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true, "newPassword": "verySecretPassword" }
                 """;
-        postRegistrationWithApiValidation(givenUserProfileWithPassword).andExpect(status().isAccepted());
+        postRegistration(givenUserProfileWithPassword).andExpect(status().isAccepted());
 
         verify(userDao).findByNormalizedName("nickname");
         verify(userDao).countBlockedUsername("nickname");
@@ -185,7 +179,7 @@ class ProfileControllerTest {
         var givenAnonymousUserProfile = """
                     { "nickname": "nickname", "email": "nickname@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
                 """;
-        postRegistrationWithApiValidation(givenAnonymousUserProfile).andExpect(status().isAccepted());
+        postRegistration(givenAnonymousUserProfile).andExpect(status().isAccepted());
 
         assertThat(monitor.getMessages().get(0)).isEqualTo("New registration{nickname='nickname', email='nickname@example.com', license='CC0_10', photoOwner=true, link='https://link@example.com', anonymous=true}\nvia UserAgent");
     }
@@ -196,7 +190,7 @@ class ProfileControllerTest {
         var givenUserProfileWithSameName = """
                     { "nickname": "%s", "email": "other@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """.formatted(EXISTING_USER_NAME);
-        postRegistrationWithApiValidation(givenUserProfileWithSameName).andExpect(status().isConflict());
+        postRegistration(givenUserProfileWithSameName).andExpect(status().isConflict());
     }
 
     @Test
@@ -206,7 +200,7 @@ class ProfileControllerTest {
         var givenUserProfileWithBlockedName = """
                     { "nickname": "%s", "email": "other@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """.formatted("Blocked Name");
-        postRegistrationWithApiValidation(givenUserProfileWithBlockedName).andExpect(status().isConflict());
+        postRegistration(givenUserProfileWithBlockedName).andExpect(status().isConflict());
     }
 
     @Test
@@ -215,7 +209,7 @@ class ProfileControllerTest {
         var givenUserProfileWithSameEmail = """
                     { "nickname": "othername", "email": "%s", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """.formatted(EXISTING_EMAIL);
-        postRegistrationWithApiValidation(givenUserProfileWithSameEmail).andExpect(status().isConflict());
+        postRegistration(givenUserProfileWithSameEmail).andExpect(status().isConflict());
 
         assertThat(monitor.getMessages().get(0)).isEqualTo("Registration for user 'othername' with eMail 'existing@example.com' failed, eMail is already taken\nvia UserAgent");
     }
@@ -226,7 +220,7 @@ class ProfileControllerTest {
         var givenUserProfileWithEmptyName = """
                     { "nickname": "", "email": "%s", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """.formatted(EXISTING_EMAIL);
-        postRegistrationWithApiValidation(givenUserProfileWithEmptyName).andExpect(status().isBadRequest());
+        postRegistration(givenUserProfileWithEmptyName).andExpect(status().isBadRequest());
     }
 
     @Test
@@ -239,7 +233,7 @@ class ProfileControllerTest {
                         .secure(true)
                         .with(basicHttpAuthForExistingUser())
                         .with(csrf()))
-                .andExpect(validOpenApi())
+                .andExpect(validOpenApiResponse())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nickname").value(EXISTING_USER_NAME));
     }
@@ -294,7 +288,7 @@ class ProfileControllerTest {
 
         }
 
-        return mvc.perform(action).andExpect(validOpenApi());
+        return mvc.perform(action).andExpect(validOpenApiResponse());
     }
 
     @Test
@@ -382,7 +376,7 @@ class ProfileControllerTest {
     @NotNull
     private ResultActions postMyProfileWithOpenApiValidation(String newProfileJson) throws Exception {
         return postMyProfile(newProfileJson)
-                .andExpect(validOpenApi());
+                .andExpect(validOpenApiResponse());
     }
 
     @NotNull
@@ -477,7 +471,7 @@ class ProfileControllerTest {
                         .header("User-Agent", "UserAgent")
                         .header("NameOrEmail", nameOrEmail)
                         .with(csrf()))
-                .andExpect(validOpenApi());
+                .andExpect(validOpenApiResponse());
     }
 
     @Test
@@ -545,7 +539,7 @@ class ProfileControllerTest {
         return mvc.perform(get("/emailVerification/" + token)
                         .header("User-Agent", "UserAgent")
                         .with(csrf()))
-                .andExpect(validOpenApi());
+                .andExpect(validOpenApiResponse());
     }
 
     @Test
@@ -577,7 +571,7 @@ class ProfileControllerTest {
                         .secure(true)
                         .with(basicHttpAuthForExistingUser())
                         .with(csrf()))
-                .andExpect(validOpenApi())
+                .andExpect(validOpenApiResponse())
                 .andExpect(status().isOk());
 
         assertVerificationEmail();
@@ -594,15 +588,11 @@ class ProfileControllerTest {
                         .with(basicHttpAuthForExistingUser())
                         .with(csrf()))
                 .andExpect(status().isNoContent())
-                .andExpect(validOpenApi());
+                .andExpect(validOpenApiResponse());
 
         verify(userDao).anonymizeUser(eq(EXISTING_USER_ID));
         verify(userDao).addUsernameToBlocklist(EXISTING_USER_NAME);
         verify(authorizationDao).deleteAllByUser(EXISTING_USER_NAME);
-    }
-
-    private ResultMatcher validOpenApi() {
-        return openApi().isValid("static/openapi.yaml");
     }
 
 }

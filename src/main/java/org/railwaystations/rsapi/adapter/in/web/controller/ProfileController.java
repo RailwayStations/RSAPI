@@ -1,9 +1,8 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.railwaystations.rsapi.adapter.in.web.api.ProfileApi;
 import org.railwaystations.rsapi.adapter.in.web.model.ChangePasswordDto;
 import org.railwaystations.rsapi.adapter.in.web.model.LicenseDto;
 import org.railwaystations.rsapi.adapter.in.web.model.ProfileDto;
@@ -15,65 +14,21 @@ import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.ports.in.ManageProfileUseCase;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.net.URI;
 
 @RestController
 @Slf4j
-@Validated
 @RequiredArgsConstructor
-public class ProfileController {
+public class ProfileController implements ProfileApi {
 
     private final ManageProfileUseCase manageProfileUseCase;
-
-    @PostMapping(value = "/changePassword", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> changePassword(@AuthenticationPrincipal AuthUser authUser,
-                                                 @RequestBody ChangePasswordDto changePasswordDto) {
-        manageProfileUseCase.changePassword(authUser.getUser(), changePasswordDto.getNewPassword());
-        return ResponseEntity.ok("Password changed");
-    }
-
-    @PostMapping(value = "/changePassword")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> changePassword(@AuthenticationPrincipal AuthUser authUser,
-                                                 @RequestHeader(value = "New-Password") String newPassword) {
-        manageProfileUseCase.changePassword(authUser.getUser(), newPassword);
-        return ResponseEntity.ok("Password changed");
-    }
-
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/newUploadToken")
-    public ResponseEntity<String> newUploadToken(@RequestHeader(HttpHeaders.USER_AGENT) String userAgent,
-                                                 @NotNull @RequestHeader("Email") String email) {
-        return resetPassword(userAgent, email);
-    }
-
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/resetPassword")
-    public ResponseEntity<String> resetPassword(@RequestHeader(HttpHeaders.USER_AGENT) String userAgent,
-                                                @NotNull @RequestHeader("NameOrEmail") String nameOrEmail) {
-        manageProfileUseCase.resetPassword(nameOrEmail, userAgent);
-        return ResponseEntity.accepted().build();
-    }
-
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, value = "/registration")
-    public ResponseEntity<String> register(@RequestHeader(HttpHeaders.USER_AGENT) String userAgent,
-                                           @RequestBody @NotNull RegisterProfileDto registerProfileDto) {
-        manageProfileUseCase.register(toUser(registerProfileDto), userAgent);
-
-        return ResponseEntity.accepted().build();
-    }
 
     private User toUser(RegisterProfileDto registerProfileDto) {
         return User.builder()
@@ -97,14 +52,6 @@ public class ProfileController {
             case CC_BY_SA_4_0, CC4 -> License.CC_BY_SA_40;
             case UNKNOWN -> License.UNKNOWN;
         };
-    }
-
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/myProfile")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ProfileDto> getMyProfile(@AuthenticationPrincipal AuthUser authUser) {
-        User user = authUser.getUser();
-        log.info("Get profile for '{}'", user.getEmail());
-        return ResponseEntity.ok(toProfileDto(user));
     }
 
     private ProfileDto toProfileDto(User user) {
@@ -131,23 +78,6 @@ public class ProfileController {
         };
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, value = "/myProfile")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> updateMyProfile(@RequestHeader(HttpHeaders.USER_AGENT) String userAgent,
-                                                  @RequestBody @Valid UpdateProfileDto updateProfileDto,
-                                                  @AuthenticationPrincipal AuthUser authUser) {
-        manageProfileUseCase.updateProfile(authUser.getUser(), toUser(updateProfileDto), userAgent);
-        return ResponseEntity.ok("Profile updated");
-    }
-
-    @DeleteMapping(value = "/myProfile")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> deleteMyProfile(@RequestHeader(HttpHeaders.USER_AGENT) String userAgent,
-                                             @AuthenticationPrincipal AuthUser authUser) {
-        manageProfileUseCase.deleteProfile(authUser.getUser(), userAgent);
-        return ResponseEntity.noContent().build();
-    }
-
     private User toUser(UpdateProfileDto updateProfileDto) {
         return User.builder()
                 .name(updateProfileDto.getNickname())
@@ -160,18 +90,67 @@ public class ProfileController {
                 .build();
     }
 
-    @PostMapping("/resendEmailVerification")
+    private static AuthUser getAuthUser() {
+        return (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    private static String getUserAgent() {
+        return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getHeader(HttpHeaders.USER_AGENT);
+    }
+
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Void> resendEmailVerification(@AuthenticationPrincipal AuthUser authUser) {
-        manageProfileUseCase.resendEmailVerification(authUser.getUser());
+    @Override
+    public ResponseEntity<Void> changePasswordPost(String authorization, String newPassword, ChangePasswordDto changePasswordDto) {
+        manageProfileUseCase.changePassword(getAuthUser().getUser(), changePasswordDto != null ? changePasswordDto.getNewPassword() : newPassword);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/emailVerification/{token}")
-    public ResponseEntity<String> emailVerification(@PathVariable("token") String token) {
+    @Override
+    public ResponseEntity<String> emailVerificationTokenGet(String token) {
         return manageProfileUseCase.emailVerification(token)
                 .map(u -> new ResponseEntity<>("Email successfully verified!", HttpStatus.OK))
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @Override
+    public ResponseEntity<Void> myProfileDelete(String authorization, String uploadToken, String email) {
+        manageProfileUseCase.deleteProfile(getAuthUser().getUser(), getUserAgent());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @Override
+    public ResponseEntity<ProfileDto> myProfileGet(String authorization, String uploadToken, String email) {
+        User user = getAuthUser().getUser();
+        log.info("Get profile for '{}'", user.getEmail());
+        return ResponseEntity.ok(toProfileDto(user));
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @Override
+    public ResponseEntity<Void> myProfilePost(UpdateProfileDto profile, String authorization, String uploadToken, String email) {
+        manageProfileUseCase.updateProfile(getAuthUser().getUser(), toUser(profile), getUserAgent());
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> registrationPost(RegisterProfileDto registration) {
+        manageProfileUseCase.register(toUser(registration), getUserAgent());
+        return ResponseEntity.accepted().build();
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @Override
+    public ResponseEntity<Void> resendEmailVerificationPost(String authorization) {
+        manageProfileUseCase.resendEmailVerification(getAuthUser().getUser());
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> resetPasswordPost(String nameOrEmail) {
+        manageProfileUseCase.resetPassword(nameOrEmail, getUserAgent());
+        return ResponseEntity.accepted().build();
     }
 
 }

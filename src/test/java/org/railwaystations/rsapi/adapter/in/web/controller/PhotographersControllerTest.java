@@ -1,8 +1,5 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
-import com.atlassian.oai.validator.OpenApiInteractionValidator;
-import com.atlassian.oai.validator.whitelist.ValidationErrorsWhitelist;
-import com.atlassian.oai.validator.whitelist.rule.WhitelistRules;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,13 +15,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.util.Map;
 import java.util.Optional;
 
-import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
 import static org.mockito.Mockito.when;
+import static org.railwaystations.rsapi.utils.OpenApiValidatorUtil.validOpenApiResponse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -52,19 +48,8 @@ class PhotographersControllerTest {
     @ValueSource(strings = {"/x/photographers", "/xyz/photographers", "/photographers?country=x", "/photographers?country=xyz"})
     void whenCountryIsInvalidThenReturnsStatus400(String urlTemplate) throws Exception {
         mvc.perform(get(urlTemplate))
-                .andExpect(validOpenApi())
+                .andExpect(validOpenApiResponse())
                 .andExpect(status().isBadRequest());
-    }
-
-    private ResultMatcher validOpenApi() {
-        return openApi().isValid(OpenApiInteractionValidator.createFor("static/openapi.yaml")
-                .withWhitelist(
-                        ValidationErrorsWhitelist.create()
-                                .withRule(
-                                        "Ignore requests", WhitelistRules.isRequest()
-                                )
-                )
-                .build());
     }
 
     @ParameterizedTest
@@ -78,7 +63,7 @@ class PhotographersControllerTest {
                 .andExpect(jsonPath("$.@user8").value(29))
                 .andExpect(jsonPath("$.@user10").value(15))
                 .andExpect(jsonPath("$.@user0").value(9))
-                .andExpect(validOpenApi());
+                .andExpect(validOpenApiResponse());
     }
 
     @ParameterizedTest
@@ -92,7 +77,7 @@ class PhotographersControllerTest {
                 .andExpect(jsonPath("$.@user8").value(29))
                 .andExpect(jsonPath("$.@user10").value(15))
                 .andExpect(jsonPath("$.@user0").value(9))
-                .andExpect(validOpenApi());
+                .andExpect(validOpenApiResponse());
     }
 
     @NotNull

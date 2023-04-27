@@ -21,15 +21,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.Set;
 
-import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 import static org.mockito.Mockito.when;
+import static org.railwaystations.rsapi.utils.OpenApiValidatorUtil.validOpenApiResponse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = CountriesController.class)
-@ContextConfiguration(classes={WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class, CountryService.class})
+@ContextConfiguration(classes = {WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class, CountryService.class})
 @AutoConfigureMockMvc(addFilters = false)
 class CountriesControllerTest {
 
@@ -49,7 +49,7 @@ class CountriesControllerTest {
 
         var contentAsString = mvc.perform(get(urlTemplate))
                 .andExpect(status().isOk())
-                .andExpect(openApi().isValid("static/openapi.yaml"))
+                .andExpect(validOpenApiResponse())
                 .andReturn().getResponse().getContentAsString();
 
         List<CountryDto> countries = objectMapper.readerForListOf(CountryDto.class).readValue(contentAsString);

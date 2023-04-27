@@ -75,11 +75,6 @@ public class StationsController implements StationsApi {
     }
 
     @Override
-    public ResponseEntity<List<StationDto>> recentPhotoImportsGet(Integer sinceHours) {
-        return ResponseEntity.ok(toDto(findPhotoStationsUseCase.findRecentImports(sinceHours)));
-    }
-
-    @Override
     public ResponseEntity<List<StationDto>> stationsGet(List<String> country, Boolean hasPhoto, String photographer, Boolean active) {
         return ResponseEntity.ok(toDto(findPhotoStationsUseCase.findByCountry(country != null ? new HashSet<>(country) : null, hasPhoto, photographer, active)));
     }

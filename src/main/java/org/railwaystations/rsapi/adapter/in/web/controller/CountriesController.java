@@ -1,5 +1,6 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.railwaystations.rsapi.adapter.in.web.api.CountriesApi;
 import org.railwaystations.rsapi.adapter.in.web.model.CountryDto;
@@ -8,6 +9,7 @@ import org.railwaystations.rsapi.core.model.Country;
 import org.railwaystations.rsapi.core.model.ProviderApp;
 import org.railwaystations.rsapi.core.ports.in.ListCountriesUseCase;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -39,7 +41,8 @@ public class CountriesController implements CountriesApi {
     }
 
     @Override
-    public ResponseEntity<List<CountryDto>> countriesJsonGet(Boolean onlyActive) {
+    public ResponseEntity<List<CountryDto>> countriesJsonGet(
+            @Valid @RequestParam(value = "onlyActive", required = false) Boolean onlyActive) {
         return countriesGet(onlyActive);
     }
 

@@ -14,12 +14,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.util.Optional;
 
-import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
 import static org.mockito.Mockito.when;
+import static org.railwaystations.rsapi.utils.OpenApiValidatorUtil.validOpenApiResponse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -46,6 +45,7 @@ class StatisticControllerTest {
     @Test
     void whenCountryIsInvalidThenReturnsStatus400() throws Exception {
         mvc.perform(get("/x/stats"))
+                .andExpect(validOpenApiResponse())
                 .andExpect(status().isBadRequest());
     }
 
@@ -55,16 +55,12 @@ class StatisticControllerTest {
 
         mvc.perform(get("/stats"))
                 .andExpect(status().isOk())
-                .andExpect(validOpenApi())
+                .andExpect(validOpenApiResponse())
                 .andExpect(jsonPath("$.total").value(954))
                 .andExpect(jsonPath("$.withPhoto").value(91))
                 .andExpect(jsonPath("$.withoutPhoto").value(863))
                 .andExpect(jsonPath("$.photographers").value(6))
                 .andExpect(jsonPath("$.countryCode").doesNotExist());
-    }
-
-    private ResultMatcher validOpenApi() {
-        return openApi().isValid("static/openapi.yaml");
     }
 
     @Test
@@ -73,7 +69,7 @@ class StatisticControllerTest {
 
         mvc.perform(get("/de/stats"))
                 .andExpect(status().isOk())
-                .andExpect(validOpenApi())
+                .andExpect(validOpenApiResponse())
                 .andExpect(jsonPath("$.total").value(729))
                 .andExpect(jsonPath("$.withPhoto").value(84))
                 .andExpect(jsonPath("$.withoutPhoto").value(645))

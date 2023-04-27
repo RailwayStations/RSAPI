@@ -1,7 +1,5 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
-import com.atlassian.oai.validator.OpenApiInteractionValidator;
-import com.atlassian.oai.validator.whitelist.ValidationErrorsWhitelist;
 import org.apache.commons.io.IOUtils;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +38,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -51,14 +48,12 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
-import static com.atlassian.oai.validator.whitelist.rule.WhitelistRules.allOf;
-import static com.atlassian.oai.validator.whitelist.rule.WhitelistRules.messageHasKey;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.railwaystations.rsapi.utils.OpenApiValidatorUtil.validOpenApiResponse;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -203,16 +198,7 @@ class InboxControllerTest {
                         .content(inputBytes)
                         .with(user(new AuthUser(User.builder().name(nickname).license(License.CC0_10).id(userId).email(email).ownPhotos(true).emailVerification(emailVerification).build(), Collections.emptyList())))
                         .with(csrf()))
-                .andExpect(validOpenApi());
-    }
-
-    private ResultMatcher validOpenApi() {
-        return openApi().isValid(OpenApiInteractionValidator
-                .createFor("static/openapi.yaml")
-                .withWhitelist(ValidationErrorsWhitelist
-                        .create()
-                        .withRule("No security", allOf(messageHasKey("validation.request.security.missing"))))
-                .build());
+                .andExpect(validOpenApiResponse());
     }
 
     @Test
@@ -449,7 +435,7 @@ class InboxControllerTest {
                         .content(inboxStateQueries)
                         .with(user(new AuthUser(User.builder().name("nickname").license(License.CC0_10).id(42).email("nickname@example.com").emailVerification(User.EMAIL_VERIFIED).build(), Collections.emptyList())))
                         .with(csrf()))
-                .andExpect(validOpenApi())
+                .andExpect(validOpenApiResponse())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].state").value("REVIEW"))
                 .andExpect(jsonPath("$.[0].filename").value("1.jpg"))
@@ -527,7 +513,7 @@ class InboxControllerTest {
                         .content(problemReportJson)
                         .with(user(new AuthUser(User.builder().name("@nick name").license(License.CC0_10).id(42).email("nickname@example.com").ownPhotos(true).anonymous(false).emailVerification(emailVerification).build(), Collections.emptyList())))
                         .with(csrf()))
-                .andExpect(validOpenApi());
+                .andExpect(validOpenApiResponse());
     }
 
     @Test
