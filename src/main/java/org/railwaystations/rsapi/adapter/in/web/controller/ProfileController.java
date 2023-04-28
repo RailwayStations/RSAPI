@@ -8,20 +8,18 @@ import org.railwaystations.rsapi.adapter.in.web.model.LicenseDto;
 import org.railwaystations.rsapi.adapter.in.web.model.ProfileDto;
 import org.railwaystations.rsapi.adapter.in.web.model.RegisterProfileDto;
 import org.railwaystations.rsapi.adapter.in.web.model.UpdateProfileDto;
-import org.railwaystations.rsapi.app.auth.AuthUser;
 import org.railwaystations.rsapi.core.model.License;
 import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.ports.in.ManageProfileUseCase;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.net.URI;
+
+import static org.railwaystations.rsapi.adapter.in.web.RequestUtil.getAuthUser;
+import static org.railwaystations.rsapi.adapter.in.web.RequestUtil.getUserAgent;
 
 @RestController
 @Slf4j
@@ -88,14 +86,6 @@ public class ProfileController implements ProfileApi {
                 .license(toLicense(updateProfileDto.getLicense()))
                 .sendNotifications(updateProfileDto.getSendNotifications() == null || updateProfileDto.getSendNotifications())
                 .build();
-    }
-
-    private static AuthUser getAuthUser() {
-        return (AuthUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    }
-
-    private static String getUserAgent() {
-        return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getHeader(HttpHeaders.USER_AGENT);
     }
 
     @PreAuthorize("isAuthenticated()")
