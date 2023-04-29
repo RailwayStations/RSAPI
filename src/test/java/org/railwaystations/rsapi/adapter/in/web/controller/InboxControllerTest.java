@@ -77,17 +77,6 @@ class InboxControllerTest {
 
     @BeforeEach
     void setUp() {
-        var key0815 = new Station.Key("ch", "0815");
-        var station0815 = createStation(key0815, new Coordinates(40.1, 7.0), "LAL", createPhoto(key0815, createUser("Jim Knopf", 18)));
-        var key4711 = new Station.Key("de", "4711");
-        var station4711 = createStation(key4711, new Coordinates(50.0, 9.0), "XYZ", null);
-        var key1234 = new Station.Key("de", "1234");
-        var station1234 = createStation(key1234, new Coordinates(40.1, 7.0), "LAL", createPhoto(key1234, createUser("Jim Knopf")));
-        var key5678 = new Station.Key("de", "5678");
-        var station5678 = createStation(key5678, new Coordinates(51.0, 10.0), "DEF", createPhoto(key5678, createUser("nickname")));
-        var key9876 = new Station.Key("de", "9876");
-        var station9876 = createStation(key9876, new Coordinates(52.0, 8.0), "EFF", createPhoto(key9876, createUser("nickname", 42)));
-
         var userNickname = User.builder()
                 .name("nickname")
                 .license(License.CC0_10)
@@ -107,11 +96,13 @@ class InboxControllerTest {
                 .build();
         when(userDao.findByEmail("someuser@example.com")).thenReturn(Optional.of(userSomeuser));
 
-        when(stationDao.findByKey(key4711.getCountry(), key4711.getId())).thenReturn(Set.of(station4711));
-        when(stationDao.findByKey(key1234.getCountry(), key1234.getId())).thenReturn(Set.of(station1234));
-        when(stationDao.findByKey(key5678.getCountry(), key5678.getId())).thenReturn(Set.of(station5678));
+        var key0815 = new Station.Key("ch", "0815");
+        var station0815 = createStation(key0815, new Coordinates(40.1, 7.0), "LAL", createPhoto(key0815, User.builder().name("Jim Knopf").url("photographerUrl").license(License.CC0_10).id(18).ownPhotos(true).anonymous(false).admin(false).emailVerification(User.EMAIL_VERIFIED).sendNotifications(true).build()));
         when(stationDao.findByKey(key0815.getCountry(), key0815.getId())).thenReturn(Set.of(station0815));
-        when(stationDao.findByKey(key9876.getCountry(), key9876.getId())).thenReturn(Set.of(station9876));
+
+        var key1234 = new Station.Key("de", "1234");
+        var station1234 = createStation(key1234, new Coordinates(40.1, 7.0), "LAL", createPhoto(key1234, createUser()));
+        when(stationDao.findByKey(key1234.getCountry(), key1234.getId())).thenReturn(Set.of(station1234));
 
         monitor.getMessages().clear();
     }
@@ -230,12 +221,8 @@ class InboxControllerTest {
                 .andExpect(jsonPath("$.filename").doesNotExist());
     }
 
-    private User createUser(String name) {
-        return createUser(name, 0);
-    }
-
-    private User createUser(String name, int id) {
-        return User.builder().name(name).url("photographerUrl").license(License.CC0_10).id(id).ownPhotos(true).anonymous(false).admin(false).emailVerification(User.EMAIL_VERIFIED).sendNotifications(true).build();
+    private User createUser() {
+        return User.builder().name("Jim Knopf").url("photographerUrl").license(License.CC0_10).id(18).ownPhotos(true).anonymous(false).admin(false).emailVerification(User.EMAIL_VERIFIED).sendNotifications(true).build();
     }
 
 }
