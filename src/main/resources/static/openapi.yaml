@@ -495,7 +495,7 @@ paths:
     post:
       summary: Upload a new Photo
       tags:
-        - inbox
+        - photoUpload
       parameters:
         - $ref: '#/components/parameters/Authorization'
         - $ref: '#/components/parameters/Upload-Token'
