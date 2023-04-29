@@ -44,7 +44,7 @@ class PhotoStationsControllerTest {
     PhotoStationsService photoStationsService;
 
     @Test
-    void get_photoStationsByCountry() throws Exception {
+    void getPhotoStationsByCountry() throws Exception {
         var stationXY1 = createStationXY1();
         var stationXY5 = createStationXY5();
         stationXY5.getPhotos().add(createPhotoXY5());
@@ -85,7 +85,7 @@ class PhotoStationsControllerTest {
     }
 
     @Test
-    void get_photoStationsByCountry_with_isActive_filter() throws Exception {
+    void getPhotoStationsByCountryWithIsActiveFilter() throws Exception {
         when(photoStationsService.findByCountry(Set.of("xy"), null, false)).thenReturn(Set.of(createStationXY1()));
 
         mvc.perform(get("/photoStationsByCountry/xy?isActive=false"))
@@ -106,7 +106,7 @@ class PhotoStationsControllerTest {
     }
 
     @Test
-    void get_photoStationsByCountry_with_hasPhoto_filter() throws Exception {
+    void getPhotoStationsByCountryWithHasPhotoFilter() throws Exception {
         var stationXY5 = createStationXY5();
         stationXY5.getPhotos().add(createPhotoXY5());
         when(photoStationsService.findByCountry(Set.of("xy"), true, null)).thenReturn(Set.of(stationXY5));
@@ -140,7 +140,7 @@ class PhotoStationsControllerTest {
     }
 
     @Test
-    void get_photoStationsByCountry_with_unknown_country() throws Exception {
+    void getPhotoStationsByCountryWithUnknownCountry() throws Exception {
         mvc.perform(get("/photoStationsByCountry/00"))
                 .andExpect(status().isOk())
                 .andExpect(validOpenApiResponse())
@@ -151,7 +151,7 @@ class PhotoStationsControllerTest {
     }
 
     @Test
-    void get_photoStationById_inactive_station_without_photos() throws Exception {
+    void getPhotoStationByIdOfInactiveStationWithoutPhotos() throws Exception {
         when(photoStationsService.findByCountryAndId("xy", "1")).thenReturn(Optional.of(createStationXY1()));
 
         mvc.perform(get("/photoStationById/xy/1"))
@@ -172,7 +172,7 @@ class PhotoStationsControllerTest {
     }
 
     @Test
-    void get_photoStationById_active_station_with_two_photos() throws Exception {
+    void getPhotoStationByIdOfActiveStationWithTwoPhotos() throws Exception {
         var stationAB3 = createStationAB3();
         stationAB3.getPhotos().add(createPhotoAB3_1());
         stationAB3.getPhotos().add(createPhotoAB3_2());
@@ -216,14 +216,14 @@ class PhotoStationsControllerTest {
     }
 
     @Test
-    void get_photoStationById_not_found() throws Exception {
+    void getPhotoStationByIdWithNonExistingId() throws Exception {
         mvc.perform(get("/photoStationById/ab/not_existing_id"))
                 .andExpect(status().isNotFound())
                 .andExpect(validOpenApiResponse());
     }
 
     @Test
-    void get_photoStationsByPhotographer_with_country_filter() throws Exception {
+    void getPhotoStationsByPhotographerWithCountryFilter() throws Exception {
         var stationXY5 = createStationXY5();
         stationXY5.getPhotos().add(createPhotoXY5());
         when(photoStationsService.findByPhotographer("Jim Knopf", "xy")).thenReturn(Set.of(stationXY5));
@@ -257,7 +257,7 @@ class PhotoStationsControllerTest {
     }
 
     @Test
-    void get_photoStationsByPhotographer() throws Exception {
+    void getPhotoStationsByPhotographer() throws Exception {
         var stationAB3 = createStationAB3();
         stationAB3.getPhotos().add(createPhotoAB3_2());
         var stationXY5 = createStationXY5();
@@ -307,7 +307,7 @@ class PhotoStationsControllerTest {
     }
 
     @Test
-    void get_photoStationsByRecentPhotoImports_with_default_sinceHours() throws Exception {
+    void getPhotoStationsByRecentPhotoImportsWithDefaultSinceHours() throws Exception {
         var stationXY5 = createStationXY5();
         stationXY5.getPhotos().add(createPhotoXY5());
         when(photoStationsService.findRecentImports(10)).thenReturn(Set.of(stationXY5));
@@ -324,7 +324,7 @@ class PhotoStationsControllerTest {
     }
 
     @Test
-    void get_photoStationsByRecentPhotoImports_sinceHours_defined() throws Exception {
+    void getPhotoStationsByRecentPhotoImportsWithSinceHours() throws Exception {
         var stationAB3 = createStationAB3();
         stationAB3.getPhotos().add(createPhotoAB3_1());
         when(photoStationsService.findRecentImports(100)).thenReturn(Set.of(stationAB3));

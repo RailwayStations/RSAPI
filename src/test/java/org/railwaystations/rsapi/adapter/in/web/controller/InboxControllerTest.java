@@ -130,7 +130,7 @@ class InboxControllerTest {
     }
 
     @Test
-    void testUserInbox() throws Exception {
+    void userInbox() throws Exception {
         var user = User.builder().name("nickname").license(License.CC0_10).id(42).email("nickname@example.com").build();
 
         when(inboxDao.findById(1)).thenReturn(createInboxEntry(user, 1, "de", "4711", null, false));
@@ -189,7 +189,7 @@ class InboxControllerTest {
     }
 
     @Test
-    void testPostProblemReport() throws Exception {
+    void postProblemReport() throws Exception {
         when(inboxDao.insert(any())).thenReturn(6L);
         var problemReportJson = """
                     { "countryCode": "de", "stationId": "1234", "type": "OTHER", "comment": "something is wrong" }
@@ -209,7 +209,7 @@ class InboxControllerTest {
     }
 
     @Test
-    void testPostProblemReportEmailNotVerified() throws Exception {
+    void postProblemReportEmailNotVerified() throws Exception {
         var problemReportJson = """
                     { "countryCode": "de", "stationId": "1234", "type": "OTHER", "comment": "something is wrong" }
                 """;

@@ -14,7 +14,7 @@ public class StatisticController implements StatisticApi {
 
     private final GetStatisticUseCase getStatisticUseCase;
 
-    private StatisticDto getStatisticMap(String country) {
+    private StatisticDto getStatistic(String country) {
         return toDto(getStatisticUseCase.getStatistic(country));
     }
 
@@ -25,11 +25,11 @@ public class StatisticController implements StatisticApi {
 
     @Override
     public ResponseEntity<StatisticDto> countryStatsGet(String country) {
-        return ResponseEntity.ok(getStatisticMap(country));
+        return ResponseEntity.ok(getStatistic(country));
     }
 
     @Override
     public ResponseEntity<StatisticDto> statsGet(String country) {
-        return ResponseEntity.ok(getStatisticMap(country));
+        return ResponseEntity.ok(getStatistic(country));
     }
 }

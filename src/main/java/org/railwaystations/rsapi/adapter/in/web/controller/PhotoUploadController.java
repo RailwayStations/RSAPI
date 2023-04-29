@@ -37,15 +37,6 @@ import static org.railwaystations.rsapi.adapter.in.web.InboxResponseMapper.toHtt
 @RequiredArgsConstructor
 public class PhotoUploadController {
 
-    public static final String STATION_ID = "stationId";
-    public static final String COUNTRY_CODE = "countryCode";
-    public static final String STATION_TITLE = "stationTitle";
-    public static final String LATITUDE = "latitude";
-    public static final String LONGITUDE = "longitude";
-    public static final String COMMENT = "comment";
-    public static final String ACTIVE = "active";
-    public static final String FILE = "file";
-
     private final ManageInboxUseCase manageInboxUseCase;
 
     /**
@@ -57,14 +48,14 @@ public class PhotoUploadController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<InboxResponseDto> photoUploadMultipartFormdata(@RequestHeader(value = HttpHeaders.USER_AGENT, required = false) String userAgent,
                                                                          @AuthenticationPrincipal AuthUser user,
-                                                                         @RequestParam(value = STATION_ID, required = false) String stationId,
-                                                                         @RequestParam(value = COUNTRY_CODE, required = false) String countryCode,
-                                                                         @RequestParam(value = STATION_TITLE, required = false) String stationTitle,
-                                                                         @RequestParam(value = LATITUDE, required = false) Double latitude,
-                                                                         @RequestParam(value = LONGITUDE, required = false) Double longitude,
-                                                                         @RequestParam(value = COMMENT, required = false) String comment,
-                                                                         @RequestParam(value = ACTIVE, required = false) Boolean active,
-                                                                         @RequestParam(value = FILE) MultipartFile file) {
+                                                                         @RequestParam(value = "stationId", required = false) String stationId,
+                                                                         @RequestParam(value = "countryCode", required = false) String countryCode,
+                                                                         @RequestParam(value = "stationTitle", required = false) String stationTitle,
+                                                                         @RequestParam(value = "latitude", required = false) Double latitude,
+                                                                         @RequestParam(value = "longitude", required = false) Double longitude,
+                                                                         @RequestParam(value = "comment", required = false) String comment,
+                                                                         @RequestParam(value = "active", required = false) Boolean active,
+                                                                         @RequestParam(value = "file") MultipartFile file) {
         log.info("MultipartFormData2: user={}, station={}, country={}, file={}", user.getUsername(), stationId, countryCode, file.getName());
 
         try {

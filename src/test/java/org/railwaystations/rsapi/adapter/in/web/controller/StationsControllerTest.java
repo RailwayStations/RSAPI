@@ -85,7 +85,7 @@ class StationsControllerTest {
     }
 
     @Test
-    void testGetXY() throws Exception {
+    void getStationsByCountryXY() throws Exception {
         mvc.perform(get("/stations?country=xy"))
                 .andExpect(status().isOk())
                 .andExpect(validOpenApiResponse())
@@ -103,7 +103,7 @@ class StationsControllerTest {
     }
 
     @Test
-    void testGetXYWithFilterActive() throws Exception {
+    void getStationsByCountryXYWithFilterActive() throws Exception {
         mvc.perform(get("/stations?country=xy&active=true"))
                 .andExpect(status().isOk())
                 .andExpect(validOpenApiResponse())
@@ -112,7 +112,7 @@ class StationsControllerTest {
     }
 
     @Test
-    void testGetAB() throws Exception {
+    void getStationsByCountryAB() throws Exception {
         mvc.perform(get("/stations?country=ab"))
                 .andExpect(status().isOk())
                 .andExpect(validOpenApiResponse())
@@ -130,7 +130,7 @@ class StationsControllerTest {
     }
 
     @Test
-    void testGetById() throws Exception {
+    void getStationById() throws Exception {
         mvc.perform(get("/ab/stations/3"))
                 .andExpect(status().isOk())
                 .andExpect(validOpenApiResponse())
@@ -148,7 +148,7 @@ class StationsControllerTest {
     }
 
     @Test
-    void testGetABXY() throws Exception {
+    void getStationsByCountriesABandXY() throws Exception {
         mvc.perform(get("/stations?country=ab&country=xy"))
                 .andExpect(status().isOk())
                 .andExpect(validOpenApiResponse())
@@ -158,7 +158,7 @@ class StationsControllerTest {
     }
 
     @Test
-    void testGetAll() throws Exception {
+    void getAllStations() throws Exception {
         mvc.perform(get("/stations"))
                 .andExpect(status().isOk())
                 .andExpect(validOpenApiResponse())

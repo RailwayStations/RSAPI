@@ -44,7 +44,7 @@ class CountriesControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"/countries", "/countries.json"})
-    void testList(String urlTemplate) throws Exception {
+    void listCountries(String urlTemplate) throws Exception {
         when(countryDao.list(true)).thenReturn(createCountryList());
 
         var contentAsString = mvc.perform(get(urlTemplate))

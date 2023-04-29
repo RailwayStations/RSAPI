@@ -50,7 +50,7 @@ class StatisticControllerTest {
     }
 
     @Test
-    void statisticAll() throws Exception {
+    void getOverallStatistic() throws Exception {
         when(stationDao.getStatistic(null)).thenReturn(new Statistic(null, 954, 91, 6));
 
         mvc.perform(get("/stats"))
@@ -64,7 +64,7 @@ class StatisticControllerTest {
     }
 
     @Test
-    void statisticDe() throws Exception {
+    void getStatisticForCountryDe() throws Exception {
         when(stationDao.getStatistic("de")).thenReturn(new Statistic("de", 729, 84, 4));
 
         mvc.perform(get("/de/stats"))

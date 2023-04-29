@@ -97,7 +97,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testRegisterNewUser() throws Exception {
+    void registerNewUser() throws Exception {
         var givenUserProfile = """
                     { "nickname": "nickname", "email": "nickname@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """;
@@ -136,7 +136,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testRegisterNewUserWithPassword() throws Exception {
+    void registerNewUserWithPassword() throws Exception {
         var givenUserProfileWithPassword = """
                     { "nickname": "nickname", "email": "nickname@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true, "newPassword": "verySecretPassword" }
                 """;
@@ -175,7 +175,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testRegisterNewUserAnonymous() throws Exception {
+    void registerNewUserAnonymous() throws Exception {
         var givenAnonymousUserProfile = """
                     { "nickname": "nickname", "email": "nickname@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
                 """;
@@ -185,7 +185,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testRegisterUserNameTaken() throws Exception {
+    void registerUserNameTaken() throws Exception {
         givenExistingUser();
         var givenUserProfileWithSameName = """
                     { "nickname": "%s", "email": "other@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
@@ -194,7 +194,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testRegisterUserNameBlocked() throws Exception {
+    void registerUserNameBlocked() throws Exception {
         when(userDao.countBlockedUsername("blockedname")).thenReturn(1);
         givenExistingUser();
         var givenUserProfileWithBlockedName = """
@@ -204,7 +204,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testRegisterExistingUserEmailTaken() throws Exception {
+    void registerExistingUserEmailTaken() throws Exception {
         givenExistingUser();
         var givenUserProfileWithSameEmail = """
                     { "nickname": "othername", "email": "%s", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
@@ -215,7 +215,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testRegisterExistingUserEmptyName() throws Exception {
+    void registerExistingUserEmptyName() throws Exception {
         givenExistingUser();
         var givenUserProfileWithEmptyName = """
                     { "nickname": "", "email": "%s", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
@@ -224,7 +224,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testGetMyProfile() throws Exception {
+    void getMyProfile() throws Exception {
         givenExistingUser();
 
         mvc.perform(get("/myProfile")
@@ -260,7 +260,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testChangePasswordTooShortHeader() throws Exception {
+    void changePasswordTooShortHeader() throws Exception {
         givenExistingUser();
 
         postChangePassword("secret", null)
@@ -292,7 +292,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testChangePasswordTooShortBody() throws Exception {
+    void changePasswordTooShortBody() throws Exception {
         givenExistingUser();
 
         postChangePassword(null, "{\"newPassword\": \"secret\"}")
@@ -304,7 +304,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testChangePasswordHeader() throws Exception {
+    void changePasswordHeader() throws Exception {
         givenExistingUser();
 
         postChangePassword("secretlong", null)
@@ -320,7 +320,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testChangePasswordBody() throws Exception {
+    void changePasswordBody() throws Exception {
         givenExistingUser();
 
         postChangePassword(null, "{\"newPassword\": \"secretlong\"}")
@@ -336,7 +336,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testChangePasswordHeaderAndBody() throws Exception {
+    void changePasswordHeaderAndBody() throws Exception {
         givenExistingUser();
 
         postChangePassword("secretheader", "{\"newPassword\": \"secretbody\"}")
@@ -352,7 +352,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testUpdateMyProfile() throws Exception {
+    void updateMyProfile() throws Exception {
         when(userDao.findByNormalizedName("newname")).thenReturn(Optional.empty());
         givenExistingUser();
         var newProfileJson = """
@@ -391,7 +391,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testUpdateMyProfileConflict() throws Exception {
+    void updateMyProfileConflict() throws Exception {
         var user = User.builder()
                 .name("@New name")
                 .email("newname@example.com")
@@ -408,7 +408,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testUpdateMyProfileNameTooLong() throws Exception {
+    void updateMyProfileNameTooLong() throws Exception {
         var user = User.builder()
                 .name("@New name")
                 .email("newname@example.com")
@@ -424,7 +424,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testUpdateMyProfileNewMail() throws Exception {
+    void updateMyProfileNewMail() throws Exception {
         when(userDao.findByEmail("newname@example.com")).thenReturn(Optional.empty());
         givenExistingUser();
         var newProfileJson = """
@@ -447,7 +447,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testResetPasswordViaEmail() throws Exception {
+    void resetPasswordViaEmail() throws Exception {
         var user = User.builder()
                 .name(EXISTING_USER_NAME)
                 .license(License.CC0_10)
@@ -475,7 +475,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testResetPasswordViaName() throws Exception {
+    void resetPasswordViaName() throws Exception {
         var user = User.builder()
                 .name(EXISTING_USER_NAME)
                 .license(License.CC0_10)
@@ -494,13 +494,13 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testResetPasswordUserNotFound() throws Exception {
+    void resetPasswordUserNotFound() throws Exception {
         postResetPassword("doesnt-exist").andExpect(status().isBadRequest());
         verify(authorizationDao, never()).deleteAllByUser("doesnt-exist");
     }
 
     @Test
-    void testResetPasswordEmailMissing() throws Exception {
+    void resetPasswordEmailMissing() throws Exception {
         var user = User.builder()
                 .name(EXISTING_USER_NAME)
                 .build();
@@ -513,7 +513,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testVerifyEmailSuccess() throws Exception {
+    void verifyEmailSuccess() throws Exception {
         var token = "verification";
         var user = User.builder()
                 .id(EXISTING_USER_ID)
@@ -543,7 +543,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testVerifyEmailFailed() throws Exception {
+    void verifyEmailFailed() throws Exception {
         var token = "verification";
         var user = User.builder()
                 .id(EXISTING_USER_ID)
@@ -564,7 +564,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testResendEmailVerification() throws Exception {
+    void resendEmailVerification() throws Exception {
         givenExistingUser();
         mvc.perform(post("/resendEmailVerification")
                         .header("User-Agent", "UserAgent")
@@ -579,7 +579,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testDeleteMyProfile() throws Exception {
+    void deleteMyProfile() throws Exception {
         givenExistingUser();
 
         mvc.perform(delete("/myProfile")

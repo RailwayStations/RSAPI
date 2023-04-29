@@ -46,7 +46,7 @@ class PhotographersControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"/x/photographers", "/xyz/photographers", "/photographers?country=x", "/photographers?country=xyz"})
-    void whenCountryIsInvalidThenReturnsStatus400(String urlTemplate) throws Exception {
+    void getPhotographersWithInvalidCountry(String urlTemplate) throws Exception {
         mvc.perform(get(urlTemplate))
                 .andExpect(validOpenApiResponse())
                 .andExpect(status().isBadRequest());
@@ -54,7 +54,7 @@ class PhotographersControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"/de/photographers", "/photographers?country=de"})
-    void photographersDe(String urlTemplate) throws Exception {
+    void getPhotographersOfCountryDe(String urlTemplate) throws Exception {
         when(stationDao.getPhotographerMap("de")).thenReturn(createPhotographersResponse());
 
         mvc.perform(get(urlTemplate))
@@ -68,7 +68,7 @@ class PhotographersControllerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"/photographers"})
-    void photographersAll(String urlTemplate) throws Exception {
+    void getPhotographersOfAllCountries(String urlTemplate) throws Exception {
         when(stationDao.getPhotographerMap(null)).thenReturn(createPhotographersResponse());
 
         mvc.perform(get(urlTemplate))
