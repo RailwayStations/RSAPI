@@ -53,16 +53,13 @@ public class ProfileController implements ProfileApi {
     }
 
     private ProfileDto toProfileDto(User user) {
-        return new ProfileDto()
-                .nickname(user.getName())
-                .license(toLicenseDto(user.getLicense()))
+        return new ProfileDto(user.getName(), toLicenseDto(user.getLicense()), user.isOwnPhotos())
                 .admin(user.isAdmin())
                 .email(user.getEmail())
                 .anonymous(user.isAnonymous())
                 .emailVerified(user.isEmailVerified())
                 .sendNotifications(user.isSendNotifications())
-                .link(user.getUrl() != null ? URI.create(user.getUrl()) : null)
-                .photoOwner(user.isOwnPhotos());
+                .link(user.getUrl() != null ? URI.create(user.getUrl()) : null);
     }
 
     private LicenseDto toLicenseDto(License license) {

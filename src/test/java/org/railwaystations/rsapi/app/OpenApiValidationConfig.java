@@ -7,6 +7,7 @@ import jakarta.servlet.Filter;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -15,8 +16,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-// TODO: OpenApiValidationInterceptor not compatible with Spring Boot 3
-//@Configuration
+@Configuration
 public class OpenApiValidationConfig {
 
     @Bean
@@ -34,7 +34,7 @@ public class OpenApiValidationConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addInterceptors(@NotNull InterceptorRegistry registry) {
-                //registry.addInterceptor(openApiValidationInterceptor);
+                registry.addInterceptor(openApiValidationInterceptor);
             }
         };
     }

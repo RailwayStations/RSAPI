@@ -13,7 +13,7 @@ OpenAPI documentation.
 
 ## build
 
-To build the project, you need Java 19.
+To build the project, you need Java 20.
 
 Run on Unix like systems:
 

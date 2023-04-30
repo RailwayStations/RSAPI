@@ -1,8 +1,11 @@
 package org.railwaystations.rsapi.app;
 
+import com.atlassian.oai.validator.springmvc.OpenApiValidationFilter;
+import com.atlassian.oai.validator.springmvc.OpenApiValidationInterceptor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.Filter;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -22,17 +25,22 @@ import org.railwaystations.rsapi.core.model.Station;
 import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.ports.out.Monitor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.EncodedResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.imageio.ImageIO;
 import java.io.ByteArrayInputStream;
@@ -105,10 +113,10 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         assertThat(photoStationsDto.getPhotoBaseUrl()).isEqualTo("https://api.railway-stations.org/photos");
 
         var licenses = photoStationsDto.getLicenses();
-        assertThat(licenses).containsExactly(new PhotoLicenseDto().id("CC0_10").name("CC0 1.0 Universell (CC0 1.0)").url(URI.create("https://creativecommons.org/publicdomain/zero/1.0/")));
+        assertThat(licenses).containsExactly(new PhotoLicenseDto("CC0_10", "CC0 1.0 Universell (CC0 1.0)", URI.create("https://creativecommons.org/publicdomain/zero/1.0/")));
 
         var photographers = photoStationsDto.getPhotographers();
-        assertThat(photographers).containsExactly(new PhotographerDto().name("@user10").url(URI.create("https://www.example.com/user10")));
+        assertThat(photographers).containsExactly(new PhotographerDto("@user10").url(URI.create("https://www.example.com/user10")));
 
         var station = photoStationsDto.getStations().get(0);
         assertThat(station.getCountry()).isEqualTo("de");
@@ -195,11 +203,11 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         assertThat(photoStationsDto).isNotNull();
 
         var licenses = photoStationsDto.getLicenses();
-        assertThat(licenses).containsExactlyInAnyOrder(new PhotoLicenseDto().id("CC0_10").name("CC0 1.0 Universell (CC0 1.0)").url(URI.create("https://creativecommons.org/publicdomain/zero/1.0/")),
-                new PhotoLicenseDto().id("CC_BY_SA_40").name("CC BY-SA 4.0").url(URI.create("https://creativecommons.org/licenses/by-sa/4.0/")));
+        assertThat(licenses).containsExactlyInAnyOrder(new PhotoLicenseDto("CC0_10", "CC0 1.0 Universell (CC0 1.0)", URI.create("https://creativecommons.org/publicdomain/zero/1.0/")),
+                new PhotoLicenseDto("CC_BY_SA_40", "CC BY-SA 4.0", URI.create("https://creativecommons.org/licenses/by-sa/4.0/")));
 
         var photographers = photoStationsDto.getPhotographers();
-        assertThat(photographers).containsExactly(new PhotographerDto().name("@user10").url(URI.create("https://www.example.com/user10")));
+        assertThat(photographers).containsExactly(new PhotographerDto("@user10").url(URI.create("https://www.example.com/user10")));
         assertThat(photographers).noneMatch(photographerDto -> !photographerDto.getName().equals("@user10"));
         assertThat(photoStationsDto.getStations()).noneMatch(stationDto -> !stationDto.getCountry().equals("de"));
         assertThat(photoStationsDto.getStations().stream().flatMap(photoStationDto -> photoStationDto.getPhotos().stream())).noneMatch(photoDto -> !photoDto.getPhotographer().equals("@user10"));
@@ -236,10 +244,10 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         assertThat(photoStationsDto).isNotNull();
 
         var licenses = photoStationsDto.getLicenses();
-        assertThat(licenses).containsExactlyInAnyOrder(new PhotoLicenseDto().id("CC0_10").name("CC0 1.0 Universell (CC0 1.0)").url(URI.create("https://creativecommons.org/publicdomain/zero/1.0/")));
+        assertThat(licenses).containsExactlyInAnyOrder(new PhotoLicenseDto("CC0_10", "CC0 1.0 Universell (CC0 1.0)", URI.create("https://creativecommons.org/publicdomain/zero/1.0/")));
 
         var photographers = photoStationsDto.getPhotographers();
-        assertThat(photographers).containsExactly(new PhotographerDto().name("Anonym").url(URI.create("https://railway-stations.org")));
+        assertThat(photographers).containsExactly(new PhotographerDto("Anonym").url(URI.create("https://railway-stations.org")));
         assertThat(photographers).noneMatch(photographerDto -> !photographerDto.getName().equals("Anonym"));
         assertThat(photoStationsDto.getStations().stream().map(PhotoStationDto::getCountry).collect(Collectors.toSet())).containsExactlyInAnyOrder("de", "ch");
         assertThat(photoStationsDto.getStations().stream().flatMap(photoStationDto -> photoStationDto.getPhotos().stream())).noneMatch(photoDto -> !photoDto.getPhotographer().equals("Anonym"));
@@ -747,7 +755,6 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
             }
         }
 
-        /* TODO: OpenApiValidationInterceptor not compatible with Spring Boot 3
         @Bean
         public Filter openApiValidationFilter() {
             return new OpenApiValidationFilter(true, true);
@@ -764,7 +771,6 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
                 }
             };
         }
-         */
     }
 
 }
