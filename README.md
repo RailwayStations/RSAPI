@@ -13,7 +13,7 @@ OpenAPI documentation.
 
 ## build
 
-To build the project, you need Java 17.
+To build the project, you need Java 19.
 
 Run on Unix like systems:
 
@@ -26,6 +26,10 @@ Run on Windows:
 Build docker image:
 
 ```docker build . -t railwaystations/rsapi:latest```
+
+## IntelliJ
+
+After importing this project for the first time, you might need to specify the folder `build/openapi/src/main/java` as source root folder.
 
 ## Working Directory
 
