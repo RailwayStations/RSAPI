@@ -7,8 +7,8 @@ import lombok.Value;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -91,13 +91,13 @@ public class User {
             return false;
         }
         if (StringUtils.isNotBlank(url)) {
-            URL validatedUrl;
+            URI validatedUri;
             try {
-                validatedUrl = new URL(url);
-            } catch (MalformedURLException e) {
+                validatedUri = new URI(url);
+            } catch (URISyntaxException e) {
                 return false;
             }
-            return validatedUrl.getProtocol().matches("https?");
+            return validatedUri.getScheme() != null && validatedUri.getScheme().matches("https?");
         }
 
         return true;

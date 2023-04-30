@@ -21,6 +21,6 @@ public interface OAuth2AuthorizationDao {
             DELETE FROM oauth2_authorization
                 WHERE principal_name = :principalName
             """)
-    int deleteAllByUser(@Bind("principalName") String principalName);
+    void deleteAllByUser(@Bind("principalName") String principalName);
 
 }

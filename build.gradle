@@ -11,8 +11,8 @@ group = 'org.railwaystations'
 version = '0.0.1-SNAPSHOT'
 
 java {
-    sourceCompatibility = "19"
-    targetCompatibility = "19"
+    sourceCompatibility = "20"
+    targetCompatibility = "20"
 }
 
 configurations {
@@ -102,7 +102,7 @@ dependencies {
     testImplementation "org.testcontainers:junit-jupiter:$testContainersVersion"
     testImplementation "org.testcontainers:mariadb:$testContainersVersion"
     testImplementation "com.atlassian.oai:swagger-request-validator-core:$swaggerRequestValidatorVersion"
-    testImplementation "com.atlassian.oai:swagger-request-validator-springmvc:$swaggerRequestValidatorVersion"
+    testImplementation "com.atlassian.oai:swagger-request-validator-spring-webmvc:$swaggerRequestValidatorVersion"
     testImplementation "com.atlassian.oai:swagger-request-validator-mockmvc:$swaggerRequestValidatorVersion"
     testImplementation 'org.assertj:assertj-core:3.24.2'
     testImplementation 'org.xmlunit:xmlunit-assertj3:2.9.1'
