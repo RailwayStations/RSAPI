@@ -90,7 +90,7 @@ public class ProfileController implements ProfileApi {
 
     @PreAuthorize("isAuthenticated()")
     @Override
-    public ResponseEntity<Void> changePasswordPost(String authorization, String newPassword, ChangePasswordDto changePasswordDto) {
+    public ResponseEntity<Void> changePasswordPost(String newPassword, ChangePasswordDto changePasswordDto) {
         manageProfileUseCase.changePassword(getAuthUser().getUser(), changePasswordDto != null ? changePasswordDto.getNewPassword() : newPassword);
         return ResponseEntity.ok().build();
     }
@@ -104,14 +104,14 @@ public class ProfileController implements ProfileApi {
 
     @PreAuthorize("isAuthenticated()")
     @Override
-    public ResponseEntity<Void> myProfileDelete(String authorization, String uploadToken, String email) {
+    public ResponseEntity<Void> myProfileDelete() {
         manageProfileUseCase.deleteProfile(getAuthUser().getUser(), getUserAgent());
         return ResponseEntity.noContent().build();
     }
 
     @PreAuthorize("isAuthenticated()")
     @Override
-    public ResponseEntity<ProfileDto> myProfileGet(String authorization, String uploadToken, String email) {
+    public ResponseEntity<ProfileDto> myProfileGet() {
         User user = getAuthUser().getUser();
         log.info("Get profile for '{}'", user.getEmail());
         return ResponseEntity.ok(toProfileDto(user));
@@ -119,7 +119,7 @@ public class ProfileController implements ProfileApi {
 
     @PreAuthorize("isAuthenticated()")
     @Override
-    public ResponseEntity<Void> myProfilePost(UpdateProfileDto profile, String authorization, String uploadToken, String email) {
+    public ResponseEntity<Void> myProfilePost(UpdateProfileDto profile) {
         manageProfileUseCase.updateProfile(getAuthUser().getUser(), toUser(profile), getUserAgent());
         return ResponseEntity.ok().build();
     }
@@ -132,7 +132,7 @@ public class ProfileController implements ProfileApi {
 
     @PreAuthorize("isAuthenticated()")
     @Override
-    public ResponseEntity<Void> resendEmailVerificationPost(String authorization) {
+    public ResponseEntity<Void> resendEmailVerificationPost() {
         manageProfileUseCase.resendEmailVerification(getAuthUser().getUser());
         return ResponseEntity.ok().build();
     }

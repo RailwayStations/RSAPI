@@ -200,13 +200,13 @@ public class InboxController implements InboxApi {
 
     @PreAuthorize("hasRole('ADMIN')")
     @Override
-    public ResponseEntity<List<InboxEntryDto>> adminInboxGet(String authorization) {
+    public ResponseEntity<List<InboxEntryDto>> adminInboxGet() {
         return ResponseEntity.ok(toInboxEntryDto(manageInboxUseCase.listAdminInbox(getAuthUser().getUser())));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @Override
-    public ResponseEntity<AdminInboxCommandResponseDto> adminInboxPost(InboxCommandDto uploadCommand, String authorization) {
+    public ResponseEntity<AdminInboxCommandResponseDto> adminInboxPost(InboxCommandDto uploadCommand) {
         log.info("Executing adminInbox commandDto {} for Nickname: {}", uploadCommand.getCommand(), getAuthUser().getUsername());
         try {
             var command = toDomain(uploadCommand);
@@ -245,14 +245,14 @@ public class InboxController implements InboxApi {
 
     @PreAuthorize("isAuthenticated()")
     @Override
-    public ResponseEntity<InboxResponseDto> reportProblemPost(ProblemReportDto problemReport, String authorization) {
+    public ResponseEntity<InboxResponseDto> reportProblemPost(ProblemReportDto problemReport) {
         InboxResponseDto inboxResponse = InboxResponseMapper.toDto(manageInboxUseCase.reportProblem(toDomain(problemReport), getAuthUser().getUser(), getUserAgent()));
         return new ResponseEntity<>(inboxResponse, toHttpStatus(inboxResponse.getState()));
     }
 
     @PreAuthorize("isAuthenticated()")
     @Override
-    public ResponseEntity<List<InboxStateQueryResponseDto>> userInboxPost(List<InboxStateQueryRequestDto> uploadStateQueries, String authorization) {
+    public ResponseEntity<List<InboxStateQueryResponseDto>> userInboxPost(List<InboxStateQueryRequestDto> uploadStateQueries) {
         return ResponseEntity.ok(toInboxStateQueryDto(manageInboxUseCase.userInbox(getAuthUser().getUser(), toIdList(uploadStateQueries))));
     }
 

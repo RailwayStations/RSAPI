@@ -41,7 +41,6 @@ openApiGenerate {
     apiPackage = "org.railwaystations.rsapi.adapter.in.web.api"
     modelPackage = "org.railwaystations.rsapi.adapter.in.web.model"
     modelNameSuffix = "Dto"
-    library = "spring-boot"
     cleanupOutput = true
     configOptions = [
             interfaceOnly        : "true",
@@ -53,8 +52,8 @@ openApiGenerate {
             annotationLibrary    : "none",
             useTags              : "true",
             useBeanValidation    : "true",
-            performBeanValidation: "true",
-            useSpringBoot3       : "true"
+            useSpringBoot3       : "true",
+            implicitHeadersRegex : "(Authorization|Upload-Token|Email)"
     ]
 }
 
