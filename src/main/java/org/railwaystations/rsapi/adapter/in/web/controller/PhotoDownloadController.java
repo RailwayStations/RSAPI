@@ -1,15 +1,15 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.railwaystations.rsapi.adapter.in.web.api.PhotoDownloadApi;
 import org.railwaystations.rsapi.core.ports.out.PhotoStorage;
 import org.railwaystations.rsapi.utils.ImageUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -19,43 +19,42 @@ import java.nio.file.Path;
 
 @RestController
 @Slf4j
-public class PhotoDownloadController {
+@RequiredArgsConstructor
+public class PhotoDownloadController implements PhotoDownloadApi {
 
-    public static final String COUNTRY_CODE = "countryCode";
-    public static final String FILENAME = "filename";
-    public static final String WIDTH = "width";
+    private final PhotoStorage photoStorage;
 
-    @Autowired
-    private PhotoStorage photoStorage;
-
-    @GetMapping(value = "/photos/{countryCode}/{filename}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
-    public ResponseEntity<byte[]> photos(@PathVariable(COUNTRY_CODE) String countryCode,
-                                  @PathVariable(FILENAME) String filename,
-                                  @RequestParam(value = WIDTH, required = false) Integer width) throws IOException {
-        log.info("Download photo country={}, file={}", countryCode, filename);
-        return downloadPhoto(photoStorage.getPhotoFile(countryCode, filename), width);
-    }
-
-    private static ResponseEntity<byte[]> downloadPhoto(Path photo, Integer width) throws IOException {
+    private static ResponseEntity<Resource> downloadPhoto(Path photo, Integer width) {
         if (!Files.exists(photo) || !Files.isReadable(photo)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
-        return ResponseEntity.ok().contentType(MediaType.valueOf(ImageUtil.extensionToMimeType(ImageUtil.getExtension(photo.toString())))).body(ImageUtil.scalePhoto(photo, width));
+        byte[] body;
+        try {
+            body = ImageUtil.scalePhoto(photo, width);
+        } catch (IOException e) {
+            log.error("Error scaling photo {} to width {}", photo, width, e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return ResponseEntity.ok().contentType(MediaType.valueOf(ImageUtil.extensionToMimeType(ImageUtil.getExtension(photo.toString())))).body(new ByteArrayResource(body));
     }
 
-    @GetMapping(value = "/inbox/{filename}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
-    public ResponseEntity<byte[]> inbox(@PathVariable(FILENAME) String filename,
-                                 @RequestParam(value = WIDTH, required = false) Integer width) throws IOException {
+    @Override
+    public ResponseEntity<Resource> inboxFilenameGet(String filename, Integer width) {
         log.info("Download inbox file={}", filename);
         return downloadPhoto(photoStorage.getInboxFile(filename), width);
     }
 
-    @GetMapping(value = "/inbox/processed/{filename}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
-    public ResponseEntity<byte[]> inboxProcessed(@PathVariable(FILENAME) String filename,
-                                          @RequestParam(value = WIDTH, required = false) Integer width) throws IOException {
+    @Override
+    public ResponseEntity<Resource> inboxProcessedFilenameGet(String filename, Integer width) {
         log.info("Download inbox file={}", filename);
         return downloadPhoto(photoStorage.getInboxProcessedFile(filename), width);
     }
 
+    @Override
+    public ResponseEntity<Resource> photosCountryFilenameGet(String country, String filename, Integer width) {
+        log.info("Download photo country={}, file={}", country, filename);
+        return downloadPhoto(photoStorage.getPhotoFile(country, filename), width);
+    }
 }

@@ -15,14 +15,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
 import static org.mockito.Mockito.when;
+import static org.railwaystations.rsapi.utils.OpenApiValidatorUtil.validOpenApiResponse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -86,10 +85,10 @@ class StationsControllerTest {
     }
 
     @Test
-    void testGetXY() throws Exception {
+    void getStationsByCountryXY() throws Exception {
         mvc.perform(get("/stations?country=xy"))
                 .andExpect(status().isOk())
-                .andExpect(validOpenApi())
+                .andExpect(validOpenApiResponse())
                 .andExpect(jsonPath("$.[0].country").value("xy"))
                 .andExpect(jsonPath("$.[0].idStr").value("5"))
                 .andExpect(jsonPath("$.[0].title").value("Lummerland"))
@@ -104,23 +103,19 @@ class StationsControllerTest {
     }
 
     @Test
-    void testGetXYWithFilterActive() throws Exception {
+    void getStationsByCountryXYWithFilterActive() throws Exception {
         mvc.perform(get("/stations?country=xy&active=true"))
                 .andExpect(status().isOk())
-                .andExpect(validOpenApi())
+                .andExpect(validOpenApiResponse())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$").isEmpty());
     }
 
-    ResultMatcher validOpenApi() {
-        return openApi().isValid("static/openapi.yaml");
-    }
-
     @Test
-    void testGetAB() throws Exception {
+    void getStationsByCountryAB() throws Exception {
         mvc.perform(get("/stations?country=ab"))
                 .andExpect(status().isOk())
-                .andExpect(validOpenApi())
+                .andExpect(validOpenApiResponse())
                 .andExpect(jsonPath("$.[0].country").value("ab"))
                 .andExpect(jsonPath("$.[0].idStr").value("3"))
                 .andExpect(jsonPath("$.[0].title").value("Nimmerland"))
@@ -135,10 +130,10 @@ class StationsControllerTest {
     }
 
     @Test
-    void testGetById() throws Exception {
+    void getStationById() throws Exception {
         mvc.perform(get("/ab/stations/3"))
                 .andExpect(status().isOk())
-                .andExpect(validOpenApi())
+                .andExpect(validOpenApiResponse())
                 .andExpect(jsonPath("$.country").value("ab"))
                 .andExpect(jsonPath("$.idStr").value("3"))
                 .andExpect(jsonPath("$.title").value("Nimmerland"))
@@ -153,18 +148,20 @@ class StationsControllerTest {
     }
 
     @Test
-    void testGetABXY() throws Exception {
+    void getStationsByCountriesABandXY() throws Exception {
         mvc.perform(get("/stations?country=ab&country=xy"))
                 .andExpect(status().isOk())
+                .andExpect(validOpenApiResponse())
                 .andExpect(jsonPath("$.[0]").isNotEmpty())
                 .andExpect(jsonPath("$.[1]").isNotEmpty())
                 .andExpect(jsonPath("$.[2]").doesNotExist());
     }
 
     @Test
-    void testGetAll() throws Exception {
+    void getAllStations() throws Exception {
         mvc.perform(get("/stations"))
                 .andExpect(status().isOk())
+                .andExpect(validOpenApiResponse())
                 .andExpect(jsonPath("$.[0]").isNotEmpty())
                 .andExpect(jsonPath("$.[1]").isNotEmpty())
                 .andExpect(jsonPath("$.[2]").doesNotExist());

@@ -1,14 +1,13 @@
 package org.railwaystations.rsapi.app.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.railwaystations.rsapi.adapter.in.web.writer.StatisticTxtWriter;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
@@ -24,15 +23,13 @@ import java.util.List;
 @EnableWebMvc
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-
-
+    
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.add(new StatisticTxtWriter());
         var builder = new Jackson2ObjectMapperBuilder();
         builder.serializationInclusion(JsonInclude.Include.NON_NULL);
         converters.add(new MappingJackson2HttpMessageConverter(builder.build()));
-        converters.add(byteArrayHttpMessageConverter());
+        converters.add(resourceHttpMessageConverter());
     }
 
     @Override
@@ -45,10 +42,10 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public ByteArrayHttpMessageConverter byteArrayHttpMessageConverter() {
-        var arrayHttpMessageConverter = new ByteArrayHttpMessageConverter();
-        arrayHttpMessageConverter.setSupportedMediaTypes(getSupportedMediaTypes());
-        return arrayHttpMessageConverter;
+    public ResourceHttpMessageConverter resourceHttpMessageConverter() {
+        var resourceHttpMessageConverter = new ResourceHttpMessageConverter();
+        resourceHttpMessageConverter.setSupportedMediaTypes(getSupportedMediaTypes());
+        return resourceHttpMessageConverter;
     }
 
     @Bean

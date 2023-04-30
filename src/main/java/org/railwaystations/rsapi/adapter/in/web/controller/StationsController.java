@@ -1,82 +1,29 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
+import org.railwaystations.rsapi.adapter.in.web.api.StationsApi;
 import org.railwaystations.rsapi.adapter.in.web.model.StationDto;
 import org.railwaystations.rsapi.core.model.Station;
 import org.railwaystations.rsapi.core.ports.in.FindPhotoStationsUseCase;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @RestController
-@Validated
-public class StationsController {
+public class StationsController implements StationsApi {
 
-    private static final String COUNTRY = "country";
-    private static final String PHOTOGRAPHER = "photographer";
-    private static final String HAS_PHOTO = "hasPhoto";
-    private static final String ID = "id";
-    private static final String ACTIVE = "active";
-    private static final String SINCE_HOURS = "sinceHours";
+    private final FindPhotoStationsUseCase findPhotoStationsUseCase;
 
-    @Autowired
-    private FindPhotoStationsUseCase findPhotoStationsUseCase;
+    private final String photoBaseUrl;
 
-    @Value("${photoBaseUrl}")
-    private String photoBaseUrl;
-
-    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"}, value = "/stations")
-    public List<StationDto> get(@RequestParam(value = COUNTRY, required = false) Set<String> countries,
-                                @RequestParam(value = HAS_PHOTO, required = false) Boolean hasPhoto,
-                                @RequestParam(value = PHOTOGRAPHER, required = false) String photographer,
-                                @RequestParam(value = ACTIVE, required = false) Boolean active) {
-        return toDto(findPhotoStationsUseCase.findByCountry(countries, hasPhoto, photographer, active));
-    }
-
-    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"}, value = "/stations.json")
-    public List<StationDto> getAsJson(@RequestParam(value = COUNTRY, required = false) Set<String> countries,
-                                      @RequestParam(value = HAS_PHOTO, required = false) Boolean hasPhoto,
-                                      @RequestParam(value = PHOTOGRAPHER, required = false) String photographer,
-                                      @RequestParam(value = ACTIVE, required = false) Boolean active) {
-        return get(countries, hasPhoto, photographer, active);
-    }
-
-    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"}, value = "/{country}/stations")
-    public List<StationDto> getWithCountry(@PathVariable(COUNTRY) String country,
-                                           @RequestParam(value = HAS_PHOTO, required = false) Boolean hasPhoto,
-                                           @RequestParam(value = PHOTOGRAPHER, required = false) String photographer,
-                                           @RequestParam(value = ACTIVE, required = false) Boolean active) {
-        return get(Set.of(country), hasPhoto, photographer, active);
-    }
-
-    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8"}, value = "/{country}/stations.json")
-    public List<StationDto> getWithCountryAsJson(@PathVariable(COUNTRY) String country,
-                                                 @RequestParam(value = HAS_PHOTO, required = false) Boolean hasPhoto,
-                                                 @RequestParam(value = PHOTOGRAPHER, required = false) String photographer,
-                                                 @RequestParam(value = ACTIVE, required = false) Boolean active) {
-        return getWithCountry(country, hasPhoto, photographer, active);
-    }
-
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8", value = "/{country}/stations/{id}")
-    public StationDto getById(@PathVariable(COUNTRY) String country,
-                              @PathVariable(ID) String id) {
-        return toDto(findPhotoStationsUseCase.findByCountryAndId(country, id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
-    }
-
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8", value = "/recentPhotoImports")
-    public List<StationDto> recentPhotoImports(@RequestParam(value = SINCE_HOURS, required = false, defaultValue = "10") @Min(1) @Max(800) long sinceHours) {
-        return toDto(findPhotoStationsUseCase.findRecentImports(sinceHours));
+    public StationsController(FindPhotoStationsUseCase findPhotoStationsUseCase, @Value("${photoBaseUrl}") String photoBaseUrl) {
+        this.findPhotoStationsUseCase = findPhotoStationsUseCase;
+        this.photoBaseUrl = photoBaseUrl;
     }
 
     private List<StationDto> toDto(Set<Station> stations) {
@@ -84,15 +31,15 @@ public class StationsController {
     }
 
     private StationDto toDto(Station station) {
-        var stationDto = new StationDto()
-                .country(station.getKey().getCountry())
-                .idStr(station.getKey().getId())
+        var stationDto = new StationDto(
+                station.getKey().getId(),
+                station.getKey().getCountry(),
+                station.getTitle(),
+                station.getCoordinates().getLat(),
+                station.getCoordinates().getLon(),
+                station.isActive())
                 .id(legacyStationId(station.getKey().getId()))
-                .title(station.getTitle())
-                .DS100(station.getDs100())
-                .active(station.isActive())
-                .lat(station.getCoordinates().getLat())
-                .lon(station.getCoordinates().getLon());
+                .DS100(station.getDs100());
 
         station.getPrimaryPhoto()
                 .map(photo -> {
@@ -115,6 +62,21 @@ public class StationsController {
         } catch (NumberFormatException ignored) {
             return -1;
         }
+    }
+
+    @Override
+    public ResponseEntity<List<StationDto>> countryStationsGet(String country, Boolean hasPhoto, String photographer, Boolean active) {
+        return stationsGet(List.of(country), hasPhoto, photographer, active);
+    }
+
+    @Override
+    public ResponseEntity<StationDto> countryStationsIdGet(String country, String id) {
+        return ResponseEntity.ok(toDto(findPhotoStationsUseCase.findByCountryAndId(country, id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))));
+    }
+
+    @Override
+    public ResponseEntity<List<StationDto>> stationsGet(List<String> country, Boolean hasPhoto, String photographer, Boolean active) {
+        return ResponseEntity.ok(toDto(findPhotoStationsUseCase.findByCountry(country != null ? new HashSet<>(country) : null, hasPhoto, photographer, active)));
     }
 
 }

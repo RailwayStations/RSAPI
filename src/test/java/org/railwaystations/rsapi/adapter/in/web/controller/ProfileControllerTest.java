@@ -24,13 +24,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.util.Optional;
 
-import static com.atlassian.oai.validator.mockmvc.OpenApiValidationMatchers.openApi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -42,6 +40,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.railwaystations.rsapi.utils.OpenApiValidatorUtil.validOpenApiResponse;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -88,26 +87,21 @@ class ProfileControllerTest {
     }
 
     @NotNull
-    private ResultActions postRegistrationWithApiValidation(String userProfileJson) throws Exception {
-        return postRegistration(userProfileJson)
-                .andExpect(validOpenApi());
-    }
-
-    @NotNull
     private ResultActions postRegistration(String userProfileJson) throws Exception {
         return mvc.perform(post("/registration")
-                .header("User-Agent", "UserAgent")
-                .contentType("application/json")
-                .content(userProfileJson)
-                .with(csrf()));
+                        .header("User-Agent", "UserAgent")
+                        .contentType("application/json")
+                        .content(userProfileJson)
+                        .with(csrf()))
+                .andExpect(validOpenApiResponse());
     }
 
     @Test
-    void testRegisterNewUser() throws Exception {
+    void registerNewUser() throws Exception {
         var givenUserProfile = """
                     { "nickname": "nickname", "email": "nickname@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """;
-        postRegistrationWithApiValidation(givenUserProfile).andExpect(status().isAccepted());
+        postRegistration(givenUserProfile).andExpect(status().isAccepted());
 
         verify(userDao).findByNormalizedName("nickname");
         verify(userDao).countBlockedUsername("nickname");
@@ -142,11 +136,11 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testRegisterNewUserWithPassword() throws Exception {
+    void registerNewUserWithPassword() throws Exception {
         var givenUserProfileWithPassword = """
                     { "nickname": "nickname", "email": "nickname@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true, "newPassword": "verySecretPassword" }
                 """;
-        postRegistrationWithApiValidation(givenUserProfileWithPassword).andExpect(status().isAccepted());
+        postRegistration(givenUserProfileWithPassword).andExpect(status().isAccepted());
 
         verify(userDao).findByNormalizedName("nickname");
         verify(userDao).countBlockedUsername("nickname");
@@ -181,56 +175,56 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testRegisterNewUserAnonymous() throws Exception {
+    void registerNewUserAnonymous() throws Exception {
         var givenAnonymousUserProfile = """
                     { "nickname": "nickname", "email": "nickname@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
                 """;
-        postRegistrationWithApiValidation(givenAnonymousUserProfile).andExpect(status().isAccepted());
+        postRegistration(givenAnonymousUserProfile).andExpect(status().isAccepted());
 
         assertThat(monitor.getMessages().get(0)).isEqualTo("New registration{nickname='nickname', email='nickname@example.com', license='CC0_10', photoOwner=true, link='https://link@example.com', anonymous=true}\nvia UserAgent");
     }
 
     @Test
-    void testRegisterUserNameTaken() throws Exception {
+    void registerUserNameTaken() throws Exception {
         givenExistingUser();
         var givenUserProfileWithSameName = """
                     { "nickname": "%s", "email": "other@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """.formatted(EXISTING_USER_NAME);
-        postRegistrationWithApiValidation(givenUserProfileWithSameName).andExpect(status().isConflict());
+        postRegistration(givenUserProfileWithSameName).andExpect(status().isConflict());
     }
 
     @Test
-    void testRegisterUserNameBlocked() throws Exception {
+    void registerUserNameBlocked() throws Exception {
         when(userDao.countBlockedUsername("blockedname")).thenReturn(1);
         givenExistingUser();
         var givenUserProfileWithBlockedName = """
                     { "nickname": "%s", "email": "other@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """.formatted("Blocked Name");
-        postRegistrationWithApiValidation(givenUserProfileWithBlockedName).andExpect(status().isConflict());
+        postRegistration(givenUserProfileWithBlockedName).andExpect(status().isConflict());
     }
 
     @Test
-    void testRegisterExistingUserEmailTaken() throws Exception {
+    void registerExistingUserEmailTaken() throws Exception {
         givenExistingUser();
         var givenUserProfileWithSameEmail = """
                     { "nickname": "othername", "email": "%s", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """.formatted(EXISTING_EMAIL);
-        postRegistrationWithApiValidation(givenUserProfileWithSameEmail).andExpect(status().isConflict());
+        postRegistration(givenUserProfileWithSameEmail).andExpect(status().isConflict());
 
         assertThat(monitor.getMessages().get(0)).isEqualTo("Registration for user 'othername' with eMail 'existing@example.com' failed, eMail is already taken\nvia UserAgent");
     }
 
     @Test
-    void testRegisterExistingUserEmptyName() throws Exception {
+    void registerExistingUserEmptyName() throws Exception {
         givenExistingUser();
         var givenUserProfileWithEmptyName = """
                     { "nickname": "", "email": "%s", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
                 """.formatted(EXISTING_EMAIL);
-        postRegistrationWithApiValidation(givenUserProfileWithEmptyName).andExpect(status().isBadRequest());
+        postRegistration(givenUserProfileWithEmptyName).andExpect(status().isBadRequest());
     }
 
     @Test
-    void testGetMyProfile() throws Exception {
+    void getMyProfile() throws Exception {
         givenExistingUser();
 
         mvc.perform(get("/myProfile")
@@ -239,7 +233,7 @@ class ProfileControllerTest {
                         .secure(true)
                         .with(basicHttpAuthForExistingUser())
                         .with(csrf()))
-                .andExpect(validOpenApi())
+                .andExpect(validOpenApiResponse())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nickname").value(EXISTING_USER_NAME));
     }
@@ -266,7 +260,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testChangePasswordTooShortHeader() throws Exception {
+    void changePasswordTooShortHeader() throws Exception {
         givenExistingUser();
 
         postChangePassword("secret", null)
@@ -294,11 +288,11 @@ class ProfileControllerTest {
 
         }
 
-        return mvc.perform(action).andExpect(validOpenApi());
+        return mvc.perform(action).andExpect(validOpenApiResponse());
     }
 
     @Test
-    void testChangePasswordTooShortBody() throws Exception {
+    void changePasswordTooShortBody() throws Exception {
         givenExistingUser();
 
         postChangePassword(null, "{\"newPassword\": \"secret\"}")
@@ -310,7 +304,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testChangePasswordHeader() throws Exception {
+    void changePasswordHeader() throws Exception {
         givenExistingUser();
 
         postChangePassword("secretlong", null)
@@ -326,7 +320,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testChangePasswordBody() throws Exception {
+    void changePasswordBody() throws Exception {
         givenExistingUser();
 
         postChangePassword(null, "{\"newPassword\": \"secretlong\"}")
@@ -342,7 +336,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testChangePasswordHeaderAndBody() throws Exception {
+    void changePasswordHeaderAndBody() throws Exception {
         givenExistingUser();
 
         postChangePassword("secretheader", "{\"newPassword\": \"secretbody\"}")
@@ -358,7 +352,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testUpdateMyProfile() throws Exception {
+    void updateMyProfile() throws Exception {
         when(userDao.findByNormalizedName("newname")).thenReturn(Optional.empty());
         givenExistingUser();
         var newProfileJson = """
@@ -382,7 +376,7 @@ class ProfileControllerTest {
     @NotNull
     private ResultActions postMyProfileWithOpenApiValidation(String newProfileJson) throws Exception {
         return postMyProfile(newProfileJson)
-                .andExpect(validOpenApi());
+                .andExpect(validOpenApiResponse());
     }
 
     @NotNull
@@ -397,7 +391,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testUpdateMyProfileConflict() throws Exception {
+    void updateMyProfileConflict() throws Exception {
         var user = User.builder()
                 .name("@New name")
                 .email("newname@example.com")
@@ -414,7 +408,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testUpdateMyProfileNameTooLong() throws Exception {
+    void updateMyProfileNameTooLong() throws Exception {
         var user = User.builder()
                 .name("@New name")
                 .email("newname@example.com")
@@ -430,7 +424,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testUpdateMyProfileNewMail() throws Exception {
+    void updateMyProfileNewMail() throws Exception {
         when(userDao.findByEmail("newname@example.com")).thenReturn(Optional.empty());
         givenExistingUser();
         var newProfileJson = """
@@ -453,7 +447,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testResetPasswordViaEmail() throws Exception {
+    void resetPasswordViaEmail() throws Exception {
         var user = User.builder()
                 .name(EXISTING_USER_NAME)
                 .license(License.CC0_10)
@@ -477,11 +471,11 @@ class ProfileControllerTest {
                         .header("User-Agent", "UserAgent")
                         .header("NameOrEmail", nameOrEmail)
                         .with(csrf()))
-                .andExpect(validOpenApi());
+                .andExpect(validOpenApiResponse());
     }
 
     @Test
-    void testResetPasswordViaName() throws Exception {
+    void resetPasswordViaName() throws Exception {
         var user = User.builder()
                 .name(EXISTING_USER_NAME)
                 .license(License.CC0_10)
@@ -500,13 +494,13 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testResetPasswordUserNotFound() throws Exception {
+    void resetPasswordUserNotFound() throws Exception {
         postResetPassword("doesnt-exist").andExpect(status().isBadRequest());
         verify(authorizationDao, never()).deleteAllByUser("doesnt-exist");
     }
 
     @Test
-    void testResetPasswordEmailMissing() throws Exception {
+    void resetPasswordEmailMissing() throws Exception {
         var user = User.builder()
                 .name(EXISTING_USER_NAME)
                 .build();
@@ -519,7 +513,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testVerifyEmailSuccess() throws Exception {
+    void verifyEmailSuccess() throws Exception {
         var token = "verification";
         var user = User.builder()
                 .id(EXISTING_USER_ID)
@@ -545,11 +539,11 @@ class ProfileControllerTest {
         return mvc.perform(get("/emailVerification/" + token)
                         .header("User-Agent", "UserAgent")
                         .with(csrf()))
-                .andExpect(validOpenApi());
+                .andExpect(validOpenApiResponse());
     }
 
     @Test
-    void testVerifyEmailFailed() throws Exception {
+    void verifyEmailFailed() throws Exception {
         var token = "verification";
         var user = User.builder()
                 .id(EXISTING_USER_ID)
@@ -570,14 +564,14 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testResendEmailVerification() throws Exception {
+    void resendEmailVerification() throws Exception {
         givenExistingUser();
         mvc.perform(post("/resendEmailVerification")
                         .header("User-Agent", "UserAgent")
                         .secure(true)
                         .with(basicHttpAuthForExistingUser())
                         .with(csrf()))
-                .andExpect(validOpenApi())
+                .andExpect(validOpenApiResponse())
                 .andExpect(status().isOk());
 
         assertVerificationEmail();
@@ -585,7 +579,7 @@ class ProfileControllerTest {
     }
 
     @Test
-    void testDeleteMyProfile() throws Exception {
+    void deleteMyProfile() throws Exception {
         givenExistingUser();
 
         mvc.perform(delete("/myProfile")
@@ -594,15 +588,11 @@ class ProfileControllerTest {
                         .with(basicHttpAuthForExistingUser())
                         .with(csrf()))
                 .andExpect(status().isNoContent())
-                .andExpect(validOpenApi());
+                .andExpect(validOpenApiResponse());
 
         verify(userDao).anonymizeUser(eq(EXISTING_USER_ID));
         verify(userDao).addUsernameToBlocklist(EXISTING_USER_NAME);
         verify(authorizationDao).deleteAllByUser(EXISTING_USER_NAME);
-    }
-
-    private ResultMatcher validOpenApi() {
-        return openApi().isValid("static/openapi.yaml");
     }
 
 }

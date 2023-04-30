@@ -420,7 +420,6 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
                         	"anonymous": true
                         }""", headers), String.class);
         assertThat(responsePostUpdate.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responsePostUpdate.getBody()).isNotNull();
 
         var responseGetAfter = restTemplate.exchange(String.format("http://localhost:%d%s", port, "/myProfile"), HttpMethod.GET, new HttpEntity<>(headers), String.class);
         assertThat(responseGetAfter.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -435,13 +434,13 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
     private void changePassword(String oldPassword, String newPassword, boolean changePasswordViaHeader) {
         var headers = new HttpHeaders();
         headers.setBasicAuth("user14@example.com", oldPassword);
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<Object> changePasswordRequest;
         if (changePasswordViaHeader) {
             headers.add("New-Password", newPassword);
             changePasswordRequest = new HttpEntity<>(headers);
         } else {
-            headers.setContentType(MediaType.APPLICATION_JSON);
             var changePassword = mapper.createObjectNode();
             changePassword.set("newPassword", new TextNode(newPassword));
             changePasswordRequest = new HttpEntity<>(changePassword, headers);

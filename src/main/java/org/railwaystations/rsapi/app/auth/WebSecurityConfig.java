@@ -141,8 +141,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/**").permitAll()
                         .requestMatchers("/adminInbox", "/adminInboxCount", "/userInbox",
                                 "/photoUpload", "/photoUploadMultipartFormdata",
-                                "/resendEmailVerification", "/reportProblem", "/changePassword", "/myProfile",
-                                "/resendEmailVerification").authenticated())
+                                "/resendEmailVerification", "/reportProblem", "/changePassword", "/myProfile").authenticated())
                 .exceptionHandling()
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 .and()

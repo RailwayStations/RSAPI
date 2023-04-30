@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20230423.1840"
+  version: "20230426.2200"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -26,6 +26,8 @@ paths:
         Redirect the user to this URL to start the authorization code flow.
         Specification: https://datatracker.ietf.org/doc/html/rfc6749#section-3.1
         PKCE: https://tools.ietf.org/html/rfc7636
+      tags:
+        - oauth
       parameters:
         - name: client_id
           in: query
@@ -75,6 +77,8 @@ paths:
     post:
       summary: OAuth2 token endpoint
       description: https://datatracker.ietf.org/doc/html/rfc6749#section-3.2
+      tags:
+        - oauth
       parameters:
         - $ref: '#/components/parameters/Authorization'
       requestBody:
@@ -94,6 +98,8 @@ paths:
     post:
       summary: OAuth2 revoke token endpoint
       description: https://datatracker.ietf.org/doc/html/rfc7009#section-2.1
+      tags:
+        - oauth
       parameters:
         - $ref: '#/components/parameters/Authorization'
       requestBody:
@@ -109,13 +115,15 @@ paths:
   /photoStationById/{country}/{id}:
     get:
       summary: Get a railway station of a country by its id with all its photos
+      tags:
+        - photoStations
       parameters:
         - name: country
           in: path
           description: country code
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/CountryCode'
         - name: id
           in: path
           description: id of the station
@@ -139,13 +147,15 @@ paths:
       description: |
         Returns only the primary photo of each station.
         Stations can optionally be filtered by 'hasPhoto' and/or 'isActive' flag.
+      tags:
+        - photoStations
       parameters:
         - name: country
           in: path
           description: country code
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/CountryCode'
         - name: hasPhoto
           in: query
           description: filter by photo available/missing
@@ -170,6 +180,8 @@ paths:
       description: |
         Returns only the photos of a station which belong to the photographer.
         Can return several photos per station, not necessarily the primary photo.
+      tags:
+        - photoStations
       parameters:
         - name: photographer
           in: path
@@ -181,7 +193,7 @@ paths:
           in: query
           description: country code
           schema:
-            type: string
+            $ref: '#/components/schemas/CountryCode'
       responses:
         200:
           description: successful operation
@@ -196,6 +208,8 @@ paths:
       description: |
         Returns only the recently imported photos of a station, defined by the sinceHours parameter.
         Can return several photos per station, not necessarily the primary photo.
+      tags:
+        - photoStations
       parameters:
         - name: sinceHours
           in: query
@@ -220,13 +234,15 @@ paths:
     get:
       summary: Finds railway stations by various query criteria
       deprecated: true
+      tags:
+        - stations
       parameters:
         - name: country
           in: path
           description: filter by country code
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/CountryCode'
         - name: hasPhoto
           in: query
           description: filter by photo availalbe/missing
@@ -259,6 +275,8 @@ paths:
     get:
       summary: Finds railway stations by various query criteria
       deprecated: true
+      tags:
+        - stations
       parameters:
         - name: country
           in: query
@@ -266,7 +284,7 @@ paths:
           schema:
             type: array
             items:
-              type: string
+              $ref: '#/components/schemas/CountryCode'
         - name: hasPhoto
           in: query
           description: filter by photo availalbe/missing
@@ -296,13 +314,15 @@ paths:
     get:
       summary: Find a railway station by its ID
       deprecated: true
+      tags:
+        - stations
       parameters:
         - name: country
           in: path
           description: country code
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/CountryCode'
         - name: id
           in: path
           description: id of the station
@@ -320,100 +340,19 @@ paths:
           description: Station not found
           content: { }
 
-  /recentPhotoImports:
-    get:
-      summary: List stations with photo uploads in the last 24h
-      deprecated: true
-      parameters:
-        - name: sinceHours
-          in: query
-          description: |
-            defines the timeframe since when to look for recent photo uploads,
-            default is 10h
-          schema:
-            type: integer
-            format: int32
-            minimum: 1
-            maximum: 800
-            default: 10
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Station'
-
   /{country}/photographers:
     get:
       summary: List of all photographers of a given country with their number of photos taken
       deprecated: true
+      tags:
+        - photographers
       parameters:
         - name: country
           in: path
           description: filter by country code
           required: true
           schema:
-            type: string
-      responses:
-        200:
-          description: successful operation
-          content:
-            text/plain:
-              schema:
-                type: string
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Photographers'
-        400:
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                type: object
-        404:
-          description: Country not found
-          content: { }
-
-  /{country}/photographers.txt:
-    get:
-      summary: List of all photographers of a given country with their number of photos taken
-      deprecated: true
-      parameters:
-        - name: country
-          in: path
-          description: filter by country code
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          description: successful operation
-          content:
-            text/plain:
-              schema:
-                type: string
-        400:
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                type: object
-        404:
-          description: Country not found
-          content: { }
-
-  /{country}/photographers.json:
-    get:
-      summary: List of all photographers of a given country with their number of photos taken
-      deprecated: true
-      parameters:
-        - name: country
-          in: path
-          description: filter by country code
-          required: true
-          schema:
-            type: string
+            $ref: '#/components/schemas/CountryCode'
       responses:
         200:
           description: successful operation
@@ -434,40 +373,15 @@ paths:
   /photographers:
     get:
       summary: List of all photographers with their number of photos taken
+      tags:
+        - photographers
       parameters:
         - name: country
-          in: header
+          in: query
           description: filter by country code
           required: false
           schema:
-            type: string
-      responses:
-        200:
-          description: successful operation
-          content:
-            text/plain:
-              schema:
-                type: string
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Photographers'
-        400:
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                type: object
-
-  /photographers.json:
-    get:
-      summary: List of all photographers with their number of photos taken
-      parameters:
-        - name: country
-          in: header
-          description: filter by country code
-          required: false
-          schema:
-            type: string
+            $ref: '#/components/schemas/CountryCode'
       responses:
         200:
           description: successful operation
@@ -475,30 +389,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Photographers'
-        400:
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                type: object
-
-  /photographers.txt:
-    get:
-      summary: List of all photographers with their number of photos taken
-      parameters:
-        - name: country
-          in: header
-          description: filter by country code
-          required: false
-          schema:
-            type: string
-      responses:
-        200:
-          description: successful operation
-          content:
-            text/plain:
-              schema:
-                type: string
         400:
           description: Bad Request
           content:
@@ -510,44 +400,15 @@ paths:
     get:
       summary: Statistic of photos with and without photos by country
       deprecated: true
+      tags:
+        - statistic
       parameters:
         - name: country
           in: path
           description: filter by country code
           required: true
           schema:
-            type: string
-      responses:
-        200:
-          description: successful operation
-          content:
-            text/plain:
-              schema:
-                type: string
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Statistic'
-        400:
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                type: object
-        404:
-          description: Country not found
-          content: { }
-
-  /{country}/stats.json:
-    get:
-      summary: Statistic of photos with and without photos by country
-      deprecated: true
-      parameters:
-        - name: country
-          in: path
-          description: filter by country code
-          required: true
-          schema:
-            type: string
+            $ref: '#/components/schemas/CountryCode'
       responses:
         200:
           description: successful operation
@@ -555,34 +416,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Statistic'
-        400:
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                type: object
-        404:
-          description: Country not found
-          content: { }
-
-  /{country}/stats.txt:
-    get:
-      summary: Statistic of photos with and without photos by country
-      deprecated: true
-      parameters:
-        - name: country
-          in: path
-          description: filter by country code
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          description: successful operation
-          content:
-            text/plain:
-              schema:
-                type: string
         400:
           description: Bad Request
           content:
@@ -596,35 +429,14 @@ paths:
   /stats:
     get:
       summary: Overall statistic of photos with and without photos
+      tags:
+        - statistic
       parameters:
         - name: country
           in: query
           description: filter by country code
           schema:
-            type: string
-      responses:
-        200:
-          description: successful operation
-          content:
-            text/plain:
-              schema:
-                type: string
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Statistic'
-        404:
-          description: Country not found
-          content: { }
-
-  /stats.json:
-    get:
-      summary: Overall statistic of photos with and without photos
-      parameters:
-        - name: country
-          in: query
-          description: filter by country code
-          schema:
-            type: string
+            $ref: '#/components/schemas/CountryCode'
       responses:
         200:
           description: successful operation
@@ -632,26 +444,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Statistic'
-        404:
-          description: Country not found
-          content: { }
-
-  /stats.txt:
-    get:
-      summary: Overall statistic of photos with and without photos
-      parameters:
-        - name: country
-          in: query
-          description: filter by country code
-          schema:
-            type: string
-      responses:
-        200:
-          description: successful operation
-          content:
-            text/plain:
-              schema:
-                type: string
         404:
           description: Country not found
           content: { }
@@ -659,6 +451,8 @@ paths:
   /countries:
     get:
       summary: List of all supported countries with their configuration
+      tags:
+        - countries
       parameters:
         - name: onlyActive
           in: query
@@ -678,6 +472,9 @@ paths:
   /countries.json:
     get:
       summary: List of all supported countries with their configuration
+      deprecated: true
+      tags:
+        - countries
       parameters:
         - name: onlyActive
           in: query
@@ -697,6 +494,8 @@ paths:
   /photoUpload:
     post:
       summary: Upload a new Photo
+      tags:
+        - photoUpload
       parameters:
         - $ref: '#/components/parameters/Authorization'
         - $ref: '#/components/parameters/Upload-Token'
@@ -705,7 +504,7 @@ paths:
           in: header
           description: country code
           schema:
-            type: string
+            $ref: '#/components/schemas/CountryCode'
         - name: Station-Id
           in: header
           description: id of the railwaystation
@@ -800,6 +599,8 @@ paths:
   /reportProblem:
     post:
       summary: Report a for a Railway-Station
+      tags:
+        - inbox
       parameters:
         - $ref: '#/components/parameters/Authorization'
       requestBody:
@@ -836,6 +637,8 @@ paths:
   /userInbox:
     post:
       summary: Query the state of photo uploads of the authorized user
+      tags:
+        - inbox
       parameters:
         - $ref: '#/components/parameters/Authorization'
       requestBody:
@@ -860,6 +663,8 @@ paths:
   /publicInbox:
     get:
       summary: Get the current public inbox, stations where photos have been uploaded
+      tags:
+        - inbox
       responses:
         200:
           description: array of public inbox objects
@@ -873,6 +678,8 @@ paths:
   /adminInboxCount:
     get:
       summary: Count pending inbox items
+      tags:
+        - inbox
       responses:
         200:
           description: count of pending inbox items
@@ -884,6 +691,8 @@ paths:
   /nextZ:
     get:
       summary: Get next Z-StationId for missing stations
+      tags:
+        - inbox
       responses:
         200:
           description: next Z-StationId value
@@ -895,6 +704,8 @@ paths:
   /adminInbox:
     get:
       summary: Get the current inbox, photos and problem reports under review.
+      tags:
+        - inbox
       parameters:
         - $ref: '#/components/parameters/Authorization'
       responses:
@@ -915,6 +726,8 @@ paths:
     post:
       summary: |
         Import or reject an uploaded photo or a problem report from the inbox
+      tags:
+        - inbox
       parameters:
         - $ref: '#/components/parameters/Authorization'
       requestBody:
@@ -950,6 +763,8 @@ paths:
       description: |
         DEPRECATED: use oauth instead
       deprecated: true
+      tags:
+        - profile
       requestBody:
         description: Registration information
         content:
@@ -981,6 +796,8 @@ paths:
   /emailVerification/{token}:
     get:
       summary: Verify eMail-Address with verification token
+      tags:
+        - profile
       parameters:
         - name: token
           in: path
@@ -1001,6 +818,8 @@ paths:
   /resendEmailVerification:
     post:
       summary: Sends a new eMail-Verification mail
+      tags:
+        - profile
       parameters:
         - $ref: '#/components/parameters/Authorization'
       responses:
@@ -1014,6 +833,8 @@ paths:
       description: |
         DEPRECATED: use oauth instead
       deprecated: true
+      tags:
+        - profile
       parameters:
         - name: NameOrEmail
           in: header
@@ -1035,6 +856,8 @@ paths:
   /changePassword:
     post:
       summary: Change user password
+      tags:
+        - profile
       parameters:
         - $ref: '#/components/parameters/Authorization'
         - name: New-Password
@@ -1054,13 +877,7 @@ paths:
       responses:
         200:
           description: password changed
-          content:
-            text/plain:
-              schema:
-                type: string
-            application/json:
-              schema:
-                type: string
+          content: { }
         400:
           description: Bad Request
           content:
@@ -1074,6 +891,8 @@ paths:
   /myProfile:
     get:
       summary: Get the users profile
+      tags:
+        - profile
       parameters:
         - $ref: '#/components/parameters/Authorization'
         - $ref: '#/components/parameters/Upload-Token'
@@ -1095,6 +914,8 @@ paths:
       summary: Update the users profile.
       description: |
         In case the email has been changed, only the email is saved and a new password is send.
+      tags:
+        - profile
       parameters:
         - $ref: '#/components/parameters/Authorization'
         - $ref: '#/components/parameters/Upload-Token'
@@ -1109,13 +930,7 @@ paths:
       responses:
         200:
           description: ok
-          content:
-            text/plain:
-              schema:
-                type: string
-            application/json:
-              schema:
-                type: string
+          content: { }
         400:
           description: Bad Request
           content:
@@ -1142,6 +957,8 @@ paths:
         The account will be changed to anonymous. 
         The email-address, nickname, link and credentials will be removed from the account.
         All OAuth tokens will be removed as well. No further login will be possible.
+      tags:
+        - profile
       parameters:
         - $ref: '#/components/parameters/Authorization'
         - $ref: '#/components/parameters/Upload-Token'
@@ -1159,13 +976,15 @@ paths:
   /photos/{country}/{filename}:
     get:
       summary: downloads the given photo
+      tags:
+        - photoDownload
       parameters:
         - name: country
           in: path
           description: country code
           required: true
           schema:
-            type: string
+            $ref: '#/components/schemas/CountryCode'
         - name: filename
           in: path
           description: filename of the photo
@@ -1197,6 +1016,8 @@ paths:
   /inbox/{filename}:
     get:
       summary: downloads the given photo from the inbox
+      tags:
+        - photoDownload
       parameters:
         - name: filename
           in: path
@@ -1229,6 +1050,8 @@ paths:
   /inbox/processed/{filename}:
     get:
       summary: downloads the given photo from the processed inbox
+      tags:
+        - photoDownload
       parameters:
         - name: filename
           in: path
@@ -1422,7 +1245,7 @@ components:
       type: object
       properties:
         country:
-          type: string
+          $ref: '#/components/schemas/CountryCode'
           description: 2 letter code of the country
           example: "uk"
         id:
@@ -1508,7 +1331,7 @@ components:
           deprecated: true
           format: int64
         country:
-          type: string
+          $ref: '#/components/schemas/CountryCode'
           description: Two character country code
         title:
           type: string
@@ -1588,7 +1411,7 @@ components:
           type: integer
           format: int64
         countryCode:
-          type: string
+          $ref: '#/components/schemas/CountryCode'
           nullable: true
       required:
         - total
@@ -1601,7 +1424,7 @@ components:
       type: object
       properties:
         code:
-          type: string
+          $ref: '#/components/schemas/CountryCode'
           description: Two letter country code
         name:
           type: string
@@ -1799,7 +1622,7 @@ components:
           type: integer
           format: int64
         countryCode:
-          type: string
+          $ref: '#/components/schemas/CountryCode'
         stationId:
           type: string
         lat:
@@ -1837,7 +1660,7 @@ components:
       type: object
       properties:
         countryCode:
-          type: string
+          $ref: '#/components/schemas/CountryCode'
         stationId:
           type: string
         title:
@@ -1863,7 +1686,7 @@ components:
           type: integer
           format: int64
         countryCode:
-          type: string
+          $ref: '#/components/schemas/CountryCode'
         stationId:
           type: string
         title:
@@ -1935,7 +1758,7 @@ components:
           type: integer
           format: int64
         countryCode:
-          type: string
+          $ref: '#/components/schemas/CountryCode'
           description: country of a new station
         stationId:
           type: string
@@ -2019,7 +1842,7 @@ components:
       type: object
       properties:
         countryCode:
-          type: string
+          $ref: '#/components/schemas/CountryCode'
         stationId:
           type: string
         photoId:
@@ -2077,3 +1900,8 @@ components:
       required:
         - status
         - message
+
+    CountryCode:
+      type: string
+      maxLength: 2
+      minLength: 2

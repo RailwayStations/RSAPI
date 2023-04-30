@@ -5,11 +5,11 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.ports.in.ManageProfileUseCase;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -24,18 +24,18 @@ import java.util.Objects;
 
 @Controller
 @Slf4j
+@RequiredArgsConstructor
 public class LoginController {
 
-    @Autowired
-    private ManageProfileUseCase manageProfileUseCase;
+    private final ManageProfileUseCase manageProfileUseCase;
 
     @GetMapping("/login")
-    String login() {
+    public String login() {
         return "login";
     }
 
     @PostMapping("/loginResetPassword")
-    String resetPassword(@RequestHeader(HttpHeaders.USER_AGENT) String userAgent, @RequestParam String username) {
+    public String resetPassword(@RequestHeader(HttpHeaders.USER_AGENT) String userAgent, @RequestParam String username) {
         try {
             manageProfileUseCase.resetPassword(username, userAgent);
         } catch (Exception e) {
@@ -45,12 +45,12 @@ public class LoginController {
     }
 
     @GetMapping("/loginRegister")
-    String register(@ModelAttribute NewAccount newAccount) {
+    public String register(@ModelAttribute NewAccount newAccount) {
         return "register";
     }
 
     @PostMapping("/loginRegister")
-    String registerNewAccount(@RequestHeader(HttpHeaders.USER_AGENT) String userAgent, @ModelAttribute @Valid NewAccount newAccount, BindingResult bindingResult) {
+    public String registerNewAccount(@RequestHeader(HttpHeaders.USER_AGENT) String userAgent, @ModelAttribute @Valid NewAccount newAccount, BindingResult bindingResult) {
 
         if (!bindingResult.hasErrors()) {
             if (!Objects.equals(newAccount.password, newAccount.passwordRepeat)) {
