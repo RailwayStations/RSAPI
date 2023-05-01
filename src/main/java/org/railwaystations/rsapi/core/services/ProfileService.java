@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -199,6 +200,11 @@ public class ProfileService implements ManageProfileUseCase {
         authorizationDao.deleteAllByUser(user.getName());
         monitor.sendMessage(
                 String.format("Closed account %d - %s", user.getId(), user.getName()));
+    }
+
+    @Override
+    public void updateLocale(User user, Locale locale) {
+        userDao.updateLocale(user.getId(), locale);
     }
 
     private void sendPasswordMail(String email, String newPassword) {

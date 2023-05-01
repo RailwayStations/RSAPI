@@ -14,6 +14,7 @@ import org.railwaystations.rsapi.core.model.User;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 public interface UserDao {
@@ -38,15 +39,15 @@ public interface UserDao {
     void updateCredentials(@Bind("id") int id, @Bind("key") String key);
 
     @SqlUpdate("""
-            INSERT INTO users (id, name, url, license, email, normalizedName, ownPhotos, anonymous, `key`, emailVerification, sendNotifications)
-                VALUES (:id, :name, :url, :license, :email, :normalizedName, :ownPhotos, :anonymous, :key, :emailVerification, :sendNotifications)
+            INSERT INTO users (id, name, url, license, email, normalizedName, ownPhotos, anonymous, `key`, emailVerification, sendNotifications, locale)
+                VALUES (:id, :name, :url, :license, :email, :normalizedName, :ownPhotos, :anonymous, :key, :emailVerification, :sendNotifications, :localeLanguageTag)
             """)
     @GetGeneratedKeys("id")
     Integer insert(@BindBean User user, @Bind("key") String key, @Bind("emailVerification") String emailVerification);
 
     @SqlUpdate("""
             UPDATE users SET name = :name, url = :url, license = :license, email = :email, normalizedName = :normalizedName, ownPhotos = :ownPhotos,
-                            anonymous = :anonymous, sendNotifications = :sendNotifications
+                            anonymous = :anonymous, sendNotifications = :sendNotifications, locale = :localeLanguageTag
             WHERE id = :id
             """)
     void update(@Bind("id") int id, @BindBean User user);
@@ -84,8 +85,12 @@ public interface UserDao {
     @SqlQuery("SELECT COUNT(*) FROM blocked_usernames WHERE normalizedName = :normalizedName")
     int countBlockedUsername(@Bind("normalizedName") String normalizedName);
 
+    @SqlUpdate("UPDATE users SET locale = :locale.toLanguageTag WHERE id = :id")
+    void updateLocale(@Bind("id") int id, @Bind("locale") Locale locale);
+
     class UserMapper implements RowMapper<User> {
         public User map(ResultSet rs, StatementContext ctx) throws SQLException {
+            var locale = rs.getString("locale");
             return User.builder()
                     .id(rs.getInt("id"))
                     .name(rs.getString("name"))
@@ -98,6 +103,7 @@ public interface UserDao {
                     .admin(rs.getBoolean("admin"))
                     .emailVerification(rs.getString("emailVerification"))
                     .sendNotifications(rs.getBoolean("sendNotifications"))
+                    .locale(locale != null ? Locale.forLanguageTag(locale) : Locale.ENGLISH)
                     .build();
         }
     }

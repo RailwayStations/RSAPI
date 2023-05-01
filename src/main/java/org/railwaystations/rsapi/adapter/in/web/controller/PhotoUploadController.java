@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.railwaystations.rsapi.adapter.in.web.model.InboxResponseDto;
 import org.railwaystations.rsapi.app.auth.AuthUser;
 import org.railwaystations.rsapi.core.ports.in.ManageInboxUseCase;
+import org.railwaystations.rsapi.core.ports.in.ManageProfileUseCase;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.LocaleResolver;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +32,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.railwaystations.rsapi.adapter.in.web.InboxResponseMapper.toDto;
 import static org.railwaystations.rsapi.adapter.in.web.InboxResponseMapper.toHttpStatus;
+import static org.railwaystations.rsapi.adapter.in.web.RequestUtil.getRequest;
 
 @RestController
 @Slf4j
@@ -38,6 +41,10 @@ import static org.railwaystations.rsapi.adapter.in.web.InboxResponseMapper.toHtt
 public class PhotoUploadController {
 
     private final ManageInboxUseCase manageInboxUseCase;
+
+    private final ManageProfileUseCase manageProfileUseCase;
+
+    private final LocaleResolver localeResolver;
 
     /**
      * Not part of the "official" API.
@@ -109,10 +116,16 @@ public class PhotoUploadController {
     private InboxResponseDto uploadPhoto(String userAgent, InputStream body, String stationId,
                                          String countryCode, String contentType, String stationTitle,
                                          Double latitude, Double longitude, String comment,
-                                         Boolean active, AuthUser user) {
+                                         Boolean active, AuthUser authUser) {
+        var locale = localeResolver.resolveLocale(getRequest());
+        var user = authUser.getUser();
+        if (!user.getLocale().equals(locale)) {
+            manageProfileUseCase.updateLocale(user, locale);
+        }
+
         var inboxResponse = manageInboxUseCase.uploadPhoto(userAgent, body, StringUtils.trimToNull(stationId), StringUtils.trimToNull(countryCode),
                 StringUtils.trimToEmpty(contentType).split(";")[0], stationTitle,
-                latitude, longitude, comment, active != null ? active : true, user.getUser());
+                latitude, longitude, comment, active != null ? active : true, user);
         return consumeBodyAndReturn(body, toDto(inboxResponse));
     }
 

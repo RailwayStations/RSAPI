@@ -52,6 +52,9 @@ public class User {
 
     boolean sendNotifications;
 
+    @Builder.Default
+    Locale locale = Locale.ENGLISH;
+
     public String getNormalizedName() {
         return normalizeName(name);
     }
@@ -130,6 +133,10 @@ public class User {
             roles.add(ROLE_ADMIN);
         }
         return roles;
+    }
+
+    public String getLocaleLanguageTag() {
+        return locale.toLanguageTag();
     }
 
 }

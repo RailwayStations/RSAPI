@@ -23,7 +23,7 @@ import java.util.List;
 @EnableWebMvc
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-    
+
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         var builder = new Jackson2ObjectMapperBuilder();

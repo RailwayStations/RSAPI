@@ -22,16 +22,19 @@ import org.railwaystations.rsapi.core.model.ProblemReport;
 import org.railwaystations.rsapi.core.model.ProblemReportType;
 import org.railwaystations.rsapi.core.model.PublicInboxEntry;
 import org.railwaystations.rsapi.core.ports.in.ManageInboxUseCase;
+import org.railwaystations.rsapi.core.ports.in.ManageProfileUseCase;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.LocaleResolver;
 
 import java.util.List;
 
 import static org.railwaystations.rsapi.adapter.in.web.InboxResponseMapper.toHttpStatus;
 import static org.railwaystations.rsapi.adapter.in.web.RequestUtil.getAuthUser;
+import static org.railwaystations.rsapi.adapter.in.web.RequestUtil.getRequest;
 import static org.railwaystations.rsapi.adapter.in.web.RequestUtil.getUserAgent;
 
 @RestController
@@ -41,6 +44,10 @@ import static org.railwaystations.rsapi.adapter.in.web.RequestUtil.getUserAgent;
 public class InboxController implements InboxApi {
 
     private final ManageInboxUseCase manageInboxUseCase;
+
+    private final ManageProfileUseCase manageProfileUseCase;
+
+    private final LocaleResolver localeResolver;
 
     private ProblemReport toDomain(ProblemReportDto problemReport) {
         return ProblemReport.builder()
@@ -246,7 +253,13 @@ public class InboxController implements InboxApi {
     @PreAuthorize("isAuthenticated()")
     @Override
     public ResponseEntity<InboxResponseDto> reportProblemPost(ProblemReportDto problemReport) {
-        InboxResponseDto inboxResponse = InboxResponseMapper.toDto(manageInboxUseCase.reportProblem(toDomain(problemReport), getAuthUser().getUser(), getUserAgent()));
+        var locale = localeResolver.resolveLocale(getRequest());
+        var user = getAuthUser().getUser();
+        if (!user.getLocale().equals(locale)) {
+            manageProfileUseCase.updateLocale(user, locale);
+        }
+
+        var inboxResponse = InboxResponseMapper.toDto(manageInboxUseCase.reportProblem(toDomain(problemReport), user, getUserAgent()));
         return new ResponseEntity<>(inboxResponse, toHttpStatus(inboxResponse.getState()));
     }
 

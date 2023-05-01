@@ -19,8 +19,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.LocaleResolver;
 
 import java.util.Objects;
+
+import static org.railwaystations.rsapi.adapter.in.web.RequestUtil.getRequest;
 
 @Controller
 @Slf4j
@@ -28,6 +31,8 @@ import java.util.Objects;
 public class LoginController {
 
     private final ManageProfileUseCase manageProfileUseCase;
+
+    private final LocaleResolver localeResolver;
 
     @GetMapping("/login")
     public String login() {
@@ -66,6 +71,7 @@ public class LoginController {
                     .name(StringUtils.trimToEmpty(newAccount.username))
                     .email(StringUtils.trimToEmpty(newAccount.email))
                     .newPassword(newAccount.password)
+                    .locale(localeResolver.resolveLocale(getRequest()))
                     .build();
             manageProfileUseCase.register(user, userAgent);
         } catch (ManageProfileUseCase.ProfileConflictException e) {

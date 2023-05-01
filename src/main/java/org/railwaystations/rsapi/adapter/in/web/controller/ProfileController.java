@@ -15,10 +15,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.LocaleResolver;
 
 import java.net.URI;
+import java.util.Locale;
 
 import static org.railwaystations.rsapi.adapter.in.web.RequestUtil.getAuthUser;
+import static org.railwaystations.rsapi.adapter.in.web.RequestUtil.getRequest;
 import static org.railwaystations.rsapi.adapter.in.web.RequestUtil.getUserAgent;
 
 @RestController
@@ -27,6 +30,8 @@ import static org.railwaystations.rsapi.adapter.in.web.RequestUtil.getUserAgent;
 public class ProfileController implements ProfileApi {
 
     private final ManageProfileUseCase manageProfileUseCase;
+
+    private final LocaleResolver localeResolver;
 
     private User toUser(RegisterProfileDto registerProfileDto) {
         return User.builder()
@@ -38,6 +43,7 @@ public class ProfileController implements ProfileApi {
                 .license(toLicense(registerProfileDto.getLicense()))
                 .sendNotifications(registerProfileDto.getSendNotifications() == null || registerProfileDto.getSendNotifications())
                 .newPassword(registerProfileDto.getNewPassword())
+                .locale(localeResolver.resolveLocale(getRequest()))
                 .build();
     }
 
@@ -74,6 +80,8 @@ public class ProfileController implements ProfileApi {
     }
 
     private User toUser(UpdateProfileDto updateProfileDto) {
+        Locale locale = localeResolver.resolveLocale(getRequest());
+        log.info("User locale {}", locale);
         return User.builder()
                 .name(updateProfileDto.getNickname())
                 .email(updateProfileDto.getEmail())
@@ -82,6 +90,7 @@ public class ProfileController implements ProfileApi {
                 .anonymous(updateProfileDto.getAnonymous() != null && updateProfileDto.getAnonymous())
                 .license(toLicense(updateProfileDto.getLicense()))
                 .sendNotifications(updateProfileDto.getSendNotifications() == null || updateProfileDto.getSendNotifications())
+                .locale(locale)
                 .build();
     }
 

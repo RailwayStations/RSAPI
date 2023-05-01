@@ -1018,4 +1018,10 @@
         <modifyDataType tableName="users" columnName="normalizedName" newDataType="varchar(50)"/>
     </changeSet>
 
+    <changeSet id="55" author="pstorch">
+        <addColumn tableName="users">
+            <column name="locale" type="varchar(20)"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

@@ -2,6 +2,7 @@ package org.railwaystations.rsapi.core.ports.in;
 
 import org.railwaystations.rsapi.core.model.User;
 
+import java.util.Locale;
 import java.util.Optional;
 
 public interface ManageProfileUseCase {
@@ -19,6 +20,8 @@ public interface ManageProfileUseCase {
     Optional<User> emailVerification(String token);
 
     void deleteProfile(User user, String userAgent);
+
+    void updateLocale(User user, Locale locale);
 
     class ProfileConflictException extends RuntimeException {
 

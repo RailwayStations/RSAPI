@@ -26,6 +26,7 @@ import org.railwaystations.rsapi.core.model.License;
 import org.railwaystations.rsapi.core.model.Photo;
 import org.railwaystations.rsapi.core.model.Station;
 import org.railwaystations.rsapi.core.model.User;
+import org.railwaystations.rsapi.core.ports.in.ManageProfileUseCase;
 import org.railwaystations.rsapi.core.services.InboxService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -95,6 +96,9 @@ class PhotoUploadControllerTest {
 
     @MockBean
     private PhotoDao photoDao;
+
+    @MockBean
+    private ManageProfileUseCase manageProfileUseCase;
 
     @BeforeEach
     void setUp() {
