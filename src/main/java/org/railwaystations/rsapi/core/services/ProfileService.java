@@ -204,7 +204,7 @@ public class ProfileService implements ManageProfileUseCase {
 
     @Override
     public void updateLocale(User user, Locale locale) {
-        userDao.updateLocale(user.getId(), locale);
+        userDao.updateLocale(user.getId(), locale.toLanguageTag());
     }
 
     private void sendPasswordMail(String email, String newPassword) {

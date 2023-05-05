@@ -85,8 +85,8 @@ public interface UserDao {
     @SqlQuery("SELECT COUNT(*) FROM blocked_usernames WHERE normalizedName = :normalizedName")
     int countBlockedUsername(@Bind("normalizedName") String normalizedName);
 
-    @SqlUpdate("UPDATE users SET locale = :locale.toLanguageTag WHERE id = :id")
-    void updateLocale(@Bind("id") int id, @Bind("locale") Locale locale);
+    @SqlUpdate("UPDATE users SET locale = :localeLanguageTag WHERE id = :id")
+    void updateLocale(@Bind("id") int id, @Bind("localeLanguageTag") String locallocaleLanguageTage);
 
     class UserMapper implements RowMapper<User> {
         public User map(ResultSet rs, StatementContext ctx) throws SQLException {
