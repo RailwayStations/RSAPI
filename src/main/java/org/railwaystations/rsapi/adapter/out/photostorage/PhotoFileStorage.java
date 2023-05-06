@@ -127,6 +127,16 @@ public class PhotoFileStorage implements PhotoStorage {
         cleanupOldCopiesFrom(workDir.getInboxRejectedDir(), maxAge);
     }
 
+    @Override
+    public Path getInboxDoneFile(String filename) {
+        return workDir.getInboxDoneDir().resolve(sanitizeFilename(filename));
+    }
+
+    @Override
+    public Path getInboxRejectedFile(String filename) {
+        return workDir.getInboxRejectedDir().resolve(sanitizeFilename(filename));
+    }
+
     static void cleanupOldCopiesFrom(Path dir, Instant maxAge) {
         try (var pathStream = Files.list(dir)) {
             pathStream

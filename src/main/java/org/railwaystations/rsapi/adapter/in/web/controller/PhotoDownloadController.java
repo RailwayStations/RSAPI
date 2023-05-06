@@ -41,6 +41,12 @@ public class PhotoDownloadController implements PhotoDownloadApi {
     }
 
     @Override
+    public ResponseEntity<Resource> inboxDoneFilenameGet(String filename, Integer width) {
+        log.info("Download inbox file={}", filename);
+        return downloadPhoto(photoStorage.getInboxDoneFile(filename), width);
+    }
+
+    @Override
     public ResponseEntity<Resource> inboxFilenameGet(String filename, Integer width) {
         log.info("Download inbox file={}", filename);
         return downloadPhoto(photoStorage.getInboxFile(filename), width);
@@ -50,6 +56,12 @@ public class PhotoDownloadController implements PhotoDownloadApi {
     public ResponseEntity<Resource> inboxProcessedFilenameGet(String filename, Integer width) {
         log.info("Download inbox file={}", filename);
         return downloadPhoto(photoStorage.getInboxProcessedFile(filename), width);
+    }
+
+    @Override
+    public ResponseEntity<Resource> inboxRejectedFilenameGet(String filename, Integer width) {
+        log.info("Download inbox file={}", filename);
+        return downloadPhoto(photoStorage.getInboxRejectedFile(filename), width);
     }
 
     @Override

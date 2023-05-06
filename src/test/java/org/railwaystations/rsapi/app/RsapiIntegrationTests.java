@@ -452,6 +452,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 
     @Test
     void photoUploadUnknownStationThenDeletePhotoThenDeleteStation() throws IOException {
+        // upload unknown station with photo
         var headers = new HttpHeaders();
         headers.add("Station-Title", URLEncoder.encode("Hintertupfingen", StandardCharsets.UTF_8));
         headers.add("Latitude", "50.123");
@@ -467,7 +468,16 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         var uploadId = inboxResponse.get("id").asInt();
         var filename = inboxResponse.get("filename").asText();
         assertThat(filename).isNotBlank();
+        assertThat(inboxResponse.get("state").asText()).isEqualTo("REVIEW");
         assertThat(inboxResponse.get("crc32").asLong()).isEqualTo(312729961L);
+
+
+        // get userInbox
+        var userInboxJson = getUser10UserInboxAsJson().get(0);
+        assertThat(userInboxJson.get("id").asInt()).isEqualTo(uploadId);
+        assertThat(userInboxJson.get("state").asText()).isEqualTo("REVIEW");
+        assertThat(userInboxJson.get("inboxUrl").asText().endsWith("/inbox/" + filename)).isTrue();
+
 
         // download uploaded photo from inbox
         var photoResponse = restTemplate.getForEntity(
@@ -479,6 +489,14 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 
         // simulate VsionAI
         Files.move(workDir.getInboxToProcessDir().resolve(filename), workDir.getInboxProcessedDir().resolve(filename));
+
+
+        // get userInbox processed
+        var userInboxProcessedJson = getUser10UserInboxAsJson().get(0);
+        assertThat(userInboxProcessedJson.get("id").asInt()).isEqualTo(uploadId);
+        assertThat(userInboxProcessedJson.get("state").asText()).isEqualTo("REVIEW");
+        assertThat(userInboxProcessedJson.get("inboxUrl").asText().endsWith("/inbox/processed/" + filename)).isTrue();
+
 
         // get nextZ value for stationId
         var nextZResponse = restTemplateWithBasicAuthUser10().getForEntity(
@@ -509,6 +527,14 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         assertThat(newStation.getPhotographer()).isEqualTo("@user10");
         assertThat(newStation.getPhotoUrl()).isNotNull();
 
+
+        // get userInbox processed
+        var userInboxImportedJson = getUser10UserInboxAsJson().get(0);
+        assertThat(userInboxImportedJson.get("id").asInt()).isEqualTo(uploadId);
+        assertThat(userInboxImportedJson.get("state").asText()).isEqualTo("ACCEPTED");
+        assertThat(userInboxImportedJson.get("inboxUrl").asText().endsWith("/inbox/done/" + filename)).isTrue();
+
+
         // send problem report wrong photo
         var problemReportWrongPhotoJson = """
                 {
@@ -518,11 +544,27 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
                 	"comment": "This photo is clearly wrong"
                 }""".formatted(stationId);
         int idWrongPhoto = sendProblemReport(problemReportWrongPhotoJson);
+
+        // get userInbox with problem report
+        var userInboxWithProblemJson = getUser10UserInboxAsJson();
+        assertThat(userInboxWithProblemJson.get(1).get("id").asInt()).isEqualTo(uploadId); // upload is now second entry
+        assertThat(userInboxWithProblemJson.get(0).get("id").asInt()).isEqualTo(idWrongPhoto);
+        assertThat(userInboxWithProblemJson.get(0).get("state").asText()).isEqualTo("REVIEW");
+
+
+        // delete photo
         sendInboxCommand("{\"id\": " + idWrongPhoto + ", \"command\": \"DELETE_PHOTO\"}");
 
         // assert station has no photo anymore
         var deletedPhotoStation = loadDeStationByStationId(stationId);
         assertThat(deletedPhotoStation.getPhotoUrl()).isNull();
+
+
+        // get userInbox with problem report
+        var userInboxProblemAcceptedJson = getUser10UserInboxAsJson();
+        assertThat(userInboxProblemAcceptedJson.get(0).get("id").asInt()).isEqualTo(idWrongPhoto);
+        assertThat(userInboxProblemAcceptedJson.get(0).get("state").asText()).isEqualTo("ACCEPTED");
+
 
         // send problem report station not existing
         var problemReportStationNonExistentJson = """
@@ -533,10 +575,31 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
                 	"comment": "This photo is clearly wrong"
                 }""".formatted(stationId);
         int idStationNonExistent = sendProblemReport(problemReportStationNonExistentJson);
+
+
+        // get userInbox with problem report
+        var userInboxProblem2Json = getUser10UserInboxAsJson();
+        assertThat(userInboxProblem2Json.get(0).get("id").asInt()).isEqualTo(idStationNonExistent);
+        assertThat(userInboxProblem2Json.get(0).get("state").asText()).isEqualTo("REVIEW");
+
+
+        // delete station
         sendInboxCommand("{\"id\": " + idStationNonExistent + ", \"command\": \"DELETE_STATION\"}");
 
         // assert station doesn't exist anymore
         loadRaw("/de/stations/" + stationId, HttpStatus.NOT_FOUND, StationDto.class);
+
+
+        // get userInbox with problem report
+        var userInboxProblem2AcceptedJson = getUser10UserInboxAsJson();
+        assertThat(userInboxProblem2AcceptedJson.get(0).get("id").asInt()).isEqualTo(idStationNonExistent);
+        assertThat(userInboxProblem2AcceptedJson.get(0).get("state").asText()).isEqualTo("ACCEPTED");
+    }
+
+    private JsonNode getUser10UserInboxAsJson() throws JsonProcessingException {
+        var userInboxResponse = restTemplateWithBasicAuthUser10().getForEntity(
+                String.format("http://localhost:%d%s", port, "/userInbox"), String.class);
+        return mapper.readTree(userInboxResponse.getBody());
     }
 
     @Test

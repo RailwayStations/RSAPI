@@ -119,9 +119,14 @@ public class InboxService implements ManageInboxUseCase {
     }
 
     @Override
-    public List<InboxStateQuery> userInbox(@NotNull User user, List<Long> ids) {
-        log.info("Query uploadStatus for Nickname: {}", user.getName());
+    public List<InboxStateQuery> userInbox(@NotNull User user) {
+        return inboxDao.findByUser(user.getId()).stream()
+                .map(this::mapToInboxStateQuery)
+                .toList();
+    }
 
+    @Override
+    public List<InboxStateQuery> userInbox(@NotNull User user, List<Long> ids) {
         return ids.stream()
                 .filter(Objects::nonNull)
                 .map(inboxDao::findById)
@@ -131,6 +136,7 @@ public class InboxService implements ManageInboxUseCase {
     }
 
     private InboxStateQuery mapToInboxStateQuery(InboxEntry inboxEntry) {
+        inboxEntry.setProcessed(!inboxEntry.isDone() && photoStorage.isProcessed(inboxEntry.getFilename()));
         return InboxStateQuery.builder()
                 .id(inboxEntry.getId())
                 .state(calculateInboxState(inboxEntry))
@@ -139,7 +145,7 @@ public class InboxService implements ManageInboxUseCase {
                 .stationId(inboxEntry.getStationId())
                 .coordinates(inboxEntry.getCoordinates())
                 .filename(inboxEntry.getFilename())
-                .inboxUrl(getInboxUrl(inboxEntry.getFilename(), photoStorage.isProcessed(inboxEntry.getFilename())))
+                .inboxUrl(getInboxUrl(inboxEntry))
                 .crc32(inboxEntry.getCrc32())
                 .build();
     }
@@ -152,9 +158,11 @@ public class InboxService implements ManageInboxUseCase {
                 return InboxStateQuery.InboxState.REJECTED;
             }
         } else {
-            if (hasConflict(inboxEntry.getId(),
-                    findStationByCountryAndId(inboxEntry.getCountryCode(), inboxEntry.getStationId()).orElse(null))
-                    || (inboxEntry.getStationId() == null && hasConflict(inboxEntry.getId(), inboxEntry.getCoordinates()))) {
+            if (inboxEntry.isPhotoUpload() &&
+                    (
+                            hasConflict(inboxEntry.getId(), findStationByCountryAndId(inboxEntry.getCountryCode(), inboxEntry.getStationId()).orElse(null))
+                                    || (inboxEntry.getStationId() == null && hasConflict(inboxEntry.getId(), inboxEntry.getCoordinates()))
+                    )) {
                 return InboxStateQuery.InboxState.CONFLICT;
             } else {
                 return InboxStateQuery.InboxState.REVIEW;
@@ -164,7 +172,6 @@ public class InboxService implements ManageInboxUseCase {
 
     @Override
     public List<InboxEntry> listAdminInbox(@NotNull User user) {
-        log.info("Load adminInbox for Nickname: {}", user.getName());
         var pendingInboxEntries = inboxDao.findPendingInboxEntries();
         pendingInboxEntries.forEach(this::updateInboxEntry);
         return pendingInboxEntries;
@@ -174,15 +181,26 @@ public class InboxService implements ManageInboxUseCase {
         var filename = inboxEntry.getFilename();
         if (filename != null) {
             inboxEntry.setProcessed(photoStorage.isProcessed(filename));
-            inboxEntry.setInboxUrl(getInboxUrl(filename, inboxEntry.isProcessed()));
+            inboxEntry.setInboxUrl(getInboxUrl(inboxEntry));
         }
         if (inboxEntry.getStationId() == null && !inboxEntry.getCoordinates().hasZeroCoords()) {
             inboxEntry.setConflict(hasConflict(inboxEntry.getId(), inboxEntry.getCoordinates()));
         }
     }
 
-    private String getInboxUrl(String filename, boolean processed) {
-        return filename != null ? inboxBaseUrl + (processed ? "/processed/" : "/") + filename : null;
+    private String getInboxUrl(InboxEntry inboxEntry) {
+        if (inboxEntry.getFilename() == null) {
+            return null;
+        }
+
+        if (inboxEntry.isDone()) {
+            if (inboxEntry.getRejectReason() != null) {
+                return inboxBaseUrl + "/rejected/" + inboxEntry.getFilename();
+            } else {
+                return inboxBaseUrl + "/done/" + inboxEntry.getFilename();
+            }
+        }
+        return inboxBaseUrl + (inboxEntry.isProcessed() ? "/processed/" : "/") + inboxEntry.getFilename();
     }
 
     public void markPhotoOutdated(InboxCommand command) {

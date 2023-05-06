@@ -265,6 +265,12 @@ public class InboxController implements InboxApi {
 
     @PreAuthorize("isAuthenticated()")
     @Override
+    public ResponseEntity<List<InboxStateQueryResponseDto>> userInboxGet() {
+        return ResponseEntity.ok(toInboxStateQueryDto(manageInboxUseCase.userInbox(getAuthUser().getUser())));
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @Override
     public ResponseEntity<List<InboxStateQueryResponseDto>> userInboxPost(List<InboxStateQueryRequestDto> uploadStateQueries) {
         return ResponseEntity.ok(toInboxStateQueryDto(manageInboxUseCase.userInbox(getAuthUser().getUser(), toIdList(uploadStateQueries))));
     }
