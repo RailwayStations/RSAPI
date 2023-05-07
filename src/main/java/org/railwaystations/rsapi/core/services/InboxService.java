@@ -141,6 +141,7 @@ public class InboxService implements ManageInboxUseCase {
                 .id(inboxEntry.getId())
                 .state(calculateInboxState(inboxEntry))
                 .comment(inboxEntry.getComment())
+                .problemReportType(inboxEntry.getProblemReportType())
                 .rejectedReason(inboxEntry.getRejectReason())
                 .countryCode(inboxEntry.getCountryCode())
                 .stationId(inboxEntry.getStationId())
