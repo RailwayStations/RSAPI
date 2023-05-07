@@ -24,6 +24,8 @@ public class InboxStateQuery {
 
     String comment;
 
+    ProblemReportType problemReportType;
+
     String rejectedReason;
 
     String filename;

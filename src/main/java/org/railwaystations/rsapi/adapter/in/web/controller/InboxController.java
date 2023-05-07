@@ -13,6 +13,7 @@ import org.railwaystations.rsapi.adapter.in.web.model.InboxStateQueryRequestDto;
 import org.railwaystations.rsapi.adapter.in.web.model.InboxStateQueryResponseDto;
 import org.railwaystations.rsapi.adapter.in.web.model.NextZResponseDto;
 import org.railwaystations.rsapi.adapter.in.web.model.ProblemReportDto;
+import org.railwaystations.rsapi.adapter.in.web.model.ProblemReportTypeDto;
 import org.railwaystations.rsapi.adapter.in.web.model.PublicInboxEntryDto;
 import org.railwaystations.rsapi.core.model.Coordinates;
 import org.railwaystations.rsapi.core.model.InboxCommand;
@@ -60,7 +61,7 @@ public class InboxController implements InboxApi {
                 .build();
     }
 
-    private ProblemReportType toDomain(ProblemReportDto.TypeEnum dtoType) {
+    private ProblemReportType toDomain(ProblemReportTypeDto dtoType) {
         return switch (dtoType) {
             case OTHER -> ProblemReportType.OTHER;
             case WRONG_NAME -> ProblemReportType.WRONG_NAME;
@@ -118,6 +119,7 @@ public class InboxController implements InboxApi {
                 .crc32(inboxStateQuery.getCrc32())
                 .createdAt(inboxStateQuery.getCreatedAt().toEpochMilli())
                 .comment(inboxStateQuery.getComment())
+                .problemReportType(toDto(inboxStateQuery.getProblemReportType()))
                 .rejectedReason(inboxStateQuery.getRejectedReason());
     }
 
@@ -157,19 +159,19 @@ public class InboxController implements InboxApi {
                 .problemReportType(toDto(inboxEntry.getProblemReportType()));
     }
 
-    private InboxEntryDto.ProblemReportTypeEnum toDto(ProblemReportType problemReportType) {
+    private ProblemReportTypeDto toDto(ProblemReportType problemReportType) {
         if (problemReportType == null) {
             return null;
         }
         return switch (problemReportType) {
-            case STATION_NONEXISTENT -> InboxEntryDto.ProblemReportTypeEnum.STATION_NONEXISTENT;
-            case WRONG_LOCATION -> InboxEntryDto.ProblemReportTypeEnum.WRONG_LOCATION;
-            case STATION_ACTIVE -> InboxEntryDto.ProblemReportTypeEnum.STATION_ACTIVE;
-            case STATION_INACTIVE -> InboxEntryDto.ProblemReportTypeEnum.STATION_INACTIVE;
-            case PHOTO_OUTDATED -> InboxEntryDto.ProblemReportTypeEnum.PHOTO_OUTDATED;
-            case WRONG_PHOTO -> InboxEntryDto.ProblemReportTypeEnum.WRONG_PHOTO;
-            case WRONG_NAME -> InboxEntryDto.ProblemReportTypeEnum.WRONG_NAME;
-            case OTHER -> InboxEntryDto.ProblemReportTypeEnum.OTHER;
+            case STATION_NONEXISTENT -> ProblemReportTypeDto.STATION_NONEXISTENT;
+            case WRONG_LOCATION -> ProblemReportTypeDto.WRONG_LOCATION;
+            case STATION_ACTIVE -> ProblemReportTypeDto.STATION_ACTIVE;
+            case STATION_INACTIVE -> ProblemReportTypeDto.STATION_INACTIVE;
+            case PHOTO_OUTDATED -> ProblemReportTypeDto.PHOTO_OUTDATED;
+            case WRONG_PHOTO -> ProblemReportTypeDto.WRONG_PHOTO;
+            case WRONG_NAME -> ProblemReportTypeDto.WRONG_NAME;
+            case OTHER -> ProblemReportTypeDto.OTHER;
         };
     }
 

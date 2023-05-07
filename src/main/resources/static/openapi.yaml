@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20230506.1630"
+  version: "20230507.1830"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -1718,6 +1718,8 @@ components:
           format: double
         comment:
           type: string
+        problemReportType:
+          $ref: '#/components/schemas/ProblemReportType'
         rejectedReason:
           type: string
         filename:
@@ -1816,16 +1818,7 @@ components:
           type: boolean
           description: conflict with another upload or existing photo
         problemReportType:
-          type: string
-          enum:
-            - WRONG_LOCATION
-            - STATION_INACTIVE
-            - STATION_ACTIVE
-            - STATION_NONEXISTENT
-            - WRONG_NAME
-            - WRONG_PHOTO
-            - PHOTO_OUTDATED
-            - OTHER
+          $ref: '#/components/schemas/ProblemReportType'
         isProcessed:
           type: boolean
           description: was this image process (e.g. pixelated)
@@ -1942,16 +1935,7 @@ components:
         comment:
           type: string
         type:
-          type: string
-          enum:
-            - WRONG_LOCATION
-            - STATION_ACTIVE
-            - STATION_INACTIVE
-            - STATION_NONEXISTENT
-            - WRONG_PHOTO
-            - PHOTO_OUTDATED
-            - OTHER
-            - WRONG_NAME
+          $ref: '#/components/schemas/ProblemReportType'
         lat:
           type: number
           format: double
@@ -1963,6 +1947,18 @@ components:
         - stationId
         - comment
         - type
+
+    ProblemReportType:
+      type: string
+      enum:
+        - WRONG_LOCATION
+        - STATION_INACTIVE
+        - STATION_ACTIVE
+        - STATION_NONEXISTENT
+        - WRONG_NAME
+        - WRONG_PHOTO
+        - PHOTO_OUTDATED
+        - OTHER
 
     ChangePassword:
       type: object
