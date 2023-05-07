@@ -140,13 +140,16 @@ public class InboxService implements ManageInboxUseCase {
         return InboxStateQuery.builder()
                 .id(inboxEntry.getId())
                 .state(calculateInboxState(inboxEntry))
+                .comment(inboxEntry.getComment())
                 .rejectedReason(inboxEntry.getRejectReason())
                 .countryCode(inboxEntry.getCountryCode())
                 .stationId(inboxEntry.getStationId())
+                .title(inboxEntry.getTitle())
                 .coordinates(inboxEntry.getCoordinates())
                 .filename(inboxEntry.getFilename())
                 .inboxUrl(getInboxUrl(inboxEntry))
                 .crc32(inboxEntry.getCrc32())
+                .createdAt(inboxEntry.getCreatedAt())
                 .build();
     }
 

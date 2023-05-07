@@ -163,7 +163,7 @@ class InboxControllerTest {
                 .andExpect(jsonPath("$.[0].filename").value("1.jpg"))
                 .andExpect(jsonPath("$.[1].state").value("ACCEPTED"))
                 .andExpect(jsonPath("$.[2].state").value("REJECTED"))
-                .andExpect(jsonPath("$.[3].state").value("CONFLICT"));
+                .andExpect(jsonPath("$.[3].state").value("REVIEW"));
     }
 
     private InboxEntry createInboxEntry(User user, int id, String countryCode, String stationId, String rejectReason, boolean done) {

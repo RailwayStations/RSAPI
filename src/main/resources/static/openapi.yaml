@@ -1708,12 +1708,16 @@ components:
           $ref: '#/components/schemas/CountryCode'
         stationId:
           type: string
+        title:
+          type: string
         lat:
           type: number
           format: double
         lon:
           type: number
           format: double
+        comment:
+          type: string
         rejectedReason:
           type: string
         filename:
@@ -1734,6 +1738,9 @@ components:
             - CONFLICT
             - ACCEPTED
             - REJECTED
+        createdAt:
+          type: integer
+          format: int64
       required:
         - id
         - state
