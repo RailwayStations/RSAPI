@@ -29,6 +29,10 @@ public interface PhotoStorage {
 
     void cleanupOldCopies();
 
+    Path getInboxDoneFile(String filename);
+
+    Path getInboxRejectedFile(String filename);
+
     class PhotoTooLargeException extends Exception {
         private final long maxSize;
 

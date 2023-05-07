@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20230426.2200"
+  version: "20230506.1630"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -635,6 +635,21 @@ paths:
       x-codegen-request-body-name: problemReport
 
   /userInbox:
+    get:
+      summary: Query all uploads of the authorized user
+      tags:
+        - inbox
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
+      responses:
+        200:
+          description: array of InboxStateQueryResponse objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InboxStateQueryResponse'
     post:
       summary: Query the state of photo uploads of the authorized user
       tags:
@@ -651,7 +666,7 @@ paths:
         required: true
       responses:
         200:
-          description: array UploadStateQuery objects
+          description: array of InboxStateQueryResponse objects
           content:
             application/json:
               schema:
@@ -1050,6 +1065,74 @@ paths:
   /inbox/processed/{filename}:
     get:
       summary: downloads the given photo from the processed inbox
+      tags:
+        - photoDownload
+      parameters:
+        - name: filename
+          in: path
+          description: filename of the photo
+          required: true
+          schema:
+            type: string
+        - name: width
+          in: query
+          description: scale the image to the given width
+          schema:
+            type: integer
+            format: int32
+      responses:
+        200:
+          description: ok
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+        404:
+          description: file not found
+          content: { }
+
+  /inbox/done/{filename}:
+    get:
+      summary: downloads the given photo from the done inbox
+      tags:
+        - photoDownload
+      parameters:
+        - name: filename
+          in: path
+          description: filename of the photo
+          required: true
+          schema:
+            type: string
+        - name: width
+          in: query
+          description: scale the image to the given width
+          schema:
+            type: integer
+            format: int32
+      responses:
+        200:
+          description: ok
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+        404:
+          description: file not found
+          content: { }
+
+  /inbox/rejected/{filename}:
+    get:
+      summary: downloads the given photo from the rejected inbox
       tags:
         - photoDownload
       parameters:
@@ -1625,12 +1708,16 @@ components:
           $ref: '#/components/schemas/CountryCode'
         stationId:
           type: string
+        title:
+          type: string
         lat:
           type: number
           format: double
         lon:
           type: number
           format: double
+        comment:
+          type: string
         rejectedReason:
           type: string
         filename:
@@ -1651,6 +1738,9 @@ components:
             - CONFLICT
             - ACCEPTED
             - REJECTED
+        createdAt:
+          type: integer
+          format: int64
       required:
         - id
         - state

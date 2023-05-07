@@ -125,9 +125,8 @@ public class ProfileService implements ManageProfileUseCase {
         }
 
         monitor.sendMessage(
-                String.format("New registration{nickname='%s', email='%s', license='%s', photoOwner=%s, link='%s', anonymous=%s}%nvia %s",
-                        newUser.getName(), newUser.getEmail(), newUser.getLicense(), newUser.isOwnPhotos(),
-                        newUser.getUrl(), newUser.isAnonymous(), clientInfo));
+                String.format("New registration{nickname='%s', email='%s'}%nvia %s",
+                        newUser.getName(), newUser.getEmail(), clientInfo));
     }
 
     private String createNewPassword() {

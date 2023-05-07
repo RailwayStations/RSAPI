@@ -18,6 +18,8 @@ public interface ManageInboxUseCase {
 
     List<PublicInboxEntry> publicInbox();
 
+    List<InboxStateQuery> userInbox(@NotNull User user);
+
     List<InboxStateQuery> userInbox(@NotNull User user, List<Long> ids);
 
     List<InboxEntry> listAdminInbox(@NotNull User user);

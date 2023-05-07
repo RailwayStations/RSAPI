@@ -110,19 +110,21 @@ public class InboxController implements InboxApi {
         return new InboxStateQueryResponseDto(inboxStateQuery.getId(), toDto(inboxStateQuery.getState()))
                 .countryCode(inboxStateQuery.getCountryCode())
                 .stationId(inboxStateQuery.getStationId())
+                .title(inboxStateQuery.getTitle())
                 .inboxUrl(inboxStateQuery.getInboxUrl())
                 .lat(inboxStateQuery.getCoordinates() != null ? inboxStateQuery.getCoordinates().getLat() : null)
                 .lon(inboxStateQuery.getCoordinates() != null ? inboxStateQuery.getCoordinates().getLon() : null)
                 .filename(inboxStateQuery.getFilename())
                 .crc32(inboxStateQuery.getCrc32())
+                .createdAt(inboxStateQuery.getCreatedAt().toEpochMilli())
+                .comment(inboxStateQuery.getComment())
                 .rejectedReason(inboxStateQuery.getRejectedReason());
     }
 
     public InboxStateQueryResponseDto.StateEnum toDto(InboxStateQuery.InboxState inboxState) {
         return switch (inboxState) {
-            case REVIEW -> InboxStateQueryResponseDto.StateEnum.REVIEW;
+            case REVIEW, CONFLICT -> InboxStateQueryResponseDto.StateEnum.REVIEW;
             case ACCEPTED -> InboxStateQueryResponseDto.StateEnum.ACCEPTED;
-            case CONFLICT -> InboxStateQueryResponseDto.StateEnum.CONFLICT;
             case REJECTED -> InboxStateQueryResponseDto.StateEnum.REJECTED;
             case UNKNOWN -> InboxStateQueryResponseDto.StateEnum.UNKNOWN;
         };
@@ -261,6 +263,12 @@ public class InboxController implements InboxApi {
 
         var inboxResponse = InboxResponseMapper.toDto(manageInboxUseCase.reportProblem(toDomain(problemReport), user, getUserAgent()));
         return new ResponseEntity<>(inboxResponse, toHttpStatus(inboxResponse.getState()));
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @Override
+    public ResponseEntity<List<InboxStateQueryResponseDto>> userInboxGet() {
+        return ResponseEntity.ok(toInboxStateQueryDto(manageInboxUseCase.userInbox(getAuthUser().getUser())));
     }
 
     @PreAuthorize("isAuthenticated()")

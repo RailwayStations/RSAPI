@@ -94,6 +94,10 @@ public interface InboxDao {
     @SqlUpdate("UPDATE inbox SET notified = true WHERE id IN (<ids>)")
     void updateNotified(@BindList("ids") List<Long> ids);
 
+    @SqlQuery(JOIN_QUERY + " WHERE i.photographerId = :photographerId ORDER BY i.id DESC")
+    @RegisterRowMapper(InboxEntryMapper.class)
+    List<InboxEntry> findByUser(@Bind(PHOTOGRAPHER_ID) int photographerId);
+
     class InboxEntryMapper implements RowMapper<InboxEntry> {
 
         public InboxEntry map(ResultSet rs, StatementContext ctx) throws SQLException {

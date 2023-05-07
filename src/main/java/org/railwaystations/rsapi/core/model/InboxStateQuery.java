@@ -3,6 +3,8 @@ package org.railwaystations.rsapi.core.model;
 import lombok.Builder;
 import lombok.Value;
 
+import java.time.Instant;
+
 @Value
 @Builder
 public class InboxStateQuery {
@@ -13,10 +15,14 @@ public class InboxStateQuery {
 
     String stationId;
 
+    String title;
+
     Coordinates coordinates;
 
     @Builder.Default
     InboxState state = InboxState.UNKNOWN;
+
+    String comment;
 
     String rejectedReason;
 
@@ -25,6 +31,8 @@ public class InboxStateQuery {
     String inboxUrl;
 
     Long crc32;
+
+    Instant createdAt;
 
     public enum InboxState {
         UNKNOWN,

@@ -109,7 +109,7 @@ class ProfileControllerTest {
         verify(userDao).insert(any(User.class), anyString(), anyString());
         verify(userDao, never()).updateCredentials(anyInt(), anyString());
 
-        assertThat(monitor.getMessages().get(0)).isEqualTo("New registration{nickname='nickname', email='nickname@example.com', license='CC0_10', photoOwner=true, link='https://link@example.com', anonymous=false}\nvia UserAgent");
+        assertThat(monitor.getMessages().get(0)).isEqualTo("New registration{nickname='nickname', email='nickname@example.com'}\nvia UserAgent");
         assertNewPasswordEmail();
 
         verifyNoMoreInteractions(userDao);
@@ -148,7 +148,7 @@ class ProfileControllerTest {
         verify(userDao).insert(any(User.class), anyString(), anyString());
         verify(userDao, never()).updateCredentials(anyInt(), anyString());
 
-        assertThat(monitor.getMessages().get(0)).isEqualTo("New registration{nickname='nickname', email='nickname@example.com', license='CC0_10', photoOwner=true, link='https://link@example.com', anonymous=false}\nvia UserAgent");
+        assertThat(monitor.getMessages().get(0)).isEqualTo("New registration{nickname='nickname', email='nickname@example.com'}\nvia UserAgent");
         assertVerificationEmail();
 
         verifyNoMoreInteractions(userDao);
@@ -181,7 +181,7 @@ class ProfileControllerTest {
                 """;
         postRegistration(givenAnonymousUserProfile).andExpect(status().isAccepted());
 
-        assertThat(monitor.getMessages().get(0)).isEqualTo("New registration{nickname='nickname', email='nickname@example.com', license='CC0_10', photoOwner=true, link='https://link@example.com', anonymous=true}\nvia UserAgent");
+        assertThat(monitor.getMessages().get(0)).isEqualTo("New registration{nickname='nickname', email='nickname@example.com'}\nvia UserAgent");
     }
 
     @Test
