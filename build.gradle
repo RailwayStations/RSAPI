@@ -75,7 +75,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-jdbc"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
-    implementation "org.springframework.security:spring-security-oauth2-authorization-server:1.0.2"
+    implementation "org.springframework.security:spring-security-oauth2-authorization-server:1.1.0"
     implementation 'org.liquibase:liquibase-core'
     implementation "org.jdbi:jdbi3-spring5:$jdbiVersion"
     implementation "org.jdbi:jdbi3-sqlobject:$jdbiVersion"
