@@ -1024,4 +1024,20 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="56" author="pstorch">
+        <addColumn tableName="oauth2_registered_client">
+            <column name="post_logout_redirect_uris" type="varchar(1000)"/>
+        </addColumn>
+        <addColumn tableName="oauth2_authorization">
+            <column name="user_code_value" type="text"/>
+            <column name="user_code_issued_at" type="timestamp"/>
+            <column name="user_code_expires_at" type="timestamp"/>
+            <column name="user_code_metadata" type="text"/>
+            <column name="device_code_value" type="text"/>
+            <column name="device_code_issued_at" type="timestamp"/>
+            <column name="device_code_expires_at" type="timestamp"/>
+            <column name="device_code_metadata" type="text"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
