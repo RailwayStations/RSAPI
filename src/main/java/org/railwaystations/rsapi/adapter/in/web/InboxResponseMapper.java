@@ -29,8 +29,7 @@ public class InboxResponseMapper {
     public static InboxResponseDto.StateEnum toDto(InboxResponse.InboxResponseState inboxResponseState) {
         return switch (inboxResponseState) {
             case ERROR -> InboxResponseDto.StateEnum.ERROR;
-            case CONFLICT -> InboxResponseDto.StateEnum.CONFLICT;
-            case REVIEW -> InboxResponseDto.StateEnum.REVIEW;
+            case CONFLICT, REVIEW -> InboxResponseDto.StateEnum.REVIEW;
             case UNAUTHORIZED -> InboxResponseDto.StateEnum.UNAUTHORIZED;
             case LAT_LON_OUT_OF_RANGE -> InboxResponseDto.StateEnum.LAT_LON_OUT_OF_RANGE;
             case NOT_ENOUGH_DATA -> InboxResponseDto.StateEnum.NOT_ENOUGH_DATA;

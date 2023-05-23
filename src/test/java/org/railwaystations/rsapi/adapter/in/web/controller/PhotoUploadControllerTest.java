@@ -393,8 +393,8 @@ class PhotoUploadControllerTest {
         when(inboxDao.countPendingInboxEntriesForStation(null, "de", "4711")).thenReturn(1);
 
         whenPostImage("@nick name", 42, "nickname@example.com", "4711", "de", null, null, null, null)
-                .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.state").value("CONFLICT"))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.state").value("REVIEW"))
                 .andExpect(jsonPath("$.id").value(2))
                 .andExpect(jsonPath("$.filename").value("2.jpg"));
 
@@ -421,8 +421,8 @@ class PhotoUploadControllerTest {
     void postDuplicate() throws Exception {
         when(inboxDao.insert(any())).thenReturn(5L);
         whenPostImage("@nick name", 42, "nickname@example.com", "1234", "de", null, null, null, null)
-                .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.state").value("CONFLICT"))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.state").value("REVIEW"))
                 .andExpect(jsonPath("$.id").value(5))
                 .andExpect(jsonPath("$.filename").value("5.jpg"));
 
