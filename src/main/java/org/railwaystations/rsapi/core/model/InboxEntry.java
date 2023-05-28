@@ -37,7 +37,7 @@ public class InboxEntry {
 
     boolean done;
 
-    boolean hasPhoto;
+    String existingPhotoUrlPath;
 
     Long crc32;
 
@@ -82,6 +82,10 @@ public class InboxEntry {
             return null;
         }
         return String.format("%d.%s", id, extension);
+    }
+
+    public boolean hasPhoto() {
+        return existingPhotoUrlPath != null;
     }
 
 }

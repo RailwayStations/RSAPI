@@ -47,7 +47,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
@@ -127,8 +126,8 @@ class PhotoUploadControllerTest {
         var key1234 = new Station.Key("de", "1234");
         var station1234 = createStation(key1234, new Coordinates(40.1, 7.0), "LAL", createPhoto(key1234, createUserJimKnopf()));
 
-        when(stationDao.findByKey(key4711.getCountry(), key4711.getId())).thenReturn(Set.of(station4711));
-        when(stationDao.findByKey(key1234.getCountry(), key1234.getId())).thenReturn(Set.of(station1234));
+        when(stationDao.findByKey(key4711.getCountry(), key4711.getId())).thenReturn(Optional.of(station4711));
+        when(stationDao.findByKey(key1234.getCountry(), key1234.getId())).thenReturn(Optional.of(station1234));
 
         monitor.getMessages().clear();
     }

@@ -20,9 +20,12 @@ public interface PhotoDao {
     void delete(@Bind("id") long id);
 
     @SqlUpdate("UPDATE photos SET outdated = true WHERE id = :id")
-    void updatePhotoOutdated(@Bind("id")  long id);
+    void updatePhotoOutdated(@Bind("id") long id);
 
     @SqlUpdate("UPDATE photos SET `primary` = false WHERE countryCode = :country and stationId = :id")
     void setAllPhotosForStationSecondary(@BindBean Station.Key key);
+
+    @SqlUpdate("UPDATE photos SET `primary` = true WHERE id = :id")
+    void setPrimary(@Bind("id") long id);
 
 }

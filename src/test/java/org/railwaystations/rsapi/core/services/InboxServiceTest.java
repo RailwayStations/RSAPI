@@ -33,10 +33,8 @@ import org.railwaystations.rsapi.core.ports.out.PhotoStorage;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -90,7 +88,7 @@ class InboxServiceTest {
 
     @BeforeEach
     void setup() {
-        inboxService = new InboxService(stationDao, photoStorage, monitor, inboxDao, userDao, countryDao, photoDao, "inboxBaseUrl", mastodonBot);
+        inboxService = new InboxService(stationDao, photoStorage, monitor, inboxDao, userDao, countryDao, photoDao, "inboxBaseUrl", mastodonBot, "photoBaseUrl");
         reset(stationDao, photoStorage, monitor, inboxDao, userDao, countryDao, photoDao, mastodonBot);
 
         lenient().when(countryDao.findById(DE.getCode())).thenReturn(Optional.of(DE));
@@ -134,7 +132,7 @@ class InboxServiceTest {
             var inboxEntry = createInboxEntry1().build();
             when(inboxDao.findById(INBOX_ENTRY1_ID)).thenReturn(inboxEntry);
             var station = createStationDe1().build();
-            when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), STATION_KEY_DE_1.getId())).thenReturn(Set.of(station));
+            when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), STATION_KEY_DE_1.getId())).thenReturn(Optional.of(station));
             when(photoDao.insert(photoCaptor.capture())).thenReturn(IMPORTED_PHOTO_ID);
             when(photoStorage.importPhoto(inboxEntry, station)).thenReturn(IMPORTED_PHOTO_URL_PATH);
 
@@ -259,7 +257,7 @@ class InboxServiceTest {
             InboxEntry inboxEntry = createInboxEntry1().build();
             when(inboxDao.findById(INBOX_ENTRY1_ID)).thenReturn(inboxEntry);
             when(inboxDao.countPendingInboxEntriesForStation(INBOX_ENTRY1_ID, inboxEntry.getCountryCode(), inboxEntry.getStationId())).thenReturn(1);
-            when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), STATION_KEY_DE_1.getId())).thenReturn(Set.of(createStationDe1().build()));
+            when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), STATION_KEY_DE_1.getId())).thenReturn(Optional.of(createStationDe1().build()));
 
             assertThatThrownBy(() -> inboxService.importPhoto(command)).isInstanceOf(IllegalArgumentException.class).hasMessage("There is a conflict with another photo");
         }
@@ -272,7 +270,7 @@ class InboxServiceTest {
             InboxEntry inboxEntry = createInboxEntry1().build();
             when(inboxDao.findById(INBOX_ENTRY1_ID)).thenReturn(inboxEntry);
             when(inboxDao.countPendingInboxEntriesForStation(INBOX_ENTRY1_ID, inboxEntry.getCountryCode(), inboxEntry.getStationId())).thenReturn(1);
-            when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), STATION_KEY_DE_1.getId())).thenReturn(Set.of(createStationDe1().build()));
+            when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), STATION_KEY_DE_1.getId())).thenReturn(Optional.of(createStationDe1().build()));
 
             assertThatThrownBy(() -> inboxService.importPhoto(command)).isInstanceOf(IllegalArgumentException.class).hasMessage("Conflict with another upload! The only possible ConflictResolution strategy is IMPORT_AS_NEW_PRIMARY_PHOTO.");
         }
@@ -298,11 +296,11 @@ class InboxServiceTest {
                 .id(EXISTING_PHOTO_ID)
                 .primary(true)
                 .build());
-        when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), STATION_KEY_DE_1.getId())).thenReturn(Set.of(stationDe1));
+        when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), STATION_KEY_DE_1.getId())).thenReturn(Optional.of(stationDe1));
     }
 
     private void whenStation1HasNoPhoto() {
-        when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), STATION_KEY_DE_1.getId())).thenReturn(Set.of(createStationDe1().build()));
+        when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), STATION_KEY_DE_1.getId())).thenReturn(Optional.of(createStationDe1().build()));
     }
 
     private Station.StationBuilder createNewStationByCommand(InboxCommand command) {
@@ -355,7 +353,7 @@ class InboxServiceTest {
                     .stationId(null)
                     .build();
             when(inboxDao.findById(INBOX_ENTRY1_ID)).thenReturn(inboxEntry);
-            when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), command.getStationId())).thenReturn(Collections.emptySet());
+            when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), command.getStationId())).thenReturn(Optional.empty());
             var newStation = createNewStationByCommand(command).build();
             when(photoDao.insert(photoCaptor.capture())).thenReturn(IMPORTED_PHOTO_ID);
             when(photoStorage.importPhoto(inboxEntry, newStation)).thenReturn(IMPORTED_PHOTO_URL_PATH);
@@ -379,7 +377,7 @@ class InboxServiceTest {
                     .extension(null)
                     .build();
             when(inboxDao.findById(INBOX_ENTRY1_ID)).thenReturn(inboxEntry);
-            when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), command.getStationId())).thenReturn(Collections.emptySet());
+            when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), command.getStationId())).thenReturn(Optional.empty());
             var newStation = createNewStationByCommand(command).build();
 
             inboxService.importMissingStation(command);
@@ -491,7 +489,7 @@ class InboxServiceTest {
             InboxEntry inboxEntry = createInboxEntry1().build();
             when(inboxDao.findById(INBOX_ENTRY1_ID)).thenReturn(inboxEntry);
             when(inboxDao.countPendingInboxEntriesForStation(INBOX_ENTRY1_ID, inboxEntry.getCountryCode(), inboxEntry.getStationId())).thenReturn(1);
-            when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), STATION_KEY_DE_1.getId())).thenReturn(Set.of(createStationDe1().build()));
+            when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), STATION_KEY_DE_1.getId())).thenReturn(Optional.of(createStationDe1().build()));
 
             assertThatThrownBy(() -> inboxService.importMissingStation(command)).isInstanceOf(IllegalArgumentException.class).hasMessage("There is a conflict with another photo");
         }

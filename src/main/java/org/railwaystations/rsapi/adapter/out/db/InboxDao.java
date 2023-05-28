@@ -115,11 +115,15 @@ public interface InboxDao {
             if (rs.wasNull()) {
                 crc32 = null;
             }
+            Long photoId = rs.getLong("photoId");
+            if (rs.wasNull()) {
+                photoId = null;
+            }
             return InboxEntry.builder()
                     .id(id)
                     .countryCode(rs.getString(COUNTRY_CODE))
                     .stationId(rs.getString(STATION_ID))
-                    .photoId(rs.getLong("photoId"))
+                    .photoId(photoId)
                     .title(title)
                     .coordinates(coordinates)
                     .photographerId(rs.getInt(PHOTOGRAPHER_ID))
@@ -130,7 +134,7 @@ public interface InboxDao {
                     .rejectReason(rs.getString("rejectReason"))
                     .createdAt(rs.getTimestamp("createdAt").toInstant())
                     .done(done)
-                    .hasPhoto(rs.getString("urlPath") != null)
+                    .existingPhotoUrlPath(rs.getString("urlPath"))
                     .conflict(rs.getInt("conflict") > 0)
                     .problemReportType(problemReportType != null ? ProblemReportType.valueOf(problemReportType) : null)
                     .active(active)

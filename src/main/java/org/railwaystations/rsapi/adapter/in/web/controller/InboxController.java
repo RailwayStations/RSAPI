@@ -144,7 +144,7 @@ public class InboxController implements InboxApi {
                 inboxEntry.getComment(),
                 inboxEntry.getCreatedAt().toEpochMilli(),
                 inboxEntry.isDone(),
-                inboxEntry.isHasPhoto())
+                inboxEntry.hasPhoto())
                 .countryCode(inboxEntry.getCountryCode())
                 .stationId(inboxEntry.getStationId())
                 .title(inboxEntry.getTitle())
@@ -153,6 +153,7 @@ public class InboxController implements InboxApi {
                 .active(inboxEntry.getActive())
                 .inboxUrl(inboxEntry.getInboxUrl())
                 .filename(inboxEntry.getFilename())
+                .photoId(inboxEntry.getPhotoId())
                 .hasConflict(inboxEntry.isConflict())
                 .isProcessed(inboxEntry.isProcessed())
                 .photographerEmail(inboxEntry.getPhotographerEmail())

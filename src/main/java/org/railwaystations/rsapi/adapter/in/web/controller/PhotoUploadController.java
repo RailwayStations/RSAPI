@@ -132,7 +132,7 @@ public class PhotoUploadController {
     private InboxResponseDto consumeBodyAndReturn(InputStream body, InboxResponseDto response) {
         if (body != null) {
             try {
-                IOUtils.copy(body, NullOutputStream.NULL_OUTPUT_STREAM);
+                IOUtils.copy(body, NullOutputStream.INSTANCE);
             } catch (IOException e) {
                 log.warn("Unable to consume body", e);
             }

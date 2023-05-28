@@ -25,6 +25,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public interface StationDao {
@@ -59,7 +60,7 @@ public interface StationDao {
     @UseRowReducer(SingleStationReducer.class)
     @RegisterRowMapper(SingleStationMapper.class)
     @RegisterRowMapper(PhotoMapper.class)
-    Set<Station> findByKey(@Bind("countryCode") String countryCode, @Bind("id") String id);
+    Optional<Station> findByKey(@Bind("countryCode") String countryCode, @Bind("id") String id);
 
     @SqlQuery("""
             SELECT s.countryCode, s.id, s.DS100, s.title, s.lat, s.lon, s.active,

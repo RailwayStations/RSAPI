@@ -48,12 +48,14 @@ public class InboxService implements ManageInboxUseCase {
     private final CountryDao countryDao;
     private final PhotoDao photoDao;
     private final String inboxBaseUrl;
+    private final String photoBaseUrl;
     private final MastodonBot mastodonBot;
     private final Monitor monitor;
 
     public InboxService(StationDao stationDao, PhotoStorage photoStorage, Monitor monitor,
                         InboxDao inboxDao, UserDao userDao, CountryDao countryDao,
-                        PhotoDao photoDao, @Value("${inboxBaseUrl}") String inboxBaseUrl, MastodonBot mastodonBot) {
+                        PhotoDao photoDao, @Value("${inboxBaseUrl}") String inboxBaseUrl, MastodonBot mastodonBot,
+                        @Value("${photoBaseUrl}") String photoBaseUrl) {
         this.stationDao = stationDao;
         this.photoStorage = photoStorage;
         this.monitor = monitor;
@@ -63,6 +65,7 @@ public class InboxService implements ManageInboxUseCase {
         this.photoDao = photoDao;
         this.inboxBaseUrl = inboxBaseUrl;
         this.mastodonBot = mastodonBot;
+        this.photoBaseUrl = photoBaseUrl;
     }
 
     @Override
@@ -186,6 +189,8 @@ public class InboxService implements ManageInboxUseCase {
         if (filename != null) {
             inboxEntry.setProcessed(photoStorage.isProcessed(filename));
             inboxEntry.setInboxUrl(getInboxUrl(inboxEntry));
+        } else if (inboxEntry.hasPhoto()) {
+            inboxEntry.setInboxUrl(photoBaseUrl + inboxEntry.getExistingPhotoUrlPath());
         }
         if (inboxEntry.getStationId() == null && !inboxEntry.getCoordinates().hasZeroCoords()) {
             inboxEntry.setConflict(hasConflict(inboxEntry.getId(), inboxEntry.getCoordinates()));
@@ -277,7 +282,12 @@ public class InboxService implements ManageInboxUseCase {
     public void deletePhoto(InboxCommand command) {
         var inboxEntry = assertPendingInboxEntryExists(command);
         var station = assertStationExistsAndHasPhoto(inboxEntry);
-        photoDao.delete(getPhotoIdFromInboxOrPrimaryPhoto(inboxEntry, station));
+        long photoIdToDelete = getPhotoIdFromInboxOrPrimaryPhoto(inboxEntry, station);
+        photoDao.delete(photoIdToDelete);
+        if (station.getPrimaryPhoto().map(p -> p.getId() == photoIdToDelete).orElse(false)) {
+            station.getPhotos().stream().filter(p -> p.getId() != photoIdToDelete)
+                    .findFirst().ifPresent(photo -> photoDao.setPrimary(photo.getId()));
+        }
         inboxDao.done(inboxEntry.getId());
         log.info("Problem report {} photo of station {} deleted", inboxEntry.getId(), station.getKey());
     }

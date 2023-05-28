@@ -34,7 +34,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
@@ -101,22 +100,22 @@ class InboxControllerTest {
         when(userDao.findByEmail("someuser@example.com")).thenReturn(Optional.of(userSomeuser));
 
         var key0815 = new Station.Key("ch", "0815");
-        var station0815 = createStation(key0815, new Coordinates(40.1, 7.0), "LAL", createPhoto(key0815, User.builder().name("Jim Knopf").url("photographerUrl").license(License.CC0_10).id(18).ownPhotos(true).anonymous(false).admin(false).emailVerification(User.EMAIL_VERIFIED).sendNotifications(true).build()));
-        when(stationDao.findByKey(key0815.getCountry(), key0815.getId())).thenReturn(Set.of(station0815));
+        var station0815 = createStation(key0815, new Coordinates(40.1, 7.0), createPhoto(key0815, User.builder().name("Jim Knopf").url("photographerUrl").license(License.CC0_10).id(18).ownPhotos(true).anonymous(false).admin(false).emailVerification(User.EMAIL_VERIFIED).sendNotifications(true).build()));
+        when(stationDao.findByKey(key0815.getCountry(), key0815.getId())).thenReturn(Optional.of(station0815));
 
         var key1234 = new Station.Key("de", "1234");
-        var station1234 = createStation(key1234, new Coordinates(40.1, 7.0), "LAL", createPhoto(key1234, createUser()));
-        when(stationDao.findByKey(key1234.getCountry(), key1234.getId())).thenReturn(Set.of(station1234));
+        var station1234 = createStation(key1234, new Coordinates(40.1, 7.0), createPhoto(key1234, createUser()));
+        when(stationDao.findByKey(key1234.getCountry(), key1234.getId())).thenReturn(Optional.of(station1234));
 
         monitor.getMessages().clear();
     }
 
-    private Station createStation(Station.Key key, Coordinates coordinates, String ds100, Photo photo) {
+    private Station createStation(Station.Key key, Coordinates coordinates, Photo photo) {
         var station = Station.builder()
                 .key(key)
                 .title("Station" + key.getId())
                 .coordinates(coordinates)
-                .ds100(ds100)
+                .ds100("LAL")
                 .build();
         if (photo != null) {
             station.getPhotos().add(photo);
