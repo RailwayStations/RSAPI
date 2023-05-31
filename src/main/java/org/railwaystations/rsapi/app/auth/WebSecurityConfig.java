@@ -17,12 +17,11 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.jackson2.SecurityJackson2Modules;
@@ -49,6 +48,7 @@ import java.util.List;
 
 import static org.railwaystations.rsapi.utils.JwtUtil.generateRsaKey;
 import static org.railwaystations.rsapi.utils.JwtUtil.loadRsaKey;
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
@@ -74,22 +74,21 @@ public class WebSecurityConfig {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         http
                 .securityMatcher("/oauth2/**")
-                .cors()
-                .configurationSource(request -> {
+                .cors(corsConfigurer -> corsConfigurer.configurationSource(request -> {
                     var cors = new CorsConfiguration();
                     cors.setAllowedOriginPatterns(List.of("*"));
                     cors.setAllowedMethods(List.of("GET", "POST", "OPTIONS"));
                     cors.setAllowedHeaders(List.of("*"));
                     cors.setAllowCredentials(true);
                     return cors;
-                }).and()
+                }))
                 .exceptionHandling((exceptions) -> exceptions
                         .authenticationEntryPoint(
                                 new LoginUrlAuthenticationEntryPoint("/login"))
                 )
-                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
+                .oauth2ResourceServer(serverConfigurer -> serverConfigurer.jwt(withDefaults()))
                 .getConfigurer(OAuth2AuthorizationServerConfigurer.class)
-                .oidc(Customizer.withDefaults())
+                .oidc(withDefaults())
                 .authorizationEndpoint(authorizationEndpoint ->
                         authorizationEndpoint.consentPage(CUSTOM_CONSENT_PAGE_URI));
 
@@ -127,24 +126,15 @@ public class WebSecurityConfig {
         authenticationManagerBuilder.userDetailsService(userDetailsService);
         var authenticationManager = authenticationManagerBuilder.build();
 
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .csrf()
-                .requireCsrfProtectionMatcher(createCsrfRequestMatcher())
-                .and()
-
-                .headers()
-                .frameOptions().disable()
-                .and()
-
+        http.sessionManagement(sessionConfigurer -> sessionConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(csrfConfigurer -> csrfConfigurer.requireCsrfProtectionMatcher(createCsrfRequestMatcher()))
+                .headers(headersConfigurer -> headersConfigurer.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/**").permitAll()
                         .requestMatchers("/adminInbox", "/adminInboxCount", "/userInbox",
                                 "/photoUpload", "/photoUploadMultipartFormdata",
                                 "/resendEmailVerification", "/reportProblem", "/changePassword", "/myProfile").authenticated())
-                .exceptionHandling()
-                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-                .and()
+                .exceptionHandling(exceptionHandlingConfigurer -> exceptionHandlingConfigurer.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .addFilterBefore(uploadTokenAuthenticationFilter(authenticationManager, authorizationService), UsernamePasswordAuthenticationFilter.class)
                 .authenticationManager(authenticationManager);
 
