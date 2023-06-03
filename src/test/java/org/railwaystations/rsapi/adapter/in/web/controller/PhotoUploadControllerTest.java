@@ -16,6 +16,7 @@ import org.railwaystations.rsapi.adapter.out.db.UserDao;
 import org.railwaystations.rsapi.adapter.out.monitoring.MockMonitor;
 import org.railwaystations.rsapi.adapter.out.photostorage.PhotoFileStorage;
 import org.railwaystations.rsapi.adapter.out.photostorage.WorkDir;
+import org.railwaystations.rsapi.app.ClockTestConfiguration;
 import org.railwaystations.rsapi.app.auth.AuthUser;
 import org.railwaystations.rsapi.app.auth.RSAuthenticationProvider;
 import org.railwaystations.rsapi.app.auth.RSUserDetailsService;
@@ -63,7 +64,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = PhotoUploadController.class, properties = {"inboxBaseUrl=http://inbox.railway-stations.org"})
 @ContextConfiguration(classes = {WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class, MockMvcTestConfiguration.class, WebSecurityConfig.class})
-@Import({InboxService.class, PhotoFileStorage.class, RSUserDetailsService.class})
+@Import({InboxService.class, PhotoFileStorage.class, RSUserDetailsService.class, ClockTestConfiguration.class})
 @ActiveProfiles("mockMvcTest")
 class PhotoUploadControllerTest {
 

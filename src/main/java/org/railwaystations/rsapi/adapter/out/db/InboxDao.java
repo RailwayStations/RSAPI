@@ -1,6 +1,5 @@
 package org.railwaystations.rsapi.adapter.out.db;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
@@ -102,8 +101,6 @@ public interface InboxDao {
 
         public InboxEntry map(ResultSet rs, StatementContext ctx) throws SQLException {
             var id = rs.getLong(ID);
-            var coordinates = getCoordinates(rs);
-            var title = getTitle(rs);
             var done = rs.getBoolean("done");
             var problemReportType = rs.getString("problemReportType");
             var extension = rs.getString("extension");
@@ -124,8 +121,10 @@ public interface InboxDao {
                     .countryCode(rs.getString(COUNTRY_CODE))
                     .stationId(rs.getString(STATION_ID))
                     .photoId(photoId)
-                    .title(title)
-                    .coordinates(coordinates)
+                    .title(rs.getString("s_title"))
+                    .newTitle(rs.getString("i_title"))
+                    .coordinates(getCoordinates(rs, "s_"))
+                    .newCoordinates(getCoordinates(rs, "i_"))
                     .photographerId(rs.getInt(PHOTOGRAPHER_ID))
                     .photographerNickname(rs.getString("photographerNickname"))
                     .photographerEmail(rs.getString("photographerEmail"))
@@ -151,33 +150,18 @@ public interface InboxDao {
             return PublicInboxEntry.builder()
                     .countryCode(rs.getString(COUNTRY_CODE))
                     .stationId(rs.getString(STATION_ID))
-                    .title(getTitle(rs))
-                    .coordinates(getCoordinates(rs))
+                    .title(rs.getString("s_title"))
+                    .coordinates(getCoordinates(rs, "s_"))
                     .build();
         }
 
     }
 
     /**
-     * Gets the uploaded title, if not present returns the station title
-     */
-    static String getTitle(ResultSet rs) throws SQLException {
-        var title = rs.getString("i_title");
-        if (StringUtils.isBlank(title)) {
-            title = rs.getString("s_title");
-        }
-        return title;
-    }
-
-    /**
      * Get the uploaded coordinates, if not present or not valid gets the station coordinates
      */
-    static Coordinates getCoordinates(ResultSet rs) throws SQLException {
-        var coordinates = new Coordinates(rs.getDouble("i_lat"), rs.getDouble("i_lon"));
-        if (!coordinates.isValid()) {
-            coordinates = new Coordinates(rs.getDouble("s_lat"), rs.getDouble("s_lon"));
-        }
-        return coordinates;
+    static Coordinates getCoordinates(ResultSet rs, String columnPrefix) throws SQLException {
+        return new Coordinates(rs.getDouble(columnPrefix + "lat"), rs.getDouble(columnPrefix + "lon"));
     }
 
 }

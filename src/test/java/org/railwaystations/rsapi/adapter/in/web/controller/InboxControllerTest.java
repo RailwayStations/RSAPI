@@ -10,6 +10,7 @@ import org.railwaystations.rsapi.adapter.out.db.StationDao;
 import org.railwaystations.rsapi.adapter.out.db.UserDao;
 import org.railwaystations.rsapi.adapter.out.monitoring.MockMonitor;
 import org.railwaystations.rsapi.adapter.out.photostorage.PhotoFileStorage;
+import org.railwaystations.rsapi.app.ClockTestConfiguration;
 import org.railwaystations.rsapi.app.auth.AuthUser;
 import org.railwaystations.rsapi.app.auth.RSAuthenticationProvider;
 import org.railwaystations.rsapi.app.auth.RSUserDetailsService;
@@ -18,6 +19,7 @@ import org.railwaystations.rsapi.core.model.Coordinates;
 import org.railwaystations.rsapi.core.model.InboxEntry;
 import org.railwaystations.rsapi.core.model.License;
 import org.railwaystations.rsapi.core.model.Photo;
+import org.railwaystations.rsapi.core.model.ProblemReportType;
 import org.railwaystations.rsapi.core.model.Station;
 import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.ports.in.ManageProfileUseCase;
@@ -31,12 +33,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 import static org.railwaystations.rsapi.utils.OpenApiValidatorUtil.validOpenApiResponse;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -47,7 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = InboxController.class, properties = {"inboxBaseUrl=http://inbox.railway-stations.org"})
 @ContextConfiguration(classes = {WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class, MockMvcTestConfiguration.class, WebSecurityConfig.class})
-@Import({InboxService.class, PhotoFileStorage.class, RSUserDetailsService.class})
+@Import({InboxService.class, PhotoFileStorage.class, RSUserDetailsService.class, ClockTestConfiguration.class})
 @ActiveProfiles("mockMvcTest")
 class InboxControllerTest {
 
@@ -56,6 +58,9 @@ class InboxControllerTest {
 
     @Autowired
     private MockMonitor monitor;
+
+    @Autowired
+    private Clock clock;
 
     @MockBean
     private InboxDao inboxDao;
@@ -192,8 +197,15 @@ class InboxControllerTest {
     }
 
     @Test
-    void postProblemReport() throws Exception {
-        when(inboxDao.insert(any())).thenReturn(6L);
+    void postProblemReportOther() throws Exception {
+        when(inboxDao.insert(InboxEntry.builder()
+                .photographerId(42)
+                .countryCode("de")
+                .stationId("1234")
+                .problemReportType(ProblemReportType.OTHER)
+                .comment("something is wrong")
+                .createdAt(clock.instant())
+                .build())).thenReturn(6L);
         var problemReportJson = """
                     { "countryCode": "de", "stationId": "1234", "type": "OTHER", "comment": "something is wrong" }
                 """;
@@ -207,6 +219,62 @@ class InboxControllerTest {
         assertThat(monitor.getMessages().get(0)).isEqualTo("""
                 New problem report for Station1234 - de:1234
                 OTHER: something is wrong
+                by @nick name
+                via UserAgent""");
+    }
+
+    @Test
+    void postProblemReportWrongLocation() throws Exception {
+        when(inboxDao.insert(InboxEntry.builder()
+                .photographerId(42)
+                .countryCode("de")
+                .stationId("1234")
+                .problemReportType(ProblemReportType.WRONG_LOCATION)
+                .coordinates(new Coordinates(50.0, 9.1))
+                .comment("coordinates are slightly off")
+                .createdAt(clock.instant())
+                .build())).thenReturn(6L);
+        var problemReportJson = """
+                    { "countryCode": "de", "stationId": "1234", "type": "WRONG_LOCATION", "lat": 50.0, "lon": 9.1, "comment": "coordinates are slightly off" }
+                """;
+
+        whenPostProblemReport(User.EMAIL_VERIFIED, problemReportJson)
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.state").value("REVIEW"))
+                .andExpect(jsonPath("$.id").value(6))
+                .andExpect(jsonPath("$.filename").doesNotExist());
+
+        assertThat(monitor.getMessages().get(0)).isEqualTo("""
+                New problem report for Station1234 - de:1234
+                WRONG_LOCATION: coordinates are slightly off
+                by @nick name
+                via UserAgent""");
+    }
+
+    @Test
+    void postProblemReportWrongName() throws Exception {
+        when(inboxDao.insert(InboxEntry.builder()
+                .photographerId(42)
+                .countryCode("de")
+                .stationId("1234")
+                .title("New Name")
+                .problemReportType(ProblemReportType.WRONG_NAME)
+                .comment("name is wrong")
+                .createdAt(clock.instant())
+                .build())).thenReturn(6L);
+        var problemReportJson = """
+                    { "countryCode": "de", "stationId": "1234", "type": "WRONG_NAME", "title": "New Name", "comment": "name is wrong" }
+                """;
+
+        whenPostProblemReport(User.EMAIL_VERIFIED, problemReportJson)
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.state").value("REVIEW"))
+                .andExpect(jsonPath("$.id").value(6))
+                .andExpect(jsonPath("$.filename").doesNotExist());
+
+        assertThat(monitor.getMessages().get(0)).isEqualTo("""
+                New problem report for Station1234 - de:1234
+                WRONG_NAME: name is wrong
                 by @nick name
                 via UserAgent""");
     }

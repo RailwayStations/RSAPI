@@ -11,6 +11,8 @@ public class ProblemReport {
 
     String stationId;
 
+    String title;
+
     Long photoId;
 
     ProblemReportType type;

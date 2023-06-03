@@ -624,9 +624,9 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
                 	"lon": 11.123
                 }""";
         int id = sendProblemReport(problemReportJson);
-        sendInboxCommand("{\"id\": " + id + ", \"command\": \"UPDATE_LOCATION\"}");
+        sendInboxCommand("{ \"id\": " + id + ", \"command\": \"UPDATE_LOCATION\", \"lat\": 51.129, \"lon\": 11.129 }");
 
-        assertCoordinatesOfStation6815(51.123, 11.123);
+        assertCoordinatesOfStation6815(51.129, 11.129);
     }
 
     int sendProblemReport(String problemReportJson) throws JsonProcessingException {

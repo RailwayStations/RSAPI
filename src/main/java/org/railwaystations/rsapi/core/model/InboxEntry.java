@@ -19,7 +19,11 @@ public class InboxEntry {
 
     String title;
 
+    String newTitle;
+
     Coordinates coordinates;
+
+    Coordinates newCoordinates;
 
     int photographerId;
 
@@ -63,6 +67,14 @@ public class InboxEntry {
 
     public Double getLon() {
         return coordinates != null ? coordinates.getLon() : null;
+    }
+
+    public Double getNewLat() {
+        return newCoordinates != null ? newCoordinates.getLat() : null;
+    }
+
+    public Double getNewLon() {
+        return newCoordinates != null ? newCoordinates.getLon() : null;
     }
 
     public boolean isPhotoUpload() {

@@ -32,7 +32,9 @@ import org.railwaystations.rsapi.core.ports.out.Monitor;
 import org.railwaystations.rsapi.core.ports.out.PhotoStorage;
 
 import java.io.IOException;
+import java.time.Clock;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,10 +87,11 @@ class InboxServiceTest {
     MastodonBot mastodonBot;
     @Captor
     ArgumentCaptor<Photo> photoCaptor;
+    Clock clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
 
     @BeforeEach
     void setup() {
-        inboxService = new InboxService(stationDao, photoStorage, monitor, inboxDao, userDao, countryDao, photoDao, "inboxBaseUrl", mastodonBot, "photoBaseUrl");
+        inboxService = new InboxService(stationDao, photoStorage, monitor, inboxDao, userDao, countryDao, photoDao, "inboxBaseUrl", mastodonBot, "photoBaseUrl", clock);
         reset(stationDao, photoStorage, monitor, inboxDao, userDao, countryDao, photoDao, mastodonBot);
 
         lenient().when(countryDao.findById(DE.getCode())).thenReturn(Optional.of(DE));
@@ -152,7 +155,7 @@ class InboxServiceTest {
             var inboxEntry = createInboxEntry1().build();
             when(inboxDao.findById(INBOX_ENTRY1_ID)).thenReturn(inboxEntry);
             var station = createStationDe1().build();
-            whenStation1HasPhoto();
+            whenStation1ExistsWithPhoto();
             when(photoDao.insert(photoCaptor.capture())).thenReturn(IMPORTED_PHOTO_ID);
             when(photoStorage.importPhoto(inboxEntry, station)).thenReturn(IMPORTED_PHOTO_URL_PATH);
 
@@ -173,7 +176,7 @@ class InboxServiceTest {
             var inboxEntry = createInboxEntry1().build();
             when(inboxDao.findById(INBOX_ENTRY1_ID)).thenReturn(inboxEntry);
             var station = createStationDe1().build();
-            whenStation1HasPhoto();
+            whenStation1ExistsWithPhoto();
             when(photoDao.insert(photoCaptor.capture())).thenReturn(IMPORTED_PHOTO_ID);
             when(photoStorage.importPhoto(inboxEntry, station)).thenReturn(IMPORTED_PHOTO_URL_PATH);
 
@@ -194,7 +197,7 @@ class InboxServiceTest {
             var inboxEntry = createInboxEntry1().build();
             when(inboxDao.findById(INBOX_ENTRY1_ID)).thenReturn(inboxEntry);
             var station = createStationDe1().build();
-            whenStation1HasPhoto();
+            whenStation1ExistsWithPhoto();
             when(photoStorage.importPhoto(inboxEntry, station)).thenReturn(IMPORTED_PHOTO_URL_PATH);
 
             inboxService.importPhoto(command);
@@ -246,7 +249,7 @@ class InboxServiceTest {
         void stationHasPhotoAndNoConflictResolutionProvided() {
             var command = createInboxCommand1().build();
             when(inboxDao.findById(INBOX_ENTRY1_ID)).thenReturn(createInboxEntry1().build());
-            whenStation1HasPhoto();
+            whenStation1ExistsWithPhoto();
 
             assertThatThrownBy(() -> inboxService.importPhoto(command)).isInstanceOf(IllegalArgumentException.class).hasMessage("There is a conflict with another photo");
         }
@@ -290,7 +293,7 @@ class InboxServiceTest {
                         .build());
     }
 
-    private void whenStation1HasPhoto() {
+    private void whenStation1ExistsWithPhoto() {
         var stationDe1 = createStationDe1().build();
         stationDe1.getPhotos().add(Photo.builder()
                 .id(EXISTING_PHOTO_ID)
@@ -299,7 +302,7 @@ class InboxServiceTest {
         when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), STATION_KEY_DE_1.getId())).thenReturn(Optional.of(stationDe1));
     }
 
-    private void whenStation1HasNoPhoto() {
+    private void whenStation1Exists() {
         when(stationDao.findByKey(STATION_KEY_DE_1.getCountry(), STATION_KEY_DE_1.getId())).thenReturn(Optional.of(createStationDe1().build()));
     }
 
@@ -475,7 +478,7 @@ class InboxServiceTest {
                     .stationId(STATION_KEY_DE_1.getId())
                     .build();
             when(inboxDao.findById(INBOX_ENTRY1_ID)).thenReturn(createInboxEntry1().build());
-            whenStation1HasPhoto();
+            whenStation1ExistsWithPhoto();
 
             assertThatThrownBy(() -> inboxService.importMissingStation(command)).isInstanceOf(IllegalArgumentException.class).hasMessage("There is a conflict with another photo");
         }
@@ -501,7 +504,7 @@ class InboxServiceTest {
         @Test
         void reportWrongPhoto() {
             var problemReport = createWrongPhotoProblemReport(EXISTING_PHOTO_ID);
-            whenStation1HasPhoto();
+            whenStation1ExistsWithPhoto();
 
             var inboxResponse = inboxService.reportProblem(problemReport, createValidUser().build(), null);
 
@@ -511,7 +514,7 @@ class InboxServiceTest {
         @Test
         void reportWrongPhotoWithWrongPhotoId() {
             var problemReport = createWrongPhotoProblemReport(0L);
-            whenStation1HasPhoto();
+            whenStation1ExistsWithPhoto();
 
             var inboxResponse = inboxService.reportProblem(problemReport, createValidUser().build(), null);
 
@@ -541,7 +544,7 @@ class InboxServiceTest {
         @Test
         void reportWrongPhotoForStationWithoutPhoto() {
             var problemReport = createWrongPhotoProblemReport(EXISTING_PHOTO_ID);
-            whenStation1HasNoPhoto();
+            whenStation1Exists();
 
             var inboxResponse = inboxService.reportProblem(problemReport, createValidUser().build(), null);
 
@@ -557,6 +560,102 @@ class InboxServiceTest {
                     .type(ProblemReportType.WRONG_PHOTO)
                     .comment("a comment")
                     .build();
+        }
+
+        @Test
+        void changeNameCommand() {
+            whenStation1Exists();
+            whenWrongNameProblemReportExists();
+
+            inboxService.changeStationTitle(InboxCommand.builder()
+                    .id(INBOX_ENTRY1_ID)
+                    .title("New Title By Admin")
+                    .build());
+
+            verify(stationDao).changeStationTitle(STATION_KEY_DE_1, "New Title By Admin");
+            verify(inboxDao).done(INBOX_ENTRY1_ID);
+        }
+
+        @Test
+        void changeNameCommandWithoutTitle() {
+            whenWrongNameProblemReportExists();
+
+            assertThatThrownBy(() -> inboxService.changeStationTitle(InboxCommand.builder()
+                    .id(INBOX_ENTRY1_ID)
+                    .build()))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("Empty new title: null");
+        }
+
+        private void whenWrongNameProblemReportExists() {
+            when(inboxDao.findById(INBOX_ENTRY1_ID)).thenReturn(InboxEntry.builder()
+                    .id(INBOX_ENTRY1_ID)
+                    .problemReportType(ProblemReportType.WRONG_NAME)
+                    .countryCode(STATION_KEY_DE_1.getCountry())
+                    .stationId(STATION_KEY_DE_1.getId())
+                    .title("Old Title")
+                    .newTitle("New Title By Reporter")
+                    .build());
+        }
+
+        @Test
+        void changeLocationCommandWithCoordinatesByAdmin() {
+            whenStation1Exists();
+            whenWrongLocationInboxEntryExists();
+
+            inboxService.updateLocation(InboxCommand.builder()
+                    .id(INBOX_ENTRY1_ID)
+                    .coordinates(new Coordinates(52.0, 11.0))
+                    .build());
+
+            verify(stationDao).updateLocation(STATION_KEY_DE_1, new Coordinates(52.0, 11.0));
+            verify(inboxDao).done(INBOX_ENTRY1_ID);
+        }
+
+        private void whenWrongLocationInboxEntryExists() {
+            when(inboxDao.findById(INBOX_ENTRY1_ID)).thenReturn(InboxEntry.builder()
+                    .id(INBOX_ENTRY1_ID)
+                    .problemReportType(ProblemReportType.WRONG_LOCATION)
+                    .countryCode(STATION_KEY_DE_1.getCountry())
+                    .stationId(STATION_KEY_DE_1.getId())
+                    .coordinates(new Coordinates(50.0, 9.0))
+                    .newCoordinates(new Coordinates(51.0, 10.0))
+                    .build());
+        }
+
+        @Test
+        void changeLocationCommandWithoutNewCoordinatesByAdmin() {
+            whenWrongLocationInboxEntryExists();
+
+            assertThatThrownBy(() -> inboxService.updateLocation(InboxCommand.builder()
+                    .id(INBOX_ENTRY1_ID)
+                    .build()))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("Can't update location, coordinates: null");
+        }
+
+        @Test
+        void changeLocationCommandWithZeroCoordinatesByAdmin() {
+            whenWrongLocationInboxEntryExists();
+
+            assertThatThrownBy(() -> inboxService.updateLocation(InboxCommand.builder()
+                    .id(INBOX_ENTRY1_ID)
+                    .coordinates(new Coordinates(0, 0))
+                    .build()))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("Can't update location, coordinates: Coordinates(lat=0.0, lon=0.0)");
+        }
+
+        @Test
+        void changeLocationCommandWithInvalidCoordinatesByAdmin() {
+            whenWrongLocationInboxEntryExists();
+
+            assertThatThrownBy(() -> inboxService.updateLocation(InboxCommand.builder()
+                    .id(INBOX_ENTRY1_ID)
+                    .coordinates(new Coordinates(110, 90))
+                    .build()))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("Can't update location, coordinates: Coordinates(lat=110.0, lon=90.0)");
         }
 
     }

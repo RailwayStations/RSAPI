@@ -32,6 +32,7 @@ import org.springframework.web.util.UriUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
@@ -51,11 +52,12 @@ public class InboxService implements ManageInboxUseCase {
     private final String photoBaseUrl;
     private final MastodonBot mastodonBot;
     private final Monitor monitor;
+    private final Clock clock;
 
     public InboxService(StationDao stationDao, PhotoStorage photoStorage, Monitor monitor,
                         InboxDao inboxDao, UserDao userDao, CountryDao countryDao,
                         PhotoDao photoDao, @Value("${inboxBaseUrl}") String inboxBaseUrl, MastodonBot mastodonBot,
-                        @Value("${photoBaseUrl}") String photoBaseUrl) {
+                        @Value("${photoBaseUrl}") String photoBaseUrl, Clock clock) {
         this.stationDao = stationDao;
         this.photoStorage = photoStorage;
         this.monitor = monitor;
@@ -66,6 +68,7 @@ public class InboxService implements ManageInboxUseCase {
         this.inboxBaseUrl = inboxBaseUrl;
         this.mastodonBot = mastodonBot;
         this.photoBaseUrl = photoBaseUrl;
+        this.clock = clock;
     }
 
     @Override
@@ -103,12 +106,13 @@ public class InboxService implements ManageInboxUseCase {
         var inboxEntry = InboxEntry.builder()
                 .countryCode(problemReport.getCountryCode())
                 .stationId(problemReport.getStationId())
+                .title(problemReport.getTitle())
                 .photoId(photoId)
                 .coordinates(problemReport.getCoordinates())
                 .photographerId(user.getId())
                 .comment(problemReport.getComment())
                 .problemReportType(problemReport.getType())
-                .createdAt(Instant.now())
+                .createdAt(clock.instant())
                 .build();
         monitor.sendMessage(String.format("New problem report for %s - %s:%s%n%s: %s%nby %s%nvia %s",
                 station.get().getTitle(), station.get().getKey().getCountry(), station.get().getKey().getId(), problemReport.getType(),
@@ -221,10 +225,7 @@ public class InboxService implements ManageInboxUseCase {
 
     public void updateLocation(InboxCommand command) {
         var inboxEntry = assertPendingInboxEntryExists(command);
-        var coordinates = inboxEntry.getCoordinates();
-        if (command.hasCoords()) {
-            coordinates = command.getCoordinates();
-        }
+        var coordinates = command.getCoordinates();
         if (coordinates == null || !coordinates.isValid()) {
             throw new IllegalArgumentException("Can't update location, coordinates: " + command.getCoordinates());
         }
