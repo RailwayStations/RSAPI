@@ -93,7 +93,8 @@ dependencies {
 
     annotationProcessor 'org.projectlombok:lombok'
 
-    runtimeOnly "org.mariadb.jdbc:mariadb-java-client"
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    runtimeOnly 'org.webjars:webjars-locator-core'
 
     testImplementation "org.springframework.boot:spring-boot-starter-test"
     testImplementation "org.springframework.security:spring-security-test"
