@@ -146,7 +146,7 @@ public class InboxService implements ManageInboxUseCase {
         inboxEntry.setProcessed(!inboxEntry.isDone() && photoStorage.isProcessed(inboxEntry.getFilename()));
         return InboxStateQuery.builder()
                 .id(inboxEntry.getId())
-                .state(calculateInboxState(inboxEntry))
+                .state(calculateUserInboxState(inboxEntry))
                 .comment(inboxEntry.getComment())
                 .problemReportType(inboxEntry.getProblemReportType())
                 .rejectedReason(inboxEntry.getRejectReason())
@@ -154,6 +154,8 @@ public class InboxService implements ManageInboxUseCase {
                 .stationId(inboxEntry.getStationId())
                 .title(inboxEntry.getTitle())
                 .coordinates(inboxEntry.getCoordinates())
+                .newTitle(inboxEntry.getNewTitle())
+                .newCoordinates(inboxEntry.getNewCoordinates())
                 .filename(inboxEntry.getFilename())
                 .inboxUrl(getInboxUrl(inboxEntry))
                 .crc32(inboxEntry.getCrc32())
@@ -161,7 +163,7 @@ public class InboxService implements ManageInboxUseCase {
                 .build();
     }
 
-    private InboxStateQuery.InboxState calculateInboxState(InboxEntry inboxEntry) {
+    private InboxStateQuery.InboxState calculateUserInboxState(InboxEntry inboxEntry) {
         if (inboxEntry.isDone()) {
             if (inboxEntry.getRejectReason() == null) {
                 return InboxStateQuery.InboxState.ACCEPTED;
@@ -169,15 +171,7 @@ public class InboxService implements ManageInboxUseCase {
                 return InboxStateQuery.InboxState.REJECTED;
             }
         } else {
-            if (inboxEntry.isPhotoUpload() &&
-                    (
-                            hasConflict(inboxEntry.getId(), findStationByCountryAndId(inboxEntry.getCountryCode(), inboxEntry.getStationId()).orElse(null))
-                                    || (inboxEntry.getStationId() == null && hasConflict(inboxEntry.getId(), inboxEntry.getCoordinates()))
-                    )) {
-                return InboxStateQuery.InboxState.CONFLICT;
-            } else {
-                return InboxStateQuery.InboxState.REVIEW;
-            }
+            return InboxStateQuery.InboxState.REVIEW;
         }
     }
 

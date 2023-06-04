@@ -1716,6 +1716,14 @@ components:
         lon:
           type: number
           format: double
+        newTitle:
+          type: string
+        newLat:
+          type: number
+          format: double
+        newLon:
+          type: number
+          format: double
         comment:
           type: string
         problemReportType:

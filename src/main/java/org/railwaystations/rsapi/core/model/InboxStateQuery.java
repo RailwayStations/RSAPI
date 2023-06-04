@@ -19,6 +19,10 @@ public class InboxStateQuery {
 
     Coordinates coordinates;
 
+    String newTitle;
+
+    Coordinates newCoordinates;
+
     @Builder.Default
     InboxState state = InboxState.UNKNOWN;
 
