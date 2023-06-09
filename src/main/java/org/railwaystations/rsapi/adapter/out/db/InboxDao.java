@@ -147,11 +147,18 @@ public interface InboxDao {
     class PublicInboxEntryMapper implements RowMapper<PublicInboxEntry> {
 
         public PublicInboxEntry map(ResultSet rs, StatementContext ctx) throws SQLException {
+            var title = rs.getString("s_title");
+            var coordinates = getCoordinates(rs, "s_");
+            var stationId = rs.getString(STATION_ID);
+            if (stationId == null) {
+                title = rs.getString("i_title");
+                coordinates = getCoordinates(rs, "i_");
+            }
             return PublicInboxEntry.builder()
                     .countryCode(rs.getString(COUNTRY_CODE))
-                    .stationId(rs.getString(STATION_ID))
-                    .title(rs.getString("s_title"))
-                    .coordinates(getCoordinates(rs, "s_"))
+                    .stationId(stationId)
+                    .title(title)
+                    .coordinates(coordinates)
                     .build();
         }
 
