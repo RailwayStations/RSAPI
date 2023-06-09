@@ -18,7 +18,7 @@ services:
       org.label-schema.group: "rsapi"
 
   mariadb:
-    image: mariadb:10.11
+    image: mariadb:11.0
     container_name: mariadb
     restart: unless-stopped
     environment:
