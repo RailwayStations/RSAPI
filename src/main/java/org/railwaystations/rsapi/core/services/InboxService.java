@@ -190,8 +190,8 @@ public class InboxService implements ManageInboxUseCase {
         } else if (inboxEntry.hasPhoto()) {
             inboxEntry.setInboxUrl(photoBaseUrl + inboxEntry.getExistingPhotoUrlPath());
         }
-        if (inboxEntry.getStationId() == null && !inboxEntry.getCoordinates().hasZeroCoords()) {
-            inboxEntry.setConflict(hasConflict(inboxEntry.getId(), inboxEntry.getCoordinates()));
+        if (inboxEntry.getStationId() == null && !inboxEntry.getNewCoordinates().hasZeroCoords()) {
+            inboxEntry.setConflict(hasConflict(inboxEntry.getId(), inboxEntry.getNewCoordinates()));
         }
     }
 
