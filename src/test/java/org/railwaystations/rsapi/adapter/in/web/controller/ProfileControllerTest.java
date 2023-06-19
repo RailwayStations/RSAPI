@@ -12,6 +12,7 @@ import org.railwaystations.rsapi.app.auth.LazySodiumPasswordEncoder;
 import org.railwaystations.rsapi.app.auth.RSAuthenticationProvider;
 import org.railwaystations.rsapi.app.auth.RSUserDetailsService;
 import org.railwaystations.rsapi.app.auth.WebSecurityConfig;
+import org.railwaystations.rsapi.app.config.MessageSourceConfig;
 import org.railwaystations.rsapi.core.model.License;
 import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.ports.out.Mailer;
@@ -51,7 +52,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = ProfileController.class, properties = {"mailVerificationUrl=EMAIL_VERIFICATION_URL"})
 @ContextConfiguration(classes = {WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class, MockMvcTestConfiguration.class, WebSecurityConfig.class})
-@Import({ProfileService.class, RSUserDetailsService.class, RSAuthenticationProvider.class, LazySodiumPasswordEncoder.class})
+@Import({ProfileService.class, RSUserDetailsService.class, RSAuthenticationProvider.class, LazySodiumPasswordEncoder.class, MessageSourceConfig.class})
 @ActiveProfiles("mockMvcTest")
 class ProfileControllerTest {
 
@@ -124,15 +125,7 @@ class ProfileControllerTest {
                                 your new password is: .*
                                                     
                                 Cheers
-                                Your Railway-Stations-Team
-                                                    
-                                ---
-                                Hallo,
-                                                    
-                                Dein neues Passwort lautet: .*
-                                                    
-                                Viele Grüße
-                                Dein Bahnhofsfoto-Team"""));
+                                Your Railway-Stations-Team"""));
     }
 
     @Test

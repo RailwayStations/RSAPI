@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
@@ -68,18 +67,10 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/webjars/**").addResourceLocations("/webjars/").resourceChain(false);
     }
 
-    @Bean("messageSource")
-    public MessageSource messageSource() {
-        var messageSource = new ResourceBundleMessageSource();
-        messageSource.setBasenames("language/messages");
-        messageSource.setDefaultEncoding("UTF-8");
-        return messageSource;
-    }
-
     @Bean
     public LocalValidatorFactoryBean validator(MessageSource messageSource) {
         var validatorFactoryBean = new LocalValidatorFactoryBean();
-        validatorFactoryBean.setValidationMessageSource(messageSource());
+        validatorFactoryBean.setValidationMessageSource(messageSource);
         return validatorFactoryBean;
     }
 

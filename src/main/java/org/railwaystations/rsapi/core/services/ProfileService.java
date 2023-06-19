@@ -10,6 +10,7 @@ import org.railwaystations.rsapi.core.ports.in.ManageProfileUseCase;
 import org.railwaystations.rsapi.core.ports.out.Mailer;
 import org.railwaystations.rsapi.core.ports.out.Monitor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,14 +27,16 @@ public class ProfileService implements ManageProfileUseCase {
     private final OAuth2AuthorizationDao authorizationDao;
     private final String eMailVerificationUrl;
     private final PasswordEncoder passwordEncoder;
+    private final MessageSource messageSource;
 
-    public ProfileService(Monitor monitor, Mailer mailer, UserDao userDao, OAuth2AuthorizationDao authorizationDao, @Value("${mailVerificationUrl}") String eMailVerificationUrl, PasswordEncoder passwordEncoder) {
+    public ProfileService(Monitor monitor, Mailer mailer, UserDao userDao, OAuth2AuthorizationDao authorizationDao, @Value("${mailVerificationUrl}") String eMailVerificationUrl, PasswordEncoder passwordEncoder, MessageSource messageSource) {
         this.monitor = monitor;
         this.mailer = mailer;
         this.userDao = userDao;
         this.authorizationDao = authorizationDao;
         this.eMailVerificationUrl = eMailVerificationUrl;
         this.passwordEncoder = passwordEncoder;
+        this.messageSource = messageSource;
     }
 
     @Override
@@ -69,7 +72,7 @@ public class ProfileService implements ManageProfileUseCase {
         userDao.updateCredentials(user.getId(), key);
         monitor.sendMessage(String.format("Reset Password for '%s', email='%s'", user.getName(), user.getEmail()));
 
-        sendPasswordMail(user.getEmail(), newPassword);
+        sendPasswordMail(user.getEmail(), newPassword, user.getLocale());
         if (!user.isEmailVerified()) {
             // if the email is not yet verified, we can verify it with the next login
             userDao.updateEmailVerification(user.getId(), User.EMAIL_VERIFIED_AT_NEXT_LOGIN);
@@ -121,7 +124,7 @@ public class ProfileService implements ManageProfileUseCase {
         if (passwordProvided) {
             sendEmailVerification(newUser.getEmail(), emailVerificationToken);
         } else {
-            sendPasswordMail(newUser.getEmail(), password);
+            sendPasswordMail(newUser.getEmail(), password, newUser.getLocale());
         }
 
         monitor.sendMessage(
@@ -206,22 +209,8 @@ public class ProfileService implements ManageProfileUseCase {
         userDao.updateLocale(user.getId(), locale.toLanguageTag());
     }
 
-    private void sendPasswordMail(String email, String newPassword) {
-        var text = String.format("""
-                Hello,
-                                        
-                your new password is: %1$s
-                                        
-                Cheers
-                Your Railway-Stations-Team
-                                        
-                ---
-                Hallo,
-                                        
-                Dein neues Passwort lautet: %1$s
-                                        
-                Viele Grüße
-                Dein Bahnhofsfoto-Team""", newPassword);
+    private void sendPasswordMail(String email, String newPassword, Locale locale) {
+        var text = messageSource.getMessage("password_mail", new String[]{newPassword}, locale);
         mailer.send(email, "Railway-Stations.org new password", text);
         log.info("Password sent to {}", email);
     }

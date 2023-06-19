@@ -8,6 +8,7 @@ import org.railwaystations.rsapi.core.model.InboxEntry;
 import org.railwaystations.rsapi.core.model.User;
 import org.railwaystations.rsapi.core.ports.in.NotifyUsersUseCase;
 import org.railwaystations.rsapi.core.ports.out.Mailer;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,12 +23,14 @@ public class NotifyUsersService implements NotifyUsersUseCase {
     private final UserDao userDao;
     private final InboxDao inboxDao;
     private final Mailer mailer;
+    private final MessageSource messageSource;
 
-    public NotifyUsersService(UserDao userDao, InboxDao inboxDao, Mailer mailer) {
+    public NotifyUsersService(UserDao userDao, InboxDao inboxDao, Mailer mailer, MessageSource messageSource) {
         super();
         this.userDao = userDao;
         this.inboxDao = inboxDao;
         this.mailer = mailer;
+        this.messageSource = messageSource;
     }
 
     @Override
@@ -56,25 +59,7 @@ public class NotifyUsersService implements NotifyUsersUseCase {
                 .append(entry.getRejectReason() == null ? "accepted" : "rejected - " + entry.getRejectReason())
                 .append("\n"));
 
-        var text = String.format("""
-                Hello %1$s,
-                                
-                thank you for your contributions.
-                                
-                Cheers
-                Your Railway-Stations-Team
-                                
-                ---
-                Hallo %1$s,
-                                
-                vielen Dank für Deine Beiträge.
-                                
-                Viele Grüße
-                Dein Bahnhofsfoto-Team
-                                
-                ---------------------------------
-                                
-                %2$s""", user.getName(), report);
+        var text = messageSource.getMessage("review_mail", new String[]{user.getName(), report.toString()}, user.getLocale());
         mailer.send(user.getEmail(), "Railway-Stations.org review result", text);
         log.info("Email notification sent to {}", user.getEmail());
     }

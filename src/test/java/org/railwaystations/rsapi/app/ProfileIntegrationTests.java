@@ -89,15 +89,7 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
                                 your new password is: .*
 
                                 Cheers
-                                Your Railway-Stations-Team
-
-                                ---
-                                Hallo,
-
-                                Dein neues Passwort lautet: .*
-
-                                Viele Grüße
-                                Dein Bahnhofsfoto-Team"""));
+                                Your Railway-Stations-Team"""));
     }
 
     @Test
