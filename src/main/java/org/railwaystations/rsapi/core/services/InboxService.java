@@ -534,17 +534,18 @@ public class InboxService implements ManageInboxUseCase {
             }
 
             var duplicateInfo = conflict ? " (possible duplicate!)" : "";
+            var countryCodeParam = countryCode != null ? "countryCode=" + countryCode + "&" : "";
             if (station.isPresent()) {
                 monitor.sendMessage(String.format("New photo upload for %s - %s:%s%n%s%n%s%s%nby %s%nvia %s",
                         station.get().getTitle(), station.get().getKey().getCountry(), station.get().getKey().getId(),
                         StringUtils.trimToEmpty(comment), inboxUrl, duplicateInfo, user.getName(), clientInfo), photoStorage.getUploadFile(filename));
             } else if (filename != null) {
-                monitor.sendMessage(String.format("Photo upload for missing station %s at https://map.railway-stations.org/index.php?mlat=%s&mlon=%s&zoom=18&layers=M%n%s%n%s%s%nby %s%nvia %s",
-                        stationTitle, latitude, longitude,
+                monitor.sendMessage(String.format("Photo upload for missing station %s at https://map.railway-stations.org/index.php?%smlat=%s&mlon=%s&zoom=18&layers=M%n%s%n%s%s%nby %s%nvia %s",
+                        stationTitle, countryCodeParam, latitude, longitude,
                         StringUtils.trimToEmpty(comment), inboxUrl, duplicateInfo, user.getName(), clientInfo), photoStorage.getUploadFile(filename));
             } else {
-                monitor.sendMessage(String.format("Report missing station %s at https://map.railway-stations.org/index.php?mlat=%s&mlon=%s&zoom=18&layers=M%n%s%s%nby %s%nvia %s",
-                        stationTitle, latitude, longitude,
+                monitor.sendMessage(String.format("Report missing station %s at https://map.railway-stations.org/index.php?%smlat=%s&mlon=%s&zoom=18&layers=M%n%s%s%nby %s%nvia %s",
+                        stationTitle, countryCodeParam, latitude, longitude,
                         StringUtils.trimToEmpty(comment), duplicateInfo, user.getName(), clientInfo));
             }
         } catch (PhotoStorage.PhotoTooLargeException e) {

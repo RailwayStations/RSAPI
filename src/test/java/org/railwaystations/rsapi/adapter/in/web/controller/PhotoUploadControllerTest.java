@@ -267,7 +267,7 @@ class PhotoUploadControllerTest {
         assertUpload(uploadCaptor.getValue(), "de", null, "Missing Station", new Coordinates(10, 20));
 
         assertThat(monitor.getMessages().get(0)).isEqualTo("""
-                Report missing station Missing Station at https://map.railway-stations.org/index.php?mlat=10.0&mlon=20.0&zoom=18&layers=M
+                Report missing station Missing Station at https://map.railway-stations.org/index.php?countryCode=de&mlat=10.0&mlon=20.0&zoom=18&layers=M
                 Some Comment
                 by nickname
                 via UserAgent""");
@@ -339,17 +339,17 @@ class PhotoUploadControllerTest {
         when(inboxDao.insert(any())).thenReturn(4L);
         var uploadCaptor = ArgumentCaptor.forClass(InboxEntry.class);
 
-        whenPostPhotoUpload("@nick name", 42, "nickname@example.com", null, null, "Missing Station", 50.9876d, 9.1234d, "Some Comment", User.EMAIL_VERIFIED, null, "application/octet-stream")
+        whenPostPhotoUpload("@nick name", 42, "nickname@example.com", null, "de", "Missing Station", 50.9876d, 9.1234d, "Some Comment", User.EMAIL_VERIFIED, null, "application/octet-stream")
                 .andExpect(status().isAccepted())
                 .andExpect(jsonPath("$.state").value("REVIEW"))
                 .andExpect(jsonPath("$.id").value(4))
                 .andExpect(jsonPath("$.filename").doesNotExist());
 
         verify(inboxDao).insert(uploadCaptor.capture());
-        assertUpload(uploadCaptor.getValue(), null, null, "Missing Station", new Coordinates(50.9876, 9.1234));
+        assertUpload(uploadCaptor.getValue(), "de", null, "Missing Station", new Coordinates(50.9876, 9.1234));
 
         assertThat(monitor.getMessages().get(0)).isEqualTo("""
-                Report missing station Missing Station at https://map.railway-stations.org/index.php?mlat=50.9876&mlon=9.1234&zoom=18&layers=M
+                Report missing station Missing Station at https://map.railway-stations.org/index.php?countryCode=de&mlat=50.9876&mlon=9.1234&zoom=18&layers=M
                 Some Comment
                 by @nick name
                 via UserAgent""");
