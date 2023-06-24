@@ -1040,4 +1040,17 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="57" author="pstorch">
+        <addColumn tableName="inbox">
+            <column name="posted" type="boolean" valueBoolean="false" defaultValueBoolean="false"/>
+        </addColumn>
+        <update tableName="inbox">
+            <column name="posted" valueBoolean="true"/>
+            <where>done = :value AND extension IS NOT NULL</where>
+            <whereParams>
+                <param valueBoolean="true"/>
+            </whereParams>
+        </update>
+    </changeSet>
+
 </databaseChangeLog>

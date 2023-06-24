@@ -61,6 +61,8 @@ public class InboxEntry {
 
     boolean notified;
 
+    boolean posted;
+
     public Double getLat() {
         return coordinates != null ? coordinates.getLat() : null;
     }

@@ -23,7 +23,7 @@ public interface InboxDao {
     String JOIN_QUERY = """
             SELECT i.id, i.countryCode, i.stationId, i.photoId, i.title i_title, s.title s_title, i.lat i_lat, i.lon i_lon, s.lat s_lat, s.lon s_lon,
                  i.photographerId, u.name photographerNickname, u.email photographerEmail, i.extension, i.comment, i.rejectReason, i.createdAt,
-                 i.done, i.problemReportType, i.active, i.crc32, i.notified, p.urlPath,
+                 i.done, i.problemReportType, i.active, i.crc32, i.notified, p.urlPath, i.posted,
                  (
                     SELECT COUNT(*)
                         FROM inbox i2
@@ -48,6 +48,10 @@ public interface InboxDao {
     @SqlQuery(JOIN_QUERY + " WHERE i.done = false ORDER BY id")
     @RegisterRowMapper(InboxEntryMapper.class)
     List<InboxEntry> findPendingInboxEntries();
+
+    @SqlQuery(JOIN_QUERY + " WHERE i.done = true AND i.extension IS NOT NULL AND i.posted = false ORDER BY id DESC LIMIT 100")
+    @RegisterRowMapper(InboxEntryMapper.class)
+    List<InboxEntry> findRecentlyImportedPhotosNotYetPosted();
 
     @SqlQuery("""
             SELECT i.countryCode, i.stationId, i.title i_title, s.title s_title, i.lat i_lat, i.lon i_lon, s.lat s_lat, s.lon s_lon
@@ -93,9 +97,19 @@ public interface InboxDao {
     @SqlUpdate("UPDATE inbox SET notified = true WHERE id IN (<ids>)")
     void updateNotified(@BindList("ids") List<Long> ids);
 
+    @SqlUpdate("UPDATE inbox SET posted = true WHERE id = :id")
+    void updatePosted(@Bind("id") long id);
+
+    @SqlUpdate("UPDATE inbox SET photoId = :photoId WHERE id = :id")
+    void updatePhotoId(@Bind("id") long id, @Bind("photoId") long photoId);
+
+    @SqlUpdate("UPDATE inbox SET done = true, stationId = :stationId, countryCode = :countryCode, title = :title WHERE id = :id")
+    void updateMissingStationImported(@Bind("id") long id, @Bind("countryCode") String countryCode, @Bind("stationId") String stationId, @Bind("title") String title);
+
     @SqlQuery(JOIN_QUERY + " WHERE i.photographerId = :photographerId ORDER BY i.id DESC")
     @RegisterRowMapper(InboxEntryMapper.class)
     List<InboxEntry> findByUser(@Bind(PHOTOGRAPHER_ID) int photographerId);
+
 
     class InboxEntryMapper implements RowMapper<InboxEntry> {
 
@@ -139,6 +153,7 @@ public interface InboxDao {
                     .active(active)
                     .crc32(crc32)
                     .notified(rs.getBoolean("notified"))
+                    .posted(rs.getBoolean("posted"))
                     .build();
         }
 

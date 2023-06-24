@@ -41,7 +41,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -91,7 +90,7 @@ class InboxServiceTest {
 
     @BeforeEach
     void setup() {
-        inboxService = new InboxService(stationDao, photoStorage, monitor, inboxDao, userDao, countryDao, photoDao, "inboxBaseUrl", mastodonBot, "photoBaseUrl", clock);
+        inboxService = new InboxService(stationDao, photoStorage, monitor, inboxDao, userDao, countryDao, photoDao, "inboxBaseUrl", mastodonBot, "photoBaseUrl", clock, "stationUrl");
         reset(stationDao, photoStorage, monitor, inboxDao, userDao, countryDao, photoDao, mastodonBot);
 
         lenient().when(countryDao.findById(DE.getCode())).thenReturn(Optional.of(DE));
@@ -108,6 +107,36 @@ class InboxServiceTest {
     void licenseOfPhotoShouldBeOverridenByLicenseOfCountry() {
         var licenseForPhoto = InboxService.getLicenseForPhoto(createValidUser().build(), createCountryWithOverrideLicense(License.CC_BY_NC_SA_30_DE));
         assertThat(licenseForPhoto).isEqualTo(License.CC_BY_NC_SA_30_DE);
+    }
+
+    @Test
+    void postNewPhotoToMastodon() {
+        var user = User.builder()
+                .id(0)
+                .name("name")
+                .url("url")
+                .license(License.CC0_10)
+                .email("email")
+                .anonymous(false)
+                .build();
+        var inboxEntry = InboxEntry.builder()
+                .countryCode("de")
+                .stationId("1234")
+                .title("title")
+                .photographerId(0)
+                .photoId(2L)
+                .comment("comment")
+                .build();
+        when(userDao.findById(0)).thenReturn(Optional.of(user));
+        when(inboxDao.findRecentlyImportedPhotosNotYetPosted()).thenReturn(List.of(inboxEntry));
+
+        inboxService.postRecentlyImportedPhotoNotYetPosted();
+
+        verify(mastodonBot).tootNewPhoto("""
+                title
+                by name
+                stationUrl?countryCode=de&stationId=1234&photoId=2
+                comment""");
     }
 
     static Country createCountryWithOverrideLicense(License overrideLicense) {
@@ -144,7 +173,6 @@ class InboxServiceTest {
             assertPhotoCapture(NEW_PHOTO_ID, STATION_KEY_DE_1, true);
             verify(photoStorage).importPhoto(inboxEntry, station);
             verify(inboxDao).done(inboxEntry.getId());
-            verify(mastodonBot).tootNewPhoto(station, inboxEntry, photoCaptor.getValue(), IMPORTED_PHOTO_ID);
         }
 
         @Test
@@ -165,7 +193,6 @@ class InboxServiceTest {
             verify(photoDao).setAllPhotosForStationSecondary(STATION_KEY_DE_1);
             verify(photoStorage).importPhoto(inboxEntry, station);
             verify(inboxDao).done(inboxEntry.getId());
-            verify(mastodonBot).tootNewPhoto(station, inboxEntry, photoCaptor.getValue(), IMPORTED_PHOTO_ID);
         }
 
         @Test
@@ -186,7 +213,6 @@ class InboxServiceTest {
             verify(photoDao, never()).setAllPhotosForStationSecondary(STATION_KEY_DE_1);
             verify(photoStorage).importPhoto(inboxEntry, station);
             verify(inboxDao).done(inboxEntry.getId());
-            verify(mastodonBot).tootNewPhoto(station, inboxEntry, photoCaptor.getValue(), IMPORTED_PHOTO_ID);
         }
 
         @Test
@@ -207,7 +233,6 @@ class InboxServiceTest {
             verify(photoDao, never()).setAllPhotosForStationSecondary(STATION_KEY_DE_1);
             verify(photoStorage).importPhoto(inboxEntry, station);
             verify(inboxDao).done(inboxEntry.getId());
-            verify(mastodonBot).tootNewPhoto(station, inboxEntry, photoCaptor.getValue(), EXISTING_PHOTO_ID);
         }
 
         @Test
@@ -368,8 +393,7 @@ class InboxServiceTest {
             verify(stationDao).insert(newStation);
             assertPhotoCapture(NEW_PHOTO_ID, newStation.getKey(), true);
             verify(photoStorage).importPhoto(inboxEntry, newStation);
-            verify(inboxDao).done(inboxEntry.getId());
-            verify(mastodonBot).tootNewPhoto(newStation, inboxEntry, photoCaptor.getValue(), IMPORTED_PHOTO_ID);
+            verify(inboxDao).updateMissingStationImported(inboxEntry.getId(), STATION_KEY_DE_1.getCountry(), NEW_STATION_ID, NEW_STATION_TITLE);
         }
 
         @Test
@@ -390,8 +414,7 @@ class InboxServiceTest {
             verify(stationDao).insert(newStation);
             verify(photoDao, never()).insert(any(Photo.class));
             verify(photoStorage, never()).importPhoto(any(InboxEntry.class), any(Station.class));
-            verify(inboxDao).done(inboxEntry.getId());
-            verify(mastodonBot, never()).tootNewPhoto(any(Station.class), any(InboxEntry.class), any(Photo.class), anyLong());
+            verify(inboxDao).updateMissingStationImported(inboxEntry.getId(), STATION_KEY_DE_1.getCountry(), NEW_STATION_ID, NEW_STATION_TITLE);
         }
 
         @Test

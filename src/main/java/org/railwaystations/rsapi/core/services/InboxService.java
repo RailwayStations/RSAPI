@@ -37,6 +37,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 @Slf4j
@@ -53,11 +54,12 @@ public class InboxService implements ManageInboxUseCase {
     private final MastodonBot mastodonBot;
     private final Monitor monitor;
     private final Clock clock;
+    private final String stationUrl;
 
     public InboxService(StationDao stationDao, PhotoStorage photoStorage, Monitor monitor,
                         InboxDao inboxDao, UserDao userDao, CountryDao countryDao,
                         PhotoDao photoDao, @Value("${inboxBaseUrl}") String inboxBaseUrl, MastodonBot mastodonBot,
-                        @Value("${photoBaseUrl}") String photoBaseUrl, Clock clock) {
+                        @Value("${photoBaseUrl}") String photoBaseUrl, Clock clock, @Value("${mastodon-bot.stationUrl}") String stationUrl) {
         this.stationDao = stationDao;
         this.photoStorage = photoStorage;
         this.monitor = monitor;
@@ -69,6 +71,7 @@ public class InboxService implements ManageInboxUseCase {
         this.mastodonBot = mastodonBot;
         this.photoBaseUrl = photoBaseUrl;
         this.clock = clock;
+        this.stationUrl = stationUrl;
     }
 
     @Override
@@ -325,7 +328,7 @@ public class InboxService implements ManageInboxUseCase {
         } else {
             log.info("No photo to import for InboxEntry={}", inboxEntry.getId());
         }
-        inboxDao.done(inboxEntry.getId());
+        inboxDao.updateMissingStationImported(inboxEntry.getId(), station.getKey().getCountry(), station.getKey().getId(), station.getTitle());
     }
 
     public void importPhoto(InboxCommand command) {
@@ -397,8 +400,8 @@ public class InboxService implements ManageInboxUseCase {
                 photoId = photoDao.insert(photo);
             }
 
+            inboxDao.updatePhotoId(inboxEntry.getId(), photoId);
             log.info("Upload {} with photoId {} accepted: {}", inboxEntry.getId(), photoId, inboxEntry.getFilename());
-            mastodonBot.tootNewPhoto(station, inboxEntry, photo, photoId);
         } catch (Exception e) {
             log.error("Error importing upload {} photo {}", inboxEntry.getId(), inboxEntry.getFilename());
             throw new RuntimeException("Error moving file", e);
@@ -585,4 +588,20 @@ public class InboxService implements ManageInboxUseCase {
         return stationDao.findByKey(countryCode, stationId).stream().findFirst();
     }
 
+    public void postRecentlyImportedPhotoNotYetPosted() {
+        var inboxEntriesToPost = inboxDao.findRecentlyImportedPhotosNotYetPosted();
+        Random rand = new Random();
+        var inboxEntry = inboxEntriesToPost.get(rand.nextInt(inboxEntriesToPost.size()));
+        var photographer = userDao.findById(inboxEntry.getPhotographerId());
+        var status = String.format("%s%nby %s%n%s?countryCode=%s&stationId=%s&photoId=%s",
+                inboxEntry.getTitle(), photographer.map(User::getDisplayName).orElse(User.ANONYM), stationUrl,
+                inboxEntry.getCountryCode(), inboxEntry.getStationId(), inboxEntry.getPhotoId());
+        if (StringUtils.isNotBlank(inboxEntry.getComment())) {
+            status += String.format("%n%s", inboxEntry.getComment());
+        }
+
+        mastodonBot.tootNewPhoto(status);
+        inboxDao.updatePosted(inboxEntry.getId());
+
+    }
 }

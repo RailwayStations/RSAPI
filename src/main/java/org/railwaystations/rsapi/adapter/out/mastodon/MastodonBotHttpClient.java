@@ -1,12 +1,8 @@
 package org.railwaystations.rsapi.adapter.out.mastodon;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.railwaystations.rsapi.core.model.InboxEntry;
-import org.railwaystations.rsapi.core.model.Photo;
-import org.railwaystations.rsapi.core.model.Station;
 import org.railwaystations.rsapi.core.ports.out.MastodonBot;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
@@ -40,14 +36,14 @@ public class MastodonBotHttpClient implements MastodonBot {
 
     @Override
     @Async
-    public void tootNewPhoto(Station station, InboxEntry inboxEntry, Photo photo, long photoId) {
-        if (StringUtils.isBlank(config.instanceUrl()) || StringUtils.isBlank(config.token()) || StringUtils.isBlank(config.stationUrl())) {
-            log.info("New photo for Station {} not tooted, {}", station.getKey(), this);
+    public void tootNewPhoto(String status) {
+        if (StringUtils.isBlank(config.instanceUrl()) || StringUtils.isBlank(config.token())) {
+            log.info("New photo not tooted: {}", status);
             return;
         }
-        log.info("Sending toot for new photo of: {}", station.getKey());
+        log.info("Sending toot for new photo: {}", status);
         try {
-            String json = createStatusJson(station, inboxEntry, photo, photoId);
+            String json = objectMapper.writeValueAsString(new Toot(status));
             var request = HttpRequest.newBuilder()
                     .uri(URI.create(config.instanceUrl() + "/api/v1/statuses"))
                     .header("Content-Type", MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
@@ -69,16 +65,7 @@ public class MastodonBotHttpClient implements MastodonBot {
         }
     }
 
-    private String createStatusJson(Station station, InboxEntry inboxEntry, Photo photo, long photoId) throws JsonProcessingException {
-        var status = String.format("%s%nby %s%n%s?countryCode=%s&stationId=%s&photoId=%s",
-                station.getTitle(), photo.getPhotographer().getDisplayName(), config.stationUrl(),
-                station.getKey().getCountry(), station.getKey().getId(), photoId);
-        if (StringUtils.isNotBlank(inboxEntry.getComment())) {
-            status += String.format("%n%s", inboxEntry.getComment());
-        }
-        return objectMapper.writeValueAsString(new Toot(status));
+    record Toot(String status) {
     }
-
-    record Toot(String status) { }
 
 }
