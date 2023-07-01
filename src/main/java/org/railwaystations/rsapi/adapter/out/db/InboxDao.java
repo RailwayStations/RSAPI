@@ -49,7 +49,7 @@ public interface InboxDao {
     @RegisterRowMapper(InboxEntryMapper.class)
     List<InboxEntry> findPendingInboxEntries();
 
-    @SqlQuery(JOIN_QUERY + " WHERE i.done = true AND i.extension IS NOT NULL AND i.posted = false ORDER BY id DESC LIMIT 100")
+    @SqlQuery(JOIN_QUERY + " WHERE i.done = true AND i.rejectReason IS NULL AND i.extension IS NOT NULL AND i.posted = false ORDER BY id DESC LIMIT 100")
     @RegisterRowMapper(InboxEntryMapper.class)
     List<InboxEntry> findRecentlyImportedPhotosNotYetPosted();
 
