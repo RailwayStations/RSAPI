@@ -1,4 +1,4 @@
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b9882fcf1221409680f36afe2c85fcba)](https://www.codacy.com/gh/RailwayStations/RSAPI?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=RailwayStations/RSAPI&amp;utm_campaign=Badge_Grade) [![Coverage Status](https://coveralls.io/repos/github/RailwayStations/RSAPI/badge.svg?branch=master)](https://coveralls.io/github/RailwayStations/RSAPI?branch=master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b9882fcf1221409680f36afe2c85fcba)](https://www.codacy.com/gh/RailwayStations/RSAPI?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=RailwayStations/RSAPI&amp;utm_campaign=Badge_Grade)
 
 # Railway Stations API
 
