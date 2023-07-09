@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20230603.2145"
+  version: "202300709.1000"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -280,7 +280,7 @@ paths:
       parameters:
         - name: country
           in: query
-          description: filter by country code
+          description: filter by country code, defaults to "de" if missing, limits to max three countries
           schema:
             type: array
             items:

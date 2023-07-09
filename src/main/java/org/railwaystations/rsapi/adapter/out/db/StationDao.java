@@ -44,10 +44,6 @@ public interface StationDao {
     @RegisterRowMapper(StationMapper.class)
     Set<Station> findByCountryCodes(@BindList("countryCodes") Set<String> countryCodes, @Bind("hasPhoto") Boolean hasPhoto, @Bind("active") Boolean active);
 
-    @SqlQuery(JOIN_QUERY + " WHERE ((c.active = true AND :active IS NULL) OR c.active = :active) AND (:hasPhoto IS NULL OR (p.urlPath IS NULL AND :hasPhoto = false) OR (p.urlPath IS NOT NULL AND :hasPhoto = true))")
-    @RegisterRowMapper(StationMapper.class)
-    Set<Station> findByAllCountries(@Bind("hasPhoto") Boolean hasPhoto, @Bind("active") Boolean active);
-
     @SqlQuery("""
             SELECT s.countryCode, s.id, s.DS100, s.title, s.lat, s.lon, s.active,
                     p.id AS photoId, p.primary, p.urlPath, p.license, p.createdAt, p.outdated, u.id AS photographerId,

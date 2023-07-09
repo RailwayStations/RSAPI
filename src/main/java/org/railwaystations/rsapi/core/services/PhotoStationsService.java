@@ -44,11 +44,7 @@ public class PhotoStationsService implements FindPhotoStationsUseCase {
 
     @Override
     public Set<Station> findByCountry(Set<String> countries, Boolean hasPhoto, Boolean active) {
-        if (countries == null || countries.isEmpty()) {
-            return stationDao.findByAllCountries(hasPhoto, active);
-        } else {
-            return stationDao.findByCountryCodes(countries, hasPhoto, active);
-        }
+        return stationDao.findByCountryCodes(countries, hasPhoto, active);
     }
 
     @Override

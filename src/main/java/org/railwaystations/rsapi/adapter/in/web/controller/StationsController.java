@@ -10,9 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 public class StationsController implements StationsApi {
@@ -76,7 +76,7 @@ public class StationsController implements StationsApi {
 
     @Override
     public ResponseEntity<List<StationDto>> stationsGet(List<String> country, Boolean hasPhoto, String photographer, Boolean active) {
-        return ResponseEntity.ok(toDto(findPhotoStationsUseCase.findByCountry(country != null ? new HashSet<>(country) : null, hasPhoto, photographer, active)));
+        return ResponseEntity.ok(toDto(findPhotoStationsUseCase.findByCountry(country != null ? country.stream().limit(3).collect(Collectors.toSet()) : Set.of("de"), hasPhoto, photographer, active)));
     }
 
 }

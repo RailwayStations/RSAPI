@@ -36,10 +36,11 @@ class StationsControllerTest {
 
     @MockBean
     PhotoStationsService photoStationsService;
+    private Set<Station> stationsAll;
 
     @BeforeEach
     void setUp() {
-        var key5 = new Station.Key("xy", "5");
+        var key5 = new Station.Key("de", "5");
         var stationXY = Station.builder()
                 .key(key5)
                 .title("Lummerland")
@@ -49,7 +50,7 @@ class StationsControllerTest {
                 .build();
         stationXY.getPhotos().add(Photo.builder()
                 .stationKey(key5)
-                .urlPath("/xy/5.jpg")
+                .urlPath("/de/5.jpg")
                 .photographer(createTestPhotographer("Jim Knopf", "photographerUrl", License.CC0_10))
                 .license(License.CC0_10)
                 .primary(true)
@@ -71,32 +72,27 @@ class StationsControllerTest {
                 .primary(true)
                 .build());
 
-        var stationsAll = Set.of(stationAB, stationXY);
+        stationsAll = Set.of(stationAB, stationXY);
 
-        when(photoStationsService.findByCountry(Collections.singleton("xy"), null, null, null)).thenReturn(Set.of(stationXY));
+        when(photoStationsService.findByCountry(Collections.singleton("de"), null, null, null)).thenReturn(Set.of(stationXY));
         when(photoStationsService.findByCountry(Collections.singleton("ab"), null, null, null)).thenReturn(Set.of(stationAB));
-        when(photoStationsService.findByCountry(null, null, null, null)).thenReturn(stationsAll);
-        when(photoStationsService.findByCountry(allCountries(), null, null, null)).thenReturn(stationsAll);
+        when(photoStationsService.findByCountry(Set.of("ab", "de"), null, null, null)).thenReturn(stationsAll);
         when(photoStationsService.findByCountryAndId("ab", "3")).thenReturn(Optional.of(stationAB));
-    }
-
-    Set<String> allCountries() {
-        return Set.of("ab", "xy");
     }
 
     @Test
     void getStationsByCountryXY() throws Exception {
-        mvc.perform(get("/stations?country=xy"))
+        mvc.perform(get("/stations?country=de"))
                 .andExpect(status().isOk())
                 .andExpect(validOpenApiResponse())
-                .andExpect(jsonPath("$.[0].country").value("xy"))
+                .andExpect(jsonPath("$.[0].country").value("de"))
                 .andExpect(jsonPath("$.[0].idStr").value("5"))
                 .andExpect(jsonPath("$.[0].title").value("Lummerland"))
                 .andExpect(jsonPath("$.[0].lat").value(50.0))
                 .andExpect(jsonPath("$.[0].lon").value(9.0))
                 .andExpect(jsonPath("$.[0].photographer").value("Jim Knopf"))
                 .andExpect(jsonPath("$.[0].DS100").value("XYZ"))
-                .andExpect(jsonPath("$.[0].photoUrl").value("http://localhost:8080/photos/xy/5.jpg"))
+                .andExpect(jsonPath("$.[0].photoUrl").value("http://localhost:8080/photos/de/5.jpg"))
                 .andExpect(jsonPath("$.[0].license").value("CC0 1.0 Universell (CC0 1.0)"))
                 .andExpect(jsonPath("$.[0].photographerUrl").value("photographerUrl"))
                 .andExpect(jsonPath("$.[0].active").value(false));
@@ -104,7 +100,7 @@ class StationsControllerTest {
 
     @Test
     void getStationsByCountryXYWithFilterActive() throws Exception {
-        mvc.perform(get("/stations?country=xy&active=true"))
+        mvc.perform(get("/stations?country=de&active=true"))
                 .andExpect(status().isOk())
                 .andExpect(validOpenApiResponse())
                 .andExpect(jsonPath("$").isArray())
@@ -148,8 +144,8 @@ class StationsControllerTest {
     }
 
     @Test
-    void getStationsByCountriesABandXY() throws Exception {
-        mvc.perform(get("/stations?country=ab&country=xy"))
+    void getStationsByCountriesABandDE() throws Exception {
+        mvc.perform(get("/stations?country=ab&country=de"))
                 .andExpect(status().isOk())
                 .andExpect(validOpenApiResponse())
                 .andExpect(jsonPath("$.[0]").isNotEmpty())
@@ -158,8 +154,21 @@ class StationsControllerTest {
     }
 
     @Test
-    void getAllStations() throws Exception {
+    void getAllStationsDefaultsToDE() throws Exception {
         mvc.perform(get("/stations"))
+                .andExpect(status().isOk())
+                .andExpect(validOpenApiResponse())
+                .andExpect(jsonPath("$.[0]").isNotEmpty())
+                .andExpect(jsonPath("$.[0].country").value("de"))
+                .andExpect(jsonPath("$.[1]").doesNotExist())
+                .andExpect(jsonPath("$.[2]").doesNotExist());
+    }
+
+    @Test
+    void getStationsIsLimitedToThreeCountries() throws Exception {
+        when(photoStationsService.findByCountry(Set.of("ab", "de", "xy"), null, null, null)).thenReturn(stationsAll);
+
+        mvc.perform(get("/stations?country=ab&country=de&country=xy&country=zz"))
                 .andExpect(status().isOk())
                 .andExpect(validOpenApiResponse())
                 .andExpect(jsonPath("$.[0]").isNotEmpty())

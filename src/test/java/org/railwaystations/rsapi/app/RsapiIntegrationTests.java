@@ -82,11 +82,11 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
     PhotoDao photoDao;
 
     @Test
-    void stationsAllCountries() {
+    void stationsAllCountriesIsDefaultingToDE() {
         var stations = assertLoadStationsOk("/stations");
-        assertThat(stations.length).isEqualTo(955);
+        assertThat(stations.length).isEqualTo(730);
         assertThat(findByKey(stations, new Station.Key("de", "6721"))).isNotNull();
-        assertThat(findByKey(stations, new Station.Key("ch", "8500126"))).isNotNull();
+        assertThat(findByKey(stations, new Station.Key("ch", "8500126"))).isNull();
     }
 
     @Test
