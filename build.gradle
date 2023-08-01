@@ -87,7 +87,7 @@ dependencies {
     implementation 'io.swagger.core.v3:swagger-annotations:2.2.15'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
     implementation 'org.hibernate.validator:hibernate-validator'
-    implementation 'org.webjars:bootstrap:5.3.0'
+    implementation 'org.webjars:bootstrap:5.3.1'
 
     compileOnly 'org.projectlombok:lombok'
 
