@@ -62,7 +62,7 @@ sourceSets.main.java.srcDirs += 'build/openapi/src/main/java'
 compileJava.dependsOn tasks.openApiGenerate
 
 ext {
-    testContainersVersion = '1.18.3'
+    testContainersVersion = '1.19.0'
     jdbiVersion = '3.41.0'
     swaggerRequestValidatorVersion = '2.35.2'
 }
