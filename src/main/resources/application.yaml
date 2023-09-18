@@ -25,6 +25,10 @@ server:
       enabled: true
   tomcat:
     max-swallow-size: 100MB
+  compression:
+    enabled: true
+    mime-types: text/html,text/plain,text/css,application/javascript,application/json
+    min-response-size: 1024
 
 logging:
   level:
