@@ -20,9 +20,6 @@ public class Country {
     @Builder.Default
     String email = "info@railway-stations.org";
 
-    @Builder.Default
-    String twitterTags = "@Bahnhofsoma, #dbHackathon, #dbOpendata, #Bahnhofsfoto, @khgdrn";
-
     String timetableUrlTemplate;
 
     License overrideLicense;

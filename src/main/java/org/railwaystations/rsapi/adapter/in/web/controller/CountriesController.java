@@ -25,7 +25,6 @@ public class CountriesController implements CountriesApi {
                 .email(country.getEmail())
                 .overrideLicense(country.getOverrideLicense() != null ? country.getOverrideLicense().getDisplayName() : null)
                 .timetableUrlTemplate(country.getTimetableUrlTemplate())
-                .twitterTags(country.getTwitterTags())
                 .providerApps(toDto(country.getProviderApps()));
     }
 

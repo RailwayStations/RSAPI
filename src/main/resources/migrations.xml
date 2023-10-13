@@ -1053,4 +1053,8 @@
         </update>
     </changeSet>
 
+    <changeSet id="58" author="pstorch">
+        <dropColumn tableName="countries" columnName="twitterTags"/>
+    </changeSet>
+
 </databaseChangeLog>

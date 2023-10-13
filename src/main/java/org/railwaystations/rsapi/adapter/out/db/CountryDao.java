@@ -21,7 +21,7 @@ import java.util.Set;
 public interface CountryDao {
 
     @SqlQuery("""
-            SELECT c.id c_id, c.name c_name, c.email c_email, c.twitterTags c_twitterTags, c.timetableUrlTemplate c_timetableUrlTemplate,
+            SELECT c.id c_id, c.name c_name, c.email c_email, c.timetableUrlTemplate c_timetableUrlTemplate,
                     c.overrideLicense c_overrideLicense, c.active c_active, p.type p_type, p.name p_name, p.url p_url
             FROM countries c
                 LEFT JOIN providerApps p ON c.id = p.countryCode
@@ -33,7 +33,7 @@ public interface CountryDao {
     Optional<Country> findById(@Bind("id") String id);
 
     @SqlQuery("""
-            SELECT c.id c_id, c.name c_name, c.email c_email, c.twitterTags c_twitterTags, c.timetableUrlTemplate c_timetableUrlTemplate,
+            SELECT c.id c_id, c.name c_name, c.email c_email, c.timetableUrlTemplate c_timetableUrlTemplate,
                     c.overrideLicense c_overrideLicense, c.active c_active, p.type p_type, p.name p_name, p.url p_url
             FROM countries c
                 LEFT JOIN providerApps p ON c.id = p.countryCode
@@ -42,7 +42,7 @@ public interface CountryDao {
     @UseRowReducer(CountryProviderAppReducer.class)
     @RegisterRowMapper(CountryMapper.class)
     @RegisterRowMapper(ProviderAppMapper.class)
-    Set<Country> list(@Bind("onlyActive")  boolean onlyActive);
+    Set<Country> list(@Bind("onlyActive") boolean onlyActive);
 
     class CountryMapper implements RowMapper<Country> {
         public Country map(ResultSet rs, StatementContext ctx) throws SQLException {
@@ -51,7 +51,6 @@ public interface CountryDao {
                     .code(rs.getString("c_id"))
                     .name(rs.getString("c_name"))
                     .email(rs.getString("c_email"))
-                    .twitterTags(rs.getString("c_twitterTags"))
                     .timetableUrlTemplate(rs.getString("c_timetableUrlTemplate"))
                     .overrideLicense(overrideLicense != null ? License.valueOf(overrideLicense) : null)
                     .active(rs.getBoolean("c_active"))

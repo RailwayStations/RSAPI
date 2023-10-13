@@ -759,7 +759,6 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
             switch (node.get("code").asText()) {
                 case "de" -> {
                     assertThat(node.get("name").asText()).isEqualTo("Deutschland");
-                    assertThat(node.get("twitterTags").asText()).isEqualTo("@Bahnhofsoma, #dbHackathon, #dbOpendata, #Bahnhofsfoto, @khgdrn");
                     assertThat(node.get("providerApps").size()).isEqualTo(3);
                     assertProviderApp(node, 0, "android", "DB Navigator", "https://play.google.com/store/apps/details?id=de.hafas.android.db");
                     assertProviderApp(node, 1, "android", "FlixTrain", "https://play.google.com/store/apps/details?id=de.meinfernbus");
@@ -768,7 +767,6 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
                 }
                 case "ch" -> {
                     assertThat(node.get("name").asText()).isEqualTo("Schweiz");
-                    assertThat(node.get("twitterTags").asText()).isEqualTo("@BahnhoefeCH, @Bahnhofsoma, #BahnhofsfotoCH");
                     assertThat(node.get("providerApps").size()).isEqualTo(2);
                     assertProviderApp(node, 0, "android", "SBB Mobile", "https://play.google.com/store/apps/details?id=ch.sbb.mobile.android.b2c");
                     assertProviderApp(node, 1, "ios", "SBB Mobile", "https://apps.apple.com/app/sbb-mobile/id294855237");

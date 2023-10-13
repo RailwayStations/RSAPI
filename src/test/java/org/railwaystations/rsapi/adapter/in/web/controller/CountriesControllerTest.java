@@ -68,7 +68,6 @@ class CountriesControllerTest {
                 .code(code)
                 .name("name-" + code)
                 .email("email-" + code)
-                .twitterTags("twitter-" + code)
                 .timetableUrlTemplate("timetable-" + code)
                 .overrideLicense(License.CC_BY_NC_40_INT)
                 .active(true)
@@ -86,7 +85,6 @@ class CountriesControllerTest {
     private void assertCountry(CountryDto country) {
         assertThat(country.getName()).isEqualTo("name-" + country.getCode());
         assertThat(country.getEmail()).isEqualTo("email-" + country.getCode());
-        assertThat(country.getTwitterTags()).isEqualTo("twitter-" + country.getCode());
         assertThat(country.getTimetableUrlTemplate()).isEqualTo("timetable-" + country.getCode());
         assertThat(country.getOverrideLicense()).isEqualTo(License.CC_BY_NC_40_INT.getDisplayName());
         assertThat(country.getProviderApps().size()).isEqualTo(3);
