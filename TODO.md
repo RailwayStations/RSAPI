@@ -4,16 +4,6 @@
 
 - restructure testdata database migrations vs. TestFixtures
 
-- package structure:
-
-    - app vs. application vs. core
-
-    - core/model vs. domain
-
-- full (incoming) model validation
-
-- introduce Repository classes to hide JDBI DAOs?
-
 - reintroduce multistage docker build
 
 - harden docker
