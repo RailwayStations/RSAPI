@@ -11,6 +11,7 @@ import org.railwaystations.rsapi.adapter.out.db.InboxDao;
 import org.railwaystations.rsapi.core.model.InboxEntry;
 import org.railwaystations.rsapi.core.ports.out.PhotoStorage;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -84,7 +85,7 @@ public class WebDavSyncTask {
         try {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
             log.info("ListProcessedFiles response " + response.statusCode());
-            if (response.statusCode() != 207) {
+            if (response.statusCode() != HttpStatus.MULTI_STATUS.value()) {
                 throw new RuntimeException("Failed to list processed files, statusCode=" + response.statusCode());
             }
             return new XmlMapper().readValue(response.body(), Multistatus.class).getResponses();
@@ -124,7 +125,7 @@ public class WebDavSyncTask {
         var getResponse = client.send(getRequest, HttpResponse.BodyHandlers.ofFile(processedPath));
         log.info("Download getResponse {}, bytes {}", getResponse.statusCode(), Files.size(processedPath));
 
-        if (getResponse.statusCode() == 200) {
+        if (getResponse.statusCode() == HttpStatus.OK.value()) {
             var delRequest = HttpRequest.newBuilder()
                     .uri(processedUri)
                     .timeout(Duration.of(1, ChronoUnit.MINUTES))
@@ -151,14 +152,14 @@ public class WebDavSyncTask {
                 .build();
         var response = client.send(request, HttpResponse.BodyHandlers.ofString());
         log.info("Upload response " + response.statusCode());
-        if (response.statusCode() != 201) {
+        if (response.statusCode() != HttpStatus.CREATED.value()) {
             throw new RuntimeException("Failed Upload, statusCode=" + response.statusCode());
         }
     }
 
     @Data
     @NoArgsConstructor
-    @JsonIgnoreProperties(ignoreUnknown=true)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     static class Multistatus {
         @JacksonXmlElementWrapper(useWrapping = false)
         @JsonProperty("response")
@@ -167,7 +168,7 @@ public class WebDavSyncTask {
 
     @Data
     @NoArgsConstructor
-    @JsonIgnoreProperties(ignoreUnknown=true)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     static class MultistatusResponse {
         String href;
     }
