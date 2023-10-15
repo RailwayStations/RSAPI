@@ -1,4 +1,4 @@
-FROM amazoncorretto:20-alpine
+FROM amazoncorretto:21-alpine
 ENV RSAPI_HOME=/opt/services
 ENV RSAPI_WORK=/var/rsapi
 ENV ARTIFACT_NAME=rsapi-0.0.1-SNAPSHOT.jar
