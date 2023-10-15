@@ -86,7 +86,7 @@ class InboxServiceTest {
     MastodonBot mastodonBot;
     @Captor
     ArgumentCaptor<Photo> photoCaptor;
-    Clock clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
+    final Clock clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
 
     @BeforeEach
     void setup() {
