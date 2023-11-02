@@ -72,6 +72,7 @@ public class InboxController implements InboxApi {
             case STATION_INACTIVE -> ProblemReportType.STATION_INACTIVE;
             case WRONG_LOCATION -> ProblemReportType.WRONG_LOCATION;
             case STATION_NONEXISTENT -> ProblemReportType.STATION_NONEXISTENT;
+            case DUPLICATE -> ProblemReportType.DUPLICATE;
         };
     }
 
@@ -180,6 +181,7 @@ public class InboxController implements InboxApi {
             case WRONG_PHOTO -> ProblemReportTypeDto.WRONG_PHOTO;
             case WRONG_NAME -> ProblemReportTypeDto.WRONG_NAME;
             case OTHER -> ProblemReportTypeDto.OTHER;
+            case DUPLICATE -> ProblemReportTypeDto.DUPLICATE;
         };
     }
 

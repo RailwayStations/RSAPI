@@ -8,7 +8,8 @@ public enum ProblemReportType {
     WRONG_PHOTO(true),
     PHOTO_OUTDATED(true),
     OTHER(false),
-    WRONG_NAME(false);
+    WRONG_NAME(false),
+    DUPLICATE(false);
 
     private final boolean needsPhoto;
 

@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "202301013.1845"
+  version: "202301102.2000"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -1977,6 +1977,7 @@ components:
         - WRONG_PHOTO
         - PHOTO_OUTDATED
         - OTHER
+        - DUPLICATE
 
     ChangePassword:
       type: object
