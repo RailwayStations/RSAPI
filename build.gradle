@@ -63,7 +63,7 @@ compileJava.dependsOn tasks.openApiGenerate
 ext {
     testContainersVersion = '1.19.1'
     jdbiVersion = '3.41.3'
-    swaggerRequestValidatorVersion = '2.38.1'
+    swaggerRequestValidatorVersion = '2.39.0'
 }
 
 dependencies {
