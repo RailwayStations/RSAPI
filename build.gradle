@@ -83,7 +83,7 @@ dependencies {
     implementation "commons-codec:commons-codec"
     implementation "commons-io:commons-io:2.15.0"
     implementation "org.apache.commons:commons-lang3"
-    implementation 'io.swagger.core.v3:swagger-annotations:2.2.18'
+    implementation 'io.swagger.core.v3:swagger-annotations:2.2.19'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
     implementation 'org.hibernate.validator:hibernate-validator'
     implementation 'org.webjars:bootstrap:5.3.2'
