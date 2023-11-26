@@ -42,8 +42,8 @@ class UserTest {
             "nickname,                  , " + User.EMAIL_VERIFIED + "              , false",
             "nickname, email@example.com, " + User.EMAIL_VERIFIED_AT_NEXT_LOGIN + ", false",
             "        , email@example.com, VERIFICATION_TOKEN                       , false"})
-    void isEligibleToReportProblem(String name, String emailVerification, boolean expected) {
-        assertThat(User.builder().name(name).emailVerification(emailVerification).build().isEligibleToReportProblem()).isEqualTo(expected);
+    void isEligibleToReportProblem(String name, String email, String emailVerification, boolean expected) {
+        assertThat(User.builder().name(name).email(email).emailVerification(emailVerification).build().isEligibleToReportProblem()).isEqualTo(expected);
     }
 
     @ParameterizedTest
