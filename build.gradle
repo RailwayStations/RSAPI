@@ -2,7 +2,6 @@ plugins {
     id 'org.springframework.boot' version '3.2.0'
     id 'io.spring.dependency-management' version '1.1.4'
     id 'java'
-    id "com.github.spotbugs" version "5.2.5"
     id "org.openapi.generator" version "7.1.0"
 }
 
@@ -36,12 +35,12 @@ openApiValidate {
 openApiGenerate {
     generatorName = "spring"
     inputSpec = "$rootDir/src/main/resources/static/openapi.yaml".toString()
-    outputDir = "$buildDir/openapi".toString()
+    outputDir = layout.buildDirectory.file("openapi").get().asFile.toString()
     apiPackage = "org.railwaystations.rsapi.adapter.in.web.api"
     modelPackage = "org.railwaystations.rsapi.adapter.in.web.model"
     modelNameSuffix = "Dto"
     cleanupOutput = true
-    configOptions = [
+    configOptions.set([
             interfaceOnly        : "true",
             useSpringController  : "true",
             openApiNullable      : "false",
@@ -53,7 +52,7 @@ openApiGenerate {
             useBeanValidation    : "true",
             useSpringBoot3       : "true",
             implicitHeadersRegex : "(Authorization|Upload-Token|Email)"
-    ]
+    ])
 }
 
 sourceSets.main.java.srcDirs += 'build/openapi/src/main/java'
@@ -112,12 +111,4 @@ dependencies {
 
 test {
     useJUnitPlatform()
-}
-
-spotbugs {
-    ignoreFailures.set(true)
-}
-
-spotbugsTest {
-    ignoreFailures = true
 }
