@@ -78,7 +78,7 @@ dependencies {
     implementation "org.jdbi:jdbi3-spring5:$jdbiVersion"
     implementation "org.jdbi:jdbi3-sqlobject:$jdbiVersion"
     implementation "com.goterl:lazysodium-java:5.1.4"
-    implementation "net.java.dev.jna:jna:5.13.0"
+    implementation "net.java.dev.jna:jna:5.14.0"
     implementation "commons-codec:commons-codec"
     implementation "commons-io:commons-io:2.15.1"
     implementation "org.apache.commons:commons-lang3"
