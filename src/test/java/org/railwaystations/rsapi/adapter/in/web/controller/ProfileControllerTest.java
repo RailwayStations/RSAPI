@@ -252,28 +252,13 @@ class ProfileControllerTest {
         return httpBasic(EXISTING_EMAIL, "y89zFqkL6hro");
     }
 
-    @Test
-    void changePasswordTooShortHeader() throws Exception {
-        givenExistingUser();
-
-        postChangePassword("secret", null)
-                .andExpect(status().isBadRequest());
-
-        verify(userDao, never()).updateCredentials(anyInt(), anyString());
-        verify(authorizationDao, never()).deleteAllByUser(EXISTING_USER_NAME);
-    }
-
     @NotNull
-    private ResultActions postChangePassword(String newPasswordHeader, String newPasswordBody) throws Exception {
+    private ResultActions postChangePassword(String newPasswordBody) throws Exception {
         MockHttpServletRequestBuilder action = post("/changePassword")
                 .header("User-Agent", "UserAgent")
                 .secure(true)
                 .with(basicHttpAuthForExistingUser())
                 .with(csrf());
-
-        if (newPasswordHeader != null) {
-            action = action.header("New-Password", newPasswordHeader);
-        }
 
         if (newPasswordBody != null) {
             action = action.contentType("application/json")
@@ -288,7 +273,7 @@ class ProfileControllerTest {
     void changePasswordTooShortBody() throws Exception {
         givenExistingUser();
 
-        postChangePassword(null, "{\"newPassword\": \"secret\"}")
+        postChangePassword("{\"newPassword\": \"secret\"}")
                 .andExpect(status().isBadRequest());
 
         verify(userDao, never()).updateCredentials(anyInt(), anyString());
@@ -297,26 +282,10 @@ class ProfileControllerTest {
     }
 
     @Test
-    void changePasswordHeader() throws Exception {
-        givenExistingUser();
-
-        postChangePassword("secretlong", null)
-                .andExpect(status().isOk());
-
-        var idCaptor = ArgumentCaptor.forClass(Integer.class);
-        var keyCaptor = ArgumentCaptor.forClass(String.class);
-        verify(userDao).updateCredentials(idCaptor.capture(), keyCaptor.capture());
-        verify(authorizationDao).deleteAllByUser(EXISTING_USER_NAME);
-
-        assertThat(idCaptor.getValue()).isEqualTo(EXISTING_USER_ID);
-        assertThat(new LazySodiumPasswordEncoder().matches("secretlong", keyCaptor.getValue())).isTrue();
-    }
-
-    @Test
     void changePasswordBody() throws Exception {
         givenExistingUser();
 
-        postChangePassword(null, "{\"newPassword\": \"secretlong\"}")
+        postChangePassword("{\"newPassword\": \"secretlong\"}")
                 .andExpect(status().isOk());
 
         var idCaptor = ArgumentCaptor.forClass(Integer.class);
@@ -326,22 +295,6 @@ class ProfileControllerTest {
 
         assertThat(idCaptor.getValue()).isEqualTo(EXISTING_USER_ID);
         assertThat(new LazySodiumPasswordEncoder().matches("secretlong", keyCaptor.getValue())).isTrue();
-    }
-
-    @Test
-    void changePasswordHeaderAndBody() throws Exception {
-        givenExistingUser();
-
-        postChangePassword("secretheader", "{\"newPassword\": \"secretbody\"}")
-                .andExpect(status().isOk());
-
-        var idCaptor = ArgumentCaptor.forClass(Integer.class);
-        var keyCaptor = ArgumentCaptor.forClass(String.class);
-        verify(userDao).updateCredentials(idCaptor.capture(), keyCaptor.capture());
-        verify(authorizationDao).deleteAllByUser(EXISTING_USER_NAME);
-
-        assertThat(idCaptor.getValue()).isEqualTo(EXISTING_USER_ID);
-        assertThat(new LazySodiumPasswordEncoder().matches("secretbody", keyCaptor.getValue())).isTrue();
     }
 
     @Test
@@ -439,25 +392,6 @@ class ProfileControllerTest {
         verify(userDao).update(user.getId(), user);
     }
 
-    @Test
-    void resetPasswordViaEmail() throws Exception {
-        var user = User.builder()
-                .name(EXISTING_USER_NAME)
-                .license(License.CC0_10)
-                .email(EXISTING_EMAIL)
-                .ownPhotos(true)
-                .anonymous(false)
-                .url("https://link@example.com")
-                .sendNotifications(true).build();
-        when(userDao.findByNormalizedName(user.getName())).thenReturn(Optional.of(user));
-        when(userDao.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-
-        postResetPassword(EXISTING_EMAIL).andExpect(status().isAccepted());
-
-        verify(authorizationDao).deleteAllByUser(EXISTING_USER_NAME);
-        assertThat(monitor.getMessages().get(0)).isEqualTo(String.format("Reset Password for '%s', email='%s'", EXISTING_USER_NAME, EXISTING_EMAIL));
-    }
-
     @NotNull
     private ResultActions postResetPassword(String nameOrEmail) throws Exception {
         return mvc.perform(post("/resetPassword")
@@ -465,44 +399,6 @@ class ProfileControllerTest {
                         .header("NameOrEmail", nameOrEmail)
                         .with(csrf()))
                 .andExpect(validOpenApiResponse());
-    }
-
-    @Test
-    void resetPasswordViaName() throws Exception {
-        var user = User.builder()
-                .name(EXISTING_USER_NAME)
-                .license(License.CC0_10)
-                .email(EXISTING_EMAIL)
-                .ownPhotos(true)
-                .anonymous(false)
-                .url("https://link@example.com")
-                .sendNotifications(true).build();
-        when(userDao.findByNormalizedName(user.getName())).thenReturn(Optional.of(user));
-        when(userDao.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-
-        postResetPassword(EXISTING_USER_NAME).andExpect(status().isAccepted());
-
-        verify(authorizationDao).deleteAllByUser(EXISTING_USER_NAME);
-        assertThat(monitor.getMessages().get(0)).isEqualTo(String.format("Reset Password for '%s', email='%s'", EXISTING_USER_NAME, EXISTING_EMAIL));
-    }
-
-    @Test
-    void resetPasswordUserNotFound() throws Exception {
-        postResetPassword("doesnt-exist").andExpect(status().isBadRequest());
-        verify(authorizationDao, never()).deleteAllByUser("doesnt-exist");
-    }
-
-    @Test
-    void resetPasswordEmailMissing() throws Exception {
-        var user = User.builder()
-                .name(EXISTING_USER_NAME)
-                .build();
-        when(userDao.findByNormalizedName(user.getName())).thenReturn(Optional.of(user));
-        when(userDao.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-
-        postResetPassword(EXISTING_USER_NAME)
-                .andExpect(status().isBadRequest());
-        verify(authorizationDao, never()).deleteAllByUser(EXISTING_USER_NAME);
     }
 
     @Test

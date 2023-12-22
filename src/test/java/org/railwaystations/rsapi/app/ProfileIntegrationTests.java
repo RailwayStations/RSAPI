@@ -419,24 +419,18 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
         assertProfile(responseGetAfter, "user14", null, true, "user14@example.com");
 
         var secondPassword = "!\"$%&/()=?-1234567890";
-        changePassword(firstPassword, secondPassword, true);
-        changePassword(secondPassword, "\\=oF`)X77__U}G", false);
+        changePassword(firstPassword, secondPassword);
+        changePassword(secondPassword, "\\=oF`)X77__U}G");
     }
 
-    private void changePassword(String oldPassword, String newPassword, boolean changePasswordViaHeader) {
+    private void changePassword(String oldPassword, String newPassword) {
         var headers = new HttpHeaders();
         headers.setBasicAuth("user14@example.com", oldPassword);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<Object> changePasswordRequest;
-        if (changePasswordViaHeader) {
-            headers.add("New-Password", newPassword);
-            changePasswordRequest = new HttpEntity<>(headers);
-        } else {
-            var changePassword = mapper.createObjectNode();
-            changePassword.set("newPassword", new TextNode(newPassword));
-            changePasswordRequest = new HttpEntity<>(changePassword, headers);
-        }
+        var changePassword = mapper.createObjectNode();
+        changePassword.set("newPassword", new TextNode(newPassword));
+        var changePasswordRequest = new HttpEntity<>(changePassword, headers);
 
         var responseChangePassword = restTemplate.postForEntity(
                 String.format("http://localhost:%d%s", port, "/changePassword"), changePasswordRequest, String.class);

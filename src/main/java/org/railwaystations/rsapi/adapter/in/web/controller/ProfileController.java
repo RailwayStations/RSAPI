@@ -96,8 +96,8 @@ public class ProfileController implements ProfileApi {
 
     @PreAuthorize("isAuthenticated()")
     @Override
-    public ResponseEntity<Void> changePasswordPost(String newPassword, ChangePasswordDto changePasswordDto) {
-        manageProfileUseCase.changePassword(getAuthUser().getUser(), changePasswordDto != null ? changePasswordDto.getNewPassword() : newPassword);
+    public ResponseEntity<Void> changePasswordPost(ChangePasswordDto changePasswordDto) {
+        manageProfileUseCase.changePassword(getAuthUser().getUser(), changePasswordDto.getNewPassword());
         return ResponseEntity.ok().build();
     }
 
@@ -141,12 +141,6 @@ public class ProfileController implements ProfileApi {
     public ResponseEntity<Void> resendEmailVerificationPost() {
         manageProfileUseCase.resendEmailVerification(getAuthUser().getUser());
         return ResponseEntity.ok().build();
-    }
-
-    @Override
-    public ResponseEntity<Void> resetPasswordPost(String nameOrEmail) {
-        manageProfileUseCase.resetPassword(nameOrEmail, getUserAgent());
-        return ResponseEntity.accepted().build();
     }
 
 }

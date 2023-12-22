@@ -401,7 +401,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 
     @Test
     void photographersDe() throws IOException {
-        var response = loadRaw("/de/photographers", HttpStatus.OK, String.class);
+        var response = loadRaw("/photographers?country=de", HttpStatus.OK, String.class);
         var jsonNode = mapper.readTree(response.getBody());
         assertThat(jsonNode).isNotNull();
         assertThat(jsonNode.isObject()).isTrue();
@@ -422,7 +422,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 
     @Test
     void statisticDeJson() throws IOException {
-        var response = loadRaw("/de/stats", HttpStatus.OK, String.class);
+        var response = loadRaw("/stats?country=de", HttpStatus.OK, String.class);
         var jsonNode = mapper.readTree(response.getBody());
         assertThat(jsonNode).isNotNull();
         assertThat(jsonNode.get("total").asInt()).isEqualTo(730);

@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "202301102.2000"
+  version: "20231222.1300"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -340,36 +340,6 @@ paths:
           description: Station not found
           content: { }
 
-  /{country}/photographers:
-    get:
-      summary: List of all photographers of a given country with their number of photos taken
-      deprecated: true
-      tags:
-        - photographers
-      parameters:
-        - name: country
-          in: path
-          description: filter by country code
-          required: true
-          schema:
-            $ref: '#/components/schemas/CountryCode'
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Photographers'
-        400:
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                type: object
-        404:
-          description: Country not found
-          content: { }
-
   /photographers:
     get:
       summary: List of all photographers with their number of photos taken
@@ -395,36 +365,6 @@ paths:
             application/json:
               schema:
                 type: object
-
-  /{country}/stats:
-    get:
-      summary: Statistic of photos with and without photos by country
-      deprecated: true
-      tags:
-        - statistic
-      parameters:
-        - name: country
-          in: path
-          description: filter by country code
-          required: true
-          schema:
-            $ref: '#/components/schemas/CountryCode'
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Statistic'
-        400:
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                type: object
-        404:
-          description: Country not found
-          content: { }
 
   /stats:
     get:
@@ -842,32 +782,6 @@ paths:
           description: email successfully sent
           content: { }
 
-  /resetPassword:
-    post:
-      summary: Requests a new password only
-      description: |
-        DEPRECATED: use oauth instead
-      deprecated: true
-      tags:
-        - profile
-      parameters:
-        - name: NameOrEmail
-          in: header
-          description: name or email of the user
-          required: true
-          schema:
-            type: string
-      responses:
-        202:
-          description: request accepted, email with new password will be sent
-          content: { }
-        400:
-          description: Bad Request
-          content:
-            text/plain:
-              schema:
-                type: string
-
   /changePassword:
     post:
       summary: Change user password
@@ -875,13 +789,6 @@ paths:
         - profile
       parameters:
         - $ref: '#/components/parameters/Authorization'
-        - name: New-Password
-          in: header
-          description: new password, deprecated use body message for proper encoding
-          deprecated: true
-          required: false
-          schema:
-            type: string
       requestBody:
         description: ChangePassword
         content:
@@ -1170,7 +1077,7 @@ components:
       name: Authorization
       in: header
       description: |
-        HTTP basic authorization
+        JWT authorization
       required: false
       schema:
         type: string

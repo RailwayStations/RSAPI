@@ -24,11 +24,6 @@ public class StatisticController implements StatisticApi {
     }
 
     @Override
-    public ResponseEntity<StatisticDto> countryStatsGet(String country) {
-        return ResponseEntity.ok(getStatistic(country));
-    }
-
-    @Override
     public ResponseEntity<StatisticDto> statsGet(String country) {
         return ResponseEntity.ok(getStatistic(country));
     }

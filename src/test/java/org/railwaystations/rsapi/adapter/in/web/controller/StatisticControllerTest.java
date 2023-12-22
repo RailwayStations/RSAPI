@@ -44,7 +44,7 @@ class StatisticControllerTest {
 
     @Test
     void whenCountryIsInvalidThenReturnsStatus400() throws Exception {
-        mvc.perform(get("/x/stats"))
+        mvc.perform(get("/stats?country=x"))
                 .andExpect(validOpenApiResponse())
                 .andExpect(status().isBadRequest());
     }
@@ -67,7 +67,7 @@ class StatisticControllerTest {
     void getStatisticForCountryDe() throws Exception {
         when(stationDao.getStatistic("de")).thenReturn(new Statistic("de", 729, 84, 4));
 
-        mvc.perform(get("/de/stats"))
+        mvc.perform(get("/stats?country=de"))
                 .andExpect(status().isOk())
                 .andExpect(validOpenApiResponse())
                 .andExpect(jsonPath("$.total").value(729))

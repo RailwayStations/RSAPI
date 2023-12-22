@@ -13,11 +13,6 @@ public class PhotographersController implements PhotographersApi {
     private final LoadPhotographersUseCase loadPhotographersUseCase;
 
     @Override
-    public ResponseEntity<Object> countryPhotographersGet(String country) {
-        return ResponseEntity.ok(loadPhotographersUseCase.getPhotographersPhotocountMap(country));
-    }
-
-    @Override
     public ResponseEntity<Object> photographersGet(String country) {
         return ResponseEntity.ok(loadPhotographersUseCase.getPhotographersPhotocountMap(country));
     }

@@ -2,6 +2,7 @@ package org.railwaystations.rsapi.adapter.in.web.controller;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.railwaystations.rsapi.adapter.in.web.ErrorHandlingControllerAdvice;
@@ -45,19 +46,18 @@ class PhotographersControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"/x/photographers", "/xyz/photographers", "/photographers?country=x", "/photographers?country=xyz"})
+    @ValueSource(strings = {"/photographers?country=x", "/photographers?country=xyz"})
     void getPhotographersWithInvalidCountry(String urlTemplate) throws Exception {
         mvc.perform(get(urlTemplate))
                 .andExpect(validOpenApiResponse())
                 .andExpect(status().isBadRequest());
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"/de/photographers", "/photographers?country=de"})
-    void getPhotographersOfCountryDe(String urlTemplate) throws Exception {
+    @Test
+    void getPhotographersOfCountryDe() throws Exception {
         when(stationDao.getPhotographerMap("de")).thenReturn(createPhotographersResponse());
 
-        mvc.perform(get(urlTemplate))
+        mvc.perform(get("/photographers?country=de"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.@user27").value(31))
                 .andExpect(jsonPath("$.@user8").value(29))
