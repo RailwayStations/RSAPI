@@ -151,6 +151,7 @@ GET /actuator/;/env
 GET /actuator/env
 GET /actuators/env
 GET /adm.php
+GET /admin/
 GET /admin-app/.env
 GET /admin.php
 GET /admin.php?f=
@@ -266,6 +267,7 @@ GET /background
 GET /backup/
 GET /backup/.env
 GET /backup/.git/config
+GET /backup/wp-admin/setup-config.php?step=
 GET /BbSAMbjaNJnDlU/photographers
 GET /beta/.env
 GET /beta/.git/config
@@ -459,6 +461,7 @@ GET /environment.json
 GET /environment.rb
 GET /environment.ts
 GET /envrc
+GET /etc/passwd/
 GET /etc/passwd/stations/
 GET /etc/passwd/stations/*
 GET /events../.git/config
@@ -611,11 +614,13 @@ GET /localenv
 GET /login.action
 GET /login/.env
 GET /login/favicon.ico
+GET /login/xmlrpc.php
 GET /loginRegister/favicon.ico
 GET /LqAHAmeKyk/stats.txt
 GET /LRWjjYlswwVcJ/stats.json
 GET /lRwvbibw/photographers.json
 GET /m/.git/config
+GET /magento_version
 GET /mailer/.env
 GET /main.php
 GET /main/
@@ -647,12 +652,15 @@ GET /old_phpinfo.php
 GET /old-cuburn/.git/config
 GET /old-index.php
 GET /old/
+GET /old/wp-admin/setup-config.php?step=
+GET /OLD/wp-admin/setup-config.php?step=
 GET /oZloyF/stations.gpx
 GET /p.php
 GET /package.json
 GET /parameters.yaml
 GET /parameters.yml
 GET /PBVvtt/stations
+GET /photos
 GET /photos[/de/1866.jpg]
 GET /photos[/de/5147_1.jpg]
 GET /photos/
@@ -674,7 +682,9 @@ GET /photos/germany/langenlonsheim?width=
 GET /photos/hvHRCTBwOI/JFqGFenipIdTsi
 GET /photos/KAYogcs/gFKiwXD
 GET /photos/nEjouRjDsahC/BVWLejjkVcS
+GET /photos/Norway/Shawn%20Kennedy?width=
 GET /photos/Pakistan/Dean%20Caldwell?width=
+GET /photos/Panama/Clyde%20Gray
 GET /photos/phxJFMYGgQDGhw/tJADZVCclDUwOmIh
 GET /photos/REPLACE_COUNTRY/REPLACE_FILENAME?width=
 GET /photos/St.%20Helena/Warren?width=
@@ -682,6 +692,8 @@ GET /photos/St.%20Helena/Warren%20Copeland?width=
 GET /photos/subzu
 GET /photos/tIauVaSxomgM/tTDreedvZg
 GET /photos/ugzalumubomaco
+GET /photos/Zimbabwe/Landon%20Lee
+GET /photos/Zimbabwe/Landon%20Lee?width=
 GET /photoStationById/
 GET /photoStationById/./.
 GET /photoStationById/{country}/3881
@@ -699,7 +711,9 @@ GET /photoStationById/${847558390+822822947}/
 GET /photoStationById/${862237440+866670546}/
 GET /photoStationById/${923548232+950273653}/8504391
 GET /photoStationById/${948012488+834361903}/8504391
+GET /photoStationById/9528/421121904
 GET /photoStationById/at&
+GET /photoStationById/au&
 GET /photoStationById/Bahrain/7672743818428416
 GET /photoStationById/Bayern/220
 GET /photoStationById/be&
@@ -718,6 +732,7 @@ GET /photoStationById/Deutschland/*
 GET /photoStationById/Deutschland/458513098735616
 GET /photoStationById/Deutschland/8000001
 GET /photoStationById/dk&
+GET /photoStationById/Dominica/6971902671192064
 GET /photoStationById/es&
 GET /photoStationById/etc/passwd/*
 GET /photoStationById/etc/passwd/421122512
@@ -732,6 +747,7 @@ GET /photoStationById/France/8484154641481728
 GET /photoStationById/GCClUlBZJhhIm/LQjJhzJJcZyAK
 GET /photoStationById/Germany/*
 GET /photoStationById/Germany/1
+GET /photoStationById/Germany/2
 GET /photoStationById/GERMANY/8006538
 GET /photoStationById/Guatemala/3696039942946816
 GET /photoStationById/hr&
@@ -740,7 +756,11 @@ GET /photoStationById/http:/www.google.com/421122512
 GET /photoStationById/http:/www.google.com/421132112
 GET /photoStationById/http:/www.google.com/8101090
 GET /photoStationById/Http:/Www.Google.Com/8500026
+GET /photoStationById/https:/mc.rockylinux.si/seoforce/triggers/files/c99.txt?/
+GET /photoStationById/https:/mc.rockylinux.si/seoforce/triggers/files/c99.txt/
+GET /photoStationById/jp,..&quot;,),&
 GET /photoStationById/jp&
+GET /photoStationById/jp%&
 GET /photoStationById/Kuwait/5600665126567936
 GET /photoStationById/nl&
 GET /photoStationById/no&
@@ -1074,6 +1094,7 @@ GET /wikindex.php
 GET /wikindex.php?f=
 GET /wordpress
 GET /wordpress/
+GET /wordpress/wp-admin/setup-config.php?step=
 GET /wordpress/wp-commentin.php
 GET /wordpress/wp-config.php
 GET /wordpress/wp-includes/wlwmanifest.xml
@@ -1092,6 +1113,7 @@ GET /wp-admin/css/
 GET /wp-admin/en/widgets/wp-login.php
 GET /wp-admin/includes/class-wp-media-list-data.php
 GET /wp-admin/js/widgets/wp-login.php
+GET /wp-admin/setup-config.php?step=
 GET /wp-admin/style.php?sig=
 GET /wp-admin/xleet.php
 GET /wp-booking.php
@@ -1164,6 +1186,7 @@ GET /wp-content/plugins/apikey/apikey.php?test=
 GET /wp-content/plugins/apikey/apikey.php.suspected?test=
 GET /wp-content/plugins/armember-membership/readme.txt
 GET /wp-content/plugins/backup_index.php
+GET /wp-content/plugins/backup-backup/admin/css/bmi-plugin.min.css
 GET /wp-content/plugins/capabilities-pro/readme.txt
 GET /wp-content/plugins/capability-manager-enhanced/readme.txt
 GET /wp-content/plugins/cherry-plugin/admin/import-export/a57bze8931.php
@@ -1195,6 +1218,7 @@ GET /wp-content/plugins/mapsvg/gm_download.php?file=
 GET /wp-content/plugins/masterstudy-lms-learning-management-system/readme.txt
 GET /wp-content/plugins/mstore-api/assets/js/mstore-inspireui.js
 GET /wp-content/plugins/mstore-api/readme.txt
+GET /wp-content/plugins/mw-wp-form/css/admin-common.css
 GET /wp-content/plugins/nd-booking/readme.txt
 GET /wp-content/plugins/nd-donations/readme.txt
 GET /wp-content/plugins/nd-learning/readme.txt
@@ -1226,11 +1250,13 @@ GET /wp-content/plugins/woo-product-table/readme.txt
 GET /wp-content/plugins/woocommerce-jetpack/readme.txt
 GET /wp-content/plugins/woocommerce-payments/dist/blocks-checkout.css
 GET /wp-content/plugins/woocommerce-upload-files/*/wcuf-admin-menu.js
+GET /wp-content/plugins/woocommerce/assets/fonts/WooCommerce.woff
 GET /wp-content/plugins/wp-automatic/changelog
 GET /wp-content/plugins/wp-automatic/css/wp-automatic.css
 GET /wp-content/plugins/wp-ecommerce-shop-styling/includes/download.php?filename=
 GET /wp-content/plugins/wp-engine-module/a57bze8931.php
 GET /wp-content/plugins/wp-engine-module/wp-engine.php
+GET /wp-content/plugins/wp-fastest-cache/readme.txt
 GET /wp-content/plugins/wp-file-manager-pro/lib/php/connector.minimal.php
 GET /wp-content/plugins/wp-file-manager/lib/php/connector.minimal.php
 GET /wp-content/plugins/wp-file-manager/readme.txt
@@ -1269,6 +1295,7 @@ GET /wp-includes/en/jquery/jquery.js
 GET /wp-includes/fonts/css.php
 GET /wp-includes/ID3/license.txt
 GET /wp-includes/js/.git/config
+GET /wp-includes/js/jquery/jquery.js
 GET /wp-includes/lfx.php
 GET /wp-includes/pomo/umpomone.php
 GET /wp-includes/shell20211028.php
@@ -1280,6 +1307,7 @@ GET /wp-includes/xleet.php
 GET /wp-info.php
 GET /wp-json/wp_live_chat_support/en/remote_upload
 GET /wp-login.php
+GET /wp-pano
 GET /wp-pano.php
 GET /wp.php
 GET /wp/
@@ -1320,6 +1348,7 @@ HEAD /wordpress
 HEAD /wp
 
 POST /
+POST /.env
 POST /ALFA_DATA/alfacgiapi/perl.alfa
 POST /alfacgiapi/perl.alfa      
 POST /cgi-bin/.%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/bin/sh
