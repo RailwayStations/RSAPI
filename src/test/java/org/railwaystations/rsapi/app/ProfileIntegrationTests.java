@@ -335,7 +335,7 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
         var restTemplate = new RestTemplate();
         var factory =
                 new SimpleClientHttpRequestFactory() {
-                    public void prepareConnection(@NotNull HttpURLConnection connection, @NotNull String httpMethod) throws IOException {
+                    public void prepareConnection(@NotNull @org.jetbrains.annotations.NotNull HttpURLConnection connection, @NotNull @org.jetbrains.annotations.NotNull String httpMethod) throws IOException {
                         super.prepareConnection(connection, httpMethod);
                         connection.setInstanceFollowRedirects(false);
                     }
@@ -459,8 +459,9 @@ class ProfileIntegrationTests extends AbstractMariaDBBaseTest {
 
         // then
         assertThat(responseDelete.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        var user = userDao.findById(22).get();
-        assertThat(user).usingRecursiveComparison().isEqualTo(User.builder()
+        var user = userDao.findById(22);
+        assertThat(user).isPresent();
+        assertThat(user.get()).usingRecursiveComparison().isEqualTo(User.builder()
                 .id(22)
                 .name("deleteduser22")
                 .anonymous(true)

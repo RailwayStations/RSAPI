@@ -110,7 +110,7 @@ class ProfileControllerTest {
         verify(userDao).insert(any(User.class), anyString(), anyString());
         verify(userDao, never()).updateCredentials(anyInt(), anyString());
 
-        assertThat(monitor.getMessages().get(0)).isEqualTo("New registration{nickname='nickname', email='nickname@example.com'}\nvia UserAgent");
+        assertThat(monitor.getMessages().getFirst()).isEqualTo("New registration{nickname='nickname', email='nickname@example.com'}\nvia UserAgent");
         assertNewPasswordEmail();
 
         verifyNoMoreInteractions(userDao);
@@ -141,7 +141,7 @@ class ProfileControllerTest {
         verify(userDao).insert(any(User.class), anyString(), anyString());
         verify(userDao, never()).updateCredentials(anyInt(), anyString());
 
-        assertThat(monitor.getMessages().get(0)).isEqualTo("New registration{nickname='nickname', email='nickname@example.com'}\nvia UserAgent");
+        assertThat(monitor.getMessages().getFirst()).isEqualTo("New registration{nickname='nickname', email='nickname@example.com'}\nvia UserAgent");
         assertVerificationEmail();
 
         verifyNoMoreInteractions(userDao);
@@ -174,7 +174,7 @@ class ProfileControllerTest {
                 """;
         postRegistration(givenAnonymousUserProfile).andExpect(status().isAccepted());
 
-        assertThat(monitor.getMessages().get(0)).isEqualTo("New registration{nickname='nickname', email='nickname@example.com'}\nvia UserAgent");
+        assertThat(monitor.getMessages().getFirst()).isEqualTo("New registration{nickname='nickname', email='nickname@example.com'}\nvia UserAgent");
     }
 
     @Test
@@ -204,7 +204,7 @@ class ProfileControllerTest {
                 """.formatted(EXISTING_EMAIL);
         postRegistration(givenUserProfileWithSameEmail).andExpect(status().isConflict());
 
-        assertThat(monitor.getMessages().get(0)).isEqualTo("Registration for user 'othername' with eMail 'existing@example.com' failed, eMail is already taken\nvia UserAgent");
+        assertThat(monitor.getMessages().getFirst()).isEqualTo("Registration for user 'othername' with eMail 'existing@example.com' failed, eMail is already taken\nvia UserAgent");
     }
 
     @Test
@@ -392,15 +392,6 @@ class ProfileControllerTest {
         verify(userDao).update(user.getId(), user);
     }
 
-    @NotNull
-    private ResultActions postResetPassword(String nameOrEmail) throws Exception {
-        return mvc.perform(post("/resetPassword")
-                        .header("User-Agent", "UserAgent")
-                        .header("NameOrEmail", nameOrEmail)
-                        .with(csrf()))
-                .andExpect(validOpenApiResponse());
-    }
-
     @Test
     void verifyEmailSuccess() throws Exception {
         var token = "verification";
@@ -419,7 +410,7 @@ class ProfileControllerTest {
         getEmailVerification(token)
                 .andExpect(status().isOk());
 
-        assertThat(monitor.getMessages().get(0)).isEqualTo(String.format("Email verified {nickname='%s', email='%s'}", EXISTING_USER_NAME, EXISTING_EMAIL));
+        assertThat(monitor.getMessages().getFirst()).isEqualTo(String.format("Email verified {nickname='%s', email='%s'}", EXISTING_USER_NAME, EXISTING_EMAIL));
         verify(userDao).updateEmailVerification(EXISTING_USER_ID, User.EMAIL_VERIFIED);
     }
 

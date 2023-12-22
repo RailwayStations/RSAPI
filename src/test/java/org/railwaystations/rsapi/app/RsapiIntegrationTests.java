@@ -118,14 +118,14 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         var photographers = photoStationsDto.getPhotographers();
         assertThat(photographers).containsExactly(new PhotographerDto("@user10").url(URI.create("https://www.example.com/user10")));
 
-        var station = photoStationsDto.getStations().get(0);
+        var station = photoStationsDto.getStations().getFirst();
         assertThat(station.getCountry()).isEqualTo("de");
         assertThat(station.getId()).isEqualTo("6932");
         assertThat(station.getTitle()).isEqualTo("Wuppertal-Ronsdorf");
         assertThat(station.getShortCode()).isEqualTo("KWRO");
         assertThat(station.getInactive()).isFalse();
 
-        var photo1 = station.getPhotos().get(0);
+        var photo1 = station.getPhotos().getFirst();
         assertThat(photo1.getId()).isEqualTo(24);
         assertThat(photo1.getPath()).isEqualTo("/de/6932.jpg");
         assertThat(photo1.getPhotographer()).isEqualTo("@user10");
@@ -157,10 +157,10 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
                 .noneMatch(photoStationDto -> !photoStationDto.getCountry().equals("de"));
 
         // check if we can find the license and photographer of one stationphoto
-        var stationWithPhoto = photoStationsDto.getStations().stream().filter(photoStationDto -> photoStationDto.getPhotos().size() > 0).findAny();
+        var stationWithPhoto = photoStationsDto.getStations().stream().filter(photoStationDto -> !photoStationDto.getPhotos().isEmpty()).findAny();
         assertThat(stationWithPhoto).isPresent();
-        assertThat(photoStationsDto.getLicenses()).anyMatch(photoLicenseDto -> photoLicenseDto.getId().equals(stationWithPhoto.get().getPhotos().get(0).getLicense()));
-        assertThat(photoStationsDto.getPhotographers()).anyMatch(photographerDto -> photographerDto.getName().equals(stationWithPhoto.get().getPhotos().get(0).getPhotographer()));
+        assertThat(photoStationsDto.getLicenses()).anyMatch(photoLicenseDto -> photoLicenseDto.getId().equals(stationWithPhoto.get().getPhotos().getFirst().getLicense()));
+        assertThat(photoStationsDto.getPhotographers()).anyMatch(photographerDto -> photographerDto.getName().equals(stationWithPhoto.get().getPhotos().getFirst().getPhotographer()));
     }
 
     @ParameterizedTest
@@ -219,7 +219,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         assertThat(station.getCountry()).isEqualTo("de");
         assertThat(station.getId()).isEqualTo("6932");
 
-        var photo1 = station.getPhotos().get(0);
+        var photo1 = station.getPhotos().getFirst();
         assertThat(photo1.getId()).isEqualTo(24L);
         assertThat(photo1.getPath()).isEqualTo("/de/6932.jpg");
         assertThat(photo1.getPhotographer()).isEqualTo("@user10");
@@ -259,7 +259,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         assertThat(station.getCountry()).isEqualTo("de");
         assertThat(station.getId()).isEqualTo("6998");
 
-        var photo1 = station.getPhotos().get(0);
+        var photo1 = station.getPhotos().getFirst();
         assertThat(photo1.getId()).isEqualTo(54);
         assertThat(photo1.getPath()).isEqualTo("/de/6998_1.jpg");
         assertThat(photo1.getPhotographer()).isEqualTo("Anonym");
@@ -295,7 +295,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
         assertThat(station.getCountry()).isEqualTo("de");
         assertThat(station.getId()).isEqualTo("7051");
         assertThat(station.getPhotos()).hasSize(1);
-        var photo1 = station.getPhotos().get(0);
+        var photo1 = station.getPhotos().getFirst();
         assertThat(photo1.getId()).isNotNull();
         assertThat(photo1.getPath()).isEqualTo("/de/7051_2.jpg");
     }
