@@ -2,8 +2,7 @@ package org.railwaystations.rsapi.adapter.in.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.api.Test;
 import org.railwaystations.rsapi.adapter.in.web.ErrorHandlingControllerAdvice;
 import org.railwaystations.rsapi.adapter.in.web.model.CountryDto;
 import org.railwaystations.rsapi.adapter.out.db.CountryDao;
@@ -42,28 +41,27 @@ class CountriesControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @ParameterizedTest
-    @ValueSource(strings = {"/countries", "/countries.json"})
-    void listCountries(String urlTemplate) throws Exception {
+    @Test
+    void listCountries() throws Exception {
         when(countryDao.list(true)).thenReturn(createCountryList());
 
-        var contentAsString = mvc.perform(get(urlTemplate))
+        var contentAsString = mvc.perform(get("/countries"))
                 .andExpect(status().isOk())
                 .andExpect(validOpenApiResponse())
                 .andReturn().getResponse().getContentAsString();
 
         List<CountryDto> countries = objectMapper.readerForListOf(CountryDto.class).readValue(contentAsString);
         assertThat(countries.size()).isEqualTo(2);
-        countries.forEach(this::assertCountry);
+        countries.forEach(CountriesControllerTest::assertCountry);
     }
 
     @NotNull
-    private Set<Country> createCountryList() {
+    static Set<Country> createCountryList() {
         return Set.of(createCountry("xy"), createCountry("ab"));
     }
 
     @NotNull
-    private Country createCountry(String code) {
+    static Country createCountry(String code) {
         var country = Country.builder()
                 .code(code)
                 .name("name-" + code)
@@ -78,11 +76,11 @@ class CountriesControllerTest {
         return country;
     }
 
-    private ProviderApp createProviderApp(String type, String code) {
+    static ProviderApp createProviderApp(String type, String code) {
         return ProviderApp.builder().type(type).name("Provider-" + code).url(type + "App-" + code).build();
     }
 
-    private void assertCountry(CountryDto country) {
+    static void assertCountry(CountryDto country) {
         assertThat(country.getName()).isEqualTo("name-" + country.getCode());
         assertThat(country.getEmail()).isEqualTo("email-" + country.getCode());
         assertThat(country.getTimetableUrlTemplate()).isEqualTo("timetable-" + country.getCode());

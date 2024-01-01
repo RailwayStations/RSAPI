@@ -1,13 +1,10 @@
 package org.railwaystations.rsapi.adapter.in.web.controller;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.railwaystations.rsapi.adapter.in.web.ErrorHandlingControllerAdvice;
 import org.railwaystations.rsapi.adapter.out.db.OAuth2AuthorizationDao;
 import org.railwaystations.rsapi.adapter.out.db.UserDao;
-import org.railwaystations.rsapi.adapter.out.monitoring.MockMonitor;
 import org.railwaystations.rsapi.app.auth.LazySodiumPasswordEncoder;
 import org.railwaystations.rsapi.app.auth.RSAuthenticationProvider;
 import org.railwaystations.rsapi.app.auth.RSUserDetailsService;
@@ -15,7 +12,7 @@ import org.railwaystations.rsapi.app.auth.WebSecurityConfig;
 import org.railwaystations.rsapi.app.config.MessageSourceConfig;
 import org.railwaystations.rsapi.core.model.License;
 import org.railwaystations.rsapi.core.model.User;
-import org.railwaystations.rsapi.core.ports.out.Mailer;
+import org.railwaystations.rsapi.core.ports.in.ManageProfileUseCase;
 import org.railwaystations.rsapi.core.services.ProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -30,16 +27,12 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.matches;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.railwaystations.rsapi.utils.OpenApiValidatorUtil.validOpenApiResponse;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -54,167 +47,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = {WebMvcTestApplication.class, ErrorHandlingControllerAdvice.class, MockMvcTestConfiguration.class, WebSecurityConfig.class})
 @Import({ProfileService.class, RSUserDetailsService.class, RSAuthenticationProvider.class, LazySodiumPasswordEncoder.class, MessageSourceConfig.class})
 @ActiveProfiles("mockMvcTest")
-class ProfileControllerTest {
+public class ProfileControllerTest {
 
-    public static final String EXISTING_USER_NAME = "existing";
-    public static final String EXISTING_EMAIL = "existing@example.com";
+    public static final String USER_NAME = "existing";
+    public static final String USER_EMAIL = "existing@example.com";
     public static final int EXISTING_USER_ID = 42;
+    public static final String USER_AGENT = "UserAgent";
     @Autowired
     private MockMvc mvc;
 
-    @Autowired
-    private MockMonitor monitor;
-
     @MockBean
-    private Mailer mailer;
+    private ProfileService profileService;
 
     @MockBean
     private UserDao userDao;
 
     @MockBean
     private OAuth2AuthorizationDao authorizationDao;
-
-    @BeforeEach
-    public void setUp() {
-        monitor.getMessages().clear();
-    }
-
-    @Test
-    void testRegisterInvalidData() throws Exception {
-        var givenUserProfileWithoutEmail = """
-                    { "nickname": "nickname", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
-                """;
-        postRegistration(givenUserProfileWithoutEmail).andExpect(status().isBadRequest());
-    }
-
-    @NotNull
-    private ResultActions postRegistration(String userProfileJson) throws Exception {
-        return mvc.perform(post("/registration")
-                        .header("User-Agent", "UserAgent")
-                        .contentType("application/json")
-                        .content(userProfileJson)
-                        .with(csrf()))
-                .andExpect(validOpenApiResponse());
-    }
-
-    @Test
-    void registerNewUser() throws Exception {
-        var givenUserProfile = """
-                    { "nickname": "nickname", "email": "nickname@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
-                """;
-        postRegistration(givenUserProfile).andExpect(status().isAccepted());
-
-        verify(userDao).findByNormalizedName("nickname");
-        verify(userDao).countBlockedUsername("nickname");
-        verify(userDao).findByEmail("nickname@example.com");
-        verify(userDao).insert(any(User.class), anyString(), anyString());
-        verify(userDao, never()).updateCredentials(anyInt(), anyString());
-
-        assertThat(monitor.getMessages().getFirst()).isEqualTo("New registration{nickname='nickname', email='nickname@example.com'}\nvia UserAgent");
-        assertNewPasswordEmail();
-
-        verifyNoMoreInteractions(userDao);
-    }
-
-    private void assertNewPasswordEmail() {
-        verify(mailer, times(1))
-                .send(anyString(),
-                        anyString(), matches("""
-                                Hello,
-                                                    
-                                your new password is: .*
-                                                    
-                                Cheers
-                                Your Railway-Stations-Team"""));
-    }
-
-    @Test
-    void registerNewUserWithPassword() throws Exception {
-        var givenUserProfileWithPassword = """
-                    { "nickname": "nickname", "email": "nickname@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true, "newPassword": "verySecretPassword" }
-                """;
-        postRegistration(givenUserProfileWithPassword).andExpect(status().isAccepted());
-
-        verify(userDao).findByNormalizedName("nickname");
-        verify(userDao).countBlockedUsername("nickname");
-        verify(userDao).findByEmail("nickname@example.com");
-        verify(userDao).insert(any(User.class), anyString(), anyString());
-        verify(userDao, never()).updateCredentials(anyInt(), anyString());
-
-        assertThat(monitor.getMessages().getFirst()).isEqualTo("New registration{nickname='nickname', email='nickname@example.com'}\nvia UserAgent");
-        assertVerificationEmail();
-
-        verifyNoMoreInteractions(userDao);
-    }
-
-    private void assertVerificationEmail() {
-        verify(mailer, times(1))
-                .send(anyString(),
-                        anyString(), matches("""
-                                Hello,
-
-                                please click on EMAIL_VERIFICATION_URL.* to verify your eMail-Address.
-
-                                Cheers
-                                Your Railway-Stations-Team
-
-                                ---
-                                Hallo,
-
-                                bitte klicke auf EMAIL_VERIFICATION_URL.*, um Deine eMail-Adresse zu verifizieren.
-
-                                Viele Grüße
-                                Dein Bahnhofsfoto-Team"""));
-    }
-
-    @Test
-    void registerNewUserAnonymous() throws Exception {
-        var givenAnonymousUserProfile = """
-                    { "nickname": "nickname", "email": "nickname@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
-                """;
-        postRegistration(givenAnonymousUserProfile).andExpect(status().isAccepted());
-
-        assertThat(monitor.getMessages().getFirst()).isEqualTo("New registration{nickname='nickname', email='nickname@example.com'}\nvia UserAgent");
-    }
-
-    @Test
-    void registerUserNameTaken() throws Exception {
-        givenExistingUser();
-        var givenUserProfileWithSameName = """
-                    { "nickname": "%s", "email": "other@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
-                """.formatted(EXISTING_USER_NAME);
-        postRegistration(givenUserProfileWithSameName).andExpect(status().isConflict());
-    }
-
-    @Test
-    void registerUserNameBlocked() throws Exception {
-        when(userDao.countBlockedUsername("blockedname")).thenReturn(1);
-        givenExistingUser();
-        var givenUserProfileWithBlockedName = """
-                    { "nickname": "%s", "email": "other@example.com", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
-                """.formatted("Blocked Name");
-        postRegistration(givenUserProfileWithBlockedName).andExpect(status().isConflict());
-    }
-
-    @Test
-    void registerExistingUserEmailTaken() throws Exception {
-        givenExistingUser();
-        var givenUserProfileWithSameEmail = """
-                    { "nickname": "othername", "email": "%s", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
-                """.formatted(EXISTING_EMAIL);
-        postRegistration(givenUserProfileWithSameEmail).andExpect(status().isConflict());
-
-        assertThat(monitor.getMessages().getFirst()).isEqualTo("Registration for user 'othername' with eMail 'existing@example.com' failed, eMail is already taken\nvia UserAgent");
-    }
-
-    @Test
-    void registerExistingUserEmptyName() throws Exception {
-        givenExistingUser();
-        var givenUserProfileWithEmptyName = """
-                    { "nickname": "", "email": "%s", "link": "https://link@example.com", "license": "CC0", "anonymous": false, "sendNotifications": true, "photoOwner": true }
-                """.formatted(EXISTING_EMAIL);
-        postRegistration(givenUserProfileWithEmptyName).andExpect(status().isBadRequest());
-    }
 
     @Test
     void getMyProfile() throws Exception {
@@ -228,28 +77,34 @@ class ProfileControllerTest {
                         .with(csrf()))
                 .andExpect(validOpenApiResponse())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nickname").value(EXISTING_USER_NAME));
+                .andExpect(jsonPath("$.nickname").value(USER_NAME));
     }
 
-    private void givenExistingUser() {
+    private User givenExistingUser() {
         var key = "246172676F6E32696424763D3139246D3D36353533362C743D322C703D3124426D4F637165757646794E44754132726B566A6A3177246A7568362F6E6C2F49437A4B475570446E6B674171754A304F7A486A62694F587442542F2B62584D49476300000000000000000000000000000000000000000000000000000000000000";
-        var user = User.builder()
-                .name(EXISTING_USER_NAME)
-                .license(License.CC0_10)
+        var user = createUser()
                 .id(EXISTING_USER_ID)
-                .email(EXISTING_EMAIL)
-                .ownPhotos(true)
-                .anonymous(false)
                 .key(key)
-                .admin(false)
-                .sendNotifications(true).build();
+                .build();
         when(userDao.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
         when(userDao.findByNormalizedName(user.getName())).thenReturn(Optional.of(user));
+        return user;
+    }
+
+    private static User.UserBuilder createUser() {
+        return User.builder()
+                .name(USER_NAME)
+                .license(License.CC0_10)
+                .email(USER_EMAIL)
+                .ownPhotos(true)
+                .anonymous(false)
+                .admin(false)
+                .sendNotifications(true);
     }
 
     @NotNull
     private RequestPostProcessor basicHttpAuthForExistingUser() {
-        return httpBasic(EXISTING_EMAIL, "y89zFqkL6hro");
+        return httpBasic(USER_EMAIL, "y89zFqkL6hro");
     }
 
     @NotNull
@@ -272,51 +127,37 @@ class ProfileControllerTest {
     @Test
     void changePasswordTooShortBody() throws Exception {
         givenExistingUser();
+        doThrow(new IllegalArgumentException())
+                .when(profileService).changePassword(any(User.class), eq("secret"));
 
         postChangePassword("{\"newPassword\": \"secret\"}")
                 .andExpect(status().isBadRequest());
-
-        verify(userDao, never()).updateCredentials(anyInt(), anyString());
-        verify(userDao, never()).updateCredentials(anyInt(), anyString());
-        verify(authorizationDao, never()).deleteAllByUser(EXISTING_USER_NAME);
     }
 
     @Test
     void changePasswordBody() throws Exception {
-        givenExistingUser();
+        var user = givenExistingUser();
 
         postChangePassword("{\"newPassword\": \"secretlong\"}")
                 .andExpect(status().isOk());
 
-        var idCaptor = ArgumentCaptor.forClass(Integer.class);
-        var keyCaptor = ArgumentCaptor.forClass(String.class);
-        verify(userDao).updateCredentials(idCaptor.capture(), keyCaptor.capture());
-        verify(authorizationDao).deleteAllByUser(EXISTING_USER_NAME);
-
-        assertThat(idCaptor.getValue()).isEqualTo(EXISTING_USER_ID);
-        assertThat(new LazySodiumPasswordEncoder().matches("secretlong", keyCaptor.getValue())).isTrue();
+        verify(profileService).changePassword(user, "secretlong");
     }
 
     @Test
     void updateMyProfile() throws Exception {
-        when(userDao.findByNormalizedName("newname")).thenReturn(Optional.empty());
-        givenExistingUser();
+        var existingUser = givenExistingUser();
         var newProfileJson = """
                     { "nickname": "new_name", "email": "%s", "link": "http://twitter.com/", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
-                """.formatted(EXISTING_EMAIL);
+                """.formatted(USER_EMAIL);
 
         postMyProfileWithOpenApiValidation(newProfileJson).andExpect(status().isOk());
 
-        var user = User.builder()
+        var user = createUser()
                 .id(EXISTING_USER_ID)
                 .name("new_name")
-                .license(License.CC0_10)
-                .email(EXISTING_EMAIL)
-                .ownPhotos(true)
-                .url("http://twitter.com/")
-                .anonymous(true)
-                .sendNotifications(true).build();
-        verify(userDao).update(user.getId(), user);
+                .build();
+        verify(profileService).updateProfile(existingUser, user, USER_AGENT);
     }
 
     @NotNull
@@ -328,7 +169,7 @@ class ProfileControllerTest {
     @NotNull
     private ResultActions postMyProfile(String newProfileJson) throws Exception {
         return mvc.perform(post("/myProfile")
-                .header("User-Agent", "UserAgent")
+                .header("User-Agent", USER_AGENT)
                 .contentType("application/json")
                 .content(newProfileJson)
                 .secure(true)
@@ -338,80 +179,54 @@ class ProfileControllerTest {
 
     @Test
     void updateMyProfileConflict() throws Exception {
-        var user = User.builder()
-                .name("@New name")
-                .email("newname@example.com")
-                .sendNotifications(true).build();
-        when(userDao.findByNormalizedName("newname")).thenReturn(Optional.of(user));
+        doThrow(new ManageProfileUseCase.ProfileConflictException())
+                .when(profileService).updateProfile(any(User.class), any(User.class), anyString());
         givenExistingUser();
         var newProfileJson = """
                     { "nickname": "new_name", "email": "%s", "link": "http://twitter.com/", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
-                """.formatted(EXISTING_EMAIL);
+                """.formatted(USER_EMAIL);
 
         postMyProfileWithOpenApiValidation(newProfileJson).andExpect(status().isConflict());
-
-        verify(userDao, never()).update(eq(user.getId()), any(User.class));
     }
 
     @Test
     void updateMyProfileNameTooLong() throws Exception {
-        var user = User.builder()
-                .name("@New name")
-                .email("newname@example.com")
-                .sendNotifications(true).build();
-        givenExistingUser();
         var newProfileJson = """
                     { "nickname": "A very long name with a lot of extra words to overfill the database column", "email": "%s", "link": "http://twitter.com/", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
-                """.formatted(EXISTING_EMAIL);
+                """.formatted(USER_EMAIL);
 
         postMyProfile(newProfileJson).andExpect(status().isBadRequest());
 
-        verify(userDao, never()).update(eq(user.getId()), any(User.class));
+        verify(profileService, never()).updateProfile(any(User.class), any(User.class), anyString());
     }
 
     @Test
     void updateMyProfileNewMail() throws Exception {
-        when(userDao.findByEmail("newname@example.com")).thenReturn(Optional.empty());
-        givenExistingUser();
+        var existingUser = givenExistingUser();
         var newProfileJson = """
                     { "nickname": "%s", "email": "newname@example.com", "link": "http://twitter.com/", "license": "CC0", "anonymous": true, "sendNotifications": true, "photoOwner": true }
-                """.formatted(EXISTING_USER_NAME);
+                """.formatted(USER_NAME);
 
         postMyProfileWithOpenApiValidation(newProfileJson).andExpect(status().isOk());
 
-        assertVerificationEmail();
-        var user = User.builder()
+        var user = createUser()
                 .id(EXISTING_USER_ID)
-                .name(EXISTING_USER_NAME)
-                .license(License.CC0_10)
                 .email("newname@example.com")
-                .ownPhotos(true)
-                .anonymous(false)
-                .url("http://twitter.com/")
-                .sendNotifications(true).build();
-        verify(userDao).update(user.getId(), user);
+                .build();
+        verify(profileService).updateProfile(existingUser, user, USER_AGENT);
     }
 
     @Test
     void verifyEmailSuccess() throws Exception {
         var token = "verification";
-        var user = User.builder()
+        var user = createUser()
                 .id(EXISTING_USER_ID)
-                .name(EXISTING_USER_NAME)
-                .license(License.CC0_10)
-                .email(EXISTING_EMAIL)
-                .ownPhotos(true)
-                .anonymous(false)
-                .url("https://link@example.com")
                 .emailVerification(token)
-                .sendNotifications(true).build();
-        when(userDao.findByEmailVerification(token)).thenReturn(Optional.of(user));
+                .build();
+        when(profileService.emailVerification(token)).thenReturn(Optional.of(user));
 
         getEmailVerification(token)
                 .andExpect(status().isOk());
-
-        assertThat(monitor.getMessages().getFirst()).isEqualTo(String.format("Email verified {nickname='%s', email='%s'}", EXISTING_USER_NAME, EXISTING_EMAIL));
-        verify(userDao).updateEmailVerification(EXISTING_USER_ID, User.EMAIL_VERIFIED);
     }
 
     @NotNull
@@ -425,27 +240,19 @@ class ProfileControllerTest {
     @Test
     void verifyEmailFailed() throws Exception {
         var token = "verification";
-        var user = User.builder()
+        var user = createUser()
                 .id(EXISTING_USER_ID)
-                .name(EXISTING_USER_NAME)
-                .license(License.CC0_10)
-                .email(EXISTING_EMAIL)
-                .ownPhotos(true)
-                .anonymous(false)
-                .url("https://link@example.com")
                 .emailVerification(token)
-                .sendNotifications(true).build();
-        when(userDao.findByEmailVerification(token)).thenReturn(Optional.of(user));
+                .build();
+        when(profileService.emailVerification(token)).thenReturn(Optional.of(user));
 
         getEmailVerification("wrong_token").andExpect(status().isNotFound());
 
-        assertThat(monitor.getMessages().isEmpty()).isTrue();
-        verify(userDao, never()).updateEmailVerification(EXISTING_USER_ID, User.EMAIL_VERIFIED);
     }
 
     @Test
     void resendEmailVerification() throws Exception {
-        givenExistingUser();
+        var user = givenExistingUser();
         mvc.perform(post("/resendEmailVerification")
                         .header("User-Agent", "UserAgent")
                         .secure(true)
@@ -454,13 +261,12 @@ class ProfileControllerTest {
                 .andExpect(validOpenApiResponse())
                 .andExpect(status().isOk());
 
-        assertVerificationEmail();
-        verify(userDao).updateEmailVerification(eq(EXISTING_USER_ID), anyString());
+        verify(profileService).resendEmailVerification(user);
     }
 
     @Test
     void deleteMyProfile() throws Exception {
-        givenExistingUser();
+        var user = givenExistingUser();
 
         mvc.perform(delete("/myProfile")
                         .header("User-Agent", "UserAgent")
@@ -470,9 +276,7 @@ class ProfileControllerTest {
                 .andExpect(status().isNoContent())
                 .andExpect(validOpenApiResponse());
 
-        verify(userDao).anonymizeUser(eq(EXISTING_USER_ID));
-        verify(userDao).addUsernameToBlocklist(EXISTING_USER_NAME);
-        verify(authorizationDao).deleteAllByUser(EXISTING_USER_NAME);
+        verify(profileService).deleteProfile(user, USER_AGENT);
     }
 
 }
