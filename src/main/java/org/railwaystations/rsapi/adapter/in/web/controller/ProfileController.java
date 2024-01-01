@@ -6,7 +6,6 @@ import org.railwaystations.rsapi.adapter.in.web.api.ProfileApi;
 import org.railwaystations.rsapi.adapter.in.web.model.ChangePasswordDto;
 import org.railwaystations.rsapi.adapter.in.web.model.LicenseDto;
 import org.railwaystations.rsapi.adapter.in.web.model.ProfileDto;
-import org.railwaystations.rsapi.adapter.in.web.model.RegisterProfileDto;
 import org.railwaystations.rsapi.adapter.in.web.model.UpdateProfileDto;
 import org.railwaystations.rsapi.core.model.License;
 import org.railwaystations.rsapi.core.model.User;
@@ -33,21 +32,8 @@ public class ProfileController implements ProfileApi {
 
     private final LocaleResolver localeResolver;
 
-    private User toUser(RegisterProfileDto registerProfileDto) {
-        return User.builder()
-                .name(registerProfileDto.getNickname())
-                .email(registerProfileDto.getEmail())
-                .url(registerProfileDto.getLink() != null ? registerProfileDto.getLink().toString() : null)
-                .ownPhotos(registerProfileDto.getPhotoOwner())
-                .anonymous(registerProfileDto.getAnonymous() != null && registerProfileDto.getAnonymous())
-                .license(toLicense(registerProfileDto.getLicense()))
-                .sendNotifications(registerProfileDto.getSendNotifications() == null || registerProfileDto.getSendNotifications())
-                .newPassword(registerProfileDto.getNewPassword())
-                .locale(localeResolver.resolveLocale(getRequest()))
-                .build();
-    }
 
-    private License toLicense(LicenseDto license) {
+    static License toLicense(LicenseDto license) {
         if (license == null) {
             return License.UNKNOWN;
         }
@@ -128,12 +114,6 @@ public class ProfileController implements ProfileApi {
     public ResponseEntity<Void> myProfilePost(UpdateProfileDto profile) {
         manageProfileUseCase.updateProfile(getAuthUser().getUser(), toUser(profile), getUserAgent());
         return ResponseEntity.ok().build();
-    }
-
-    @Override
-    public ResponseEntity<Void> registrationPost(RegisterProfileDto registration) {
-        manageProfileUseCase.register(toUser(registration), getUserAgent());
-        return ResponseEntity.accepted().build();
     }
 
     @PreAuthorize("isAuthenticated()")

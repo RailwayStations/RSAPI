@@ -11,11 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.railwaystations.rsapi.adapter.in.web.controller.DeprecatedApiController.StationDto;
 import org.railwaystations.rsapi.adapter.in.web.model.PhotoLicenseDto;
 import org.railwaystations.rsapi.adapter.in.web.model.PhotoStationDto;
 import org.railwaystations.rsapi.adapter.in.web.model.PhotoStationsDto;
 import org.railwaystations.rsapi.adapter.in.web.model.PhotographerDto;
-import org.railwaystations.rsapi.adapter.in.web.model.StationDto;
 import org.railwaystations.rsapi.adapter.out.db.PhotoDao;
 import org.railwaystations.rsapi.adapter.out.monitoring.LoggingMonitor;
 import org.railwaystations.rsapi.adapter.out.photostorage.WorkDir;
@@ -92,13 +92,13 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
     @Test
     void stationById() {
         var station = loadStationDe6932();
-        assertThat(station.getIdStr()).isEqualTo("6932");
-        assertThat(station.getTitle()).isEqualTo("Wuppertal-Ronsdorf");
-        assertThat(station.getPhotoUrl()).isEqualTo("https://api.railway-stations.org/photos/de/6932.jpg");
-        assertThat(station.getPhotographer()).isEqualTo("@user10");
-        assertThat(station.getLicense()).isEqualTo("CC0 1.0 Universell (CC0 1.0)");
-        assertThat(station.getActive()).isTrue();
-        assertThat(station.getOutdated()).isFalse();
+        assertThat(station.idStr()).isEqualTo("6932");
+        assertThat(station.title()).isEqualTo("Wuppertal-Ronsdorf");
+        assertThat(station.photoUrl()).isEqualTo("https://api.railway-stations.org/photos/de/6932.jpg");
+        assertThat(station.photographer()).isEqualTo("@user10");
+        assertThat(station.license()).isEqualTo("CC0 1.0 Universell (CC0 1.0)");
+        assertThat(station.active()).isTrue();
+        assertThat(station.outdated()).isFalse();
     }
 
     @Test
@@ -313,9 +313,9 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
     @Test
     void outdatedStationById() {
         var station = loadDeStationByStationId("7051");
-        assertThat(station.getCountry()).isEqualTo("de");
-        assertThat(station.getIdStr()).isEqualTo("7051");
-        assertThat(station.getOutdated()).isTrue();
+        assertThat(station.country()).isEqualTo("de");
+        assertThat(station.idStr()).isEqualTo("7051");
+        assertThat(station.outdated()).isTrue();
     }
 
     @Test
@@ -396,7 +396,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
     }
 
     StationDto findByKey(StationDto[] stations, Station.Key key) {
-        return Arrays.stream(stations).filter(station -> station.getCountry().equals(key.getCountry()) && station.getIdStr().equals(key.getId())).findAny().orElse(null);
+        return Arrays.stream(stations).filter(station -> station.country().equals(key.getCountry()) && station.idStr().equals(key.getId())).findAny().orElse(null);
     }
 
     @Test
@@ -521,11 +521,11 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 
         // assert station is imported
         var newStation = loadDeStationByStationId(stationId);
-        assertThat(newStation.getTitle()).isEqualTo("Hintertupfingen");
-        assertThat(newStation.getLat()).isEqualTo(50.123);
-        assertThat(newStation.getLon()).isEqualTo(9.123);
-        assertThat(newStation.getPhotographer()).isEqualTo("@user10");
-        assertThat(newStation.getPhotoUrl()).isNotNull();
+        assertThat(newStation.title()).isEqualTo("Hintertupfingen");
+        assertThat(newStation.lat()).isEqualTo(50.123);
+        assertThat(newStation.lon()).isEqualTo(9.123);
+        assertThat(newStation.photographer()).isEqualTo("@user10");
+        assertThat(newStation.photoUrl()).isNotNull();
 
 
         // get userInbox processed
@@ -557,7 +557,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 
         // assert station has no photo anymore
         var deletedPhotoStation = loadDeStationByStationId(stationId);
-        assertThat(deletedPhotoStation.getPhotoUrl()).isNull();
+        assertThat(deletedPhotoStation.photoUrl()).isNull();
 
 
         // get userInbox with problem report
@@ -642,15 +642,15 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
     void assertCoordinatesOfStation6815(double lat, double lon) {
         var station = loadDeStationByStationId("6815");
         assertThat(station).isNotNull();
-        assertThat(station.getLat()).isEqualTo(lat);
-        assertThat(station.getLon()).isEqualTo(lon);
+        assertThat(station.lat()).isEqualTo(lat);
+        assertThat(station.lon()).isEqualTo(lon);
     }
 
     @Test
     void problemReportWithWrongStationName() throws JsonProcessingException {
         var stationBefore = loadDeStationByStationId("6815");
         assertThat(stationBefore).isNotNull();
-        assertThat(stationBefore.getTitle()).isEqualTo("Wippra");
+        assertThat(stationBefore.title()).isEqualTo("Wippra");
 
         var problemReportJson = """
                 {
@@ -664,7 +664,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
 
         var stationAfter = loadDeStationByStationId("6815");
         assertThat(stationAfter).isNotNull();
-        assertThat(stationAfter.getTitle()).isEqualTo("Admin New Name");
+        assertThat(stationAfter.title()).isEqualTo("Admin New Name");
     }
 
     @Test
@@ -706,7 +706,7 @@ class RsapiIntegrationTests extends AbstractMariaDBBaseTest {
     void assertOutdatedPhotoOfStation7065(boolean outdated) {
         var station = loadDeStationByStationId("7065");
         assertThat(station).isNotNull();
-        assertThat(station.getOutdated()).isEqualTo(outdated);
+        assertThat(station.outdated()).isEqualTo(outdated);
     }
 
 

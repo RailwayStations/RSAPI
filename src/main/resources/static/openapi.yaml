@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20231222.1300"
+  version: "20231231.1830"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -230,116 +230,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/PhotoStations'
 
-  /{country}/stations:
-    get:
-      summary: Finds railway stations by various query criteria
-      deprecated: true
-      tags:
-        - stations
-      parameters:
-        - name: country
-          in: path
-          description: filter by country code
-          required: true
-          schema:
-            $ref: '#/components/schemas/CountryCode'
-        - name: hasPhoto
-          in: query
-          description: filter by photo availalbe/missing
-          schema:
-            type: boolean
-        - name: photographer
-          in: query
-          description: filter by nickname of a photographer
-          schema:
-            type: string
-        - name: active
-          in: query
-          description: filter on active/inactive stations
-          schema:
-            type: boolean
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Station'
-        404:
-          description: Country not found
-          content: { }
-
-  /stations:
-    get:
-      summary: Finds railway stations by various query criteria
-      deprecated: true
-      tags:
-        - stations
-      parameters:
-        - name: country
-          in: query
-          description: filter by country code, defaults to "de" if missing, limits to max three countries
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/CountryCode'
-        - name: hasPhoto
-          in: query
-          description: filter by photo available/missing
-          schema:
-            type: boolean
-        - name: photographer
-          in: query
-          description: filter by nickname of a photographer
-          schema:
-            type: string
-        - name: active
-          in: query
-          description: filter on active/inactive stations
-          schema:
-            type: boolean
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Station'
-
-  /{country}/stations/{id}:
-    get:
-      summary: Find a railway station by its ID
-      deprecated: true
-      tags:
-        - stations
-      parameters:
-        - name: country
-          in: path
-          description: country code
-          required: true
-          schema:
-            $ref: '#/components/schemas/CountryCode'
-        - name: id
-          in: path
-          description: id of the station
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Station'
-        404:
-          description: Station not found
-          content: { }
-
   /photographers:
     get:
       summary: List of all photographers with their number of photos taken
@@ -391,28 +281,6 @@ paths:
   /countries:
     get:
       summary: List of all supported countries with their configuration
-      tags:
-        - countries
-      parameters:
-        - name: onlyActive
-          in: query
-          description: return only active countries? Defaults to true.
-          schema:
-            type: boolean
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Country'
-
-  /countries.json:
-    get:
-      summary: List of all supported countries with their configuration
-      deprecated: true
       tags:
         - countries
       parameters:
@@ -712,42 +580,6 @@ paths:
           content: { }
       x-codegen-request-body-name: UploadCommand
 
-  /registration:
-    post:
-      summary: Register a new account
-      description: |
-        DEPRECATED: use oauth instead
-      deprecated: true
-      tags:
-        - profile
-      requestBody:
-        description: Registration information
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RegisterProfile'
-        required: true
-      responses:
-        202:
-          description: registration accepted
-          content: { }
-        400:
-          description: Bad Request
-          content:
-            text/plain:
-              schema:
-                type: string
-        409:
-          description: conflict with existing name or email
-          content:
-            text/plain:
-              schema:
-                type: string
-        422:
-          description: unprocessable entity, Registration input document error
-          content: { }
-      x-codegen-request-body-name: registration
-
   /emailVerification/{token}:
     get:
       summary: Verify eMail-Address with verification token
@@ -817,8 +649,6 @@ paths:
         - profile
       parameters:
         - $ref: '#/components/parameters/Authorization'
-        - $ref: '#/components/parameters/Upload-Token'
-        - $ref: '#/components/parameters/Email'
       responses:
         200:
           description: ok
@@ -840,8 +670,6 @@ paths:
         - profile
       parameters:
         - $ref: '#/components/parameters/Authorization'
-        - $ref: '#/components/parameters/Upload-Token'
-        - $ref: '#/components/parameters/Email'
       requestBody:
         description: Userprofile
         content:
@@ -883,8 +711,6 @@ paths:
         - profile
       parameters:
         - $ref: '#/components/parameters/Authorization'
-        - $ref: '#/components/parameters/Upload-Token'
-        - $ref: '#/components/parameters/Email'
       responses:
         204:
           description: delete action has been enacted, no further information
@@ -1308,76 +1134,6 @@ components:
         - "createdAt"
         - "license"
 
-    Station:
-      description: A railway-station object with location and optional photo
-      type: object
-      properties:
-        idStr:
-          type: string
-          description: Unique ID of the station per country
-        id:
-          type: integer
-          description: Unique (numeric) ID of the station per country
-          deprecated: true
-          format: int64
-        country:
-          $ref: '#/components/schemas/CountryCode'
-          description: Two character country code
-        title:
-          type: string
-          description: Name of the station
-        photographer:
-          type: string
-          description: Nickname of the photographer
-        photographerUrl:
-          type: string
-          description: Link to the photographer
-        photoUrl:
-          type: string
-          description: URL of the photo
-        photoId:
-          type: integer
-          description: ID of the photo
-          format: int64
-        license:
-          type: string
-          description: |
-            License of the photo, clients need to link to an online version
-            of the license text
-        licenseUrl:
-          type: string
-          description: |
-            The URL of the license text. Clients should use this to link
-            to the online version of the license text
-        lat:
-          type: number
-          description: Latitude of the station
-          format: double
-        lon:
-          type: number
-          description: Longitute of the station
-          format: double
-        createdAt:
-          type: integer
-          description: |
-            Timestamp when the photo was created in the railway-stations
-            database (Epoche milliseconds since 1.1.1970)
-          format: int64
-        DS100:
-          type: string
-          description: A short code of the station, depending on the country
-        active:
-          type: boolean
-        outdated:
-          type: boolean
-      required:
-        - idStr
-        - country
-        - title
-        - lat
-        - lon
-        - active
-
     Photographers:
       description: |
         JSON Object with photographers nickname as parameter and number
@@ -1421,7 +1177,7 @@ components:
           description: Name of the country
         email:
           type: string
-          description: Email Address to send photos to
+          description: Contact email address
         timetableUrlTemplate:
           type: string
           description: |
