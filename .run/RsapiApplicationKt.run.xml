@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="RsapiApplicationKt" type="Application" factoryName="Application" nameIsGenerated="true">
+    <envs>
+      <env name="SPRING_PROFILES_ACTIVE" value="peter" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="org.railwaystations.rsapi.app.RsapiApplicationKt" />
+    <module name="rsapi.main" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="org.railwaystations.rsapi.app.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

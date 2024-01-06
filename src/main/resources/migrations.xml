@@ -154,7 +154,7 @@
         </insert>
     </changeSet>
 
-    <changeSet id="2" author="pstorch" context="junit">
+    <changeSet id="2" author="pstorch2" context="junit">
         <insert tableName="countries">
             <column name="id" value="de"/>
             <column name="name" value="Deutschland"/>
