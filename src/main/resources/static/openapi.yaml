@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20231231.1830"
+  version: "20240204.1845"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -305,7 +305,7 @@ paths:
       tags:
         - photoUpload
       parameters:
-        - $ref: '#/components/parameters/Authorization'
+        - $ref: '#/components/parameters/AuthorizationOptional'
         - $ref: '#/components/parameters/Upload-Token'
         - $ref: '#/components/parameters/Email'
         - name: Country
@@ -511,19 +511,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/InboxCountResponse'
 
-  /nextZ:
-    get:
-      summary: Get next Z-StationId for missing stations
-      tags:
-        - inbox
-      responses:
-        200:
-          description: next Z-StationId value
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NextZResponse'
-
   /adminInbox:
     get:
       summary: Get the current inbox, photos and problem reports under review.
@@ -627,7 +614,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ChangePassword'
-        required: false
+        required: true
       responses:
         200:
           description: password changed
@@ -900,6 +887,14 @@ paths:
 components:
   parameters:
     Authorization:
+      name: Authorization
+      in: header
+      description: |
+        JWT authorization
+      required: true
+      schema:
+        type: string
+    AuthorizationOptional:
       name: Authorization
       in: header
       description: |
