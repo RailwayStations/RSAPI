@@ -50,4 +50,9 @@ interface ManageInboxUseCase {
     fun updateLocation(command: InboxCommand)
 
     fun markPhotoOutdated(command: InboxCommand)
+    fun deleteUserInboxEntry(user: User, id: Long)
+
+    class InboxEntryNotFoundException : RuntimeException("InboxEntry not found")
+    class InboxEntryNotOwnerException : RuntimeException("InboxEntry not owned by user")
+
 }

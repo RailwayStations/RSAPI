@@ -6,6 +6,7 @@ import io.mockk.verify
 import net.javacrumbs.jsonunit.spring.JsonUnitResultMatchers.json
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
 import org.railwaystations.rsapi.adapter.web.RequestUtil
 import org.railwaystations.rsapi.app.auth.AuthUser
 import org.railwaystations.rsapi.core.model.Coordinates
@@ -28,6 +29,7 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActions
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -38,7 +40,7 @@ import java.util.*
 private const val USER_AGENT = "UserAgent"
 
 @WebMvcTest(controllers = [InboxController::class])
-@Import(RequestUtil::class)
+@Import(RequestUtil::class, ErrorHandlingControllerAdvice::class)
 @ActiveProfiles("mockMvcTest")
 internal class InboxControllerTest {
 
@@ -209,6 +211,74 @@ internal class InboxControllerTest {
             """.trimIndent()
                 )
             )
+    }
+
+    @Test
+    fun deleteUserInboxUnauthorized() {
+        mvc.perform(
+            delete("/userInbox/1")
+                .header(HttpHeaders.AUTHORIZATION, "any")
+                .with(csrf())
+        )
+            .andExpect(validOpenApiResponse())
+            .andExpect(status().isUnauthorized)
+    }
+
+    @Test
+    fun deleteUserInboxNotFound() {
+        every {
+            manageInboxUseCase.deleteUserInboxEntry(
+                userNickname,
+                1
+            )
+        } throws ManageInboxUseCase.InboxEntryNotFoundException()
+
+        mvc.perform(
+            delete("/userInbox/1")
+                .header(HttpHeaders.AUTHORIZATION, "any")
+                .with(user(AuthUser(userNickname, listOf())))
+                .with(csrf())
+        )
+            .andExpect(validOpenApiResponse())
+            .andExpect(status().isNotFound)
+    }
+
+    @Test
+    fun deleteUserInboxForbidden() {
+        every {
+            manageInboxUseCase.deleteUserInboxEntry(
+                userNickname,
+                1
+            )
+        } throws ManageInboxUseCase.InboxEntryNotOwnerException()
+
+        mvc.perform(
+            delete("/userInbox/1")
+                .header(HttpHeaders.AUTHORIZATION, "any")
+                .with(user(AuthUser(userNickname, listOf())))
+                .with(csrf())
+        )
+            .andExpect(validOpenApiResponse())
+            .andExpect(status().isForbidden)
+    }
+
+    @Test
+    fun deleteUserInbox() {
+        every {
+            manageInboxUseCase.deleteUserInboxEntry(
+                userNickname,
+                1
+            )
+        } returns Unit
+
+        mvc.perform(
+            delete("/userInbox/1")
+                .header(HttpHeaders.AUTHORIZATION, "any")
+                .with(user(AuthUser(userNickname, listOf())))
+                .with(csrf())
+        )
+            .andExpect(validOpenApiResponse())
+            .andExpect(status().isNoContent)
     }
 
     private fun whenPostProblemReport(problemReportJson: String): ResultActions {

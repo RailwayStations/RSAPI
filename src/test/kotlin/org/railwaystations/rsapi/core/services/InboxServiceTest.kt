@@ -30,6 +30,7 @@ import org.railwaystations.rsapi.core.model.ProblemReport
 import org.railwaystations.rsapi.core.model.ProblemReportType
 import org.railwaystations.rsapi.core.model.Station
 import org.railwaystations.rsapi.core.model.User
+import org.railwaystations.rsapi.core.ports.ManageInboxUseCase
 import org.railwaystations.rsapi.core.ports.MastodonBot
 import org.railwaystations.rsapi.core.ports.Monitor
 import org.railwaystations.rsapi.core.ports.PhotoStorage
@@ -441,8 +442,8 @@ internal class InboxServiceTest {
             inboxEntry.extension = null
             every { inboxDao.findById(INBOX_ENTRY1_ID) } returns inboxEntry
             every { stationDao.findByKey(STATION_KEY_DE_1.country, command.stationId!!) } returns null
-            every { stationDao.maxZ } returns 1024
-            val newStation = createNewStationByCommand(command, "Z1025")
+            every { stationDao.maxZ } returns 4711
+            val newStation = createNewStationByCommand(command, "Z4712")
 
             inboxService.importMissingStation(command)
 
@@ -581,6 +582,40 @@ internal class InboxServiceTest {
             assertThatThrownBy { inboxService.importMissingStation(command) }.isInstanceOf(
                 IllegalArgumentException::class.java
             ).hasMessage("There is a conflict with another photo")
+        }
+    }
+
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    @Nested
+    internal inner class UserInbox {
+        @Test
+        fun deleteUserInboxEntry() {
+            val inboxEntry = createInboxEntry1()
+            every { inboxDao.findById(inboxEntry.id) } returns inboxEntry
+            every { inboxDao.reject(any(), any()) } returns Unit
+
+            inboxService.deleteUserInboxEntry(PHOTOGRAPHER, inboxEntry.id)
+
+            verify { inboxDao.reject(inboxEntry.id, "Deleted by user") }
+        }
+
+        @Test
+        fun deleteUserInboxEntryNotOwner() {
+            val inboxEntry = createInboxEntry1()
+            every { inboxDao.findById(inboxEntry.id) } returns inboxEntry
+
+            assertThatThrownBy { inboxService.deleteUserInboxEntry(createValidUser(), 1L) }
+                .isInstanceOf(ManageInboxUseCase.InboxEntryNotOwnerException::class.java)
+
+            verify(exactly = 0) { inboxDao.reject(inboxEntry.id, "Deleted by user") }
+        }
+
+        @Test
+        fun deleteUserInboxEntryNotFound() {
+            every { inboxDao.findById(1L) } returns null
+
+            assertThatThrownBy { inboxService.deleteUserInboxEntry(PHOTOGRAPHER, 1L) }
+                .isInstanceOf(ManageInboxUseCase.InboxEntryNotFoundException::class.java)
         }
     }
 
