@@ -1635,8 +1635,6 @@ components:
           type: number
           format: double
       required:
-        - countryCode
-        - stationId
         - title
         - lat
         - lon

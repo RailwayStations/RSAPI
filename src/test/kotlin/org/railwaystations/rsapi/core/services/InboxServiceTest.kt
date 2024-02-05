@@ -596,7 +596,7 @@ internal class InboxServiceTest {
 
             inboxService.deleteUserInboxEntry(PHOTOGRAPHER, inboxEntry.id)
 
-            verify { inboxDao.reject(inboxEntry.id, "Deleted by user") }
+            verify { inboxDao.reject(inboxEntry.id, "Withdrawn by user") }
         }
 
         @Test

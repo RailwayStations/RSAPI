@@ -216,7 +216,7 @@ class InboxService(
         if (inboxEntry.photographerId != user.id) {
             throw ManageInboxUseCase.InboxEntryNotOwnerException()
         }
-        inboxDao.reject(id, "Deleted by user")
+        inboxDao.reject(id, "Withdrawn by user")
     }
 
     override fun updateLocation(command: InboxCommand) {
