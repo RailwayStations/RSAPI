@@ -172,7 +172,7 @@ interface InboxDao {
             }
             return PublicInboxEntry(
                 countryCode = rs.getString(COUNTRY_CODE),
-                stationId = stationId!!,
+                stationId = stationId,
                 title = title!!,
                 coordinates = coordinates
             )

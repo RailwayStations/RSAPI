@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20240204.1845"
+  version: "20240204.2040"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -73,6 +73,13 @@ paths:
       responses:
         302:
           description: redirect to `redirect_uri` with `code` and `state` query parameter
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
+
   /oauth2/token:
     post:
       summary: OAuth2 token endpoint
@@ -94,6 +101,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OAuthTokenResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
+
   /oauth2/revoke:
     post:
       summary: OAuth2 revoke token endpoint
@@ -111,6 +125,12 @@ paths:
       responses:
         200:
           description: successfully revoked the token
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
 
   /photoStationById/{country}/{id}:
     get:
@@ -140,6 +160,12 @@ paths:
         404:
           description: Station not found
           content: { }
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
 
   /photoStationsByCountry/{country}:
     get:
@@ -173,6 +199,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PhotoStations'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
 
   /photoStationsByPhotographer/{photographer}:
     get:
@@ -201,6 +233,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PhotoStations'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
 
   /photoStationsByRecentPhotoImports:
     get:
@@ -229,6 +267,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PhotoStations'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
 
   /photographers:
     get:
@@ -255,6 +299,12 @@ paths:
             application/json:
               schema:
                 type: object
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
 
   /stats:
     get:
@@ -277,6 +327,12 @@ paths:
         404:
           description: Country not found
           content: { }
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
 
   /countries:
     get:
@@ -298,6 +354,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Country'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
 
   /photoUpload:
     post:
@@ -402,6 +464,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InboxResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
       x-codegen-request-body-name: image
 
   /reportProblem:
@@ -440,6 +508,12 @@ paths:
         403:
           description: forbidden
           content: { }
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
       x-codegen-request-body-name: problemReport
 
   /userInbox:
@@ -458,6 +532,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/InboxStateQueryResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
     post:
       summary: Query the state of photo uploads of the authorized user
       tags:
@@ -481,7 +561,45 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/InboxStateQueryResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
       x-codegen-request-body-name: UploadStateQueries
+
+  /userInbox/{id}:
+    delete:
+      summary: Delete an unprocessed inbox entry
+      tags:
+        - inbox
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id of the inbox entry
+          schema:
+            type: integer
+            format: int64
+      responses:
+        204:
+          description: inbox entry got deleted
+        400:
+          description: bad request, e.g. if the inbox entry is already done and can't be deleted anymore
+          content: { }
+        401:
+          description: authorization failed
+          content: { }
+        403:
+          description: forbidden
+          content: { }
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
 
   /publicInbox:
     get:
@@ -497,6 +615,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PublicInboxEntry'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
 
   /adminInboxCount:
     get:
@@ -510,6 +634,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InboxCountResponse'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
 
   /adminInbox:
     get:
@@ -533,6 +663,12 @@ paths:
         403:
           description: forbidden
           content: { }
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
     post:
       summary: |
         Import or reject an uploaded photo or a problem report from the inbox
@@ -565,6 +701,12 @@ paths:
         403:
           description: forbidden
           content: { }
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
       x-codegen-request-body-name: UploadCommand
 
   /emailVerification/{token}:
@@ -588,6 +730,12 @@ paths:
         404:
           description: token not found, verification failed
           content: { }
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
 
   /resendEmailVerification:
     post:
@@ -600,6 +748,12 @@ paths:
         200:
           description: email successfully sent
           content: { }
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
 
   /changePassword:
     post:
@@ -628,6 +782,12 @@ paths:
         404:
           description: User not found
           content: { }
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
 
   /myProfile:
     get:
@@ -649,6 +809,12 @@ paths:
         403:
           description: forbidden
           content: { }
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
     post:
       summary: Update the users profile.
       description: |
@@ -686,6 +852,12 @@ paths:
             text/plain:
               schema:
                 type: string
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
       x-codegen-request-body-name: profile
     delete:
       summary: Delete the users profile.
@@ -707,6 +879,12 @@ paths:
         403:
           description: forbidden
           content: { }
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
 
   /photos/{country}/{filename}:
     get:
@@ -747,6 +925,12 @@ paths:
         404:
           description: file not found
           content: { }
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
 
   /inbox/{filename}:
     get:
@@ -781,6 +965,12 @@ paths:
         404:
           description: file not found
           content: { }
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
 
   /inbox/processed/{filename}:
     get:
@@ -815,6 +1005,12 @@ paths:
         404:
           description: file not found
           content: { }
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
 
   /inbox/done/{filename}:
     get:
@@ -849,6 +1045,12 @@ paths:
         404:
           description: file not found
           content: { }
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
 
   /inbox/rejected/{filename}:
     get:
@@ -883,6 +1085,12 @@ paths:
         404:
           description: file not found
           content: { }
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralErrorMessage'
 
 components:
   parameters:
@@ -1427,8 +1635,6 @@ components:
           type: number
           format: double
       required:
-        - countryCode
-        - stationId
         - title
         - lat
         - lon

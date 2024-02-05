@@ -6,15 +6,18 @@ import io.mockk.verify
 import net.javacrumbs.jsonunit.spring.JsonUnitResultMatchers.json
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
 import org.railwaystations.rsapi.adapter.web.RequestUtil
 import org.railwaystations.rsapi.app.auth.AuthUser
 import org.railwaystations.rsapi.core.model.Coordinates
+import org.railwaystations.rsapi.core.model.InboxEntry
 import org.railwaystations.rsapi.core.model.InboxResponse
 import org.railwaystations.rsapi.core.model.InboxStateQuery
 import org.railwaystations.rsapi.core.model.InboxStateQuery.InboxState
 import org.railwaystations.rsapi.core.model.ProblemReport
 import org.railwaystations.rsapi.core.model.ProblemReportType
 import org.railwaystations.rsapi.core.model.PublicInboxEntry
+import org.railwaystations.rsapi.core.model.User
 import org.railwaystations.rsapi.core.model.UserTestFixtures
 import org.railwaystations.rsapi.core.ports.ManageInboxUseCase
 import org.railwaystations.rsapi.core.ports.ManageProfileUseCase
@@ -23,11 +26,15 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpHeaders
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActions
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -38,8 +45,10 @@ import java.util.*
 private const val USER_AGENT = "UserAgent"
 
 @WebMvcTest(controllers = [InboxController::class])
-@Import(RequestUtil::class)
+@Import(RequestUtil::class, ErrorHandlingControllerAdvice::class)
 @ActiveProfiles("mockMvcTest")
+@EnableWebSecurity
+@EnableMethodSecurity
 internal class InboxControllerTest {
 
     @Autowired
@@ -59,6 +68,86 @@ internal class InboxControllerTest {
     @BeforeEach
     fun setUp() {
         every { localeResolver.resolveLocale(any()) } returns Locale.GERMAN
+    }
+
+    @Test
+    fun getAdminInboxUnauthorized() {
+        mvc.perform(
+            get("/adminInbox")
+                .header(HttpHeaders.AUTHORIZATION, "any")
+                .with(csrf())
+        )
+            .andExpect(validOpenApiResponse())
+            .andExpect(status().isUnauthorized)
+    }
+
+    @Test
+    fun getAdminInboxForbidden() {
+        mvc.perform(
+            get("/adminInbox")
+                .header(HttpHeaders.AUTHORIZATION, "any")
+                .with(user(AuthUser(userNickname, listOf(SimpleGrantedAuthority(User.ROLE_USER)))))
+                .with(csrf())
+        )
+            .andExpect(validOpenApiResponse())
+            .andExpect(status().isForbidden)
+    }
+
+    @Test
+    fun getAdminInbox() {
+        val createdAt = Instant.now()
+        every {
+            manageInboxUseCase.listAdminInbox(userNickname)
+        } returns listOf(
+            InboxEntry(
+                id = 23L,
+                countryCode = "de",
+                stationId = "4711",
+                title = "Station 4711",
+                comment = "Ein Kommentar",
+                coordinates = Coordinates(50.1, 9.2),
+                photographerId = userNickname.id,
+                photographerNickname = userNickname.name,
+                ds100 = "FFU",
+                extension = "jpg",
+                inboxUrl = "https://api.railway-stations.org/inbox/23.jpg",
+                createdAt = createdAt,
+            )
+        )
+
+        mvc.perform(
+            get("/adminInbox")
+                .header(HttpHeaders.AUTHORIZATION, "any")
+                .with(user(AuthUser(userNickname, listOf(SimpleGrantedAuthority(User.ROLE_ADMIN)))))
+                .with(csrf())
+        )
+            .andExpect(validOpenApiResponse())
+            .andExpect(status().isOk)
+            .andExpect(
+                json().isEqualTo(
+                    """
+                        [
+                          {
+                            "id": 23,
+                            "photographerNickname": "nickname",
+                            "comment": "Ein Kommentar",
+                            "createdAt": %d,
+                            "done": false,
+                            "hasPhoto": false,
+                            "countryCode": "de",
+                            "stationId": "4711",
+                            "title": "Station 4711",
+                            "lat": 50.1,
+                            "lon": 9.2,
+                            "filename": "23.jpg",
+                            "inboxUrl": "https://api.railway-stations.org/inbox/23.jpg",
+                            "hasConflict": false,
+                            "isProcessed": false
+                          }
+                        ]
+            """.trimIndent().format(createdAt.toEpochMilli())
+                )
+            )
     }
 
     @Test
@@ -209,6 +298,74 @@ internal class InboxControllerTest {
             """.trimIndent()
                 )
             )
+    }
+
+    @Test
+    fun deleteUserInboxUnauthorized() {
+        mvc.perform(
+            delete("/userInbox/1")
+                .header(HttpHeaders.AUTHORIZATION, "any")
+                .with(csrf())
+        )
+            .andExpect(validOpenApiResponse())
+            .andExpect(status().isUnauthorized)
+    }
+
+    @Test
+    fun deleteUserInboxNotFound() {
+        every {
+            manageInboxUseCase.deleteUserInboxEntry(
+                userNickname,
+                1
+            )
+        } throws ManageInboxUseCase.InboxEntryNotFoundException()
+
+        mvc.perform(
+            delete("/userInbox/1")
+                .header(HttpHeaders.AUTHORIZATION, "any")
+                .with(user(AuthUser(userNickname, listOf())))
+                .with(csrf())
+        )
+            .andExpect(validOpenApiResponse())
+            .andExpect(status().isNotFound)
+    }
+
+    @Test
+    fun deleteUserInboxForbidden() {
+        every {
+            manageInboxUseCase.deleteUserInboxEntry(
+                userNickname,
+                1
+            )
+        } throws ManageInboxUseCase.InboxEntryNotOwnerException()
+
+        mvc.perform(
+            delete("/userInbox/1")
+                .header(HttpHeaders.AUTHORIZATION, "any")
+                .with(user(AuthUser(userNickname, listOf())))
+                .with(csrf())
+        )
+            .andExpect(validOpenApiResponse())
+            .andExpect(status().isForbidden)
+    }
+
+    @Test
+    fun deleteUserInbox() {
+        every {
+            manageInboxUseCase.deleteUserInboxEntry(
+                userNickname,
+                1
+            )
+        } returns Unit
+
+        mvc.perform(
+            delete("/userInbox/1")
+                .header(HttpHeaders.AUTHORIZATION, "any")
+                .with(user(AuthUser(userNickname, listOf())))
+                .with(csrf())
+        )
+            .andExpect(validOpenApiResponse())
+            .andExpect(status().isNoContent)
     }
 
     private fun whenPostProblemReport(problemReportJson: String): ResultActions {

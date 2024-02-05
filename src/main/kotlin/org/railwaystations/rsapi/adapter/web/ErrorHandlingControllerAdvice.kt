@@ -2,6 +2,7 @@ package org.railwaystations.rsapi.adapter.web
 
 import jakarta.validation.ConstraintViolation
 import jakarta.validation.ConstraintViolationException
+import org.railwaystations.rsapi.core.ports.ManageInboxUseCase
 import org.railwaystations.rsapi.core.ports.ManageProfileUseCase
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -40,4 +41,17 @@ class ErrorHandlingControllerAdvice {
     fun handleProfileConflictException(e: ManageProfileUseCase.ProfileConflictException): ResponseEntity<String> {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.message)
     }
+
+    @ExceptionHandler(ManageInboxUseCase.InboxEntryNotFoundException::class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    fun handleInboxEntryNotFoundException(e: ManageInboxUseCase.InboxEntryNotFoundException): ResponseEntity<String> {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.message)
+    }
+
+    @ExceptionHandler(ManageInboxUseCase.InboxEntryNotOwnerException::class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    fun handleInboxEntryNotOwnerException(e: ManageInboxUseCase.InboxEntryNotOwnerException): ResponseEntity<String> {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.message)
+    }
+
 }
