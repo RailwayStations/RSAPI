@@ -128,7 +128,7 @@ dependencies {
     testImplementation("com.atlassian.oai:swagger-request-validator-mockmvc:$swaggerRequestValidatorVersion")
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.xmlunit:xmlunit-assertj3")
-    testImplementation("net.javacrumbs.json-unit:json-unit-spring:3.2.2")
+    testImplementation("net.javacrumbs.json-unit:json-unit-spring:3.2.4")
     testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:3.0.1")
     testImplementation("io.mockk:mockk:1.13.9")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
