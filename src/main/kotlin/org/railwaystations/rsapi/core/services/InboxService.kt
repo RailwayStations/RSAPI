@@ -212,6 +212,7 @@ class InboxService(
 
     override fun deleteUserInboxEntry(user: User, id: Long) {
         val inboxEntry = inboxDao.findById(id) ?: throw ManageInboxUseCase.InboxEntryNotFoundException()
+        require(!inboxEntry.done) { "InboxEntry is already done" }
         if (inboxEntry.photographerId != user.id) {
             throw ManageInboxUseCase.InboxEntryNotOwnerException()
         }

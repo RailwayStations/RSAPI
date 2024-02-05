@@ -607,7 +607,20 @@ internal class InboxServiceTest {
             assertThatThrownBy { inboxService.deleteUserInboxEntry(createValidUser(), 1L) }
                 .isInstanceOf(ManageInboxUseCase.InboxEntryNotOwnerException::class.java)
 
-            verify(exactly = 0) { inboxDao.reject(inboxEntry.id, "Deleted by user") }
+            verify(exactly = 0) { inboxDao.reject(inboxEntry.id, any()) }
+        }
+
+        @Test
+        fun deleteUserInboxEntryAlreadyDone() {
+            val inboxEntry = createInboxEntry1().copy(
+                done = true
+            )
+            every { inboxDao.findById(inboxEntry.id) } returns inboxEntry
+
+            assertThatThrownBy { inboxService.deleteUserInboxEntry(PHOTOGRAPHER, 1L) }
+                .isInstanceOf(IllegalArgumentException::class.java)
+
+            verify(exactly = 0) { inboxDao.reject(inboxEntry.id, any()) }
         }
 
         @Test

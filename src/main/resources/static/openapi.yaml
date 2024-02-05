@@ -585,6 +585,9 @@ paths:
       responses:
         204:
           description: inbox entry got deleted
+        400:
+          description: bad request, e.g. if the inbox entry is already done and can't be deleted anymore
+          content: { }
         401:
           description: authorization failed
           content: { }
