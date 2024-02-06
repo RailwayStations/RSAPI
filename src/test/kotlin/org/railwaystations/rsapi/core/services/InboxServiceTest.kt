@@ -597,6 +597,7 @@ internal class InboxServiceTest {
             inboxService.deleteUserInboxEntry(PHOTOGRAPHER, inboxEntry.id)
 
             verify { inboxDao.reject(inboxEntry.id, "Withdrawn by user") }
+            verify { monitor.sendMessage("InboxEntry ${inboxEntry.id} ${inboxEntry.title} has been withdrawn by ${PHOTOGRAPHER.name}") }
         }
 
         @Test

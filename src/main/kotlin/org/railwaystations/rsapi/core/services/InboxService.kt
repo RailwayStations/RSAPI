@@ -217,6 +217,7 @@ class InboxService(
             throw ManageInboxUseCase.InboxEntryNotOwnerException()
         }
         inboxDao.reject(id, "Withdrawn by user")
+        monitor.sendMessage("InboxEntry $id ${inboxEntry.title} has been withdrawn by ${user.name}")
     }
 
     override fun updateLocation(command: InboxCommand) {
