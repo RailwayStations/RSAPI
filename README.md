@@ -29,7 +29,7 @@ Build docker image:
 
 ## IntelliJ
 
-After importing this project for the first time, you might need to specify the folder `build/openapi/src/main/java` as source root folder.
+After importing this project for the first time, you might need to specify the folder `build/kotlin/openapi` as source root folder.
 
 ## Working Directory
 
