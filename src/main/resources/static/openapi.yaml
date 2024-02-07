@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20240204.2040"
+  version: "20240207.2200"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -1788,14 +1788,6 @@ components:
       required:
         - status
         - message
-
-    NextZResponse:
-      type: object
-      properties:
-        nextZ:
-          type: string
-      required:
-        - nextZ
 
     ProblemReport:
       description: Represents a report of a problem with a station
