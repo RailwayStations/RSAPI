@@ -80,7 +80,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KaptGenerateStubs>().configureE
 }
 
 val testContainersVersion = "1.19.4"
-val jdbiVersion = "3.44.0"
+val jdbiVersion = "3.44.1"
 val swaggerRequestValidatorVersion = "2.40.0"
 
 dependencies {
