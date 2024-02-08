@@ -1,0 +1,52 @@
+[versions]
+springBoot = "3.2.2"
+springDependency = "1.1.4"
+springOauth2AuthorizationServer = "1.2.1"
+openapiGenerator = "7.3.0"
+kotlin = "1.9.22"
+testContainers = "1.19.5"
+jdbi = "3.44.1"
+swaggerRequestValidator = "2.40.0"
+lazysodium = "5.1.4"
+jna = "5.14.0"
+commonsIo = "2.15.1"
+swaggerAnnotations = "2.2.20"
+jakartaValidationApi = "3.0.2"
+bootstrap = "5.3.2"
+jsonUnitSpring = "3.2.4"
+wiremock = "3.0.1"
+mockk = "1.13.9"
+springMockk = "4.0.2"
+
+[libraries]
+jdbi3-spring5 = { group = "org.jdbi", name = "jdbi3-spring5", version.ref = "jdbi" }
+jdbi3-kotlin = { group = "org.jdbi", name = "jdbi3-kotlin", version.ref = "jdbi" }
+jdbi3-kotlin-sqlobject = { group = "org.jdbi", name = "jdbi3-kotlin-sqlobject", version.ref = "jdbi" }
+testcontainers = { group = "org.testcontainers", name = "testcontainers", version.ref = "testContainers" }
+testcontainers-junit-jupiter = { group = "org.testcontainers", name = "junit-jupiter", version.ref = "testContainers" }
+testcontainers-mariadb = { group = "org.testcontainers", name = "mariadb", version.ref = "testContainers" }
+swagger-request-validator-core = { group = "com.atlassian.oai", name = "swagger-request-validator-core", version.ref = "swaggerRequestValidator" }
+swagger-request-validator-spring-webmvc = { group = "com.atlassian.oai", name = "swagger-request-validator-spring-webmvc", version.ref = "swaggerRequestValidator" }
+swagger-request-validator-mockmvc = { group = "com.atlassian.oai", name = "swagger-request-validator-mockmvc", version.ref = "swaggerRequestValidator" }
+kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
+kotlin-stdlib-jdk8 = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version.ref = "kotlin" }
+spring-security-oauth2-authorization-server = { group = "org.springframework.security", name = "spring-security-oauth2-authorization-server", version.ref = "springOauth2AuthorizationServer" }
+lazysodium-java = { group = "com.goterl", name = "lazysodium-java", version.ref = "lazysodium" }
+jna = { group = "net.java.dev.jna", name = "jna", version.ref = "jna" }
+commons-io = { group = "commons-io", name = "commons-io", version.ref = "commonsIo" }
+commons-lang3 = { group = "org.apache.commons", name = "commons-lang3" }
+swagger-annotations = { group = "io.swagger.core.v3", name = "swagger-annotations", version.ref = "swaggerAnnotations" }
+jakarta-validation-api = { group = "jakarta.validation", name = "jakarta.validation-api", version.ref = "jakartaValidationApi" }
+bootstrap = { group = "org.webjars", name = "bootstrap", version.ref = "bootstrap" }
+json-unit-spring = { group = "net.javacrumbs.json-unit", name = "json-unit-spring", version.ref = "jsonUnitSpring" }
+wiremock-jre8-standalone = { group = "com.github.tomakehurst", name = "wiremock-jre8-standalone", version.ref = "wiremock" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+springmockk = { group = "com.ninja-squad", name = "springmockk", version.ref = "springMockk" }
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependency" }
+openapi-generator = { id = "org.openapi.generator", version.ref = "openapiGenerator" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }

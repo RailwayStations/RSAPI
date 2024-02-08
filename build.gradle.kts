@@ -1,14 +1,12 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    val kotlinVersion = "1.9.22"
-
-    id("org.springframework.boot") version "3.2.2"
-    id("io.spring.dependency-management") version "1.1.4"
-    id("org.openapi.generator") version "7.2.0"
-    kotlin("jvm") version kotlinVersion
-    kotlin("plugin.spring") version kotlinVersion
-    kotlin("kapt") version kotlinVersion
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
+    alias(libs.plugins.openapi.generator)
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.spring)
+    alias(libs.plugins.kotlin.kapt)
 }
 
 group = "org.railwaystations"
@@ -79,10 +77,6 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KaptGenerateStubs>().configureE
     dependsOn(tasks.openApiGenerate)
 }
 
-val testContainersVersion = "1.19.4"
-val jdbiVersion = "3.44.0"
-val swaggerRequestValidatorVersion = "2.40.0"
-
 dependencies {
     kapt("org.springframework.boot:spring-boot-configuration-processor")
 
@@ -95,21 +89,21 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-    implementation("org.springframework.security:spring-security-oauth2-authorization-server:1.2.1")
+    implementation(libs.spring.security.oauth2.authorization.server)
     implementation("org.liquibase:liquibase-core")
-    implementation("org.jdbi:jdbi3-spring5:$jdbiVersion")
-    implementation("org.jdbi:jdbi3-kotlin:$jdbiVersion")
-    implementation("org.jdbi:jdbi3-kotlin-sqlobject:$jdbiVersion")
-    implementation("com.goterl:lazysodium-java:5.1.4")
-    implementation("net.java.dev.jna:jna:5.14.0")
+    implementation(libs.jdbi3.spring5)
+    implementation(libs.jdbi3.kotlin)
+    implementation(libs.jdbi3.kotlin.sqlobject)
+    implementation(libs.lazysodium.java)
+    implementation(libs.jna)
     implementation("commons-codec:commons-codec")
-    implementation("commons-io:commons-io:2.15.1")
+    implementation(libs.commons.io)
     implementation("org.apache.commons:commons-lang3")
-    implementation("io.swagger.core.v3:swagger-annotations:2.2.20")
+    implementation(libs.swagger.annotations)
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("jakarta.validation:jakarta.validation-api:3.0.2")
-    implementation("org.webjars:bootstrap:5.3.2")
+    implementation(libs.jakarta.validation.api)
+    implementation(libs.bootstrap)
 
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
     runtimeOnly("org.webjars:webjars-locator-core")
@@ -120,18 +114,18 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.awaitility:awaitility")
-    testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
-    testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
-    testImplementation("org.testcontainers:mariadb:$testContainersVersion")
-    testImplementation("com.atlassian.oai:swagger-request-validator-core:$swaggerRequestValidatorVersion")
-    testImplementation("com.atlassian.oai:swagger-request-validator-spring-webmvc:$swaggerRequestValidatorVersion")
-    testImplementation("com.atlassian.oai:swagger-request-validator-mockmvc:$swaggerRequestValidatorVersion")
+    testImplementation(libs.testcontainers)
+    testImplementation(libs.testcontainers.junit.jupiter)
+    testImplementation(libs.testcontainers.mariadb)
+    testImplementation(libs.swagger.request.validator.core)
+    testImplementation(libs.swagger.request.validator.spring.webmvc)
+    testImplementation(libs.swagger.request.validator.mockmvc)
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.xmlunit:xmlunit-assertj3")
-    testImplementation("net.javacrumbs.json-unit:json-unit-spring:3.2.4")
-    testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:3.0.1")
-    testImplementation("io.mockk:mockk:1.13.9")
-    testImplementation("com.ninja-squad:springmockk:4.0.2")
+    testImplementation(libs.json.unit.spring)
+    testImplementation(libs.wiremock.jre8.standalone)
+    testImplementation(libs.mockk)
+    testImplementation(libs.springmockk)
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
