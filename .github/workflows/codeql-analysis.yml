@@ -61,7 +61,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Gradle
-        run: ./gradlew --no-daemon assemble
+        run: ./gradlew --no-daemon :service:assemble
 
       # ℹ️ Command-line programs to run using the OS shell.
       # 📚 https://git.io/JvXDl
