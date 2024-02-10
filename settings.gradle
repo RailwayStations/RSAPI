@@ -1,1 +1,3 @@
 rootProject.name = 'rsapi'
+
+include(":openapi", ":service")

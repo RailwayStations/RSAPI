@@ -17,11 +17,11 @@ To build the project, you need Java 20.
 
 Run on Unix like systems:
 
-```./gradlew build bootJar```
+```./gradlew :service:bootJar```
 
 Run on Windows:
 
-```./gradlew.bat build bootJar```
+```./gradlew.bat :service:bootJar```
 
 Build docker image:
 
@@ -29,7 +29,9 @@ Build docker image:
 
 ## IntelliJ
 
-After importing this project for the first time, you might need to specify the folder `build/kotlin/openapi` as source root folder.
+After importing this project for the first time, you might need to specify the folder `service/build/openapi` as
+source
+root folder.
 
 ## Working Directory
 
@@ -75,7 +77,8 @@ With the following query parameter:
 
 - `isActive`: select only railwaystations which are active
 
-A more detailed API documentation can be found in the [OpenAPI](src/main/resources/static/openapi.yaml) file or online
+A more detailed API documentation can be found in the [OpenAPI](openapi/src/main/resources/static/openapi.yaml) file or
+online
 at [developer.deutschebahn.com](https://developer.deutschebahn.com/store/apis/list).
 
 ### Examples

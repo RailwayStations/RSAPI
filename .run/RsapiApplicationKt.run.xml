@@ -4,7 +4,7 @@
       <env name="SPRING_PROFILES_ACTIVE" value="peter" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="org.railwaystations.rsapi.app.RsapiApplicationKt" />
-    <module name="rsapi.main" />
+    <module name="rsapi.service.main" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="org.railwaystations.rsapi.app.*" />
