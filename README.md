@@ -50,20 +50,17 @@ The following subdirectories are being used:
 
     - `done`: imported (unprocessed) photos
 
-    - `{country}/import`: old import directories for batch imports
+    - `rejected`: rejected photos
 
 ## Run
 
-The API can be started via `docker compose up -d` locally. It starts two Docker container: a local Maria DB and the API.
+The API can be started via IntelliJ. A local Maria DB can be started via `docker compose up -d` locally.
 
 The API is then available via `http://localhost:8080`.
 
 ## Maria DB
 
-For local testing and debugging purpose you can start the MariaDB container standalone
-with `docker compose up mariadb -d`.
-
-Enter mariadb CLI:
+For local testing and debugging you can enter mariadb via CLI:
 
 `docker exec -it mariadb mysql -ursapi -prsapi rsapi --default-character-set=utf8mb4`
 

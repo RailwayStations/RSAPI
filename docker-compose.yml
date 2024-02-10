@@ -3,20 +3,6 @@ version: '2.1'
 
 services:
 
-  rsapi:
-    image: railwaystations/rsapi:latest
-    container_name: rsapi
-    volumes:
-      - /var/rsapi:/var/rsapi
-    restart: unless-stopped
-    environment:
-      - SPRING_PROFILES_ACTIVE=test
-    network_mode: "host"
-    depends_on:
-      - mariadb
-    labels:
-      org.label-schema.group: "rsapi"
-
   mariadb:
     image: mariadb:11.2
     container_name: mariadb
