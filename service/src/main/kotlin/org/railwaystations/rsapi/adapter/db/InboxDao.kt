@@ -104,9 +104,12 @@ interface InboxDao {
         @Bind("title") title: String
     )
 
-    @SqlQuery("$JOIN_QUERY WHERE i.photographerId = :photographerId ORDER BY i.id DESC")
+    @SqlQuery("$JOIN_QUERY WHERE i.photographerId = :photographerId AND (i.done = false OR :showCompletedEntries = true) ORDER BY i.id DESC")
     @RegisterRowMapper(InboxEntryMapper::class)
-    fun findByUser(@Bind(PHOTOGRAPHER_ID) photographerId: Int): List<InboxEntry>
+    fun findByUser(
+        @Bind(PHOTOGRAPHER_ID) photographerId: Int,
+        @Bind("showCompletedEntries") showCompletedEntries: Boolean
+    ): List<InboxEntry>
 
 
     class InboxEntryMapper : RowMapper<InboxEntry> {

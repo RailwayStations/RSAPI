@@ -123,8 +123,8 @@ class InboxService(
         return inboxDao.findPublicInboxEntries()
     }
 
-    override fun userInbox(user: User): List<InboxStateQuery> {
-        return inboxDao.findByUser(user.id)
+    override fun userInbox(user: User, showCompletedEntries: Boolean): List<InboxStateQuery> {
+        return inboxDao.findByUser(user.id, showCompletedEntries)
             .map { inboxEntry: InboxEntry -> mapToInboxStateQuery(inboxEntry) }
     }
 

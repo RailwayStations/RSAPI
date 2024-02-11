@@ -517,7 +517,7 @@ internal class RsapiIntegrationTest : AbstractMariaDBBaseTest() {
 
 
         // get userInbox
-        val userInboxJson = user10UserInboxAsJson[0]
+        val userInboxJson = loadUser10UserInboxAsJson()[0]
         assertThat(userInboxJson["id"].asInt()).isEqualTo(uploadId)
         assertThat(userInboxJson["state"].asText()).isEqualTo("REVIEW")
         assertThat(userInboxJson["inboxUrl"].asText().endsWith("/inbox/$filename")).isTrue()
@@ -538,7 +538,7 @@ internal class RsapiIntegrationTest : AbstractMariaDBBaseTest() {
 
 
         // get userInbox processed
-        val userInboxProcessedJson = user10UserInboxAsJson[0]
+        val userInboxProcessedJson = loadUser10UserInboxAsJson()[0]
         assertThat(userInboxProcessedJson["id"].asInt()).isEqualTo(uploadId)
         assertThat(userInboxProcessedJson["state"].asText()).isEqualTo("REVIEW")
         assertThat(userInboxProcessedJson["inboxUrl"].asText().endsWith("/inbox/processed/$filename"))
@@ -573,7 +573,7 @@ internal class RsapiIntegrationTest : AbstractMariaDBBaseTest() {
 
 
         // get userInbox processed
-        val userInboxImportedJson = user10UserInboxAsJson[0]
+        val userInboxImportedJson = loadUser10UserInboxAsJson()[0]
         assertThat(userInboxImportedJson["id"].asInt()).isEqualTo(uploadId)
         assertThat(userInboxImportedJson["state"].asText()).isEqualTo("ACCEPTED")
         assertThat(userInboxImportedJson["inboxUrl"].asText().endsWith("/inbox/done/$filename")).isTrue()
@@ -591,7 +591,7 @@ internal class RsapiIntegrationTest : AbstractMariaDBBaseTest() {
         val idWrongPhoto = sendProblemReport(problemReportWrongPhotoJson)
 
         // get userInbox with problem report
-        val userInboxWithProblemJson = user10UserInboxAsJson
+        val userInboxWithProblemJson = loadUser10UserInboxAsJson()
         assertThat(userInboxWithProblemJson[1]["id"].asInt())
             .isEqualTo(uploadId) // upload is now second entry
         assertThat(userInboxWithProblemJson[0]["id"].asInt()).isEqualTo(idWrongPhoto)
@@ -607,7 +607,7 @@ internal class RsapiIntegrationTest : AbstractMariaDBBaseTest() {
 
 
         // get userInbox with problem report
-        val userInboxProblemAcceptedJson = user10UserInboxAsJson
+        val userInboxProblemAcceptedJson = loadUser10UserInboxAsJson()
         assertThat(userInboxProblemAcceptedJson[0]["id"].asInt()).isEqualTo(idWrongPhoto)
         assertThat(userInboxProblemAcceptedJson[0]["state"].asText()).isEqualTo("ACCEPTED")
 
@@ -625,7 +625,7 @@ internal class RsapiIntegrationTest : AbstractMariaDBBaseTest() {
 
 
         // get userInbox with problem report
-        val userInboxProblem2Json = user10UserInboxAsJson
+        val userInboxProblem2Json = loadUser10UserInboxAsJson()
         assertThat(userInboxProblem2Json[0]["id"].asInt()).isEqualTo(idStationNonExistent)
         assertThat(userInboxProblem2Json[0]["state"].asText()).isEqualTo("REVIEW")
 
@@ -638,19 +638,18 @@ internal class RsapiIntegrationTest : AbstractMariaDBBaseTest() {
 
 
         // get userInbox with problem report
-        val userInboxProblem2AcceptedJson = user10UserInboxAsJson
+        val userInboxProblem2AcceptedJson = loadUser10UserInboxAsJson()
         assertThat(userInboxProblem2AcceptedJson[0]["id"].asInt()).isEqualTo(idStationNonExistent)
         assertThat(userInboxProblem2AcceptedJson[0]["state"].asText()).isEqualTo("ACCEPTED")
     }
 
-    @get:Throws(JsonProcessingException::class)
-    private val user10UserInboxAsJson: JsonNode
-        get() {
-            val userInboxResponse = restTemplateWithBasicAuthUser10().getForEntity<String>(
-                "http://localhost:$port/userInbox"
-            )
-            return mapper.readTree(userInboxResponse.body)
-        }
+    @Throws(JsonProcessingException::class)
+    private fun loadUser10UserInboxAsJson(): JsonNode {
+        val userInboxResponse = restTemplateWithBasicAuthUser10().getForEntity<String>(
+            "http://localhost:$port/userInbox?showCompletedEntries=true"
+        )
+        return mapper.readTree(userInboxResponse.body)
+    }
 
     @Test
     fun getInboxWithBasicAuthPasswordFail() {

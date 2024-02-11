@@ -40,8 +40,8 @@ subprojects {
         dependencies {
             implementation("org.jetbrains.kotlin:kotlin-reflect")
             implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-            implementation("org.springframework.boot:spring-boot-starter-web")
-            implementation("org.springframework.boot:spring-boot-starter-validation")
+            implementation(rootProject.project.libs.spring.boot.starter.web)
+            implementation(rootProject.project.libs.spring.boot.starter.validation)
             implementation(rootProject.project.libs.swagger.annotations)
             implementation(rootProject.project.libs.jakarta.validation.api)
         }

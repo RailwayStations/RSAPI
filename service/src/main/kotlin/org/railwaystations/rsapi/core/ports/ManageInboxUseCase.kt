@@ -14,7 +14,7 @@ interface ManageInboxUseCase {
 
     fun publicInbox(): List<PublicInboxEntry>
 
-    fun userInbox(user: User): List<InboxStateQuery>
+    fun userInbox(user: User, showCompletedEntries: Boolean): List<InboxStateQuery>
 
     fun userInbox(user: User, ids: List<Long>): List<InboxStateQuery>
 

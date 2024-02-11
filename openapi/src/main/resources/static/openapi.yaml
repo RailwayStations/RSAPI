@@ -8,7 +8,7 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20240207.2200"
+  version: "20240211.1400"
 servers:
   - url: https://api.railway-stations.org/
 tags:
@@ -523,6 +523,12 @@ paths:
         - inbox
       parameters:
         - $ref: '#/components/parameters/Authorization'
+        - name: showCompletedEntries
+          in: query
+          description: show completed entries or only entries in state review
+          required: false
+          schema:
+            type: boolean
       responses:
         200:
           description: array of InboxStateQueryResponse objects

@@ -6,6 +6,8 @@ import io.mockk.verify
 import net.javacrumbs.jsonunit.spring.JsonUnitResultMatchers.json
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
 import org.railwaystations.rsapi.adapter.web.RequestUtil
 import org.railwaystations.rsapi.app.auth.AuthUser
@@ -164,7 +166,7 @@ internal class InboxControllerTest {
     @Test
     fun getUserInbox() {
         every {
-            manageInboxUseCase.userInbox(userNickname)
+            manageInboxUseCase.userInbox(userNickname, true)
         } returns listOf(
             InboxStateQuery(id = 1, countryCode = "de", stationId = "4711", state = InboxState.REVIEW),
             InboxStateQuery(id = 2, countryCode = "de", stationId = "1234", state = InboxState.ACCEPTED),
@@ -173,7 +175,7 @@ internal class InboxControllerTest {
         )
 
         mvc.perform(
-            get("/userInbox")
+            get("/userInbox?showCompletedEntries=true")
                 .header(HttpHeaders.AUTHORIZATION, "any")
                 .with(user(AuthUser(userNickname, listOf())))
                 .with(csrf())
@@ -207,6 +209,40 @@ internal class InboxControllerTest {
                     "state": "REVIEW",
                     "countryCode": "ch",
                     "stationId": "0815"
+                  }
+                ]                
+            """.trimIndent()
+                )
+            )
+    }
+
+    @ParameterizedTest
+    @CsvSource("true,true", "false,false", ",false")
+    fun getUserInboxShowCompletedEntries(showCompletedEntries: Boolean?, expectedServiceCallParameter: Boolean) {
+        every {
+            manageInboxUseCase.userInbox(userNickname, expectedServiceCallParameter)
+        } returns listOf(
+            InboxStateQuery(id = 1, countryCode = "de", stationId = "4711", state = InboxState.REVIEW),
+        )
+
+        val queryParam = showCompletedEntries?.let { "?showCompletedEntries=$it" } ?: ""
+        mvc.perform(
+            get("/userInbox$queryParam")
+                .header(HttpHeaders.AUTHORIZATION, "any")
+                .with(user(AuthUser(userNickname, listOf())))
+                .with(csrf())
+        )
+            .andExpect(validOpenApiResponse())
+            .andExpect(status().isOk())
+            .andExpect(
+                json().isEqualTo(
+                    """
+                [
+                  {
+                    "id": 1,
+                    "state": "REVIEW",
+                    "countryCode": "de",
+                    "stationId": "4711"
                   }
                 ]                
             """.trimIndent()

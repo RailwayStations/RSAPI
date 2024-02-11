@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.LocaleResolver
 import java.util.*
@@ -332,15 +333,14 @@ class InboxController(
         produces = ["application/json"]
     )
     fun userInboxGet(
-        @RequestHeader(
-            required = true,
-            value = "Authorization"
-        ) authorization: String
+        @RequestHeader(required = true, value = "Authorization") authorization: String,
+        @Valid @RequestParam(value = "showCompletedEntries", required = false) showCompletedEntries: Boolean?
     ): ResponseEntity<List<InboxStateQueryResponseDto>> {
         return ResponseEntity.ok(
             toInboxStateQueryDto(
                 manageInboxUseCase.userInbox(
-                    requestUtil.authUser.user
+                    user = requestUtil.authUser.user,
+                    showCompletedEntries = showCompletedEntries ?: false
                 )
             )
         )
@@ -360,8 +360,8 @@ class InboxController(
         return ResponseEntity.ok(
             toInboxStateQueryDto(
                 manageInboxUseCase.userInbox(
-                    requestUtil.authUser.user,
-                    toIdList(uploadStateQueries)
+                    user = requestUtil.authUser.user,
+                    ids = toIdList(uploadStateQueries)
                 )
             )
         )

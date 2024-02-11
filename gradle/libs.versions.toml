@@ -19,6 +19,8 @@ mockk = "1.13.9"
 springMockk = "4.0.2"
 
 [libraries]
+spring-boot-starter-web = { group = "org.springframework.boot", name = "spring-boot-starter-web", version.ref = "springBoot" }
+spring-boot-starter-validation = { group = "org.springframework.boot", name = "spring-boot-starter-validation", version.ref = "springBoot" }
 jdbi3-spring5 = { group = "org.jdbi", name = "jdbi3-spring5", version.ref = "jdbi" }
 jdbi3-kotlin = { group = "org.jdbi", name = "jdbi3-kotlin", version.ref = "jdbi" }
 jdbi3-kotlin-sqlobject = { group = "org.jdbi", name = "jdbi3-kotlin-sqlobject", version.ref = "jdbi" }
