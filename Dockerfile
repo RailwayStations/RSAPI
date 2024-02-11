@@ -1,11 +1,11 @@
 FROM amazoncorretto:21.0.2-alpine
 ENV RSAPI_HOME=/opt/services
 ENV RSAPI_WORK=/var/rsapi
-ENV ARTIFACT_NAME=rsapi-0.0.1-SNAPSHOT.jar
+ENV ARTIFACT_NAME=service.jar
 ENV SPRING_PROFILES_ACTIVE=""
 WORKDIR $RSAPI_WORK
 
-COPY ./build/libs/${ARTIFACT_NAME} ${RSAPI_HOME}/
+COPY ./service/build/libs/${ARTIFACT_NAME} ${RSAPI_HOME}/
 
 RUN apk add --no-cache libsodium
 

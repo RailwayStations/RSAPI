@@ -31,7 +31,7 @@ jobs:
         uses: gradle/wrapper-validation-action@85cde3f5a1033b2adc2442631c24b530f1183a1a
 
       - name: Build with Gradle
-        run: ./gradlew --no-daemon build bootJar
+        run: ./gradlew --no-daemon :service:bootJar
 
       - name: Log in to the Container registry
         uses: docker/login-action@3d58c274f17dffee475a5520cbe67f0a882c4dbb

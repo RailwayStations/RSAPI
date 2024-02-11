@@ -41,7 +41,7 @@ class RSAuthenticationProvider(
             userDetailsService.updateEmailVerification(user.user)
 
             return UsernamePasswordAuthenticationToken(user, token.credentials, user.authorities)
-        } else if (token.credentials is String && user.user?.key != null) {
+        } else if (token.credentials is String && user.user.key != null) {
             // try to verify user defined password
             if (passwordEncoder.matches(token.credentials as String, user.user.key!!)) {
                 log.info("User verified by password '{}'", user.username)

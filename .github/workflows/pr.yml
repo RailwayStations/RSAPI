@@ -19,4 +19,4 @@ jobs:
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@85cde3f5a1033b2adc2442631c24b530f1183a1a
       - name: Build with Gradle
-        run: ./gradlew --no-daemon build bootJar
+        run: ./gradlew --no-daemon :service:bootJar
