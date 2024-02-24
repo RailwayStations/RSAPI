@@ -807,6 +807,49 @@ internal class InboxServiceTest {
                 .hasMessage("Can't update location, coordinates: Coordinates(lat=110.0, lon=90.0)")
         }
 
+        @Test
+        fun deleteStation() {
+            val inboxEntry1 = InboxEntry(
+                id = INBOX_ENTRY1_ID,
+                countryCode = STATION_KEY_DE_1.country,
+                stationId = STATION_KEY_DE_1.id,
+                problemReportType = ProblemReportType.DUPLICATE,
+            )
+            every { inboxDao.findById(inboxEntry1.id) } returns inboxEntry1
+            every {
+                stationDao.findByKey(
+                    inboxEntry1.countryCode!!,
+                    inboxEntry1.stationId!!
+                )
+            } returns createStationDe1()
+            val inboxEntry2 = InboxEntry(
+                id = 2,
+                countryCode = "de",
+                stationId = "4711",
+            )
+            every { inboxDao.findById(inboxEntry2.id) } returns inboxEntry2
+            every { inboxDao.findPendingByStation(inboxEntry1.countryCode!!, inboxEntry1.stationId!!) } returns listOf(
+                inboxEntry2
+            )
+            every { stationDao.delete(any()) } returns Unit
+            every { inboxDao.reject(any(), any()) } returns Unit
+            every { photoStorage.reject(any()) } returns Unit
+
+            inboxService.deleteStation(
+                InboxCommand(
+                    id = inboxEntry1.id,
+                    countryCode = inboxEntry1.countryCode,
+                    stationId = inboxEntry1.stationId,
+                )
+            )
+
+            verify { stationDao.delete(STATION_KEY_DE_1) }
+            verify { inboxDao.done(inboxEntry1.id) }
+            verify { inboxDao.reject(inboxEntry2.id, "Station has been deleted") }
+            verify { photoStorage.reject(inboxEntry2) }
+        }
+
+
         private fun invalidUsersForReportProblem(): List<Arguments> {
             val userWithoutName = createValidUser()
             userWithoutName.name = ""

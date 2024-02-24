@@ -111,6 +111,12 @@ interface InboxDao {
         @Bind("showCompletedEntries") showCompletedEntries: Boolean
     ): List<InboxEntry>
 
+    @SqlQuery("$JOIN_QUERY WHERE i.countryCode = :countryCode AND i.stationId = :stationId AND i.done = false")
+    @RegisterRowMapper(InboxEntryMapper::class)
+    fun findPendingByStation(
+        @Bind("countryCode") countryCode: String,
+        @Bind("stationId") stationId: String
+    ): List<InboxEntry>
 
     class InboxEntryMapper : RowMapper<InboxEntry> {
         @Throws(SQLException::class)

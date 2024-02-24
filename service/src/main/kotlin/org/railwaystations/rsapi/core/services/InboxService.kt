@@ -270,6 +270,16 @@ class InboxService(
         val station = assertStationExists(inboxEntry)
         stationDao.delete(station.key)
         inboxDao.done(inboxEntry.id)
+        inboxDao.findPendingByStation(station.key.country, station.key.id).forEach {
+            rejectInboxEntry(
+                InboxCommand(
+                    id = it.id,
+                    countryCode = station.key.country,
+                    stationId = station.key.id,
+                    rejectReason = "Station has been deleted",
+                )
+            )
+        }
         log.info("Problem report {} station {} deleted", inboxEntry.id, station.key)
     }
 

@@ -767,7 +767,6 @@ internal class RsapiIntegrationTest : AbstractMariaDBBaseTest() {
         assertThat(station!!.outdated).isEqualTo(outdated)
     }
 
-
     fun restTemplateWithBasicAuthUser10(): TestRestTemplate {
         return restTemplate.withBasicAuth("@user10", "uON60I7XWTIN")
     }

@@ -1057,4 +1057,12 @@
         <dropColumn tableName="countries" columnName="twitterTags"/>
     </changeSet>
 
+    <changeSet id="59" author="pstorch">
+        <dropForeignKeyConstraint baseTableName="inbox" constraintName="fk_inbox_station"/>
+        <createIndex tableName="inbox" indexName="idx_station">
+            <column name="countryCode"/>
+            <column name="stationId"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
