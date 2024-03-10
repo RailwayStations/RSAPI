@@ -36,11 +36,16 @@ class WebConfig : WebMvcConfigurer {
                 "Accept",
                 "Origin",
                 "Authorization",
-                "Comment",
                 "Country",
                 "Station-Id",
+                "Station-Title",
+                "Comment",
+                "Latitude",
+                "Longitude",
+                "Active",
+                "Email",
                 "NameOrEmail",
-                "New-Password"
+                "New-Password",
             )
             .allowedMethods("OPTIONS", "GET", "PUT", "POST", "DELETE", "HEAD")
             .allowedOriginPatterns("*")

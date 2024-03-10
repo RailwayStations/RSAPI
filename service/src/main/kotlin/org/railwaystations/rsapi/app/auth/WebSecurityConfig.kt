@@ -71,7 +71,7 @@ class WebSecurityConfig(
                     val cors = CorsConfiguration()
                     cors.setAllowedOriginPatterns(listOf("*"))
                     cors.allowedMethods = listOf("GET", "POST", "OPTIONS")
-                    cors.allowedHeaders = listOf("*")
+                    cors.allowedHeaders = listOf("Authorization")
                     cors.allowCredentials = true
                     cors
                 }
