@@ -350,7 +350,7 @@ class InboxService(
         require(inboxEntry.isPhotoUpload) { "No photo to import" }
 
         val station = findStationByCountryAndId(inboxEntry.countryCode, inboxEntry.stationId)
-            ?: throw IllegalArgumentException("Station not found")
+        require(station != null) { "Station not found" }
 
         importPhoto(command, inboxEntry, station)
         inboxDao.done(inboxEntry.id)
@@ -363,9 +363,9 @@ class InboxService(
         }
 
         val photographer = userDao.findById(inboxEntry.photographerId)
-            ?: throw IllegalArgumentException("Photographer " + inboxEntry.photographerId + " not found")
+        require(photographer != null) { "Photographer ${inboxEntry.photographerId} not found" }
         val country = countryDao.findById(StringUtils.lowerCase(station.key.country))
-            ?: throw IllegalArgumentException("Country " + station.key.country + " not found")
+        require(country != null) { "Country ${station.key.country} not found" }
 
         try {
             val urlPath = photoStorage.importPhoto(inboxEntry, station)
@@ -396,7 +396,7 @@ class InboxService(
 
                     InboxCommand.ConflictResolution.OVERWRITE_EXISTING_PHOTO -> {
                         val primaryPhoto = station.primaryPhoto
-                            ?: throw IllegalArgumentException("Station has no primary photo to overwrite")
+                        require(primaryPhoto != null) { "Station has no primary photo to overwrite" }
                         photoId = primaryPhoto.id
                         photo.id = photoId
                         photo.primary = true
