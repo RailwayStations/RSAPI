@@ -9,6 +9,7 @@ import org.railwaystations.rsapi.core.ports.NotifyUsersUseCase
 import org.railwaystations.rsapi.utils.Logger
 import org.springframework.context.MessageSource
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class NotifyUsersService(
@@ -27,7 +28,7 @@ class NotifyUsersService(
             .forEach { (userId, entriesForUser) ->
                 userDao.findById(userId)?.let { user: User ->
                     if (user.email != null && user.isEmailVerified && user.sendNotifications) {
-                        sendEmailNotification(user, entriesForUser)
+                        sendEmailNotification(entriesForUser, user.email!!, user.name, user.locale)
                     }
                 }
             }
@@ -37,7 +38,9 @@ class NotifyUsersService(
         }
     }
 
-    private fun sendEmailNotification(user: User, entriesForUser: List<InboxEntry>) {
+    private fun sendEmailNotification(
+        entriesForUser: List<InboxEntry>, email: String, username: String, locale: Locale
+    ) {
         val report = buildString {
             entriesForUser.forEach { entry ->
                 append("${entry.id}. ${entry.title}")
@@ -54,8 +57,8 @@ class NotifyUsersService(
             }
         }
 
-        val text = messageSource.getMessage("review_mail", arrayOf(user.name, report), user.locale)
-        mailer.send(user.email, "Railway-Stations.org review result", text)
-        log.info("Email notification sent to {}", user.email)
+        val text = messageSource.getMessage("review_mail", arrayOf(username, report), locale)
+        mailer.send(email, "Railway-Stations.org review result", text)
+        log.info("Email notification sent to {}", email)
     }
 }

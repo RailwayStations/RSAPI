@@ -16,47 +16,41 @@ import org.springframework.stereotype.Service
 
 @Service
 class SmtpMailer(private val config: MailerConfig) : Mailer {
-    private var session: Session? = null
+    private lateinit var session: Session
     private val log by Logger()
 
     init {
         if (StringUtils.isNoneBlank(config.host)) {
-            val properties = System.getProperties()
-            properties.setProperty("mail.smtp.host", config.host)
-            properties.setProperty("mail.smtp.auth", "true")
-            properties.setProperty("mail.smtp.port", config.port)
-            properties.setProperty("mail.smtp.ssl.enable", "true")
-            properties.setProperty("mail.smtp.timeout", "10000")
-            properties.setProperty("mail.smtp.connectiontimeout", "10000")
+            val properties = System.getProperties().apply {
+                setProperty("mail.smtp.host", config.host)
+                setProperty("mail.smtp.auth", "true")
+                setProperty("mail.smtp.port", config.port)
+                setProperty("mail.smtp.ssl.enable", config.ssl.toString())
+                setProperty("mail.smtp.timeout", "10000")
+                setProperty("mail.smtp.connectiontimeout", "10000")
+            }
 
             session = Session.getInstance(properties, UsernamePasswordAuthenticator(config.user, config.passwd))
         }
     }
 
-    override fun send(to: String?, subject: String?, text: String?) {
-        if (session == null) {
-            log.info(
-                "Mailer not initialized, can't send mail to {} with subject {} and body {}",
-                to,
-                subject,
-                text
-            )
-            return
-        }
+    override fun send(to: String, subject: String, text: String) {
         try {
             log.info("Sending mail to {}", to)
-            val message = MimeMessage(session)
-            message.setFrom(InternetAddress(config.from))
-            message.addRecipient(Message.RecipientType.TO, InternetAddress(to))
-            message.subject = subject
 
-            val multipart = MimeMultipart()
+            val multipart = MimeMultipart().apply {
+                val textBodyPart = MimeBodyPart()
+                textBodyPart.setText(text)
+                addBodyPart(textBodyPart)
+            }
 
-            val textBodyPart = MimeBodyPart()
-            textBodyPart.setText(text)
-            multipart.addBodyPart(textBodyPart)
+            val message = MimeMessage(session).apply {
+                setFrom(InternetAddress(config.from))
+                addRecipient(Message.RecipientType.TO, InternetAddress(to))
+                setSubject(subject)
+                setContent(multipart)
+            }
 
-            message.setContent(multipart)
             Transport.send(message)
             log.info("Mail sent")
         } catch (e: Exception) {

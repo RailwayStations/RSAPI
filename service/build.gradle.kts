@@ -57,6 +57,7 @@ dependencies {
     testImplementation(libs.wiremock.jre8.standalone)
     testImplementation(libs.mockk)
     testImplementation(libs.springmockk)
+    testImplementation(libs.greenmail)
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }

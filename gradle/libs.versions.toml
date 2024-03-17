@@ -17,6 +17,7 @@ jsonUnitSpring = "3.2.7"
 wiremock = "3.0.1"
 mockk = "1.13.10"
 springMockk = "4.0.2"
+greenmail = "2.0.1"
 
 [libraries]
 spring-boot-starter-web = { group = "org.springframework.boot", name = "spring-boot-starter-web", version.ref = "springBoot" }
@@ -44,6 +45,7 @@ json-unit-spring = { group = "net.javacrumbs.json-unit", name = "json-unit-sprin
 wiremock-jre8-standalone = { group = "com.github.tomakehurst", name = "wiremock-jre8-standalone", version.ref = "wiremock" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 springmockk = { group = "com.ninja-squad", name = "springmockk", version.ref = "springMockk" }
+greenmail = { group = "com.icegreen", name = "greenmail", version.ref = "greenmail" }
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
