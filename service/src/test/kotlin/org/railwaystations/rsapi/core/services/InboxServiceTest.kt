@@ -244,8 +244,9 @@ internal class InboxServiceTest {
         @Test
         fun noPendingInboxEntryFound() {
             val command = createInboxCommand1()
-            val inboxEntry1 = createInboxEntry1()
-            inboxEntry1.done = true
+            val inboxEntry1 = createInboxEntry1().copy(
+                done = true
+            )
             every { inboxDao.findById(INBOX_ENTRY1_ID) } returns inboxEntry1
 
             assertThatThrownBy { inboxService.importPhoto(command) }.isInstanceOf(
@@ -256,8 +257,9 @@ internal class InboxServiceTest {
         @Test
         fun problemReportCantBeImported() {
             val command = createInboxCommand1()
-            val inboxEntry1 = createInboxEntry1()
-            inboxEntry1.problemReportType = ProblemReportType.OTHER
+            val inboxEntry1 = createInboxEntry1().copy(
+                problemReportType = ProblemReportType.OTHER
+            )
             every { inboxDao.findById(INBOX_ENTRY1_ID) } returns inboxEntry1
             assertThatThrownBy { inboxService.importPhoto(command) }.isInstanceOf(
                 IllegalArgumentException::class.java
@@ -404,8 +406,9 @@ internal class InboxServiceTest {
         @Test
         fun importPhotoForNewStation() {
             val command = createNewStationCommand1()
-            val inboxEntry = createInboxEntry1()
-            inboxEntry.stationId = null
+            val inboxEntry = createInboxEntry1().copy(
+                stationId = null
+            )
             every { inboxDao.findById(INBOX_ENTRY1_ID) } returns inboxEntry
             every { stationDao.findByKey(STATION_KEY_DE_1.country, command.stationId!!) } returns null
             every { stationDao.maxZ } returns 1024
@@ -433,9 +436,10 @@ internal class InboxServiceTest {
         @Test
         fun createNewStationWithoutPhoto() {
             val command = createNewStationCommand1()
-            val inboxEntry = createInboxEntry1()
-            inboxEntry.stationId = null
-            inboxEntry.extension = null
+            val inboxEntry = createInboxEntry1().copy(
+                stationId = null,
+                extension = null,
+            )
             every { inboxDao.findById(INBOX_ENTRY1_ID) } returns inboxEntry
             every { stationDao.findByKey(STATION_KEY_DE_1.country, command.stationId!!) } returns null
             every { stationDao.maxZ } returns 4711
@@ -470,8 +474,9 @@ internal class InboxServiceTest {
         @Test
         fun noPendingInboxEntryFound() {
             val command = createInboxCommand1()
-            val inboxEntry1 = createInboxEntry1()
-            inboxEntry1.done = true
+            val inboxEntry1 = createInboxEntry1().copy(
+                done = true
+            )
             every { inboxDao.findById(INBOX_ENTRY1_ID) } returns inboxEntry1
 
             assertThatThrownBy { inboxService.importMissingStation(command) }.isInstanceOf(
@@ -482,8 +487,9 @@ internal class InboxServiceTest {
         @Test
         fun problemReportCantBeImported() {
             val command = createInboxCommand1()
-            val inboxEntry1 = createInboxEntry1()
-            inboxEntry1.problemReportType = ProblemReportType.OTHER
+            val inboxEntry1 = createInboxEntry1().copy(
+                problemReportType = ProblemReportType.OTHER
+            )
             every { inboxDao.findById(INBOX_ENTRY1_ID) } returns inboxEntry1
 
             assertThatThrownBy { inboxService.importMissingStation(command) }.isInstanceOf(

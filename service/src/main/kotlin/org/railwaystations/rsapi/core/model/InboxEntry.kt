@@ -3,33 +3,33 @@ package org.railwaystations.rsapi.core.model
 import java.time.Instant
 
 data class InboxEntry(
-    var id: Long = 0,
-    var countryCode: String? = null,
-    var stationId: String? = null,
-    var photoId: Long? = null,
-    var title: String? = null,
-    var newTitle: String? = null,
-    var coordinates: Coordinates? = null,
-    var newCoordinates: Coordinates? = null,
-    var photographerId: Int = 0,
-    var photographerNickname: String? = null,
-    var photographerEmail: String? = null,
-    var extension: String? = null,
-    var comment: String? = null,
-    var rejectReason: String? = null,
-    var createdAt: Instant? = null,
-    var done: Boolean = false,
-    var existingPhotoUrlPath: String? = null,
-    var crc32: Long? = null,
-    var conflict: Boolean = false,
-    var problemReportType: ProblemReportType? = null,
-    var processed: Boolean = false,
-    var inboxUrl: String? = null,
-    var ds100: String? = null,
-    var active: Boolean? = null,
-    var createStation: Boolean? = null,
-    var notified: Boolean = false,
-    var posted: Boolean = false,
+    val id: Long = 0,
+    val countryCode: String? = null,
+    val stationId: String? = null,
+    val photoId: Long? = null,
+    val title: String? = null,
+    val newTitle: String? = null,
+    val coordinates: Coordinates? = null,
+    val newCoordinates: Coordinates? = null,
+    val photographerId: Int = 0,
+    val photographerNickname: String? = null,
+    val photographerEmail: String? = null,
+    val extension: String? = null,
+    val comment: String? = null,
+    val rejectReason: String? = null,
+    val createdAt: Instant? = null,
+    val done: Boolean = false,
+    val existingPhotoUrlPath: String? = null,
+    val crc32: Long? = null,
+    val conflict: Boolean = false,
+    val problemReportType: ProblemReportType? = null,
+    val processed: Boolean = false,
+    val inboxUrl: String? = null,
+    val ds100: String? = null,
+    val active: Boolean? = null,
+    val createStation: Boolean? = null,
+    val notified: Boolean = false,
+    val posted: Boolean = false,
 ) {
 
     val lat: Double?
@@ -53,9 +53,8 @@ data class InboxEntry(
     val filename: String?
         get() = extension?.let { createFilename(id, it) }
 
-    fun hasPhoto(): Boolean {
-        return existingPhotoUrlPath != null
-    }
+    val hasPhoto: Boolean
+        get() = existingPhotoUrlPath != null
 
     companion object {
 

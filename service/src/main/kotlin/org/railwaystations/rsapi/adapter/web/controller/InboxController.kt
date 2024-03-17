@@ -150,7 +150,7 @@ class InboxController(
             comment = inboxEntry.comment ?: "",
             createdAt = inboxEntry.createdAt!!.toEpochMilli(),
             done = inboxEntry.done,
-            hasPhoto = inboxEntry.hasPhoto(),
+            hasPhoto = inboxEntry.hasPhoto,
             countryCode = inboxEntry.countryCode,
             stationId = inboxEntry.stationId,
             title = inboxEntry.title,

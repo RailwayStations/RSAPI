@@ -36,7 +36,6 @@ import java.nio.charset.StandardCharsets
 import java.time.Clock
 import java.time.Instant
 import java.util.*
-import java.util.function.Consumer
 
 @Service
 class InboxService(
@@ -136,7 +135,7 @@ class InboxService(
     }
 
     private fun mapToInboxStateQuery(inboxEntry: InboxEntry): InboxStateQuery {
-        inboxEntry.processed =
+        val processed =
             !inboxEntry.done && (inboxEntry.filename == null || photoStorage.isProcessed(inboxEntry.filename!!))
         return InboxStateQuery(
             id = inboxEntry.id,
@@ -151,56 +150,61 @@ class InboxService(
             problemReportType = inboxEntry.problemReportType,
             rejectedReason = inboxEntry.rejectReason,
             filename = inboxEntry.filename,
-            inboxUrl = getInboxUrl(inboxEntry),
+            inboxUrl = getInboxUrl(inboxEntry.filename, inboxEntry.done, inboxEntry.rejectReason, processed),
             crc32 = inboxEntry.crc32,
             createdAt = inboxEntry.createdAt
         )
     }
 
-    private fun calculateUserInboxState(inboxEntry: InboxEntry): InboxState {
-        return if (inboxEntry.done) {
-            if (inboxEntry.rejectReason == null) {
-                InboxState.ACCEPTED
-            } else {
-                InboxState.REJECTED
-            }
+    private fun calculateUserInboxState(inboxEntry: InboxEntry): InboxState = if (inboxEntry.done) {
+        if (inboxEntry.rejectReason == null) {
+            InboxState.ACCEPTED
         } else {
-            InboxState.REVIEW
+            InboxState.REJECTED
         }
+    } else {
+        InboxState.REVIEW
     }
 
-    override fun listAdminInbox(user: User): List<InboxEntry> {
-        val pendingInboxEntries = inboxDao.findPendingInboxEntries()
-        pendingInboxEntries.forEach(Consumer { inboxEntry -> this.updateInboxEntry(inboxEntry) })
-        return pendingInboxEntries
-    }
+    override fun listAdminInbox(user: User): List<InboxEntry> =
+        inboxDao.findPendingInboxEntries().map(::updateInboxEntry)
 
-    private fun updateInboxEntry(inboxEntry: InboxEntry) {
+    private fun updateInboxEntry(inboxEntry: InboxEntry): InboxEntry {
         val filename = inboxEntry.filename
-        if (filename != null) {
-            inboxEntry.processed = photoStorage.isProcessed(filename)
-            inboxEntry.inboxUrl = getInboxUrl(inboxEntry)
-        } else if (inboxEntry.hasPhoto()) {
-            inboxEntry.inboxUrl = photoBaseUrl + inboxEntry.existingPhotoUrlPath
+        val processed = filename?.let { photoStorage.isProcessed(it) } ?: false
+        val inboxUrl = if (filename != null) {
+            getInboxUrl(inboxEntry.filename, inboxEntry.done, inboxEntry.rejectReason, processed)
+        } else if (inboxEntry.hasPhoto) {
+            photoBaseUrl + inboxEntry.existingPhotoUrlPath
+        } else {
+            null
         }
-        if (inboxEntry.stationId == null && !inboxEntry.newCoordinates!!.hasZeroCoords) {
-            inboxEntry.conflict = hasConflict(inboxEntry.id, inboxEntry.newCoordinates)
+        val conflict = if (inboxEntry.stationId == null && !inboxEntry.newCoordinates!!.hasZeroCoords) {
+            hasConflict(inboxEntry.id, inboxEntry.newCoordinates)
+        } else {
+            inboxEntry.conflict
         }
+
+        return inboxEntry.copy(
+            processed = processed,
+            inboxUrl = inboxUrl,
+            conflict = conflict,
+        )
     }
 
-    private fun getInboxUrl(inboxEntry: InboxEntry): String? {
-        if (inboxEntry.filename == null) {
+    private fun getInboxUrl(filename: String?, done: Boolean, rejectReason: String?, processed: Boolean): String? {
+        if (filename == null) {
             return null
         }
 
-        if (inboxEntry.done) {
-            return if (inboxEntry.rejectReason != null) {
-                inboxBaseUrl + "/rejected/" + inboxEntry.filename
+        if (done) {
+            return if (rejectReason != null) {
+                "$inboxBaseUrl/rejected/$filename"
             } else {
-                inboxBaseUrl + "/done/" + inboxEntry.filename
+                "$inboxBaseUrl/done/$filename"
             }
         }
-        return inboxBaseUrl + (if (inboxEntry.processed) "/processed/" else "/") + inboxEntry.filename
+        return inboxBaseUrl + (if (processed) "/processed/" else "/") + filename
     }
 
     override fun markPhotoOutdated(command: InboxCommand) {
@@ -299,7 +303,7 @@ class InboxService(
 
     private fun getPhotoIdFromInboxOrPrimaryPhoto(inboxEntry: InboxEntry, station: Station): Long {
         if (inboxEntry.photoId != null) {
-            return inboxEntry.photoId!!
+            return inboxEntry.photoId
         }
 
         val primaryPhoto = station.primaryPhoto
@@ -536,7 +540,8 @@ class InboxService(
         var crc32: Long? = null
         try {
             val inboxEntry = InboxEntry(
-                countryCode = countryCode,
+                countryCode = station?.key?.country ?: countryCode,
+                stationId = station?.key?.id,
                 title = stationTitle,
                 coordinates = coordinates,
                 photographerId = user.id,
@@ -546,16 +551,12 @@ class InboxService(
                 active = active,
             )
 
-            station?.let { s: Station? ->
-                inboxEntry.countryCode = s!!.key.country
-                inboxEntry.stationId = s.key.id
-            }
             id = inboxDao.insert(inboxEntry)
             if (extension != null) {
                 filename = createFilename(id, extension)
                 crc32 = photoStorage.storeUpload(body!!, filename)
                 inboxDao.updateCrc32(id, crc32)
-                inboxUrl = inboxBaseUrl + "/" + UriUtils.encodePath(filename, StandardCharsets.UTF_8)
+                inboxUrl = "$inboxBaseUrl/${UriUtils.encodePath(filename, StandardCharsets.UTF_8)}"
             }
 
             val duplicateInfo = if (conflict) " (possible duplicate!)" else ""
@@ -590,7 +591,7 @@ class InboxService(
         } catch (e: PhotoTooLargeException) {
             return InboxResponse(
                 state = InboxResponse.InboxResponseState.PHOTO_TOO_LARGE,
-                message = "Photo too large, max " + e.maxSize + " bytes allowed"
+                message = "Photo too large, max ${e.maxSize} bytes allowed"
             )
         } catch (e: IOException) {
             log.error("Error uploading photo", e)
