@@ -82,7 +82,7 @@ class InboxService(
         }
 
         var photoId = problemReport.photoId
-        if (problemReport.type.needsPhoto()) {
+        if (problemReport.type.needsPhoto) {
             if (!station.hasPhoto()) {
                 return InboxResponse(
                     state = InboxResponse.InboxResponseState.NOT_ENOUGH_DATA,
