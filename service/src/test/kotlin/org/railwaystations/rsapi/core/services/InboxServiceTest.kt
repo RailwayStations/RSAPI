@@ -862,12 +862,15 @@ internal class InboxServiceTest {
 
 
         private fun invalidUsersForReportProblem(): List<Arguments> {
-            val userWithoutName = createValidUser()
-            userWithoutName.name = ""
-            val userWithoutEmail = createValidUser()
-            userWithoutEmail.email = null
-            val userWithEmailVerificationToken = createValidUser()
-            userWithEmailVerificationToken.emailVerification = "SOME_TOKEN"
+            val userWithoutName = createValidUser().copy(
+                name = ""
+            )
+            val userWithoutEmail = createValidUser().copy(
+                email = null
+            )
+            val userWithEmailVerificationToken = createValidUser().copy(
+                emailVerification = "SOME_TOKEN"
+            )
             return listOf(
                 Arguments.of(userWithoutName),
                 Arguments.of(userWithoutEmail),

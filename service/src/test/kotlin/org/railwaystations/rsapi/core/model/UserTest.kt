@@ -99,8 +99,9 @@ internal class UserTest {
 
     @Test
     fun testRolesAdmin() {
-        val admin = createUser("@Nick Name", null, null, null)
-        admin.admin = true
+        val admin = createUser("@Nick Name", null, null, null).copy(
+            admin = true
+        )
         val roles = admin.roles
         assertThat(roles.size).isEqualTo(2)
         assertThat(roles.contains(User.ROLE_USER)).isEqualTo(true)
@@ -114,8 +115,9 @@ internal class UserTest {
         ", false, https://railway-stations.org"
     )
     fun testDisplayUrl(url: String?, anonymous: Boolean, expectedDisplayUrl: String?) {
-        val user = createUser("user10", null, url, null)
-        user.anonymous = anonymous
+        val user = createUser("user10", null, url, null).copy(
+            anonymous = anonymous
+        )
         assertThat(user.displayUrl).isEqualTo(expectedDisplayUrl)
     }
 
@@ -124,8 +126,9 @@ internal class UserTest {
         "user10, false, user10", "user10, true, Anonym"
     )
     fun testDisplayName(name: String, anonymous: Boolean, expectedDisplayName: String?) {
-        val user = createUser(name, null, null, null)
-        user.anonymous = anonymous
+        val user = createUser(name, null, null, null).copy(
+            anonymous = anonymous
+        )
         assertThat(user.displayName).isEqualTo(expectedDisplayName)
     }
 }

@@ -85,8 +85,9 @@ internal class ProfileServiceTest {
 
     @Test
     fun registerNewUserWithPassword() {
-        val newUser = createNewUser()
-        newUser.newPassword = "verySecretPassword"
+        val newUser = createNewUser().copy(
+            newPassword = "verySecretPassword"
+        )
 
         sut.register(newUser, USER_AGENT)
 
@@ -108,15 +109,17 @@ internal class ProfileServiceTest {
     fun updateMyProfileNewMail() {
         every { userDao.findByEmail("newname@example.com") } returns null
         val existingUser = givenExistingUser()
-        val updatedUser = createNewUser()
-        updatedUser.id = existingUser.id
-        updatedUser.email = "newname@example.com"
+        val updatedUser = createNewUser().copy(
+            id = existingUser.id,
+            email = "newname@example.com"
+        )
 
         sut.updateProfile(existingUser, updatedUser, USER_AGENT)
 
         assertVerificationEmail(mailer)
-        val user = givenExistingUser()
-        user.email = "newname@example.com"
+        val user = givenExistingUser().copy(
+            email = "newname@example.com"
+        )
         verify { userDao.update(user.id, user) }
     }
 
@@ -141,9 +144,10 @@ internal class ProfileServiceTest {
     @Test
     fun verifyEmailSuccess() {
         val token = "verification"
-        val user = createNewUser()
-        user.id = ProfileControllerTest.EXISTING_USER_ID
-        user.emailVerification = token
+        val user = createNewUser().copy(
+            id = ProfileControllerTest.EXISTING_USER_ID,
+            emailVerification = token
+        )
         every { userDao.findByEmailVerification(token) } returns user
 
         sut.emailVerification(token)
@@ -157,9 +161,10 @@ internal class ProfileServiceTest {
     @Test
     fun verifyEmailFailed() {
         val token = "verification"
-        val user = createNewUser()
-        user.id = ProfileControllerTest.EXISTING_USER_ID
-        user.emailVerification = token
+        val user = createNewUser().copy(
+            id = ProfileControllerTest.EXISTING_USER_ID,
+            emailVerification = token
+        )
         every { userDao.findByEmailVerification(token) } returns user
 
         sut.emailVerification("wrong_token")
@@ -197,8 +202,9 @@ internal class ProfileServiceTest {
     @Test
     fun registerUserNameTaken() {
         val user = givenExistingUser()
-        val newUser = createNewUser()
-        newUser.name = user.name
+        val newUser = createNewUser().copy(
+            name = user.name
+        )
 
         assertThatThrownBy { sut.register(newUser, USER_AGENT) }
             .isInstanceOf(ProfileConflictException::class.java)
@@ -206,8 +212,9 @@ internal class ProfileServiceTest {
 
     @Test
     fun registerUserNameBlocked() {
-        val newUser = createNewUser()
-        newUser.name = "Blocked Name"
+        val newUser = createNewUser().copy(
+            name = "Blocked Name"
+        )
         every { userDao.countBlockedUsername("blockedname") } returns 1
 
         assertThatThrownBy { sut.register(newUser, USER_AGENT) }
@@ -217,9 +224,10 @@ internal class ProfileServiceTest {
     @Test
     fun registerUserEmailTaken() {
         val user = givenExistingUser()
-        val newUser = createNewUser()
-        newUser.name = "othername"
-        newUser.email = user.email
+        val newUser = createNewUser().copy(
+            name = "othername",
+            email = user.email
+        )
 
         assertThatThrownBy { sut.register(newUser, USER_AGENT) }
             .isInstanceOf(ProfileConflictException::class.java)
@@ -231,9 +239,10 @@ internal class ProfileServiceTest {
     @Test
     fun registernUserNameTaken() {
         val user = givenExistingUser()
-        val newUser = createNewUser()
-        newUser.name = user.name
-        newUser.email = "otheremail@example.com"
+        val newUser = createNewUser().copy(
+            name = user.name,
+            email = "otheremail@example.com"
+        )
 
         assertThatThrownBy { sut.register(newUser, USER_AGENT) }
             .isInstanceOf(ProfileConflictException::class.java)
@@ -246,8 +255,9 @@ internal class ProfileServiceTest {
 
     @Test
     fun registerUserWithEmptyName() {
-        val newUser = createNewUser()
-        newUser.name = ""
+        val newUser = createNewUser().copy(
+            name = ""
+        )
 
         assertThatThrownBy { sut.register(newUser, USER_AGENT) }
             .isInstanceOf(IllegalArgumentException::class.java)
@@ -257,7 +267,7 @@ internal class ProfileServiceTest {
         verify(exactly = 1) {
             mailer.send(
                 any(),
-                any(), match { it ->
+                any(), match {
                     it.matches(
                         """
                         Hello,
@@ -286,8 +296,9 @@ internal class ProfileServiceTest {
     }
 
     private fun givenExistingUser(): User {
-        val user = createNewUser()
-        user.id = ProfileControllerTest.EXISTING_USER_ID
+        val user = createNewUser().copy(
+            id = ProfileControllerTest.EXISTING_USER_ID
+        )
         every { userDao.findByEmail(user.email!!) } returns user
         every { userDao.findByNormalizedName(user.name) } returns user
         return user
@@ -309,8 +320,9 @@ internal class ProfileServiceTest {
 
     @Test
     fun resetPasswordViaUsernameEmailNotVerified() {
-        val user = createNewUser()
-        user.id = 123
+        val user = createNewUser().copy(
+            id = 123
+        )
         every { userDao.findByNormalizedName(ProfileControllerTest.USER_NAME) } returns user
 
         sut.resetPassword(ProfileControllerTest.USER_NAME, USER_AGENT)
@@ -328,9 +340,11 @@ internal class ProfileServiceTest {
 
     @Test
     fun resetPasswordViaEmailAndEmailVerified() {
-        val user = createNewUser()
-        user.id = 123
-        user.emailVerification = User.EMAIL_VERIFIED
+        val user = createNewUser().copy(
+            id = 123,
+            emailVerification = User.EMAIL_VERIFIED
+
+        )
         every { userDao.findByEmail(user.email!!) } returns user
 
         sut.resetPassword(user.email!!, USER_AGENT)

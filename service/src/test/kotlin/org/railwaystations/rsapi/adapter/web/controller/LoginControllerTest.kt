@@ -153,8 +153,9 @@ internal class LoginControllerTest {
 
     @Test
     fun postLoginRegisterPasswordTooShort() {
-        val user = createValidUser()
-        user.newPassword = "blah"
+        val user = createValidUser().copy(
+            newPassword = "blah"
+        )
 
         postLoginRegister(user)
             .andExpect(status().isOk())
@@ -166,8 +167,9 @@ internal class LoginControllerTest {
 
     @Test
     fun postLoginRegisterPasswordMissing() {
-        val user = createValidUser()
-        user.newPassword = null
+        val user = createValidUser().copy(
+            newPassword = null
+        )
 
         postLoginRegister(user)
             .andExpect(status().isOk())
@@ -178,8 +180,9 @@ internal class LoginControllerTest {
 
     @Test
     fun postLoginRegisterEmptyName() {
-        val user = createValidUser()
-        user.name = ""
+        val user = createValidUser().copy(
+            name = ""
+        )
 
         postLoginRegister(user)
             .andExpect(status().isOk())
@@ -191,8 +194,9 @@ internal class LoginControllerTest {
 
     @Test
     fun postLoginRegisterEmptyEmail() {
-        val user = createValidUser()
-        user.email = null
+        val user = createValidUser().copy(
+            email = null
+        )
 
         postLoginRegister(user)
             .andExpect(status().isOk())

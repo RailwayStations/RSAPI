@@ -7,19 +7,19 @@ import java.net.URISyntaxException
 import java.util.*
 
 data class User(
-    var id: Int = 0,
-    var name: String,
-    var url: String? = null,
-    var license: License = License.UNKNOWN,
-    var email: String? = null,
-    var ownPhotos: Boolean = false,
-    var anonymous: Boolean = false,
-    var key: String? = null,
-    var admin: Boolean = false,
-    var emailVerification: String? = null,
-    var newPassword: String? = null,
-    var sendNotifications: Boolean = false,
-    var locale: Locale = Locale.ENGLISH,
+    val id: Int = 0,
+    val name: String,
+    val url: String? = null,
+    val license: License = License.UNKNOWN,
+    val email: String? = null,
+    val ownPhotos: Boolean = false,
+    val anonymous: Boolean = false,
+    val key: String? = null,
+    val admin: Boolean = false,
+    val emailVerification: String? = null,
+    val newPassword: String? = null,
+    val sendNotifications: Boolean = false,
+    val locale: Locale = Locale.ENGLISH,
 ) {
     val normalizedName: String
         get() = normalizeName(name)
