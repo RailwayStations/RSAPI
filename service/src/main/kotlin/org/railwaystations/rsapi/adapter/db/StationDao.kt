@@ -26,6 +26,17 @@ import java.sql.SQLException
 import java.time.Instant
 import java.util.*
 
+private const val JOIN_QUERY: String = """
+            SELECT s.countryCode, s.id, s.DS100, s.title, s.lat, s.lon, s.active,
+                    p.id AS photoId, p.primary, p.urlPath, p.license, p.createdAt, p.outdated, u.id AS photographerId,
+                    u.name, u.url AS photographerUrl, u.license AS photographerLicense, u.anonymous
+            FROM countries c
+                LEFT JOIN stations s ON c.id = s.countryCode
+                LEFT JOIN photos p ON p.countryCode = s.countryCode AND p.stationId = s.id AND p.primary = true
+                LEFT JOIN users u ON u.id = p.photographerId
+            
+            """
+
 interface StationDao {
     @SqlQuery("$JOIN_QUERY WHERE s.countryCode IN (<countryCodes>) AND (:active IS NULL OR s.active = :active) AND (:hasPhoto IS NULL OR (p.urlPath IS NULL AND :hasPhoto = false) OR (p.urlPath IS NOT NULL AND :hasPhoto = true))")
     @RegisterRowMapper(
@@ -101,8 +112,8 @@ interface StationDao {
         override fun accumulate(container: MutableMap<Station.Key?, Station?>, rowView: RowView) {
             val station = container.computeIfAbsent(
                 Station.Key(
-                    rowView.getColumn("countryCode", String::class.java),
-                    rowView.getColumn("id", String::class.java)
+                    country = rowView.getColumn("countryCode", String::class.java),
+                    id = rowView.getColumn("id", String::class.java)
                 )
             ) { _: Station.Key? ->
                 rowView.getRow(
@@ -267,16 +278,4 @@ interface StationDao {
         }
     }
 
-    companion object {
-        const val JOIN_QUERY: String = """
-            SELECT s.countryCode, s.id, s.DS100, s.title, s.lat, s.lon, s.active,
-                    p.id AS photoId, p.primary, p.urlPath, p.license, p.createdAt, p.outdated, u.id AS photographerId,
-                    u.name, u.url AS photographerUrl, u.license AS photographerLicense, u.anonymous
-            FROM countries c
-                LEFT JOIN stations s ON c.id = s.countryCode
-                LEFT JOIN photos p ON p.countryCode = s.countryCode AND p.stationId = s.id AND p.primary = true
-                LEFT JOIN users u ON u.id = p.photographerId
-            
-            """
-    }
 }
