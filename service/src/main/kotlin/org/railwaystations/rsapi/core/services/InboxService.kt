@@ -183,7 +183,7 @@ class InboxService(
         } else if (inboxEntry.hasPhoto()) {
             inboxEntry.inboxUrl = photoBaseUrl + inboxEntry.existingPhotoUrlPath
         }
-        if (inboxEntry.stationId == null && !inboxEntry.newCoordinates!!.hasZeroCoords()) {
+        if (inboxEntry.stationId == null && !inboxEntry.newCoordinates!!.hasZeroCoords) {
             inboxEntry.conflict = hasConflict(inboxEntry.id, inboxEntry.newCoordinates)
         }
     }
@@ -429,8 +429,8 @@ class InboxService(
         // create station
         val country = countryDao.findById(StringUtils.lowerCase(command.countryCode))
         require(country != null) { "Country not found" }
-        require(command.stationId!!.startsWith("Z")) { "Station ID can't be empty and must start with Z" }
-        require(!(!command.hasCoords() || !command.coordinates!!.isValid)) { "No valid coordinates provided" }
+        require(command.stationId.startsWith("Z")) { "Station ID can't be empty and must start with Z" }
+        require(!(!command.hasCoords || !command.coordinates!!.isValid)) { "No valid coordinates provided" }
         require(
             !(hasConflict(
                 command.id,
@@ -446,7 +446,7 @@ class InboxService(
             coordinates = command.coordinates!!,
             ds100 = command.ds100,
             photos = mutableListOf(),
-            active = command.active!!
+            active = command.active
         )
         stationDao.insert(newStation)
         log.info("New station '{}' created: {}", newStation.title, newStation.key)
@@ -617,7 +617,7 @@ class InboxService(
     }
 
     private fun hasConflict(id: Long?, coordinates: Coordinates?): Boolean {
-        if (coordinates == null || coordinates.hasZeroCoords()) {
+        if (coordinates == null || coordinates.hasZeroCoords) {
             return false
         }
         return inboxDao.countPendingInboxEntriesForNearbyCoordinates(

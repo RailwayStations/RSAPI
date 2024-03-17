@@ -2,21 +2,17 @@ package org.railwaystations.rsapi.core.model
 
 import kotlin.math.abs
 
+const val ZERO: Double = 0.0
+
 data class Coordinates(
-    var lat: Double = 0.0,
-    var lon: Double = 0.0,
+    val lat: Double = ZERO,
+    val lon: Double = ZERO,
 ) {
 
-    constructor() : this(ZERO, ZERO)
-
-    fun hasZeroCoords(): Boolean {
-        return lat == ZERO && lon == ZERO
-    }
+    val hasZeroCoords: Boolean
+        get() = lat == ZERO && lon == ZERO
 
     val isValid: Boolean
-        get() = abs(lat) < 90 && abs(lon) < 180 && !hasZeroCoords()
+        get() = abs(lat) < 90 && abs(lon) < 180 && !hasZeroCoords
 
-    companion object {
-        const val ZERO: Double = 0.0
-    }
 }

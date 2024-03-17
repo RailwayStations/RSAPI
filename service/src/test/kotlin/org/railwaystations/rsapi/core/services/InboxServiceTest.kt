@@ -172,8 +172,9 @@ internal class InboxServiceTest {
         @Test
         @Throws(IOException::class)
         fun importPhotoForExistingStationWithPhotoAsNewPrimary() {
-            val command = createInboxCommand1()
-            command.conflictResolution = InboxCommand.ConflictResolution.IMPORT_AS_NEW_PRIMARY_PHOTO
+            val command = createInboxCommand1().copy(
+                conflictResolution = InboxCommand.ConflictResolution.IMPORT_AS_NEW_PRIMARY_PHOTO
+            )
             val inboxEntry = createInboxEntry1()
             every { inboxDao.findById(INBOX_ENTRY1_ID) } returns inboxEntry
             val station = createStationDe1()
@@ -192,8 +193,9 @@ internal class InboxServiceTest {
         @Test
         @Throws(IOException::class)
         fun importPhotoForExistingStationWithPhotoAsNewSecondary() {
-            val command = createInboxCommand1()
-            command.conflictResolution = InboxCommand.ConflictResolution.IMPORT_AS_NEW_SECONDARY_PHOTO
+            val command = createInboxCommand1().copy(
+                conflictResolution = InboxCommand.ConflictResolution.IMPORT_AS_NEW_SECONDARY_PHOTO
+            )
             val inboxEntry = createInboxEntry1()
             every { inboxDao.findById(INBOX_ENTRY1_ID) } returns inboxEntry
             val station = createStationDe1()
@@ -212,8 +214,9 @@ internal class InboxServiceTest {
         @Test
         @Throws(IOException::class)
         fun importPhotoForExistingStationWithPhotoOverwrite() {
-            val command = createInboxCommand1()
-            command.conflictResolution = InboxCommand.ConflictResolution.OVERWRITE_EXISTING_PHOTO
+            val command = createInboxCommand1().copy(
+                conflictResolution = InboxCommand.ConflictResolution.OVERWRITE_EXISTING_PHOTO
+            )
             val inboxEntry = createInboxEntry1()
             every { inboxDao.findById(INBOX_ENTRY1_ID) } returns inboxEntry
             val station = createStationDe1()
@@ -303,8 +306,9 @@ internal class InboxServiceTest {
 
         @Test
         fun stationHasNoPhotoButAnotherUploadsForThisStationExistsAndWrongConflictResolutionProvided() {
-            val command = createInboxCommand1()
-            command.conflictResolution = InboxCommand.ConflictResolution.OVERWRITE_EXISTING_PHOTO
+            val command = createInboxCommand1().copy(
+                conflictResolution = InboxCommand.ConflictResolution.OVERWRITE_EXISTING_PHOTO
+            )
             val inboxEntry = createInboxEntry1()
             every { inboxDao.findById(INBOX_ENTRY1_ID) } returns inboxEntry
             every {
@@ -369,39 +373,31 @@ internal class InboxServiceTest {
         )
     }
 
-    private fun createNewStationCommand1(): InboxCommand {
-        val inboxCommand = createInboxCommand1()
-        inboxCommand.countryCode = DE.code
-        inboxCommand.stationId = NEW_STATION_ID
-        inboxCommand.title = NEW_STATION_TITLE
-        inboxCommand.coordinates = NEW_COORDINATES
-        inboxCommand.active = true
-        return inboxCommand
-    }
+    private fun createNewStationCommand1(): InboxCommand = createInboxCommand1().copy(
+        countryCode = DE.code,
+        stationId = NEW_STATION_ID,
+        title = NEW_STATION_TITLE,
+        coordinates = NEW_COORDINATES,
+        active = true,
+    )
 
-    private fun createStationDe1(): Station {
-        return Station(
-            key = STATION_KEY_DE_1,
-            title = "Station DE 1",
-        )
-    }
+    private fun createStationDe1(): Station = Station(
+        key = STATION_KEY_DE_1,
+        title = "Station DE 1",
+    )
 
-    private fun createInboxCommand1(): InboxCommand {
-        return InboxCommand(
-            id = INBOX_ENTRY1_ID,
-            conflictResolution = InboxCommand.ConflictResolution.DO_NOTHING
-        )
-    }
+    private fun createInboxCommand1(): InboxCommand = InboxCommand(
+        id = INBOX_ENTRY1_ID,
+        conflictResolution = InboxCommand.ConflictResolution.DO_NOTHING
+    )
 
-    private fun createInboxEntry1(): InboxEntry {
-        return InboxEntry(
-            id = INBOX_ENTRY1_ID,
-            countryCode = STATION_KEY_DE_1.country,
-            stationId = STATION_KEY_DE_1.id,
-            photographerId = PHOTOGRAPHER.id,
-            extension = "jpg",
-        )
-    }
+    private fun createInboxEntry1(): InboxEntry = InboxEntry(
+        id = INBOX_ENTRY1_ID,
+        countryCode = STATION_KEY_DE_1.country,
+        stationId = STATION_KEY_DE_1.id,
+        photographerId = PHOTOGRAPHER.id,
+        extension = "jpg",
+    )
 
     @Nested
     internal inner class ImportMissingStation {
@@ -497,8 +493,9 @@ internal class InboxServiceTest {
 
         @Test
         fun stationNotFoundAndNotCreatedBecauseCountryNotFound() {
-            val command = createNewStationCommand1()
-            command.countryCode = "xx"
+            val command = createNewStationCommand1().copy(
+                countryCode = "xx"
+            )
             every { inboxDao.findById(INBOX_ENTRY1_ID) } returns createInboxEntry1()
 
             assertThatThrownBy { inboxService.importMissingStation(command) }.isInstanceOf(
@@ -508,8 +505,9 @@ internal class InboxServiceTest {
 
         @Test
         fun stationNotFoundAndNotCreatedBecauseNoValidCoordinatesProvides() {
-            val command = createNewStationCommand1()
-            command.coordinates = Coordinates(500.0, -300.0)
+            val command = createNewStationCommand1().copy(
+                coordinates = Coordinates(500.0, -300.0)
+            )
             every { inboxDao.findById(INBOX_ENTRY1_ID) } returns createInboxEntry1()
 
             assertThatThrownBy { inboxService.importMissingStation(command) }.isInstanceOf(
@@ -519,8 +517,9 @@ internal class InboxServiceTest {
 
         @Test
         fun stationNotFoundAndNotCreatedBecauseNoCoordinatesProvides() {
-            val command = createNewStationCommand1()
-            command.coordinates = null
+            val command = createNewStationCommand1().copy(
+                coordinates = null
+            )
             every { inboxDao.findById(INBOX_ENTRY1_ID) } returns createInboxEntry1()
 
             assertThatThrownBy { inboxService.importMissingStation(command) }.isInstanceOf(
@@ -530,8 +529,9 @@ internal class InboxServiceTest {
 
         @Test
         fun stationNotFoundAndNotCreatedBecauseTitleIsEmpty() {
-            val command = createNewStationCommand1()
-            command.title = null
+            val command = createNewStationCommand1().copy(
+                title = null
+            )
             every { inboxDao.findById(INBOX_ENTRY1_ID) } returns createInboxEntry1()
 
             assertThatThrownBy { inboxService.importMissingStation(command) }.isInstanceOf(
@@ -541,8 +541,9 @@ internal class InboxServiceTest {
 
         @Test
         fun stationNotFoundAndNotCreatedBecauseNoActiveFlagProvided() {
-            val command = createNewStationCommand1()
-            command.active = null
+            val command = createNewStationCommand1().copy(
+                active = null
+            )
             every { inboxDao.findById(INBOX_ENTRY1_ID) } returns createInboxEntry1()
 
             assertThatThrownBy { inboxService.importMissingStation(command) }.isInstanceOf(
@@ -552,9 +553,10 @@ internal class InboxServiceTest {
 
         @Test
         fun stationHasPhotoAndNoConflictResolutionProvided() {
-            val command = createInboxCommand1()
-            command.countryCode = STATION_KEY_DE_1.country
-            command.stationId = STATION_KEY_DE_1.id
+            val command = createInboxCommand1().copy(
+                countryCode = STATION_KEY_DE_1.country,
+                stationId = STATION_KEY_DE_1.id,
+            )
             every { inboxDao.findById(INBOX_ENTRY1_ID) } returns createInboxEntry1()
             whenStation1ExistsWithPhoto()
 
@@ -565,9 +567,10 @@ internal class InboxServiceTest {
 
         @Test
         fun stationHasNoPhotoButAnotherUploadsForThisStationExistsAndNoConflictResolutionProvided() {
-            val command = createInboxCommand1()
-            command.countryCode = STATION_KEY_DE_1.country
-            command.stationId = STATION_KEY_DE_1.id
+            val command = createInboxCommand1().copy(
+                countryCode = STATION_KEY_DE_1.country,
+                stationId = STATION_KEY_DE_1.id,
+            )
             val inboxEntry = createInboxEntry1()
             every { inboxDao.findById(INBOX_ENTRY1_ID) } returns inboxEntry
             every {

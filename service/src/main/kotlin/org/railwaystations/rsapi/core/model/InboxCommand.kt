@@ -1,19 +1,18 @@
 package org.railwaystations.rsapi.core.model
 
 data class InboxCommand(
-    var id: Long = 0,
-    var countryCode: String? = null,
-    var stationId: String? = null,
-    var title: String? = null,
-    var coordinates: Coordinates? = null,
-    var rejectReason: String? = null,
-    var ds100: String? = null,
-    var active: Boolean? = null,
-    var conflictResolution: ConflictResolution? = null,
+    val id: Long = 0,
+    val countryCode: String? = null,
+    val stationId: String? = null,
+    val title: String? = null,
+    val coordinates: Coordinates? = null,
+    val rejectReason: String? = null,
+    val ds100: String? = null,
+    val active: Boolean? = null,
+    val conflictResolution: ConflictResolution? = null,
 ) {
-    fun hasCoords(): Boolean {
-        return coordinates != null && !coordinates!!.hasZeroCoords()
-    }
+    val hasCoords: Boolean
+        get() = !(coordinates?.hasZeroCoords ?: true)
 
     val lat: Double?
         get() = coordinates?.lat
