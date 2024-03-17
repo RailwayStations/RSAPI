@@ -345,17 +345,19 @@ internal class InboxServiceTest {
     }
 
     private fun whenStation1ExistsWithPhoto() {
-        val stationDe1 = createStationDe1()
-        stationDe1.photos.add(
-            Photo(
-                id = EXISTING_PHOTO_ID,
-                stationKey = stationDe1.key,
-                primary = true,
-                urlPath = "",
-                photographer = createValidUser(),
-                createdAt = Instant.now(),
-                license = License.CC0_10,
-                outdated = false
+        var stationDe1 = createStationDe1()
+        stationDe1 = stationDe1.copy(
+            photos = listOf(
+                Photo(
+                    id = EXISTING_PHOTO_ID,
+                    stationKey = stationDe1.key,
+                    primary = true,
+                    urlPath = "",
+                    photographer = createValidUser(),
+                    createdAt = Instant.now(),
+                    license = License.CC0_10,
+                    outdated = false
+                )
             )
         )
         every { stationDao.findByKey(STATION_KEY_DE_1.country, STATION_KEY_DE_1.id) } returns stationDe1

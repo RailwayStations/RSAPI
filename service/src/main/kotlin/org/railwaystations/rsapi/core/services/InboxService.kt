@@ -83,7 +83,7 @@ class InboxService(
 
         var photoId = problemReport.photoId
         if (problemReport.type.needsPhoto) {
-            if (!station.hasPhoto()) {
+            if (!station.hasPhoto) {
                 return InboxResponse(
                     state = InboxResponse.InboxResponseState.NOT_ENOUGH_DATA,
                     message = "Problem type is only applicable to station with photo"
@@ -327,7 +327,7 @@ class InboxService(
 
     private fun assertStationExistsAndHasPhoto(inboxEntry: InboxEntry): Station {
         val station = assertStationExists(inboxEntry)
-        require(station.hasPhoto()) { "Station has no photo" }
+        require(station.hasPhoto) { "Station has no photo" }
         return station
     }
 
@@ -363,7 +363,7 @@ class InboxService(
     private fun importPhoto(command: InboxCommand, inboxEntry: InboxEntry, station: Station) {
         if (hasConflict(inboxEntry.id, station)) {
             require(command.conflictResolution!!.solvesPhotoConflict()) { "There is a conflict with another photo" }
-            require(!(!station.hasPhoto() && command.conflictResolution != InboxCommand.ConflictResolution.IMPORT_AS_NEW_PRIMARY_PHOTO)) { "Conflict with another upload! The only possible ConflictResolution strategy is IMPORT_AS_NEW_PRIMARY_PHOTO." }
+            require(!(!station.hasPhoto && command.conflictResolution != InboxCommand.ConflictResolution.IMPORT_AS_NEW_PRIMARY_PHOTO)) { "Conflict with another upload! The only possible ConflictResolution strategy is IMPORT_AS_NEW_PRIMARY_PHOTO." }
         }
 
         val photographer = userDao.findById(inboxEntry.photographerId)
@@ -384,7 +384,7 @@ class InboxService(
                 license = getLicenseForPhoto(photographer, country),
                 outdated = false
             )
-            val photoId = if (station.hasPhoto()) {
+            val photoId = if (station.hasPhoto) {
                 when (command.conflictResolution) {
                     InboxCommand.ConflictResolution.IMPORT_AS_NEW_PRIMARY_PHOTO -> {
                         photoDao.setAllPhotosForStationSecondary(station.key)
@@ -605,7 +605,7 @@ class InboxService(
         if (station == null) {
             return false
         }
-        if (station.hasPhoto()) {
+        if (station.hasPhoto) {
             return true
         }
         return inboxDao.countPendingInboxEntriesForStation(id, station.key.country, station.key.id) > 0

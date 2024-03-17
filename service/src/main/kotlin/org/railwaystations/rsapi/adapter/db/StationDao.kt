@@ -1,7 +1,7 @@
 package org.railwaystations.rsapi.adapter.db
 
 import org.jdbi.v3.core.mapper.RowMapper
-import org.jdbi.v3.core.result.LinkedHashMapRowReducer
+import org.jdbi.v3.core.result.RowReducer
 import org.jdbi.v3.core.result.RowView
 import org.jdbi.v3.core.statement.StatementContext
 import org.jdbi.v3.sqlobject.SingleValue
@@ -25,6 +25,7 @@ import java.sql.ResultSet
 import java.sql.SQLException
 import java.time.Instant
 import java.util.*
+import java.util.stream.Stream
 
 private const val JOIN_QUERY: String = """
             SELECT s.countryCode, s.id, s.DS100, s.title, s.lat, s.lon, s.active,
@@ -108,23 +109,39 @@ interface StationDao {
     )
     fun findRecentImports(@Bind("since") since: Instant): Set<Station>
 
-    class SingleStationReducer : LinkedHashMapRowReducer<Station.Key?, Station?> {
-        override fun accumulate(container: MutableMap<Station.Key?, Station?>, rowView: RowView) {
-            val station = container.computeIfAbsent(
+    class SingleStationReducer : RowReducer<MutableMap<Station.Key, Pair<Station, MutableList<Photo>>>, Station> {
+
+        override fun accumulate(
+            container: MutableMap<Station.Key, Pair<Station, MutableList<Photo>>>,
+            rowView: RowView
+        ) {
+            val stationAndPhotos = container.computeIfAbsent(
                 Station.Key(
                     country = rowView.getColumn("countryCode", String::class.java),
                     id = rowView.getColumn("id", String::class.java)
                 )
             ) { _: Station.Key? ->
-                rowView.getRow(
-                    Station::class.java
-                )
+                rowView.getRow(Station::class.java) to mutableListOf()
             }
 
             if (rowView.getColumn("photoId", Integer::class.java) != null) {
-                station?.photos?.add(rowView.getRow(Photo::class.java))
+                stationAndPhotos.second.add(rowView.getRow(Photo::class.java))
             }
         }
+
+        override fun container(): MutableMap<Station.Key, Pair<Station, MutableList<Photo>>> {
+            return mutableMapOf()
+        }
+
+        override fun stream(container: MutableMap<Station.Key, Pair<Station, MutableList<Photo>>>): Stream<Station> {
+            return container.values.map {
+                it.first.copy(
+                    photos = it.second
+                )
+            }.stream()
+        }
+
+
     }
 
     class SingleStationMapper : RowMapper<Station> {
@@ -230,39 +247,39 @@ interface StationDao {
         @Throws(SQLException::class)
         override fun map(rs: ResultSet, ctx: StatementContext): Station {
             val key = Station.Key(rs.getString("countryCode"), rs.getString("id"))
-            val station = Station(
+            val photos = buildList {
+                val photoUrlPath = rs.getString("urlPath")
+                if (photoUrlPath != null) {
+                    add(
+                        Photo(
+                            id = rs.getLong("photoId"),
+                            stationKey = key,
+                            primary = rs.getBoolean("primary"),
+                            urlPath = photoUrlPath,
+                            photographer = User(
+                                id = rs.getInt("photographerId"),
+                                name = rs.getString("name"),
+                                url = rs.getString("photographerUrl"),
+                                license = of(rs.getString("photographerLicense")),
+                                ownPhotos = true,
+                                anonymous = rs.getBoolean("anonymous"),
+                            ),
+                            createdAt = rs.getTimestamp("createdAt").toInstant(),
+                            license = License.valueOf(rs.getString("license")),
+                            outdated = rs.getBoolean("outdated")
+                        )
+                    )
+                }
+            }
+
+            return Station(
                 key = key,
                 title = rs.getString("title"),
                 coordinates = Coordinates(rs.getDouble("lat"), rs.getDouble("lon")),
                 ds100 = rs.getString("DS100"),
-                photos = mutableListOf(),
+                photos = photos,
                 active = rs.getBoolean("active")
             )
-
-            val photoUrlPath = rs.getString("urlPath")
-            if (photoUrlPath != null) {
-                station.photos.add(
-                    Photo(
-                        id = rs.getLong("photoId"),
-                        stationKey = key,
-                        primary = rs.getBoolean("primary"),
-                        urlPath = photoUrlPath,
-                        photographer = User(
-                            id = rs.getInt("photographerId"),
-                            name = rs.getString("name"),
-                            url = rs.getString("photographerUrl"),
-                            license = of(rs.getString("photographerLicense")),
-                            ownPhotos = true,
-                            anonymous = rs.getBoolean("anonymous"),
-                        ),
-                        createdAt = rs.getTimestamp("createdAt").toInstant(),
-                        license = License.valueOf(rs.getString("license")),
-                        outdated = rs.getBoolean("outdated")
-                    )
-                )
-            }
-
-            return station
         }
     }
 

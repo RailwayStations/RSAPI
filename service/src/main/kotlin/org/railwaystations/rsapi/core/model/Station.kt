@@ -1,27 +1,26 @@
 package org.railwaystations.rsapi.core.model
 
 data class Station(
-    var key: Key = Key("", "0"),
-    var title: String,
-    var coordinates: Coordinates = Coordinates(),
-    var ds100: String? = null,
-    var photos: MutableList<Photo> = mutableListOf(),
-    var active: Boolean = true,
+    val key: Key = Key("", "0"),
+    val title: String,
+    val coordinates: Coordinates = Coordinates(),
+    val ds100: String? = null,
+    val photos: List<Photo> = emptyList(),
+    val active: Boolean = true,
 ) {
 
-    fun hasPhoto(): Boolean {
-        return photos.isNotEmpty()
-    }
+    val hasPhoto: Boolean
+        get() = photos.isNotEmpty()
 
     fun appliesTo(photographer: String?): Boolean {
         if (photographer != null) {
-            return photos.any { photo -> photo.photographer.displayName == photographer }
+            return photos.any { it.photographer.displayName == photographer }
         }
         return true
     }
 
     val primaryPhoto: Photo?
-        get() = photos.firstOrNull { obj: Photo -> obj.primary }
+        get() = photos.firstOrNull { it.primary }
 
     data class Key(
         var country: String,

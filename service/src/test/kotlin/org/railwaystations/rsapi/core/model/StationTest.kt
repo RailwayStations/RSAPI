@@ -20,8 +20,9 @@ internal class StationTest {
         "test,    true", ",        true"
     )
     fun appliesToPhotographer(photographer: String?, expectedAppliesTo: Boolean) {
-        val station = createValidStation()
-        station.photos.add(createTestPhoto())
+        val station = createValidStation().copy(
+            photos = listOf(createTestPhoto())
+        )
         assertThat(station.appliesTo(photographer)).isEqualTo(expectedAppliesTo)
     }
 

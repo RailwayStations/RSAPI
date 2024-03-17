@@ -37,8 +37,9 @@ internal class PhotoStationsControllerTest {
     @Test
     fun getPhotoStationsByCountry() {
         val stationXY1 = createStationXY1()
-        val stationXY5 = createStationXY5()
-        stationXY5.photos.add(createPhotoXY5())
+        val stationXY5 = createStationXY5().copy(
+            photos = listOf(createPhotoXY5())
+        )
         every { photoStationsService.findByCountry(setOf("xy"), null, null) } returns setOf(stationXY1, stationXY5)
 
         mvc.perform(get("/photoStationsByCountry/xy"))
@@ -113,8 +114,9 @@ internal class PhotoStationsControllerTest {
 
     @Test
     fun getPhotoStationsByCountryWithHasPhotoFilter() {
-        val stationXY5 = createStationXY5()
-        stationXY5.photos.add(createPhotoXY5())
+        val stationXY5 = createStationXY5().copy(
+            photos = listOf(createPhotoXY5())
+        )
         every { photoStationsService.findByCountry(setOf("xy"), true, null) } returns setOf(stationXY5)
 
         mvc.perform(get("/photoStationsByCountry/xy?hasPhoto=true"))
@@ -186,9 +188,9 @@ internal class PhotoStationsControllerTest {
 
     @Test
     fun getPhotoStationByIdOfActiveStationWithTwoPhotos() {
-        val stationAB3 = createStationAB3()
-        stationAB3.photos.add(createPhotoAB3_1())
-        stationAB3.photos.add(createPhotoAB3_2())
+        val stationAB3 = createStationAB3().copy(
+            photos = listOf(createPhotoAB3_1(), createPhotoAB3_2())
+        )
         every { photoStationsService.findByCountryAndId("ab", "3") } returns stationAB3
 
         mvc.perform(get("/photoStationById/ab/3"))
@@ -248,8 +250,9 @@ internal class PhotoStationsControllerTest {
 
     @Test
     fun getPhotoStationsByPhotographerWithCountryFilter() {
-        val stationXY5 = createStationXY5()
-        stationXY5.photos.add(createPhotoXY5())
+        val stationXY5 = createStationXY5().copy(
+            photos = listOf(createPhotoXY5())
+        )
         every { photoStationsService.findByPhotographer("Jim Knopf", "xy") } returns setOf(stationXY5)
 
         mvc.perform(get("/photoStationsByPhotographer/Jim Knopf?country=xy"))
@@ -287,10 +290,12 @@ internal class PhotoStationsControllerTest {
 
     @Test
     fun getPhotoStationsByPhotographer() {
-        val stationAB3 = createStationAB3()
-        stationAB3.photos.add(createPhotoAB3_2())
-        val stationXY5 = createStationXY5()
-        stationXY5.photos.add(createPhotoXY5())
+        val stationAB3 = createStationAB3().copy(
+            photos = listOf(createPhotoAB3_2())
+        )
+        val stationXY5 = createStationXY5().copy(
+            photos = listOf(createPhotoXY5())
+        )
         every { photoStationsService.findByPhotographer("Jim Knopf", null) } returns setOf(stationAB3, stationXY5)
 
         mvc.perform(get("/photoStationsByPhotographer/Jim Knopf"))
@@ -362,8 +367,9 @@ internal class PhotoStationsControllerTest {
 
     @Test
     fun getPhotoStationsByRecentPhotoImportsWithDefaultSinceHours() {
-        val stationXY5 = createStationXY5()
-        stationXY5.photos.add(createPhotoXY5())
+        val stationXY5 = createStationXY5().copy(
+            photos = listOf(createPhotoXY5())
+        )
         every { photoStationsService.findRecentImports(10) } returns setOf(stationXY5)
 
         mvc.perform(get("/photoStationsByRecentPhotoImports"))
@@ -379,8 +385,9 @@ internal class PhotoStationsControllerTest {
 
     @Test
     fun getPhotoStationsByRecentPhotoImportsWithSinceHours() {
-        val stationAB3 = createStationAB3()
-        stationAB3.photos.add(createPhotoAB3_1())
+        val stationAB3 = createStationAB3().copy(
+            photos = listOf(createPhotoAB3_1())
+        )
         every { photoStationsService.findRecentImports(100) } returns setOf(stationAB3)
 
         mvc.perform(get("/photoStationsByRecentPhotoImports?sinceHours=100"))

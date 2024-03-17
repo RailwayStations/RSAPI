@@ -1,23 +1,17 @@
 package org.railwaystations.rsapi.core.model
 
+import org.railwaystations.rsapi.core.model.PhotoTestFixtures.Companion.createPhoto
+
 class StationTestFixtures {
     companion object {
-        fun createStationDe4711(): Station {
-            val key = Station.Key("de", "4711")
-            return createStationWithKey(key)
-        }
+        fun createStationDe4711(): Station = createStationWithKey(Station.Key("de", "4711"))
 
-        fun createStationDe0815(): Station {
-            val key = Station.Key("de", "0815")
-            return createStationWithKey(key)
-        }
+        fun createStationDe0815(): Station = createStationWithKey(Station.Key("de", "0815"))
 
-        private fun createStationWithKey(key: Station.Key): Station {
-            return Station(
-                key = key,
-                title = "${key.country} ${key.id}",
-            )
-        }
+        private fun createStationWithKey(key: Station.Key): Station = Station(
+            key = key,
+            title = "${key.country} ${key.id}",
+        )
 
         fun createStationDE5(): Station {
             val keyDE5 = Station.Key("de", "5")
@@ -25,22 +19,16 @@ class StationTestFixtures {
                 title = "Lummerland",
                 coordinates = Coordinates(50.0, 9.0),
                 ds100 = "XYZ",
-            )
-            stationDE5.photos.add(
-                PhotoTestFixtures.createPhoto(keyDE5, UserTestFixtures.createUserJimKnopf())
+                photos = listOf(createPhoto(keyDE5, UserTestFixtures.createUserJimKnopf()))
             )
             return stationDE5
         }
 
-        fun createStation(key: Station.Key, coordinates: Coordinates, photo: Photo?): Station {
-            val station = createStationWithKey(key).copy(
+        fun createStation(key: Station.Key, coordinates: Coordinates, photo: Photo?): Station =
+            createStationWithKey(key).copy(
                 coordinates = coordinates,
                 ds100 = "LAL",
+                photos = if (photo != null) listOf(photo) else listOf()
             )
-            if (photo != null) {
-                station.photos.add(photo)
-            }
-            return station
-        }
     }
 }
