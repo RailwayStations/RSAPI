@@ -22,7 +22,7 @@ class StatisticController(private val getStatisticUseCase: GetStatisticUseCase) 
         return StatisticDto(
             total = statistic.total,
             withPhoto = statistic.withPhoto,
-            withoutPhoto = statistic.withoutPhoto(),
+            withoutPhoto = statistic.withoutPhoto,
             photographers = statistic.photographers,
             countryCode = statistic.countryCode
         )

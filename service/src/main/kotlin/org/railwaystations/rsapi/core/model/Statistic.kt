@@ -6,7 +6,7 @@ data class Statistic(
     val withPhoto: Long,
     val photographers: Long
 ) {
-    fun withoutPhoto(): Long {
-        return total - withPhoto
-    }
+    val withoutPhoto: Long
+        get() = total - withPhoto
+    
 }
