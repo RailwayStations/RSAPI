@@ -384,34 +384,28 @@ class InboxService(
                 license = getLicenseForPhoto(photographer, country),
                 outdated = false
             )
-            val photoId: Long
-            if (station.hasPhoto()) {
+            val photoId = if (station.hasPhoto()) {
                 when (command.conflictResolution) {
                     InboxCommand.ConflictResolution.IMPORT_AS_NEW_PRIMARY_PHOTO -> {
                         photoDao.setAllPhotosForStationSecondary(station.key)
-                        photo.primary = true
-                        photoId = photoDao.insert(photo)
+                        photoDao.insert(photo.copy(primary = true))
                     }
 
                     InboxCommand.ConflictResolution.IMPORT_AS_NEW_SECONDARY_PHOTO -> {
-                        photo.primary = false
-                        photoId = photoDao.insert(photo)
+                        photoDao.insert(photo)
                     }
 
                     InboxCommand.ConflictResolution.OVERWRITE_EXISTING_PHOTO -> {
                         val primaryPhoto = station.primaryPhoto
                         require(primaryPhoto != null) { "Station has no primary photo to overwrite" }
-                        photoId = primaryPhoto.id
-                        photo.id = photoId
-                        photo.primary = true
-                        photoDao.update(photo)
+                        photoDao.update(photo.copy(id = primaryPhoto.id, primary = true))
+                        primaryPhoto.id
                     }
 
                     else -> throw IllegalArgumentException("No suitable conflict resolution provided")
                 }
             } else {
-                photo.primary = true
-                photoId = photoDao.insert(photo)
+                photoDao.insert(photo.copy(primary = true))
             }
 
             inboxDao.updatePhotoId(inboxEntry.id, photoId)

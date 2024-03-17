@@ -1,12 +1,12 @@
 package org.railwaystations.rsapi.core.model
 
-class InboxResponse(
-    var id: Long? = null,
-    var state: InboxResponseState,
-    var message: String? = null,
-    var filename: String? = null,
-    var inboxUrl: String? = null,
-    var crc32: Long? = null,
+data class InboxResponse(
+    val id: Long? = null,
+    val state: InboxResponseState,
+    val message: String? = null,
+    val filename: String? = null,
+    val inboxUrl: String? = null,
+    val crc32: Long? = null,
 ) {
     enum class InboxResponseState {
         REVIEW,

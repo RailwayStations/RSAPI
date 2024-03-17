@@ -3,14 +3,14 @@ package org.railwaystations.rsapi.core.model
 import java.time.Instant
 
 data class Photo(
-    var id: Long = 0,
-    var stationKey: Station.Key,
-    var primary: Boolean = false,
-    var urlPath: String,
-    var photographer: User,
-    var createdAt: Instant,
-    var license: License,
-    var outdated: Boolean = false,
+    val id: Long = 0,
+    val stationKey: Station.Key,
+    val primary: Boolean = false,
+    val urlPath: String,
+    val photographer: User,
+    val createdAt: Instant,
+    val license: License,
+    val outdated: Boolean = false,
 ) : Comparable<Photo> {
 
     override fun compareTo(other: Photo): Int {

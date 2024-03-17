@@ -2,22 +2,22 @@ package org.railwaystations.rsapi.core.model
 
 import java.time.Instant
 
-class InboxStateQuery(
-    var id: Long,
-    var countryCode: String? = null,
-    var stationId: String? = null,
-    var title: String? = null,
-    var coordinates: Coordinates? = null,
-    var newTitle: String? = null,
-    var newCoordinates: Coordinates? = null,
-    var state: InboxState = InboxState.UNKNOWN,
-    var comment: String? = null,
-    var problemReportType: ProblemReportType? = null,
-    var rejectedReason: String? = null,
-    var filename: String? = null,
-    var inboxUrl: String? = null,
-    var crc32: Long? = null,
-    var createdAt: Instant? = null,
+data class InboxStateQuery(
+    val id: Long,
+    val countryCode: String? = null,
+    val stationId: String? = null,
+    val title: String? = null,
+    val coordinates: Coordinates? = null,
+    val newTitle: String? = null,
+    val newCoordinates: Coordinates? = null,
+    val state: InboxState = InboxState.UNKNOWN,
+    val comment: String? = null,
+    val problemReportType: ProblemReportType? = null,
+    val rejectedReason: String? = null,
+    val filename: String? = null,
+    val inboxUrl: String? = null,
+    val crc32: Long? = null,
+    val createdAt: Instant? = null,
 ) {
 
     enum class InboxState {
