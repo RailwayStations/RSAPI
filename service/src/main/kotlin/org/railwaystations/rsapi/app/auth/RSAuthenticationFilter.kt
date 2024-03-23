@@ -4,7 +4,6 @@ import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.apache.commons.lang3.StringUtils
 import org.springframework.core.log.LogMessage
 import org.springframework.http.HttpHeaders
 import org.springframework.lang.NonNull
@@ -12,14 +11,11 @@ import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.context.SecurityContextHolderStrategy
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType
 import org.springframework.security.web.authentication.NullRememberMeServices
-import org.springframework.security.web.authentication.RememberMeServices
 import org.springframework.security.web.authentication.www.BasicAuthenticationConverter
 import org.springframework.security.web.context.RequestAttributeSecurityContextRepository
-import org.springframework.security.web.context.SecurityContextRepository
 import org.springframework.web.filter.OncePerRequestFilter
 import java.io.IOException
 
@@ -28,14 +24,13 @@ class RSAuthenticationFilter(
     private val oAuth2AuthorizationService: OAuth2AuthorizationService?,
 ) : OncePerRequestFilter() {
 
-    private var securityContextHolderStrategy: SecurityContextHolderStrategy = SecurityContextHolder
-        .getContextHolderStrategy()
+    private var securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy()
 
-    private var rememberMeServices: RememberMeServices = NullRememberMeServices()
+    private var rememberMeServices = NullRememberMeServices()
 
     private val authenticationConverter = BasicAuthenticationConverter()
 
-    private var securityContextRepository: SecurityContextRepository = RequestAttributeSecurityContextRepository()
+    private var securityContextRepository = RequestAttributeSecurityContextRepository()
 
     @Throws(ServletException::class, IOException::class)
     override fun doFilterInternal(
@@ -45,7 +40,7 @@ class RSAuthenticationFilter(
     ) {
         val authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION)
         var authentication: UsernamePasswordAuthenticationToken? = null
-        if (StringUtils.isNotBlank(authorizationHeader)) {
+        if (!authorizationHeader.isNullOrBlank()) {
             if (authorizationHeader.startsWith("Bearer ")) {
                 authentication = getJwtAuthentication(authorizationHeader)
             } else if (authorizationHeader.startsWith("Basic ")) {
@@ -56,7 +51,7 @@ class RSAuthenticationFilter(
         if (authentication == null) {
             val email = request.getHeader("Email")
             val uploadToken = request.getHeader("Upload-Token")
-            if (StringUtils.isNotBlank(email) && StringUtils.isNotBlank(uploadToken)) {
+            if (!email.isNullOrBlank() && !uploadToken.isNullOrBlank()) {
                 authentication = UsernamePasswordAuthenticationToken(email, uploadToken)
                 authentication.details = authenticationConverter.authenticationDetailsSource.buildDetails(request)
             }

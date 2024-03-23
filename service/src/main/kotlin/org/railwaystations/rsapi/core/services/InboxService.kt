@@ -25,6 +25,7 @@ import org.railwaystations.rsapi.core.ports.MastodonBot
 import org.railwaystations.rsapi.core.ports.Monitor
 import org.railwaystations.rsapi.core.ports.PhotoStorage
 import org.railwaystations.rsapi.core.ports.PhotoStorage.PhotoTooLargeException
+import org.railwaystations.rsapi.core.ports.PostRecentlyImportedPhotoUseCase
 import org.railwaystations.rsapi.utils.ImageUtil.mimeToExtension
 import org.railwaystations.rsapi.utils.Logger
 import org.springframework.beans.factory.annotation.Value
@@ -53,7 +54,7 @@ class InboxService(
     @param:Value(
         "\${mastodon-bot.stationUrl}"
     ) private val stationUrl: String
-) : ManageInboxUseCase {
+) : ManageInboxUseCase, PostRecentlyImportedPhotoUseCase {
 
     private val log by Logger()
 
@@ -74,7 +75,7 @@ class InboxService(
                 message = "Station not found"
             )
 
-        if (StringUtils.isBlank(problemReport.comment)) {
+        if (problemReport.comment.isNullOrBlank()) {
             return InboxResponse(
                 state = InboxResponse.InboxResponseState.NOT_ENOUGH_DATA,
                 message = "Comment is mandatory"
@@ -113,7 +114,7 @@ class InboxService(
             problemReportType = problemReport.type,
         )
         monitor.sendMessage(
-            "New problem report for ${station.title} - ${station.key.country}:${station.key.id}\n${problemReport.type}: ${problemReport.comment?.trim() ?: ""}\nby ${user.name}\nvia $clientInfo"
+            "New problem report for ${station.title} - ${station.key.country}:${station.key.id}\n${problemReport.type}: ${problemReport.comment.trim()}\nby ${user.name}\nvia $clientInfo"
         )
         return InboxResponse(state = InboxResponse.InboxResponseState.REVIEW, id = inboxDao.insert(inboxEntry))
     }
@@ -238,9 +239,6 @@ class InboxService(
         return inboxDao.countPendingInboxEntries()
     }
 
-    override val nextZ: String
-        get() = "Z${stationDao.maxZ + 1}"
-
     override fun updateStationActiveState(command: InboxCommand, active: Boolean) {
         val inboxEntry = assertPendingInboxEntryExists(command)
         val station = assertStationExists(inboxEntry)
@@ -251,9 +249,9 @@ class InboxService(
 
     override fun changeStationTitle(command: InboxCommand) {
         val inboxEntry = assertPendingInboxEntryExists(command)
-        require(!StringUtils.isBlank(command.title)) { "Empty new title: " + command.title }
+        require(!command.title.isNullOrBlank()) { "Empty new title: " + command.title }
         val station = assertStationExists(inboxEntry)
-        stationDao.changeStationTitle(station.key, command.title!!)
+        stationDao.changeStationTitle(station.key, command.title)
         inboxDao.done(inboxEntry.id)
         log.info(
             "Problem report {} station {} changed name to {}",
@@ -435,12 +433,12 @@ class InboxService(
                 command.coordinates
             ) && !command.conflictResolution!!.solvesStationConflict())
         ) { "There is a conflict with a nearby station" }
-        require(!StringUtils.isBlank(command.title)) { "Station title can't be empty" }
+        require(!command.title.isNullOrBlank()) { "Station title can't be empty" }
         requireNotNull(command.active) { "No Active flag provided" }
 
         val newStation = Station(
-            key = Station.Key(country.code, nextZ),
-            title = command.title!!,
+            key = Station.Key(country.code, "Z${stationDao.maxZ + 1}"),
+            title = command.title,
             coordinates = command.coordinates!!,
             ds100 = command.ds100,
             photos = mutableListOf(),
@@ -493,7 +491,7 @@ class InboxService(
         val coordinates: Coordinates?
         if (station == null) {
             log.warn("Station not found")
-            if (StringUtils.isBlank(stationTitle) || latitude == null || longitude == null) {
+            if (stationTitle.isNullOrBlank() || latitude == null || longitude == null) {
                 log.warn(
                     "Not enough data for missing station: title={}, latitude={}, longitude={}",
                     stationTitle,
@@ -628,7 +626,7 @@ class InboxService(
         return stationDao.findByKey(countryCode, stationId)
     }
 
-    fun postRecentlyImportedPhotoNotYetPosted() {
+    override fun postRecentlyImportedPhotoNotYetPosted() {
         val inboxEntriesToPost = inboxDao.findRecentlyImportedPhotosNotYetPosted()
         if (inboxEntriesToPost.isEmpty()) {
             return
@@ -638,7 +636,7 @@ class InboxService(
         val photographer = userDao.findById(inboxEntry.photographerId)
         var status =
             "${inboxEntry.title}\nby ${photographer?.displayName ?: User.ANONYM}\n$stationUrl?countryCode=${inboxEntry.countryCode}&stationId=${inboxEntry.stationId}&photoId=${inboxEntry.photoId}"
-        if (StringUtils.isNotBlank(inboxEntry.comment)) {
+        if (!inboxEntry.comment.isNullOrBlank()) {
             status += "\n${inboxEntry.comment}"
         }
 

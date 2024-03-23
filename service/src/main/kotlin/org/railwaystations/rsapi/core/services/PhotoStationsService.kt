@@ -1,6 +1,5 @@
 package org.railwaystations.rsapi.core.services
 
-import org.apache.commons.lang3.StringUtils
 import org.railwaystations.rsapi.adapter.db.StationDao
 import org.railwaystations.rsapi.core.model.Station
 import org.railwaystations.rsapi.core.ports.FindPhotoStationsUseCase
@@ -11,11 +10,11 @@ import java.time.temporal.ChronoUnit
 @Service
 class PhotoStationsService(private val stationDao: StationDao) : FindPhotoStationsUseCase {
     override fun findByCountryAndId(country: String?, stationId: String?): Station? {
-        if (StringUtils.isBlank(stationId) || StringUtils.isBlank(country)) {
+        if (stationId.isNullOrBlank() || country.isNullOrBlank()) {
             return null
         }
 
-        val key = Station.Key(country!!, stationId!!)
+        val key = Station.Key(country, stationId)
         return stationDao.findByKey(key.country, key.id)
     }
 

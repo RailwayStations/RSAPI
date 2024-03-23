@@ -59,7 +59,7 @@ interface CountryDao {
                 name = rs.getString("c_name"),
                 email = rs.getString("c_email"),
                 timetableUrlTemplate = rs.getString("c_timetableUrlTemplate"),
-                overrideLicense = if (overrideLicense != null) License.valueOf(overrideLicense) else null,
+                overrideLicense = overrideLicense?.let { License.valueOf(it) },
                 active = rs.getBoolean("c_active"),
             )
         }

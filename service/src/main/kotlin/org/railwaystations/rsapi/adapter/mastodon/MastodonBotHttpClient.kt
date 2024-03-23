@@ -1,7 +1,6 @@
 package org.railwaystations.rsapi.adapter.mastodon
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.apache.commons.lang3.StringUtils
 import org.railwaystations.rsapi.core.ports.MastodonBot
 import org.railwaystations.rsapi.utils.Logger
 import org.springframework.http.MediaType
@@ -28,10 +27,7 @@ class MastodonBotHttpClient(
 
     @Async
     override fun tootNewPhoto(status: String) {
-        if (StringUtils.isBlank(config.instanceUrl) || StringUtils.isBlank(
-                config.token
-            )
-        ) {
+        if (config.instanceUrl.isBlank() || config.token.isBlank()) {
             log.info("New photo not tooted: {}", status)
             return
         }

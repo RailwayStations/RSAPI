@@ -25,7 +25,7 @@ data class User(
         get() = normalizeName(name)
 
     val displayUrl: String
-        get() = if (anonymous || StringUtils.isBlank(url)) "https://railway-stations.org" else url!!
+        get() = if (anonymous || url.isNullOrBlank()) "https://railway-stations.org" else url
 
     val displayName: String
         get() = if (anonymous) ANONYM else name
@@ -34,8 +34,8 @@ data class User(
         /**
          * Checks if we have got a name and valid email for registration.
          */
-        get() = StringUtils.isNotBlank(name) &&
-                StringUtils.isNotBlank(email) &&
+        get() = name.isNotBlank() &&
+                !email.isNullOrBlank() &&
                 EmailValidator().isValid(email, null)
 
     val isValid: Boolean

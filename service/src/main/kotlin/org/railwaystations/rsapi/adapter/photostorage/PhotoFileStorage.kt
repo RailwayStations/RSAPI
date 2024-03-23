@@ -51,7 +51,7 @@ class PhotoFileStorage(private val workDir: WorkDir) : PhotoStorage {
 
     private fun getDestinationFile(destinationDir: Path, stationId: String, extension: String?): Path {
         for (sequence in 1..99) {
-            val destinationFile = destinationDir.resolve(sanitizeFilename(stationId + "_" + sequence + "." + extension))
+            val destinationFile = destinationDir.resolve(sanitizeFilename("${stationId}_$sequence.$extension"))
             if (Files.notExists(destinationFile)) {
                 return destinationFile
             }
@@ -137,9 +137,9 @@ class PhotoFileStorage(private val workDir: WorkDir) : PhotoStorage {
             try {
                 Files.list(dir).use { pathStream ->
                     pathStream
-                        .filter { path: Path -> Files.isRegularFile(path) }
-                        .filter { f: Path -> isOlderThan(f, maxAge) }
-                        .forEach { path: Path -> deleteSilently(path) }
+                        .filter { path -> Files.isRegularFile(path) }
+                        .filter { path -> isOlderThan(path, maxAge) }
+                        .forEach { path -> deleteSilently(path) }
                 }
             } catch (e: Exception) {
                 log.error("Failed to cleanup old copies from {}", dir, e)

@@ -22,9 +22,7 @@ class ErrorHandlingControllerAdvice {
         request: WebRequest?
     ): ResponseEntity<ErrorResponse> {
         val details = ex.constraintViolations
-            .parallelStream()
             .map { obj: ConstraintViolation<*> -> obj.message }
-            .toList()
 
         val error = ErrorResponse.create(ex, HttpStatus.BAD_REQUEST, details.toString())
         return ResponseEntity(error, HttpStatus.BAD_REQUEST)

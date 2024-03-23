@@ -50,7 +50,7 @@ class ProfileService(
 
         requireNotNull(user) { "Can't reset password for unknown user" }
 
-        if (StringUtils.isBlank(user.email)) {
+        if (user.email.isNullOrBlank()) {
             monitor.sendMessage("Can't reset password for '$nameOrEmail' failed: no email available\nvia $clientInfo")
             throw IllegalArgumentException("Email '${user.email}' is empty")
         }
@@ -60,7 +60,7 @@ class ProfileService(
         userDao.updateCredentials(user.id, key)
         monitor.sendMessage("Reset Password for '${user.name}', email='${user.email}'")
 
-        sendPasswordMail(user.email!!, newPassword, user.locale)
+        sendPasswordMail(user.email, newPassword, user.locale)
         if (!user.isEmailVerified) {
             // if the email is not yet verified, we can verify it with the next login
             userDao.updateEmailVerification(user.id, User.EMAIL_VERIFIED_AT_NEXT_LOGIN)
@@ -102,7 +102,7 @@ class ProfileService(
 
         var password = newUser.newPassword
         var emailVerificationToken = createNewEmailVerificationToken()
-        val passwordProvided = StringUtils.isNotBlank(password)
+        val passwordProvided = !password.isNullOrBlank()
         if (!passwordProvided) {
             password = createNewPassword()
             emailVerificationToken = User.EMAIL_VERIFIED_AT_NEXT_LOGIN
@@ -112,9 +112,9 @@ class ProfileService(
         saveRegistration(newUser, key, emailVerificationToken)
 
         if (passwordProvided) {
-            sendEmailVerification(newUser.email!!, emailVerificationToken)
+            sendEmailVerification(newUser.email, emailVerificationToken)
         } else {
-            sendPasswordMail(newUser.email!!, password!!, newUser.locale)
+            sendPasswordMail(newUser.email, password!!, newUser.locale)
         }
 
         monitor.sendMessage("New registration{nickname='${newUser.name}', email='${newUser.email}'}\nvia $clientInfo")
@@ -164,7 +164,7 @@ class ProfileService(
                 "Update email for user '${user.name}' from email '${user.email}' to '${newProfile.email}'\nvia $clientInfo"
             )
             val emailVerificationToken = createNewEmailVerificationToken()
-            sendEmailVerification(newProfile.email!!, emailVerificationToken)
+            sendEmailVerification(newProfile.email, emailVerificationToken)
             userDao.updateEmailVerification(user.id, emailVerificationToken)
         }
 

@@ -2,7 +2,6 @@ package org.railwaystations.rsapi.adapter.monitoring
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.apache.commons.lang3.StringUtils
 import org.railwaystations.rsapi.core.ports.Monitor
 import org.railwaystations.rsapi.utils.ImageUtil.extensionToMimeType
 import org.railwaystations.rsapi.utils.ImageUtil.getExtension
@@ -38,7 +37,7 @@ class MatrixMonitor(private val config: MatrixMonitorConfig, private val objectM
     @Async
     override fun sendMessage(message: String, file: Path?) {
         log.info("Sending message: {}", message)
-        if (StringUtils.isBlank(config.roomUrl)) {
+        if (config.roomUrl.isBlank()) {
             log.warn("Skipping message, missing Matrix Room URL config")
             return
         }

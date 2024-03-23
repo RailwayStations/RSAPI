@@ -26,10 +26,7 @@ object ImageUtil {
             val height = (inputImage.height * scale).toInt()
 
             // creates output image
-            val outputImage = BufferedImage(
-                width,
-                height, inputImage.type
-            )
+            val outputImage = BufferedImage(width, height, inputImage.type)
 
             // scales the input image to the output image
             val g2d = outputImage.createGraphics()

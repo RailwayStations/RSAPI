@@ -83,9 +83,8 @@ class WebDavSyncTask(
             )
             .header("Depth", "1")
             .build()
-        val response: HttpResponse<String>
         try {
-            response = client.send(request, HttpResponse.BodyHandlers.ofString())
+            val response = client.send(request, HttpResponse.BodyHandlers.ofString())
             log.info("ListProcessedFiles response " + response.statusCode())
             if (response.statusCode() != HttpStatus.MULTI_STATUS.value()) {
                 throw RuntimeException("Failed to list processed files, statusCode=" + response.statusCode())

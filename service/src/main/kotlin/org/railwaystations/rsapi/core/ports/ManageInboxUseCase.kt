@@ -22,8 +22,6 @@ interface ManageInboxUseCase {
 
     fun countPendingInboxEntries(): Long
 
-    val nextZ: String
-
     fun uploadPhoto(
         clientInfo: String?, body: InputStream?, stationId: String?,
         countryCode: String?, contentType: String?, stationTitle: String?,

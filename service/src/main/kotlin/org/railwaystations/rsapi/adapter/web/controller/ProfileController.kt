@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.LocaleResolver
 import java.net.URI
-import java.util.*
 
 @RestController
 class ProfileController(
@@ -53,7 +52,7 @@ class ProfileController(
     }
 
     private fun toUser(updateProfileDto: UpdateProfileDto): User {
-        val locale: Locale = localeResolver.resolveLocale(requestUtil.request)
+        val locale = localeResolver.resolveLocale(requestUtil.request)
         log.info("User locale {}", locale)
         return User(
             name = updateProfileDto.nickname,
@@ -89,7 +88,7 @@ class ProfileController(
     )
     fun emailVerificationTokenGet(@PathVariable("token") token: String): ResponseEntity<String> {
         return manageProfileUseCase.emailVerification(token)
-            ?.let { _: User ->
+            ?.let { _ ->
                 ResponseEntity(
                     "Email successfully verified!",
                     HttpStatus.OK

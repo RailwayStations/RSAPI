@@ -44,8 +44,7 @@ object JwtUtil {
     fun generateRsaKeyPair(): KeyPair {
         val keyPair: KeyPair
         try {
-            val keyPairGenerator =
-                KeyPairGenerator.getInstance("RSA")
+            val keyPairGenerator = KeyPairGenerator.getInstance("RSA")
             keyPairGenerator.initialize(2048)
             keyPair = keyPairGenerator.generateKeyPair()
         } catch (ex: Exception) {

@@ -28,10 +28,12 @@ class AuthorizationConsentController(private val registeredClientRepository: Reg
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown clientId")
         }
 
-        model.addAttribute("clientId", clientId)
-        model.addAttribute("clientName", registeredClient.clientName)
-        model.addAttribute("state", state)
-        model.addAttribute("principalName", principal.name)
+        with(model) {
+            addAttribute("clientId", clientId)
+            addAttribute("clientName", registeredClient.clientName)
+            addAttribute("state", state)
+            addAttribute("principalName", principal.name)
+        }
 
         return "consent"
     }
