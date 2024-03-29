@@ -58,7 +58,7 @@ class ProfileController(
             name = updateProfileDto.nickname,
             email = updateProfileDto.email,
             url = updateProfileDto.link?.toString(),
-            ownPhotos = updateProfileDto.photoOwner,
+            ownPhotos = updateProfileDto.photoOwner ?: false,
             anonymous = updateProfileDto.anonymous ?: false,
             license = toLicense(updateProfileDto.license),
             sendNotifications = updateProfileDto.sendNotifications ?: true,
