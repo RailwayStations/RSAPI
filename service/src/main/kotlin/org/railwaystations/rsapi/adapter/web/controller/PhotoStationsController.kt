@@ -30,69 +30,6 @@ class PhotoStationsController(
     @Value("\${photoBaseUrl}") private val photoBaseUrl: String,
 ) {
 
-    private fun mapPhotoStations(stations: Set<Station>): PhotoStationsDto {
-        return PhotoStationsDto(photoBaseUrl, mapLicenses(stations), mapPhotographers(stations), mapStations(stations))
-    }
-
-    private fun mapStations(stations: Set<Station>): List<PhotoStationDto> {
-        return stations
-            .map { station ->
-                PhotoStationDto(
-                    country = station.key.country,
-                    id = station.key.id,
-                    title = station.title,
-                    lat = station.coordinates.lat,
-                    lon = station.coordinates.lon,
-                    photos = mapPhotos(station),
-                    shortCode = station.ds100,
-                    inactive = if (station.active) null else true,
-                )
-            }
-    }
-
-    private fun mapPhotos(station: Station): List<PhotoDto> {
-        return station.photos
-            .sorted()
-            .map { photo ->
-                PhotoDto(
-                    id = photo.id,
-                    photographer = photo.photographer.displayName,
-                    path = photo.urlPath,
-                    createdAt = photo.createdAt.toEpochMilli(),
-                    license = photo.license.name,
-                    outdated = if (photo.outdated) true else null
-                )
-            }
-    }
-
-    private fun mapPhotographers(stations: Set<Station>): List<PhotographerDto> {
-        return stations
-            .flatMap { station -> station.photos }
-            .map { photo -> photo.photographer }
-            .associateBy { user -> user.displayName }
-            .map { entry ->
-                PhotographerDto(name = entry.value.displayName, url = URI.create(entry.value.displayUrl))
-            }
-    }
-
-    private fun mapLicenses(stations: Set<Station>): List<PhotoLicenseDto> {
-        return stations
-            .asSequence()
-            .flatMap { station -> station.photos }
-            .map { photo -> photo.license }
-            .associateBy { license -> license.name }
-            .filter { it.value.url != null }
-            .mapNotNull { license ->
-                license.value.url?.let { url ->
-                    PhotoLicenseDto(
-                        license.key,
-                        license.value.displayName,
-                        URI.create(url),
-                    )
-                }
-            }
-    }
-
     @RequestMapping(
         method = [RequestMethod.GET],
         value = ["/photoStationById/{country}/{id}"],
@@ -109,7 +46,7 @@ class PhotoStationsController(
             findPhotoStationsUseCase.findByCountryAndId(country, id)
                 ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         )
-        return ResponseEntity.ok(mapPhotoStations(stations))
+        return ResponseEntity.ok(stations.toDto(photoBaseUrl))
     }
 
     @RequestMapping(
@@ -133,7 +70,7 @@ class PhotoStationsController(
     ): ResponseEntity<PhotoStationsDto> {
         val stations =
             findPhotoStationsUseCase.findByCountry(mutableSetOf(country), hasPhoto, isActive)
-        return ResponseEntity.ok(mapPhotoStations(stations))
+        return ResponseEntity.ok(stations.toDto(photoBaseUrl))
     }
 
     @RequestMapping(
@@ -152,7 +89,7 @@ class PhotoStationsController(
         ) country: String?
     ): ResponseEntity<PhotoStationsDto> {
         val stations = findPhotoStationsUseCase.findByPhotographer(photographer, country)
-        return ResponseEntity.ok(mapPhotoStations(stations))
+        return ResponseEntity.ok(stations.toDto(photoBaseUrl))
     }
 
     @RequestMapping(
@@ -168,6 +105,58 @@ class PhotoStationsController(
         ) sinceHours: Int
     ): ResponseEntity<PhotoStationsDto> {
         val stations = findPhotoStationsUseCase.findRecentImports(sinceHours.toLong())
-        return ResponseEntity.ok(mapPhotoStations(stations))
+        return ResponseEntity.ok(stations.toDto(photoBaseUrl))
     }
 }
+
+
+private fun Set<Station>.toDto(photoBaseUrl: String) =
+    PhotoStationsDto(photoBaseUrl, toLicenses(), toPhotographers(), toStations())
+
+private fun Set<Station>.toStations() = map { station ->
+    PhotoStationDto(
+        country = station.key.country,
+        id = station.key.id,
+        title = station.title,
+        lat = station.coordinates.lat,
+        lon = station.coordinates.lon,
+        photos = station.toPhotoDtos(),
+        shortCode = station.ds100,
+        inactive = if (station.active) null else true,
+    )
+}
+
+private fun Station.toPhotoDtos() = photos
+    .sorted()
+    .map { photo ->
+        PhotoDto(
+            id = photo.id,
+            photographer = photo.photographer.displayName,
+            path = photo.urlPath,
+            createdAt = photo.createdAt.toEpochMilli(),
+            license = photo.license.name,
+            outdated = if (photo.outdated) true else null
+        )
+    }
+
+private fun Set<Station>.toPhotographers() = flatMap { station -> station.photos }
+    .map { photo -> photo.photographer }
+    .associateBy { user -> user.displayName }
+    .map { entry ->
+        PhotographerDto(name = entry.value.displayName, url = URI.create(entry.value.displayUrl))
+    }
+
+private fun Set<Station>.toLicenses() = asSequence()
+    .flatMap { station -> station.photos }
+    .map { photo -> photo.license }
+    .associateBy { license -> license.name }
+    .filter { it.value.url != null }
+    .mapNotNull { license ->
+        license.value.url?.let { url ->
+            PhotoLicenseDto(
+                license.key,
+                license.value.displayName,
+                URI.create(url),
+            )
+        }
+    }

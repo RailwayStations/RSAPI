@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.LocaleResolver
 import java.net.URI
+import java.util.*
 
 @RestController
 class ProfileController(
@@ -30,41 +31,6 @@ class ProfileController(
 ) {
 
     private val log by Logger()
-
-    private fun toProfileDto(user: User): ProfileDto {
-        return ProfileDto(
-            nickname = user.name, license = toLicenseDto(user.license), photoOwner = user.ownPhotos,
-            email = user.email,
-            link = user.url?.let { URI.create(it) },
-            anonymous = user.anonymous,
-            admin = user.admin,
-            emailVerified = user.isEmailVerified,
-            sendNotifications = user.sendNotifications,
-        )
-    }
-
-    private fun toLicenseDto(license: License?): LicenseDto {
-        return when (license) {
-            License.CC0_10 -> LicenseDto.CC0_1_PERIOD0_UNIVERSELL_LEFT_PARENTHESIS_CC0_1_PERIOD0_RIGHT_PARENTHESIS
-            License.CC_BY_SA_40 -> LicenseDto.CC_BY_MINUS_SA_4_PERIOD0
-            else -> LicenseDto.UNKNOWN
-        }
-    }
-
-    private fun toUser(updateProfileDto: UpdateProfileDto): User {
-        val locale = localeResolver.resolveLocale(requestUtil.request)
-        log.info("User locale {}", locale)
-        return User(
-            name = updateProfileDto.nickname,
-            email = updateProfileDto.email,
-            url = updateProfileDto.link?.toString(),
-            ownPhotos = updateProfileDto.photoOwner ?: false,
-            anonymous = updateProfileDto.anonymous ?: false,
-            license = toLicense(updateProfileDto.license),
-            sendNotifications = updateProfileDto.sendNotifications ?: true,
-            locale = locale,
-        )
-    }
 
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(
@@ -126,7 +92,7 @@ class ProfileController(
     ): ResponseEntity<ProfileDto> {
         val user = requestUtil.authUser.user
         log.info("Get profile for '{}'", user.email)
-        return ResponseEntity.ok(toProfileDto(user))
+        return ResponseEntity.ok(user.toDto())
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -140,7 +106,9 @@ class ProfileController(
         @RequestHeader(required = true, value = "Authorization") authorization: String,
         @Valid @RequestBody profile: UpdateProfileDto
     ): ResponseEntity<Unit> {
-        manageProfileUseCase.updateProfile(requestUtil.authUser.user, toUser(profile), requestUtil.userAgent)
+        val locale = localeResolver.resolveLocale(requestUtil.request)
+        log.info("User locale {}", locale)
+        manageProfileUseCase.updateProfile(requestUtil.authUser.user, profile.toDomain(locale), requestUtil.userAgent)
         return ResponseEntity.ok().build()
     }
 
@@ -159,14 +127,48 @@ class ProfileController(
         return ResponseEntity.ok().build()
     }
 
-    companion object {
-        @JvmStatic
-        fun toLicense(license: LicenseDto?): License {
-            return when (license) {
-                LicenseDto.CC0_1_PERIOD0_UNIVERSELL_LEFT_PARENTHESIS_CC0_1_PERIOD0_RIGHT_PARENTHESIS, LicenseDto.CC0 -> License.CC0_10
-                LicenseDto.CC_BY_MINUS_SA_4_PERIOD0, LicenseDto.CC4 -> License.CC_BY_SA_40
-                LicenseDto.UNKNOWN, null -> License.UNKNOWN
-            }
-        }
-    }
 }
+
+private fun UpdateProfileDto.toDomain(locale: Locale) = User(
+    name = nickname,
+    email = email,
+    url = link?.toString(),
+    ownPhotos = photoOwner ?: false,
+    anonymous = anonymous ?: false,
+    license = license.toDomain(),
+    sendNotifications = sendNotifications ?: true,
+    locale = locale,
+)
+
+private fun User.toDto() = ProfileDto(
+    nickname = name,
+    license = license.toDto(),
+    photoOwner = ownPhotos,
+    email = email,
+    link = url?.let { URI.create(it) },
+    anonymous = anonymous,
+    admin = admin,
+    emailVerified = isEmailVerified,
+    sendNotifications = sendNotifications,
+)
+
+private fun License?.toDto() = when (this) {
+    License.CC0_10
+    -> LicenseDto.CC0_1_PERIOD0_UNIVERSELL_LEFT_PARENTHESIS_CC0_1_PERIOD0_RIGHT_PARENTHESIS
+
+    License.CC_BY_SA_40
+    -> LicenseDto.CC_BY_MINUS_SA_4_PERIOD0
+
+    else -> LicenseDto.UNKNOWN
+}
+
+fun LicenseDto?.toDomain() = when (this) {
+    LicenseDto.CC0_1_PERIOD0_UNIVERSELL_LEFT_PARENTHESIS_CC0_1_PERIOD0_RIGHT_PARENTHESIS, LicenseDto.CC0
+    -> License.CC0_10
+
+    LicenseDto.CC_BY_MINUS_SA_4_PERIOD0, LicenseDto.CC4
+    -> License.CC_BY_SA_40
+
+    LicenseDto.UNKNOWN, null -> License.UNKNOWN
+}
+

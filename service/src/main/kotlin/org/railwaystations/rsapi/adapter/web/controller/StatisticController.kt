@@ -14,20 +14,6 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class StatisticController(private val getStatisticUseCase: GetStatisticUseCase) {
 
-    private fun getStatistic(country: String?): StatisticDto {
-        return toDto(getStatisticUseCase.getStatistic(country))
-    }
-
-    private fun toDto(statistic: Statistic): StatisticDto {
-        return StatisticDto(
-            total = statistic.total,
-            withPhoto = statistic.withPhoto,
-            withoutPhoto = statistic.withoutPhoto,
-            photographers = statistic.photographers,
-            countryCode = statistic.countryCode
-        )
-    }
-
     @RequestMapping(
         method = [RequestMethod.GET],
         value = ["/stats"],
@@ -39,6 +25,14 @@ class StatisticController(private val getStatisticUseCase: GetStatisticUseCase) 
             value = "country"
         ) country: String?
     ): ResponseEntity<StatisticDto> {
-        return ResponseEntity.ok(getStatistic(country))
+        return ResponseEntity.ok(getStatisticUseCase.getStatistic(country).toDto())
     }
 }
+
+private fun Statistic.toDto() = StatisticDto(
+    total = total,
+    withPhoto = withPhoto,
+    withoutPhoto = withoutPhoto,
+    photographers = photographers,
+    countryCode = countryCode
+)

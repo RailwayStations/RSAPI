@@ -53,162 +53,6 @@ class InboxController(
 
     private val log by Logger()
 
-    private fun toDomain(problemReport: ProblemReportDto): ProblemReport {
-        return ProblemReport(
-            countryCode = problemReport.countryCode,
-            stationId = problemReport.stationId,
-            title = problemReport.title,
-            photoId = problemReport.photoId,
-            type = toDomain(problemReport.type),
-            comment = problemReport.comment,
-            coordinates = mapCoordinates(problemReport.lat, problemReport.lon),
-        )
-    }
-
-    private fun toDomain(dtoType: ProblemReportTypeDto): ProblemReportType {
-        return when (dtoType) {
-            ProblemReportTypeDto.OTHER -> ProblemReportType.OTHER
-            ProblemReportTypeDto.WRONG_NAME -> ProblemReportType.WRONG_NAME
-            ProblemReportTypeDto.WRONG_PHOTO -> ProblemReportType.WRONG_PHOTO
-            ProblemReportTypeDto.PHOTO_OUTDATED -> ProblemReportType.PHOTO_OUTDATED
-            ProblemReportTypeDto.STATION_ACTIVE -> ProblemReportType.STATION_ACTIVE
-            ProblemReportTypeDto.STATION_INACTIVE -> ProblemReportType.STATION_INACTIVE
-            ProblemReportTypeDto.WRONG_LOCATION -> ProblemReportType.WRONG_LOCATION
-            ProblemReportTypeDto.STATION_NONEXISTENT -> ProblemReportType.STATION_NONEXISTENT
-            ProblemReportTypeDto.DUPLICATE -> ProblemReportType.DUPLICATE
-        }
-    }
-
-    private fun mapCoordinates(lat: Double?, lon: Double?): Coordinates? {
-        if (lat == null || lon == null) {
-            return null
-        }
-        return Coordinates(lat, lon)
-    }
-
-    private fun toPublicInboxEntryDto(publicInboxEntries: List<PublicInboxEntry>): List<PublicInboxEntryDto> {
-        return publicInboxEntries.map { publicInboxEntry -> toDto(publicInboxEntry) }
-    }
-
-    private fun toDto(publicInboxEntry: PublicInboxEntry): PublicInboxEntryDto {
-        return PublicInboxEntryDto(
-            countryCode = publicInboxEntry.countryCode,
-            stationId = publicInboxEntry.stationId,
-            title = publicInboxEntry.title,
-            lat = publicInboxEntry.lat,
-            lon = publicInboxEntry.lon
-        )
-    }
-
-    private fun toIdList(inboxStateQueryRequestDtos: List<InboxStateQueryRequestDto>): List<Long> {
-        return inboxStateQueryRequestDtos.map { it.id }
-    }
-
-    private fun toInboxStateQueryDto(inboxStateQueries: List<InboxStateQuery>): List<InboxStateQueryResponseDto> {
-        return inboxStateQueries.map { toDto(it) }
-    }
-
-    private fun toDto(inboxStateQuery: InboxStateQuery): InboxStateQueryResponseDto {
-        return InboxStateQueryResponseDto(
-            id = inboxStateQuery.id,
-            state = toDto(inboxStateQuery.state),
-            countryCode = inboxStateQuery.countryCode,
-            stationId = inboxStateQuery.stationId,
-            title = inboxStateQuery.title,
-            lat = inboxStateQuery.coordinates?.lat,
-            lon = inboxStateQuery.coordinates?.lon,
-            newTitle = inboxStateQuery.newTitle,
-            newLat = inboxStateQuery.newCoordinates?.lat,
-            newLon = inboxStateQuery.newCoordinates?.lon,
-            comment = inboxStateQuery.comment,
-            problemReportType = toDto(inboxStateQuery.problemReportType),
-            rejectedReason = inboxStateQuery.rejectedReason,
-            filename = inboxStateQuery.filename,
-            inboxUrl = inboxStateQuery.inboxUrl,
-            crc32 = inboxStateQuery.crc32,
-            createdAt = inboxStateQuery.createdAt?.toEpochMilli(),
-        )
-    }
-
-    private fun toDto(inboxState: InboxState): State {
-        return when (inboxState) {
-            InboxState.REVIEW, InboxState.CONFLICT -> State.REVIEW
-            InboxState.ACCEPTED -> State.ACCEPTED
-            InboxState.REJECTED -> State.REJECTED
-            InboxState.UNKNOWN -> State.UNKNOWN
-        }
-    }
-
-    private fun toInboxEntryDto(inboxEntries: List<InboxEntry>): List<InboxEntryDto> {
-        return inboxEntries.map { toDto(it) }
-    }
-
-    private fun toDto(inboxEntry: InboxEntry): InboxEntryDto {
-        return InboxEntryDto(
-            id = inboxEntry.id,
-            photographerNickname = inboxEntry.photographerNickname!!,
-            comment = inboxEntry.comment ?: "",
-            createdAt = inboxEntry.createdAt!!.toEpochMilli(),
-            done = inboxEntry.done,
-            hasPhoto = inboxEntry.hasPhoto,
-            countryCode = inboxEntry.countryCode,
-            stationId = inboxEntry.stationId,
-            title = inboxEntry.title,
-            lat = inboxEntry.lat,
-            lon = inboxEntry.lon,
-            newTitle = inboxEntry.newTitle,
-            newLat = inboxEntry.newLat,
-            newLon = inboxEntry.newLon,
-            photographerEmail = inboxEntry.photographerEmail,
-            photoId = inboxEntry.photoId,
-            filename = inboxEntry.filename,
-            inboxUrl = inboxEntry.inboxUrl,
-            hasConflict = inboxEntry.conflict,
-            problemReportType = toDto(inboxEntry.problemReportType),
-            isProcessed = inboxEntry.processed,
-            active = inboxEntry.active,
-        )
-    }
-
-    private fun toDto(problemReportType: ProblemReportType?): ProblemReportTypeDto? {
-        return when (problemReportType) {
-            ProblemReportType.STATION_NONEXISTENT -> ProblemReportTypeDto.STATION_NONEXISTENT
-            ProblemReportType.WRONG_LOCATION -> ProblemReportTypeDto.WRONG_LOCATION
-            ProblemReportType.STATION_ACTIVE -> ProblemReportTypeDto.STATION_ACTIVE
-            ProblemReportType.STATION_INACTIVE -> ProblemReportTypeDto.STATION_INACTIVE
-            ProblemReportType.PHOTO_OUTDATED -> ProblemReportTypeDto.PHOTO_OUTDATED
-            ProblemReportType.WRONG_PHOTO -> ProblemReportTypeDto.WRONG_PHOTO
-            ProblemReportType.WRONG_NAME -> ProblemReportTypeDto.WRONG_NAME
-            ProblemReportType.OTHER -> ProblemReportTypeDto.OTHER
-            ProblemReportType.DUPLICATE -> ProblemReportTypeDto.DUPLICATE
-            null -> null
-        }
-    }
-
-    private fun toDomain(command: InboxCommandDto): InboxCommand {
-        return InboxCommand(
-            id = command.id,
-            countryCode = command.countryCode,
-            stationId = command.stationId,
-            title = command.title,
-            coordinates = mapCoordinates(command.lat, command.lon),
-            rejectReason = command.rejectReason,
-            ds100 = command.DS100,
-            active = command.active,
-            conflictResolution = toDomain(command.conflictResolution),
-        )
-    }
-
-    private fun toDomain(conflictResolution: ConflictResolution?): InboxCommand.ConflictResolution {
-        return when (conflictResolution) {
-            null -> InboxCommand.ConflictResolution.DO_NOTHING
-            ConflictResolution.DO_NOTHING -> InboxCommand.ConflictResolution.DO_NOTHING
-            ConflictResolution.OVERWRITE_EXISTING_PHOTO -> InboxCommand.ConflictResolution.OVERWRITE_EXISTING_PHOTO
-            ConflictResolution.IMPORT_AS_NEW_PRIMARY_PHOTO -> InboxCommand.ConflictResolution.IMPORT_AS_NEW_PRIMARY_PHOTO
-            ConflictResolution.IMPORT_AS_NEW_SECONDARY_PHOTO -> InboxCommand.ConflictResolution.IMPORT_AS_NEW_SECONDARY_PHOTO
-            ConflictResolution.IGNORE_NEARBY_STATION -> InboxCommand.ConflictResolution.IGNORE_NEARBY_STATION
-        }
-    }
 
     @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(
@@ -232,7 +76,7 @@ class InboxController(
             value = "Authorization"
         ) authorization: String
     ): ResponseEntity<List<InboxEntryDto>> {
-        return ResponseEntity.ok(toInboxEntryDto(manageInboxUseCase.listAdminInbox(requestUtil.authUser.user)))
+        return ResponseEntity.ok(manageInboxUseCase.listAdminInbox(requestUtil.authUser.user).map(InboxEntry::toDto))
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -252,7 +96,7 @@ class InboxController(
             requestUtil.authUser.username
         )
         try {
-            val command: InboxCommand = toDomain(inboxCommandDto)
+            val command: InboxCommand = inboxCommandDto.toDomain()
             when (inboxCommandDto.command) {
                 Command.REJECT -> manageInboxUseCase.rejectInboxEntry(command)
                 Command.IMPORT_PHOTO -> manageInboxUseCase.importPhoto(command)
@@ -296,7 +140,7 @@ class InboxController(
         produces = ["application/json"]
     )
     fun publicInboxGet(): ResponseEntity<List<PublicInboxEntryDto>> {
-        return ResponseEntity.ok(toPublicInboxEntryDto(manageInboxUseCase.publicInbox()))
+        return ResponseEntity.ok(manageInboxUseCase.publicInbox().map(PublicInboxEntry::toDto))
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -318,7 +162,7 @@ class InboxController(
         val inboxResponse: InboxResponseDto =
             InboxResponseMapper.toDto(
                 manageInboxUseCase.reportProblem(
-                    toDomain(problemReport),
+                    problemReport.toDomain(),
                     user,
                     requestUtil.userAgent
                 )
@@ -337,12 +181,10 @@ class InboxController(
         @Valid @RequestParam(value = "showCompletedEntries", required = false) showCompletedEntries: Boolean?
     ): ResponseEntity<List<InboxStateQueryResponseDto>> {
         return ResponseEntity.ok(
-            toInboxStateQueryDto(
-                manageInboxUseCase.userInbox(
-                    user = requestUtil.authUser.user,
-                    showCompletedEntries = showCompletedEntries ?: false
-                )
-            )
+            manageInboxUseCase.userInbox(
+                user = requestUtil.authUser.user,
+                showCompletedEntries = showCompletedEntries ?: false
+            ).toDto()
         )
     }
 
@@ -358,12 +200,10 @@ class InboxController(
         @Valid @RequestBody uploadStateQueries: List<InboxStateQueryRequestDto>
     ): ResponseEntity<List<InboxStateQueryResponseDto>> {
         return ResponseEntity.ok(
-            toInboxStateQueryDto(
-                manageInboxUseCase.userInbox(
-                    user = requestUtil.authUser.user,
-                    ids = toIdList(uploadStateQueries)
-                )
-            )
+            manageInboxUseCase.userInbox(
+                user = requestUtil.authUser.user,
+                ids = uploadStateQueries.map { it.id }
+            ).toDto()
         )
     }
 
@@ -378,4 +218,130 @@ class InboxController(
         return ResponseEntity.noContent().build()
     }
 
+}
+
+private fun ProblemReportDto.toDomain() = ProblemReport(
+    countryCode = countryCode,
+    stationId = stationId,
+    title = title,
+    photoId = photoId,
+    type = type.toDomain(),
+    comment = comment,
+    coordinates = mapCoordinates(lat, lon),
+)
+
+private fun ProblemReportTypeDto.toDomain() = when (this) {
+    ProblemReportTypeDto.OTHER -> ProblemReportType.OTHER
+    ProblemReportTypeDto.WRONG_NAME -> ProblemReportType.WRONG_NAME
+    ProblemReportTypeDto.WRONG_PHOTO -> ProblemReportType.WRONG_PHOTO
+    ProblemReportTypeDto.PHOTO_OUTDATED -> ProblemReportType.PHOTO_OUTDATED
+    ProblemReportTypeDto.STATION_ACTIVE -> ProblemReportType.STATION_ACTIVE
+    ProblemReportTypeDto.STATION_INACTIVE -> ProblemReportType.STATION_INACTIVE
+    ProblemReportTypeDto.WRONG_LOCATION -> ProblemReportType.WRONG_LOCATION
+    ProblemReportTypeDto.STATION_NONEXISTENT -> ProblemReportType.STATION_NONEXISTENT
+    ProblemReportTypeDto.DUPLICATE -> ProblemReportType.DUPLICATE
+}
+
+private fun mapCoordinates(lat: Double?, lon: Double?): Coordinates? {
+    if (lat == null || lon == null) {
+        return null
+    }
+    return Coordinates(lat, lon)
+}
+
+private fun PublicInboxEntry.toDto() = PublicInboxEntryDto(
+    countryCode = countryCode,
+    stationId = stationId,
+    title = title,
+    lat = lat,
+    lon = lon
+)
+
+private fun List<InboxStateQuery>.toDto(): List<InboxStateQueryResponseDto> =
+    map(InboxStateQuery::toDto)
+
+private fun InboxStateQuery.toDto() = InboxStateQueryResponseDto(
+    id = id,
+    state = state.toDto(),
+    countryCode = countryCode,
+    stationId = stationId,
+    title = title,
+    lat = coordinates?.lat,
+    lon = coordinates?.lon,
+    newTitle = newTitle,
+    newLat = newCoordinates?.lat,
+    newLon = newCoordinates?.lon,
+    comment = comment,
+    problemReportType = problemReportType.toDto(),
+    rejectedReason = rejectedReason,
+    filename = filename,
+    inboxUrl = inboxUrl,
+    crc32 = crc32,
+    createdAt = createdAt?.toEpochMilli(),
+)
+
+private fun InboxState.toDto() = when (this) {
+    InboxState.REVIEW, InboxState.CONFLICT -> State.REVIEW
+    InboxState.ACCEPTED -> State.ACCEPTED
+    InboxState.REJECTED -> State.REJECTED
+    InboxState.UNKNOWN -> State.UNKNOWN
+}
+
+private fun InboxEntry.toDto() = InboxEntryDto(
+    id = id,
+    photographerNickname = photographerNickname!!,
+    comment = comment ?: "",
+    createdAt = createdAt!!.toEpochMilli(),
+    done = done,
+    hasPhoto = hasPhoto,
+    countryCode = countryCode,
+    stationId = stationId,
+    title = title,
+    lat = lat,
+    lon = lon,
+    newTitle = newTitle,
+    newLat = newLat,
+    newLon = newLon,
+    photographerEmail = photographerEmail,
+    photoId = photoId,
+    filename = filename,
+    inboxUrl = inboxUrl,
+    hasConflict = conflict,
+    problemReportType = problemReportType.toDto(),
+    isProcessed = processed,
+    active = active,
+)
+
+private fun ProblemReportType?.toDto() = when (this) {
+    ProblemReportType.STATION_NONEXISTENT -> ProblemReportTypeDto.STATION_NONEXISTENT
+    ProblemReportType.WRONG_LOCATION -> ProblemReportTypeDto.WRONG_LOCATION
+    ProblemReportType.STATION_ACTIVE -> ProblemReportTypeDto.STATION_ACTIVE
+    ProblemReportType.STATION_INACTIVE -> ProblemReportTypeDto.STATION_INACTIVE
+    ProblemReportType.PHOTO_OUTDATED -> ProblemReportTypeDto.PHOTO_OUTDATED
+    ProblemReportType.WRONG_PHOTO -> ProblemReportTypeDto.WRONG_PHOTO
+    ProblemReportType.WRONG_NAME -> ProblemReportTypeDto.WRONG_NAME
+    ProblemReportType.OTHER -> ProblemReportTypeDto.OTHER
+    ProblemReportType.DUPLICATE -> ProblemReportTypeDto.DUPLICATE
+    null -> null
+}
+
+private fun InboxCommandDto.toDomain() = InboxCommand(
+    id = id,
+    countryCode = countryCode,
+    stationId = stationId,
+    title = title,
+    coordinates = mapCoordinates(lat, lon),
+    rejectReason = rejectReason,
+    ds100 = DS100,
+    active = active,
+    conflictResolution = conflictResolution.toDomain(),
+)
+
+private fun ConflictResolution?.toDomain() = when (this) {
+    null -> InboxCommand.ConflictResolution.DO_NOTHING
+    ConflictResolution.DO_NOTHING -> InboxCommand.ConflictResolution.DO_NOTHING
+    ConflictResolution.OVERWRITE_EXISTING_PHOTO -> InboxCommand.ConflictResolution.OVERWRITE_EXISTING_PHOTO
+    ConflictResolution.IMPORT_AS_NEW_PRIMARY_PHOTO -> InboxCommand.ConflictResolution.IMPORT_AS_NEW_PRIMARY_PHOTO
+    ConflictResolution.IMPORT_AS_NEW_SECONDARY_PHOTO -> InboxCommand.ConflictResolution.IMPORT_AS_NEW_SECONDARY_PHOTO
+    ConflictResolution.IGNORE_NEARBY_STATION -> InboxCommand.ConflictResolution.IGNORE_NEARBY_STATION
 }

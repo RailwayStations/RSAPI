@@ -88,7 +88,7 @@ class PhotoUploadController(
                     countryCode, file.contentType, stationTitle, latitude, longitude, comment, active, user
                 )
             }
-            return ResponseEntity<InboxResponseDto>(response, toHttpStatusMultipartFormdata(response.state))
+            return ResponseEntity<InboxResponseDto>(response, response.state.toHttpStatusMultipartFormdata())
         } catch (e: Exception) {
             log.error("FormUpload error", e)
             return ResponseEntity<InboxResponseDto>(
@@ -97,18 +97,6 @@ class PhotoUploadController(
             )
         }
     }
-
-    /**
-     * jQuery.ajax treats anything different to 2xx as error, so we have to simplify the response codes
-     */
-    private fun toHttpStatusMultipartFormdata(state: InboxResponseDto.State): HttpStatus {
-        return when (state) {
-            InboxResponseDto.State.REVIEW, InboxResponseDto.State.CONFLICT -> HttpStatus.ACCEPTED
-            InboxResponseDto.State.PHOTO_TOO_LARGE, InboxResponseDto.State.LAT_LON_OUT_OF_RANGE, InboxResponseDto.State.NOT_ENOUGH_DATA, InboxResponseDto.State.UNSUPPORTED_CONTENT_TYPE -> HttpStatus.OK
-            else -> HttpStatus.INTERNAL_SERVER_ERROR
-        }
-    }
-
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping(
@@ -170,13 +158,28 @@ class PhotoUploadController(
     }
 
     private fun consumeBodyAndReturn(body: InputStream?, response: InboxResponseDto): InboxResponseDto {
-        if (body != null) {
+        body?.let {
             try {
-                IOUtils.copy(body, NullOutputStream.INSTANCE)
+                IOUtils.copy(it, NullOutputStream.INSTANCE)
             } catch (e: IOException) {
                 log.warn("Unable to consume body", e)
             }
         }
         return response
     }
+
 }
+
+/**
+ * jQuery.ajax treats anything different to 2xx as error, so we have to simplify the response codes
+ */
+private fun InboxResponseDto.State.toHttpStatusMultipartFormdata() = when (this) {
+    InboxResponseDto.State.REVIEW, InboxResponseDto.State.CONFLICT
+    -> HttpStatus.ACCEPTED
+
+    InboxResponseDto.State.PHOTO_TOO_LARGE, InboxResponseDto.State.LAT_LON_OUT_OF_RANGE, InboxResponseDto.State.NOT_ENOUGH_DATA, InboxResponseDto.State.UNSUPPORTED_CONTENT_TYPE
+    -> HttpStatus.OK
+
+    else -> HttpStatus.INTERNAL_SERVER_ERROR
+}
+

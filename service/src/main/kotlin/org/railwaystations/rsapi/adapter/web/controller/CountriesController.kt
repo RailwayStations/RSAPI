@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class CountriesController(private val listCountriesUseCase: ListCountriesUseCase) {
+
     @RequestMapping(
         method = [RequestMethod.GET],
         value = ["/countries"],
@@ -26,41 +27,33 @@ class CountriesController(private val listCountriesUseCase: ListCountriesUseCase
         ) onlyActive: Boolean?
     ): ResponseEntity<List<CountryDto>> {
         return ResponseEntity.ok(
-            listCountriesUseCase.list(onlyActive).map { country -> toDto(country) }
+            listCountriesUseCase.list(onlyActive).map { it.toDto() }
         )
     }
 
-    companion object {
-        fun toDto(country: Country): CountryDto {
-            return CountryDto(
-                code = country.code,
-                name = country.name,
-                active = country.active,
-                email = country.email,
-                overrideLicense = country.overrideLicense?.displayName,
-                timetableUrlTemplate = country.timetableUrlTemplate,
-                providerApps = toDto(country.providerApps)
-            )
-        }
+}
 
-        private fun toDto(providerApps: List<ProviderApp>): List<ProviderAppDto> {
-            return providerApps
-                .map { p ->
-                    ProviderAppDto(
-                        type = mapProviderAppType(p.type),
-                        name = p.name,
-                        url = p.url
-                    )
-                }
-        }
+fun Country.toDto() = CountryDto(
+    code = code,
+    name = name,
+    active = active,
+    email = email,
+    overrideLicense = overrideLicense?.displayName,
+    timetableUrlTemplate = timetableUrlTemplate,
+    providerApps = providerApps.toDtos()
+)
 
-        private fun mapProviderAppType(type: String): ProviderAppDto.Type {
-            return when (type) {
-                "android" -> ProviderAppDto.Type.ANDROID
-                "ios" -> ProviderAppDto.Type.IOS
-                "web" -> ProviderAppDto.Type.WEB
-                else -> throw IllegalStateException("Unknown ProviderApp type: $type")
-            }
-        }
-    }
+private fun List<ProviderApp>.toDtos() = map {
+    ProviderAppDto(
+        type = it.type.toProviderAppType(),
+        name = it.name,
+        url = it.url
+    )
+}
+
+private fun String.toProviderAppType() = when (this) {
+    "android" -> ProviderAppDto.Type.ANDROID
+    "ios" -> ProviderAppDto.Type.IOS
+    "web" -> ProviderAppDto.Type.WEB
+    else -> throw IllegalStateException("Unknown ProviderApp type: $this")
 }
