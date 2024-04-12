@@ -83,6 +83,7 @@ GET /.env.test.sample
 GET /.env.travis
 GET /.env.txt
 GET /.env.www
+GET /.env/backup
 GET /.env~
 GET /.env1
 GET /.environment
@@ -91,13 +92,17 @@ GET /.envrc.example
 GET /.envs
 GET /.flaskenv
 GET /.ghc.environment
+GET /.git
 GET /.git/
 GET /.git/config
+GET /.git/credentials
 GET /.git/HEAD
 GET /.gitlab-ci/.env
+GET /.hg
 GET /.hsenv
 GET /.info.php
 GET /.jenv-version
+GET /.msmtprc
 GET /.pam_environment
 GET /.phpinfo
 GET /.powenv
@@ -354,10 +359,12 @@ GET /config.yaml.bak
 GET /config.yml
 GET /config.yml.bak
 GET /config/.env
+GET /config/.git/config
 GET /config/cache.php
 GET /config/CONFIG
 GET /config/config.json
 GET /config/config.php
+GET /config/default.json
 GET /config/settings.inc.php
 GET /configuration.php
 GET /configuration.php-dist
@@ -379,6 +386,7 @@ GET /credentials.cson
 GET /credentials.hjson
 GET /credentials.xml
 GET /credentials.yaml
+GET /crm/.env
 GET /crm/.env.production
 GET /css../.git/config
 GET /cSWvQtjl/photographers.json
@@ -404,6 +412,7 @@ GET /database.php
 GET /database.xml
 GET /database/.git/config
 GET /de/
+GET /de/1_1.jpg
 GET /de/2493.jpg
 GET /de/3900.jpg
 GET /de/6858.jpg
@@ -565,6 +574,7 @@ GET /inbox/processed/SlxhrGWSrKtIfL
 GET /inbox/processed/tytHyqRGILDBT
 GET /inbox/processed/xdBUdajPsF
 GET /inbox/zUsgbvisRNeegvLT
+GET /includes/.git/config
 GET /index.js
 GET /index.php
 GET /index.php?3x=
@@ -668,6 +678,7 @@ GET /new/.git/config
 GET /news/wp-includes/wlwmanifest.xml
 GET /NGahbVAGH/photographers.txt
 GET /nLpfbRpfJjTVt/stations
+GET /node_modules/.git/config
 GET /o.php
 GET /ocp.php
 GET /of.php
@@ -687,6 +698,8 @@ GET /photos
 GET /photos[/de/1866.jpg]
 GET /photos[/de/5147_1.jpg]
 GET /photos/
+GET /photos/10830797.jpg
+GET /photos/10830797.png
 GET /photos/18508726
 GET /photos/3881
 GET /photos/Argentina/Cory%20Jensen
@@ -738,6 +751,7 @@ GET /photoStationById/${948012488+834361903}/8504391
 GET /photoStationById/9528/421121904
 GET /photoStationById/at&
 GET /photoStationById/au&
+GET /photoStationById/Australia/2870250238377984
 GET /photoStationById/Bahrain/7672743818428416
 GET /photoStationById/Bayern/220
 GET /photoStationById/be&
@@ -775,6 +789,7 @@ GET /photoStationById/Germany/*
 GET /photoStationById/Germany/1
 GET /photoStationById/Germany/1197813260091392
 GET /photoStationById/Germany/2
+GET /photoStationById/Germany/2545
 GET /photoStationById/Germany/33
 GET /photoStationById/Germany/3369951188484096
 GET /photoStationById/GERMANY/8006538
@@ -828,6 +843,7 @@ GET /photoStationsByCountry/fYmLVLXDMTk
 GET /photoStationsByCountry/germany
 GET /photoStationsByCountry/Germany
 GET /photoStationsByCountry/Germany?hasPhoto=
+GET /photoStationsByCountry/germany?hasPhoto=&isActive=
 GET /photoStationsByCountry/Germany?hasPhoto=&isActive=
 GET /photoStationsByCountry/Germany?hasPhotos=&isActive=
 GET /photoStationsByCountry/Germany?isActive=
@@ -935,6 +951,7 @@ GET /s/3323e2734323e2431323e25383/_/;/META-INF/maven/com.atlassian.jira/jira-web
 GET /s/en
 GET /s3.js
 GET /s3/.git/config
+GET /s3cmd.ini
 GET /samba-secrets
 GET /samba-secrets.tdb
 GET /samba.conf
@@ -1007,6 +1024,7 @@ GET /smb.conf
 GET /SObCGtFX/stats.json
 GET /sources/.env
 GET /src/.env
+GET /src/.git/config
 GET /src/phpinfo.php
 GET /stage2/.env
 GET /staging/.env
@@ -1266,6 +1284,8 @@ GET /wp-content/plugins/nd-shortcodes/readme.txt
 GET /wp-content/plugins/ninja-forms/readme.txt
 GET /wp-content/plugins/post-pdf-export/dompdf/dompdf.php?input_file=
 GET /wp-content/plugins/quiz-master-next/readme.txt
+GET /wp-content/plugins/royal-elementor-addons/assets/css/frontend.min.css
+GET /wp-content/plugins/royal-elementor-addons/assets/js/modal-popups.min.js
 GET /wp-content/plugins/scripts-organizer/plugins/meta-box/readme.txt
 GET /wp-content/plugins/shortcode-addons/readme.txt
 GET /wp-content/plugins/simply-schedule-appointments/readme.txt
@@ -1313,6 +1333,7 @@ GET /wp-content/plugins/wpconfig.bak.php?act=
 GET /wp-content/plugins/wpdiscuz/themes/default/style-rtl.css
 GET /wp-content/plugins/wpgateway/css/style.css
 GET /wp-content/themes/.git/config
+GET /wp-content/themes/bricks/style.css
 GET /wp-content/themes/config.bak.php
 GET /wp-content/themes/greyd_suite/style.css
 GET /wp-content/themes/seotheme/db.php?u
