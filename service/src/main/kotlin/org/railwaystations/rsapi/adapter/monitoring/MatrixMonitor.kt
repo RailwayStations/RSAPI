@@ -3,10 +3,10 @@ package org.railwaystations.rsapi.adapter.monitoring
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.railwaystations.rsapi.core.ports.Monitor
-import org.railwaystations.rsapi.utils.ImageUtil.extensionToMimeType
-import org.railwaystations.rsapi.utils.ImageUtil.getExtension
-import org.railwaystations.rsapi.utils.ImageUtil.scalePhoto
-import org.railwaystations.rsapi.utils.Logger
+import org.railwaystations.rsapi.core.utils.ImageUtil.extensionToMimeType
+import org.railwaystations.rsapi.core.utils.ImageUtil.getExtension
+import org.railwaystations.rsapi.core.utils.ImageUtil.scalePhoto
+import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.http.MediaType
 import org.springframework.scheduling.annotation.Async

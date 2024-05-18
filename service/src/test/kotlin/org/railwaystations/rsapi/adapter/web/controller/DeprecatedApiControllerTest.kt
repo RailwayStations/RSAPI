@@ -11,10 +11,10 @@ import org.railwaystations.rsapi.adapter.web.RequestUtil
 import org.railwaystations.rsapi.adapter.web.controller.CountriesControllerTest.Companion.assertCountry
 import org.railwaystations.rsapi.adapter.web.model.CountryDto
 import org.railwaystations.rsapi.app.auth.LazySodiumPasswordEncoder
-import org.railwaystations.rsapi.app.config.MessageSourceConfig
+import org.railwaystations.rsapi.core.config.MessageSourceConfig
 import org.railwaystations.rsapi.core.model.CountryTestFixtures
 import org.railwaystations.rsapi.core.model.Station
-import org.railwaystations.rsapi.core.model.StationTestFixtures.Companion.createStationDE5
+import org.railwaystations.rsapi.core.model.StationTestFixtures.createStationDE5
 import org.railwaystations.rsapi.core.model.UserTestFixtures
 import org.railwaystations.rsapi.core.ports.FindPhotoStationsUseCase
 import org.railwaystations.rsapi.core.ports.ListCountriesUseCase

@@ -13,27 +13,28 @@ import org.railwaystations.rsapi.core.model.Coordinates
 import org.railwaystations.rsapi.core.model.InboxEntry
 import org.railwaystations.rsapi.core.model.ProblemReportType
 import org.railwaystations.rsapi.core.model.PublicInboxEntry
+import org.railwaystations.rsapi.core.ports.InboxPort
 import java.sql.ResultSet
 import java.sql.SQLException
 
-interface InboxDao {
+interface InboxDao : InboxPort {
     @SqlQuery("$JOIN_QUERY WHERE i.id = :id")
     @RegisterRowMapper(
         InboxEntryMapper::class
     )
-    fun findById(@Bind(ID) id: Long): InboxEntry?
+    override fun findById(@Bind(ID) id: Long): InboxEntry?
 
     @SqlQuery("$JOIN_QUERY WHERE i.done = false ORDER BY id")
     @RegisterRowMapper(
         InboxEntryMapper::class
     )
-    fun findPendingInboxEntries(): List<InboxEntry>
+    override fun findPendingInboxEntries(): List<InboxEntry>
 
     @SqlQuery("$JOIN_QUERY WHERE i.done = true AND i.rejectReason IS NULL AND i.extension IS NOT NULL AND i.posted = false ORDER BY id DESC LIMIT 100")
     @RegisterRowMapper(
         InboxEntryMapper::class
     )
-    fun findRecentlyImportedPhotosNotYetPosted(): List<InboxEntry>
+    override fun findRecentlyImportedPhotosNotYetPosted(): List<InboxEntry>
 
     @SqlQuery(
         """
@@ -45,7 +46,7 @@ interface InboxDao {
             """
     )
     @RegisterRowMapper(PublicInboxEntryMapper::class)
-    fun findPublicInboxEntries(): List<PublicInboxEntry>
+    override fun findPublicInboxEntries(): List<PublicInboxEntry>
 
     @SqlUpdate(
         """
@@ -55,49 +56,49 @@ interface InboxDao {
             """
     )
     @GetGeneratedKeys(ID)
-    fun insert(@BindBean inboxEntry: InboxEntry): Long
+    override fun insert(@BindBean inboxEntry: InboxEntry): Long
 
     @SqlUpdate("UPDATE inbox SET rejectReason = :rejectReason, done = true WHERE id = :id")
-    fun reject(@Bind(ID) id: Long, @Bind("rejectReason") rejectReason: String)
+    override fun reject(@Bind(ID) id: Long, @Bind("rejectReason") rejectReason: String)
 
     @SqlUpdate("UPDATE inbox SET done = true WHERE id = :id")
-    fun done(@Bind(ID) id: Long)
+    override fun done(@Bind(ID) id: Long)
 
     @SqlQuery("SELECT COUNT(*) FROM inbox WHERE countryCode = :countryCode AND stationId = :stationId AND done = false AND (:id IS NULL OR id <> :id)")
-    fun countPendingInboxEntriesForStation(
+    override fun countPendingInboxEntriesForStation(
         @Bind(ID) id: Long?, @Bind(COUNTRY_CODE) countryCode: String, @Bind(STATION_ID) stationId: String
     ): Int
 
     @SqlQuery("SELECT COUNT(*) FROM inbox WHERE done = false")
-    fun countPendingInboxEntries(): Long
+    override fun countPendingInboxEntries(): Long
 
     /**
      * Count nearby pending uploads using simple pythagoras (only valid for a few km)
      */
     @SqlQuery("SELECT COUNT(*) FROM inbox WHERE SQRT(POWER(71.5 * (lon - :coords.lon),2) + POWER(111.3 * (lat - :coords.lat),2)) < 0.5 AND done = false AND (:id IS NULL OR id <> :id)")
-    fun countPendingInboxEntriesForNearbyCoordinates(
+    override fun countPendingInboxEntriesForNearbyCoordinates(
         @Bind(ID) id: Long?,
         @BindBean(COORDS) coordinates: Coordinates
     ): Int
 
     @SqlUpdate("UPDATE inbox SET crc32 = :crc32 WHERE id = :id")
-    fun updateCrc32(@Bind(ID) id: Long, @Bind("crc32") crc32: Long)
+    override fun updateCrc32(@Bind(ID) id: Long, @Bind("crc32") crc32: Long)
 
     @SqlQuery("$JOIN_QUERY WHERE i.done = true AND i.notified = false")
     @RegisterRowMapper(InboxEntryMapper::class)
-    fun findInboxEntriesToNotify(): List<InboxEntry>
+    override fun findInboxEntriesToNotify(): List<InboxEntry>
 
     @SqlUpdate("UPDATE inbox SET notified = true WHERE id IN (<ids>)")
-    fun updateNotified(@BindList("ids") ids: List<Long>)
+    override fun updateNotified(@BindList("ids") ids: List<Long>)
 
     @SqlUpdate("UPDATE inbox SET posted = true WHERE id = :id")
-    fun updatePosted(@Bind("id") id: Long)
+    override fun updatePosted(@Bind("id") id: Long)
 
     @SqlUpdate("UPDATE inbox SET photoId = :photoId WHERE id = :id")
-    fun updatePhotoId(@Bind("id") id: Long, @Bind("photoId") photoId: Long)
+    override fun updatePhotoId(@Bind("id") id: Long, @Bind("photoId") photoId: Long)
 
     @SqlUpdate("UPDATE inbox SET done = true, stationId = :stationId, countryCode = :countryCode, title = :title WHERE id = :id")
-    fun updateMissingStationImported(
+    override fun updateMissingStationImported(
         @Bind("id") id: Long,
         @Bind("countryCode") countryCode: String,
         @Bind("stationId") stationId: String,
@@ -106,14 +107,14 @@ interface InboxDao {
 
     @SqlQuery("$JOIN_QUERY WHERE i.photographerId = :photographerId AND (i.done = false OR :showCompletedEntries = true) ORDER BY i.id DESC")
     @RegisterRowMapper(InboxEntryMapper::class)
-    fun findByUser(
+    override fun findByUser(
         @Bind(PHOTOGRAPHER_ID) photographerId: Int,
         @Bind("showCompletedEntries") showCompletedEntries: Boolean
     ): List<InboxEntry>
 
     @SqlQuery("$JOIN_QUERY WHERE i.countryCode = :countryCode AND i.stationId = :stationId AND i.done = false")
     @RegisterRowMapper(InboxEntryMapper::class)
-    fun findPendingByStation(
+    override fun findPendingByStation(
         @Bind("countryCode") countryCode: String,
         @Bind("stationId") stationId: String
     ): List<InboxEntry>

@@ -3,10 +3,10 @@ package org.railwaystations.rsapi.adapter.web.controller
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Size
 import org.railwaystations.rsapi.core.ports.PhotoStorage
-import org.railwaystations.rsapi.utils.ImageUtil.extensionToMimeType
-import org.railwaystations.rsapi.utils.ImageUtil.getExtension
-import org.railwaystations.rsapi.utils.ImageUtil.scalePhoto
-import org.railwaystations.rsapi.utils.Logger
+import org.railwaystations.rsapi.core.utils.ImageUtil.extensionToMimeType
+import org.railwaystations.rsapi.core.utils.ImageUtil.getExtension
+import org.railwaystations.rsapi.core.utils.ImageUtil.scalePhoto
+import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpStatus

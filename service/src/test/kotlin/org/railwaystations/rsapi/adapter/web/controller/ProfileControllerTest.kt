@@ -7,17 +7,21 @@ import net.javacrumbs.jsonunit.spring.JsonUnitResultMatchers.json
 import org.junit.jupiter.api.Test
 import org.railwaystations.rsapi.adapter.db.UserDao
 import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
+import org.railwaystations.rsapi.adapter.web.OpenApiValidatorUtil.validOpenApiResponse
 import org.railwaystations.rsapi.adapter.web.RequestUtil
 import org.railwaystations.rsapi.app.auth.LazySodiumPasswordEncoder
 import org.railwaystations.rsapi.app.auth.RSAuthenticationProvider
 import org.railwaystations.rsapi.app.auth.RSUserDetailsService
 import org.railwaystations.rsapi.app.auth.WebSecurityConfig
-import org.railwaystations.rsapi.app.config.MessageSourceConfig
+import org.railwaystations.rsapi.core.config.MessageSourceConfig
 import org.railwaystations.rsapi.core.model.User
 import org.railwaystations.rsapi.core.model.UserTestFixtures
+import org.railwaystations.rsapi.core.model.UserTestFixtures.EXISTING_USER_ID
+import org.railwaystations.rsapi.core.model.UserTestFixtures.USER_AGENT
+import org.railwaystations.rsapi.core.model.UserTestFixtures.USER_EMAIL
+import org.railwaystations.rsapi.core.model.UserTestFixtures.USER_NAME
 import org.railwaystations.rsapi.core.ports.ManageProfileUseCase.ProfileConflictException
 import org.railwaystations.rsapi.core.services.ProfileService
-import org.railwaystations.rsapi.utils.OpenApiValidatorUtil.validOpenApiResponse
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import
@@ -279,10 +283,4 @@ class ProfileControllerTest {
             .andExpect(validOpenApiResponse())
     }
 
-    companion object {
-        const val USER_NAME: String = "existing"
-        const val USER_EMAIL: String = "existing@example.com"
-        const val EXISTING_USER_ID: Int = 42
-        const val USER_AGENT: String = "UserAgent"
-    }
 }

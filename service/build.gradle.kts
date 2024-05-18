@@ -17,6 +17,7 @@ tasks {
 
 dependencies {
     implementation(project("::openapi"))
+    implementation(project("::core"))
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
@@ -31,7 +32,7 @@ dependencies {
     implementation(libs.jna)
     implementation("commons-codec:commons-codec")
     implementation(libs.commons.io)
-    implementation("org.apache.commons:commons-lang3")
+    implementation(libs.commons.lang3)
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation(libs.bootstrap)
@@ -39,6 +40,7 @@ dependencies {
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
     runtimeOnly("org.webjars:webjars-locator-core")
 
+    testImplementation(testFixtures(project("::core")))
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "mockito-core")
     }

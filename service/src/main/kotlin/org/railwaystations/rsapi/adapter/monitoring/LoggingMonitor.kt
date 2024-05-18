@@ -1,7 +1,7 @@
 package org.railwaystations.rsapi.adapter.monitoring
 
 import org.railwaystations.rsapi.core.ports.Monitor
-import org.railwaystations.rsapi.utils.Logger
+import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import java.nio.file.Path

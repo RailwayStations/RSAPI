@@ -7,10 +7,10 @@ import org.junit.jupiter.api.Test
 import org.railwaystations.rsapi.adapter.db.CountryDao
 import org.railwaystations.rsapi.adapter.db.StationDao
 import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
+import org.railwaystations.rsapi.adapter.web.OpenApiValidatorUtil.validOpenApiResponse
 import org.railwaystations.rsapi.core.model.CountryTestFixtures
 import org.railwaystations.rsapi.core.model.Statistic
 import org.railwaystations.rsapi.core.services.StatisticService
-import org.railwaystations.rsapi.utils.OpenApiValidatorUtil.validOpenApiResponse
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest

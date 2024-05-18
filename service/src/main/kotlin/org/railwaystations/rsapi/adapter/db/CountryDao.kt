@@ -11,11 +11,12 @@ import org.jdbi.v3.sqlobject.statement.UseRowReducer
 import org.railwaystations.rsapi.core.model.Country
 import org.railwaystations.rsapi.core.model.License
 import org.railwaystations.rsapi.core.model.ProviderApp
+import org.railwaystations.rsapi.core.ports.CountryPort
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.util.*
 
-interface CountryDao {
+interface CountryDao : CountryPort {
     @SqlQuery(
         """
             SELECT c.id c_id, c.name c_name, c.email c_email, c.timetableUrlTemplate c_timetableUrlTemplate,
@@ -31,7 +32,7 @@ interface CountryDao {
     @RegisterRowMapper(
         ProviderAppMapper::class
     )
-    fun findById(@Bind("id") id: String): Country?
+    override fun findById(@Bind("id") id: String): Country?
 
     @SqlQuery(
         """
@@ -48,7 +49,7 @@ interface CountryDao {
     @RegisterRowMapper(
         ProviderAppMapper::class
     )
-    fun list(@Bind("onlyActive") onlyActive: Boolean): Set<Country>
+    override fun list(@Bind("onlyActive") onlyActive: Boolean): Set<Country>
 
     class CountryMapper : RowMapper<Country> {
         @Throws(SQLException::class)

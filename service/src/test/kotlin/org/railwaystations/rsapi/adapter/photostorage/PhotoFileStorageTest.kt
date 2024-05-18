@@ -8,7 +8,8 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.railwaystations.rsapi.adapter.photostorage.PhotoFileStorage.Companion.sanitizeFilename
 import org.railwaystations.rsapi.core.model.InboxEntry
 import org.railwaystations.rsapi.core.model.Station
-import org.railwaystations.rsapi.core.model.StationTestFixtures
+import org.railwaystations.rsapi.core.model.StationTestFixtures.createStationDe0815
+import org.railwaystations.rsapi.core.model.StationTestFixtures.createStationDe4711
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -72,7 +73,7 @@ internal class PhotoFileStorageTest {
     @Test
     @Throws(IOException::class)
     fun importPhoto() {
-        val station = StationTestFixtures.createStationDe4711()
+        val station = createStationDe4711()
         val inboxEntry = createInboxEntryWithId(1, station.key)
         val filename = inboxEntry.filename!!
         createFile(workDir.inboxDir, filename)
@@ -90,7 +91,7 @@ internal class PhotoFileStorageTest {
     @Test
     @Throws(IOException::class)
     fun importSecondPhoto() {
-        val station = StationTestFixtures.createStationDe0815()
+        val station = createStationDe0815()
         val inboxEntry = createInboxEntryWithId(2, station.key)
         val filename = inboxEntry.filename!!
         createFile(workDir.inboxDir, filename)

@@ -1,6 +1,6 @@
 package org.railwaystations.rsapi.adapter.web.controller
 
-import org.railwaystations.rsapi.utils.Logger
+import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.http.HttpStatus
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository

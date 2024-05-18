@@ -8,12 +8,12 @@ import org.assertj.core.api.Fail
 import org.junit.jupiter.api.Test
 import org.railwaystations.rsapi.adapter.db.CountryDao
 import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
+import org.railwaystations.rsapi.adapter.web.OpenApiValidatorUtil.validOpenApiResponse
 import org.railwaystations.rsapi.adapter.web.model.CountryDto
 import org.railwaystations.rsapi.adapter.web.model.ProviderAppDto
-import org.railwaystations.rsapi.core.model.CountryTestFixtures.Companion.createCountryList
+import org.railwaystations.rsapi.core.model.CountryTestFixtures.createCountryList
 import org.railwaystations.rsapi.core.model.License
 import org.railwaystations.rsapi.core.services.CountryService
-import org.railwaystations.rsapi.utils.OpenApiValidatorUtil.validOpenApiResponse
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest

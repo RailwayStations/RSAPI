@@ -27,7 +27,7 @@ import org.railwaystations.rsapi.core.model.ProblemReportType
 import org.railwaystations.rsapi.core.model.PublicInboxEntry
 import org.railwaystations.rsapi.core.ports.ManageInboxUseCase
 import org.railwaystations.rsapi.core.ports.ManageProfileUseCase
-import org.railwaystations.rsapi.utils.Logger
+import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize

@@ -1,6 +1,6 @@
 package org.railwaystations.rsapi.app.auth
 
-import org.railwaystations.rsapi.utils.Logger
+import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication

@@ -10,31 +10,32 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
 import org.railwaystations.rsapi.core.model.License.Companion.of
 import org.railwaystations.rsapi.core.model.User
+import org.railwaystations.rsapi.core.ports.UserPort
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.util.*
 
-interface UserDao {
+interface UserDao : UserPort {
     @SqlQuery("SELECT * FROM users")
     @RegisterRowMapper(UserMapper::class)
-    fun list(): List<User>
+    override fun list(): List<User>
 
     @SqlQuery("SELECT * FROM users WHERE normalizedName = :normalizedName")
     @RegisterRowMapper(
         UserMapper::class
     )
-    fun findByNormalizedName(@Bind("normalizedName") normalizedName: String): User?
+    override fun findByNormalizedName(@Bind("normalizedName") normalizedName: String): User?
 
     @SqlQuery("SELECT * FROM users WHERE id = :id")
     @RegisterRowMapper(UserMapper::class)
-    fun findById(@Bind("id") id: Int): User?
+    override fun findById(@Bind("id") id: Int): User?
 
     @SqlQuery("SELECT * FROM users WHERE email = :email")
     @RegisterRowMapper(UserMapper::class)
-    fun findByEmail(@Bind("email") email: String): User?
+    override fun findByEmail(@Bind("email") email: String): User?
 
     @SqlUpdate("UPDATE users SET `key` = :key WHERE id = :id")
-    fun updateCredentials(@Bind("id") id: Int, @Bind("key") key: String)
+    override fun updateCredentials(@Bind("id") id: Int, @Bind("key") key: String)
 
     @SqlUpdate(
         """
@@ -44,7 +45,7 @@ interface UserDao {
             """
     )
     @GetGeneratedKeys("id")
-    fun insert(
+    override fun insert(
         @BindBean user: User,
         @Bind("key") key: String?,
         @Bind("emailVerification") emailVerification: String?
@@ -58,16 +59,16 @@ interface UserDao {
             
             """
     )
-    fun update(@Bind("id") id: Int, @BindBean user: User)
+    override fun update(@Bind("id") id: Int, @BindBean user: User)
 
     @SqlQuery("SELECT * FROM users WHERE emailVerification = :emailVerification")
     @RegisterRowMapper(
         UserMapper::class
     )
-    fun findByEmailVerification(@Bind("emailVerification") emailVerification: String): User?
+    override fun findByEmailVerification(@Bind("emailVerification") emailVerification: String): User?
 
     @SqlUpdate("UPDATE users SET emailVerification = :emailVerification WHERE id = :id")
-    fun updateEmailVerification(@Bind("id") id: Int, @Bind("emailVerification") emailVerification: String?)
+    override fun updateEmailVerification(@Bind("id") id: Int, @Bind("emailVerification") emailVerification: String?)
 
     @SqlUpdate(
         """
@@ -87,7 +88,7 @@ interface UserDao {
             
             """
     )
-    fun anonymizeUser(@Bind("id") id: Int)
+    override fun anonymizeUser(@Bind("id") id: Int)
 
     @SqlUpdate(
         """
@@ -96,13 +97,13 @@ interface UserDao {
             
             """
     )
-    fun addUsernameToBlocklist(@Bind("normalizedName") normalizedName: String)
+    override fun addUsernameToBlocklist(@Bind("normalizedName") normalizedName: String)
 
     @SqlQuery("SELECT COUNT(*) FROM blocked_usernames WHERE normalizedName = :normalizedName")
-    fun countBlockedUsername(@Bind("normalizedName") normalizedName: String): Int
+    override fun countBlockedUsername(@Bind("normalizedName") normalizedName: String): Int
 
     @SqlUpdate("UPDATE users SET locale = :localeLanguageTag WHERE id = :id")
-    fun updateLocale(@Bind("id") id: Int, @Bind("localeLanguageTag") locallocaleLanguageTage: String)
+    override fun updateLocale(@Bind("id") id: Int, @Bind("localeLanguageTag") locallocaleLanguageTage: String)
 
     class UserMapper : RowMapper<User> {
         @Throws(SQLException::class)

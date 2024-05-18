@@ -11,7 +11,7 @@ import jakarta.mail.internet.MimeMessage
 import jakarta.mail.internet.MimeMultipart
 import org.apache.commons.lang3.StringUtils
 import org.railwaystations.rsapi.core.ports.Mailer
-import org.railwaystations.rsapi.utils.Logger
+import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.stereotype.Service
 
 @Service

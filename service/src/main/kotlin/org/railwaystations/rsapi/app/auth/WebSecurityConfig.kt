@@ -7,9 +7,9 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet
 import com.nimbusds.jose.jwk.source.JWKSource
 import com.nimbusds.jose.proc.SecurityContext
 import jakarta.servlet.http.HttpServletRequest
-import org.railwaystations.rsapi.utils.JwtUtil.generateRsaKey
-import org.railwaystations.rsapi.utils.JwtUtil.loadRsaKey
-import org.railwaystations.rsapi.utils.Logger
+import org.railwaystations.rsapi.adapter.web.JwtUtil.generateRsaKey
+import org.railwaystations.rsapi.adapter.web.JwtUtil.loadRsaKey
+import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean

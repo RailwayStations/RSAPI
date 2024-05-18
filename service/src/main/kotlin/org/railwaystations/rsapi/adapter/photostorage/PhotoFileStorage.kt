@@ -5,7 +5,7 @@ import org.railwaystations.rsapi.core.model.InboxEntry
 import org.railwaystations.rsapi.core.model.Station
 import org.railwaystations.rsapi.core.ports.PhotoStorage
 import org.railwaystations.rsapi.core.ports.PhotoStorage.PhotoTooLargeException
-import org.railwaystations.rsapi.utils.Logger
+import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.stereotype.Repository
 import java.io.IOException
 import java.io.InputStream

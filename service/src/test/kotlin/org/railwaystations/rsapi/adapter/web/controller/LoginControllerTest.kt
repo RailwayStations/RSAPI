@@ -9,7 +9,7 @@ import org.hamcrest.core.StringContains.containsString
 import org.junit.jupiter.api.Test
 import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
 import org.railwaystations.rsapi.adapter.web.RequestUtil
-import org.railwaystations.rsapi.app.config.MessageSourceConfig
+import org.railwaystations.rsapi.core.config.MessageSourceConfig
 import org.railwaystations.rsapi.core.model.User
 import org.railwaystations.rsapi.core.model.UserTestFixtures
 import org.railwaystations.rsapi.core.ports.ManageProfileUseCase

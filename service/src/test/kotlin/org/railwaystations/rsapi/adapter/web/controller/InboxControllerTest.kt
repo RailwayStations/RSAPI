@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
+import org.railwaystations.rsapi.adapter.web.OpenApiValidatorUtil.validOpenApiResponse
 import org.railwaystations.rsapi.adapter.web.RequestUtil
 import org.railwaystations.rsapi.app.auth.AuthUser
 import org.railwaystations.rsapi.core.model.Coordinates
@@ -23,7 +24,6 @@ import org.railwaystations.rsapi.core.model.User
 import org.railwaystations.rsapi.core.model.UserTestFixtures
 import org.railwaystations.rsapi.core.ports.ManageInboxUseCase
 import org.railwaystations.rsapi.core.ports.ManageProfileUseCase
-import org.railwaystations.rsapi.utils.OpenApiValidatorUtil.validOpenApiResponse
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import

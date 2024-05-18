@@ -10,6 +10,7 @@ swaggerRequestValidator = "2.40.0"
 lazysodium = "5.1.4"
 jna = "5.14.0"
 commonsIo = "2.16.1"
+commonsLang = "3.13.0"
 swaggerAnnotations = "2.2.22"
 jakartaValidationApi = "3.0.2"
 bootstrap = "5.3.3"
@@ -20,6 +21,8 @@ springMockk = "4.0.2"
 greenmail = "2.0.1"
 
 [libraries]
+spring-boot-starter-security = { group = "org.springframework.boot", name = "spring-boot-starter-security", version.ref = "springBoot" }
+spring-boot-starter-test = { group = "org.springframework.boot", name = "spring-boot-starter-test", version.ref = "springBoot" }
 spring-boot-starter-web = { group = "org.springframework.boot", name = "spring-boot-starter-web", version.ref = "springBoot" }
 spring-boot-starter-validation = { group = "org.springframework.boot", name = "spring-boot-starter-validation", version.ref = "springBoot" }
 jdbi3-spring5 = { group = "org.jdbi", name = "jdbi3-spring5", version.ref = "jdbi" }
@@ -37,7 +40,7 @@ spring-security-oauth2-authorization-server = { group = "org.springframework.sec
 lazysodium-java = { group = "com.goterl", name = "lazysodium-java", version.ref = "lazysodium" }
 jna = { group = "net.java.dev.jna", name = "jna", version.ref = "jna" }
 commons-io = { group = "commons-io", name = "commons-io", version.ref = "commonsIo" }
-commons-lang3 = { group = "org.apache.commons", name = "commons-lang3" }
+commons-lang3 = { group = "org.apache.commons", name = "commons-lang3", version.ref = "commonsLang" }
 swagger-annotations = { group = "io.swagger.core.v3", name = "swagger-annotations", version.ref = "swaggerAnnotations" }
 jakarta-validation-api = { group = "jakarta.validation", name = "jakarta.validation-api", version.ref = "jakartaValidationApi" }
 bootstrap = { group = "org.webjars", name = "bootstrap", version.ref = "bootstrap" }

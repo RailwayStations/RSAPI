@@ -2,7 +2,7 @@ package org.railwaystations.rsapi.adapter.mastodon
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.railwaystations.rsapi.core.ports.MastodonBot
-import org.railwaystations.rsapi.utils.Logger
+import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.http.MediaType
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service

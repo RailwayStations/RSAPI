@@ -8,7 +8,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.railwaystations.rsapi.adapter.db.InboxDao
 import org.railwaystations.rsapi.core.model.InboxEntry
 import org.railwaystations.rsapi.core.ports.PhotoStorage
-import org.railwaystations.rsapi.utils.Logger
+import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.http.HttpStatus
 import org.springframework.scheduling.annotation.Scheduled

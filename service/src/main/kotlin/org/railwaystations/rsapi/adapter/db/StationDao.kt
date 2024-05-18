@@ -21,6 +21,7 @@ import org.railwaystations.rsapi.core.model.Photo
 import org.railwaystations.rsapi.core.model.Station
 import org.railwaystations.rsapi.core.model.Statistic
 import org.railwaystations.rsapi.core.model.User
+import org.railwaystations.rsapi.core.ports.StationPort
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.time.Instant
@@ -38,12 +39,12 @@ private const val JOIN_QUERY: String = """
             
             """
 
-interface StationDao {
+interface StationDao : StationPort {
     @SqlQuery("$JOIN_QUERY WHERE s.countryCode IN (<countryCodes>) AND (:active IS NULL OR s.active = :active) AND (:hasPhoto IS NULL OR (p.urlPath IS NULL AND :hasPhoto = false) OR (p.urlPath IS NOT NULL AND :hasPhoto = true))")
     @RegisterRowMapper(
         StationMapper::class
     )
-    fun findByCountryCodes(
+    override fun findByCountryCodes(
         @BindList("countryCodes") countryCodes: Set<String>,
         @Bind("hasPhoto") hasPhoto: Boolean?,
         @Bind("active") active: Boolean?
@@ -66,7 +67,7 @@ interface StationDao {
     @RegisterRowMapper(
         PhotoMapper::class
     )
-    fun findByKey(@Bind("countryCode") countryCode: String, @Bind("id") id: String): Station?
+    override fun findByKey(@Bind("countryCode") countryCode: String, @Bind("id") id: String): Station?
 
     @SqlQuery(
         """
@@ -85,7 +86,7 @@ interface StationDao {
     @RegisterRowMapper(
         PhotoMapper::class
     )
-    fun findByPhotographer(
+    override fun findByPhotographer(
         @Bind("photographer") photographer: String,
         @Bind("countryCode") countryCode: String?
     ): Set<Station>
@@ -107,7 +108,7 @@ interface StationDao {
     @RegisterRowMapper(
         PhotoMapper::class
     )
-    fun findRecentImports(@Bind("since") since: Instant): Set<Station>
+    override fun findRecentImports(@Bind("since") since: Instant): Set<Station>
 
     class SingleStationReducer : RowReducer<MutableMap<Station.Key, Pair<Station, MutableList<Photo>>>, Station> {
 
@@ -202,7 +203,7 @@ interface StationDao {
     )
     @RegisterRowMapper(StatisticMapper::class)
     @SingleValue
-    fun getStatistic(@Bind("countryCode") countryCode: String?): Statistic
+    override fun getStatistic(@Bind("countryCode") countryCode: String?): Statistic
 
     @SqlQuery(
         """
@@ -217,31 +218,31 @@ interface StationDao {
     )
     @KeyColumn("photographer")
     @ValueColumn("photocount")
-    fun getPhotographerMap(@Bind("countryCode") countryCode: String?): Map<String, Long>
+    override fun getPhotographerMap(@Bind("countryCode") countryCode: String?): Map<String, Long>
 
     @SqlUpdate("INSERT INTO stations (countryCode, id, title, lat, lon, ds100, active) VALUES (:key.country, :key.id, :title, :coordinates?.lat, :coordinates?.lon, :ds100, :active)")
-    fun insert(@BindBean station: Station)
+    override fun insert(@BindBean station: Station)
 
     @SqlUpdate("DELETE FROM stations WHERE countryCode = :country AND id = :id")
-    fun delete(@BindBean key: Station.Key)
+    override fun delete(@BindBean key: Station.Key)
 
     @SqlUpdate("UPDATE stations SET active = :active WHERE countryCode = :key.country AND id = :key.id")
-    fun updateActive(@BindBean("key") key: Station.Key, @Bind("active") active: Boolean)
+    override fun updateActive(@BindBean("key") key: Station.Key, @Bind("active") active: Boolean)
 
     /**
      * Count nearby stations using simple pythagoras (only valid for a few km)
      */
     @SqlQuery("SELECT COUNT(*) FROM stations WHERE SQRT(POWER(71.5 * (lon - :lon),2) + POWER(111.3 * (lat - :lat),2)) < 0.5")
-    fun countNearbyCoordinates(@BindBean coordinates: Coordinates): Int
+    override fun countNearbyCoordinates(@BindBean coordinates: Coordinates): Int
 
     @get:SqlQuery("SELECT MAX(CAST(substring(id,2) AS INT)) FROM stations WHERE id LIKE 'Z%'")
-    val maxZ: Int
+    override val maxZ: Int
 
     @SqlUpdate("UPDATE stations SET title = :new_title WHERE countryCode = :key.country AND id = :key.id")
-    fun changeStationTitle(@BindBean("key") key: Station.Key, @Bind("new_title") newTitle: String)
+    override fun changeStationTitle(@BindBean("key") key: Station.Key, @Bind("new_title") newTitle: String)
 
     @SqlUpdate("UPDATE stations SET lat = :coords.lat, lon = :coords.lon WHERE countryCode = :key.country AND id = :key.id")
-    fun updateLocation(@BindBean("key") key: Station.Key, @BindBean("coords") coordinates: Coordinates)
+    override fun updateLocation(@BindBean("key") key: Station.Key, @BindBean("coords") coordinates: Coordinates)
 
     class StationMapper : RowMapper<Station> {
         @Throws(SQLException::class)

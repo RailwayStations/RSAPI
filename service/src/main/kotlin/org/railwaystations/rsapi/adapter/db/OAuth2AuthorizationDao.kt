@@ -2,9 +2,10 @@ package org.railwaystations.rsapi.adapter.db
 
 import org.jdbi.v3.sqlobject.customizer.Bind
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
+import org.railwaystations.rsapi.core.ports.OAuth2AuthorizationPort
 import java.time.Instant
 
-interface OAuth2AuthorizationDao {
+interface OAuth2AuthorizationDao : OAuth2AuthorizationPort {
     @SqlUpdate(
         """
             DELETE FROM oauth2_authorization
@@ -16,7 +17,7 @@ interface OAuth2AuthorizationDao {
             
             """
     )
-    fun deleteExpiredTokens(@Bind("now") now: Instant?): Int
+    override fun deleteExpiredTokens(@Bind("now") now: Instant?): Int
 
     @SqlUpdate(
         """
@@ -25,5 +26,5 @@ interface OAuth2AuthorizationDao {
             
             """
     )
-    fun deleteAllByUser(@Bind("principalName") principalName: String?)
+    override fun deleteAllByUser(@Bind("principalName") principalName: String?)
 }

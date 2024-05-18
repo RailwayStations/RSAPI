@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
 }
 
-group = "org.railwaystations"
+group = "org.railwaystations.rsapi"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_21
 
