@@ -1,8 +1,8 @@
 package org.railwaystations.rsapi.core.services
 
 import org.railwaystations.rsapi.core.model.Country
-import org.railwaystations.rsapi.core.ports.CountryPort
-import org.railwaystations.rsapi.core.ports.ListCountriesUseCase
+import org.railwaystations.rsapi.core.ports.inbound.ListCountriesUseCase
+import org.railwaystations.rsapi.core.ports.outbound.CountryPort
 import org.springframework.stereotype.Service
 
 @Service

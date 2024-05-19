@@ -21,7 +21,7 @@ import org.railwaystations.rsapi.core.model.Photo
 import org.railwaystations.rsapi.core.model.Station
 import org.railwaystations.rsapi.core.model.Statistic
 import org.railwaystations.rsapi.core.model.User
-import org.railwaystations.rsapi.core.ports.StationPort
+import org.railwaystations.rsapi.core.ports.outbound.StationPort
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.time.Instant

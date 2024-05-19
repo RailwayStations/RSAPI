@@ -11,7 +11,7 @@ import org.jdbi.v3.sqlobject.statement.UseRowReducer
 import org.railwaystations.rsapi.core.model.Country
 import org.railwaystations.rsapi.core.model.License
 import org.railwaystations.rsapi.core.model.ProviderApp
-import org.railwaystations.rsapi.core.ports.CountryPort
+import org.railwaystations.rsapi.core.ports.outbound.CountryPort
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.util.*

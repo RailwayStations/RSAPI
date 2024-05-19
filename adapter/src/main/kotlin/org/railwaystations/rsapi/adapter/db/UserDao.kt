@@ -10,7 +10,7 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
 import org.railwaystations.rsapi.core.model.License.Companion.of
 import org.railwaystations.rsapi.core.model.User
-import org.railwaystations.rsapi.core.ports.UserPort
+import org.railwaystations.rsapi.core.ports.outbound.UserPort
 import java.sql.ResultSet
 import java.sql.SQLException
 import java.util.*

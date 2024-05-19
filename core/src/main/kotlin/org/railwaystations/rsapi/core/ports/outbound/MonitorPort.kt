@@ -1,8 +1,8 @@
-package org.railwaystations.rsapi.core.ports
+package org.railwaystations.rsapi.core.ports.outbound
 
 import java.nio.file.Path
 
-interface Monitor {
+interface MonitorPort {
     fun sendMessage(message: String)
     fun sendMessage(message: String, file: Path?)
 }

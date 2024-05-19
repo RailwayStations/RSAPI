@@ -12,8 +12,8 @@ import org.railwaystations.rsapi.adapter.web.RequestUtil
 import org.railwaystations.rsapi.core.config.MessageSourceConfig
 import org.railwaystations.rsapi.core.model.User
 import org.railwaystations.rsapi.core.model.UserTestFixtures
-import org.railwaystations.rsapi.core.ports.ManageProfileUseCase
-import org.railwaystations.rsapi.core.ports.ManageProfileUseCase.ProfileConflictException
+import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase
+import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase.ProfileConflictException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest

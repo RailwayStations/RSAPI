@@ -15,17 +15,17 @@ import org.railwaystations.rsapi.core.model.ProblemReport
 import org.railwaystations.rsapi.core.model.PublicInboxEntry
 import org.railwaystations.rsapi.core.model.Station
 import org.railwaystations.rsapi.core.model.User
-import org.railwaystations.rsapi.core.ports.CountryPort
-import org.railwaystations.rsapi.core.ports.InboxPort
-import org.railwaystations.rsapi.core.ports.ManageInboxUseCase
-import org.railwaystations.rsapi.core.ports.MastodonBot
-import org.railwaystations.rsapi.core.ports.Monitor
-import org.railwaystations.rsapi.core.ports.PhotoPort
-import org.railwaystations.rsapi.core.ports.PhotoStorage
-import org.railwaystations.rsapi.core.ports.PhotoStorage.PhotoTooLargeException
-import org.railwaystations.rsapi.core.ports.PostRecentlyImportedPhotoUseCase
-import org.railwaystations.rsapi.core.ports.StationPort
-import org.railwaystations.rsapi.core.ports.UserPort
+import org.railwaystations.rsapi.core.ports.inbound.ManageInboxUseCase
+import org.railwaystations.rsapi.core.ports.inbound.PostRecentlyImportedPhotoUseCase
+import org.railwaystations.rsapi.core.ports.outbound.CountryPort
+import org.railwaystations.rsapi.core.ports.outbound.InboxPort
+import org.railwaystations.rsapi.core.ports.outbound.MastodonPort
+import org.railwaystations.rsapi.core.ports.outbound.MonitorPort
+import org.railwaystations.rsapi.core.ports.outbound.PhotoPort
+import org.railwaystations.rsapi.core.ports.outbound.PhotoStoragePort
+import org.railwaystations.rsapi.core.ports.outbound.PhotoStoragePort.PhotoTooLargeException
+import org.railwaystations.rsapi.core.ports.outbound.StationPort
+import org.railwaystations.rsapi.core.ports.outbound.UserPort
 import org.railwaystations.rsapi.core.utils.ImageUtil.mimeToExtension
 import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.beans.factory.annotation.Value
@@ -41,14 +41,14 @@ import java.util.*
 @Service
 class InboxService(
     private val stationPort: StationPort,
-    private val photoStorage: PhotoStorage,
-    private val monitor: Monitor,
+    private val photoStoragePort: PhotoStoragePort,
+    private val monitorPort: MonitorPort,
     private val inboxPort: InboxPort,
     private val userPort: UserPort,
     private val countryPort: CountryPort,
     private val photoPort: PhotoPort,
     @param:Value("\${inboxBaseUrl}") private val inboxBaseUrl: String,
-    private val mastodonBot: MastodonBot,
+    private val mastodonPort: MastodonPort,
     @param:Value("\${photoBaseUrl}") private val photoBaseUrl: String,
     private val clock: Clock,
     @param:Value(
@@ -113,7 +113,7 @@ class InboxService(
             createdAt = clock.instant(),
             problemReportType = problemReport.type,
         )
-        monitor.sendMessage(
+        monitorPort.sendMessage(
             "New problem report for ${station.title} - ${station.key.country}:${station.key.id}\n${problemReport.type}: ${problemReport.comment.trim()}\nby ${user.name}\nvia $clientInfo"
         )
         return InboxResponse(state = InboxResponse.InboxResponseState.REVIEW, id = inboxPort.insert(inboxEntry))
@@ -137,7 +137,7 @@ class InboxService(
 
     private fun mapToInboxStateQuery(inboxEntry: InboxEntry): InboxStateQuery {
         val processed =
-            !inboxEntry.done && (inboxEntry.filename == null || photoStorage.isProcessed(inboxEntry.filename!!))
+            !inboxEntry.done && (inboxEntry.filename == null || photoStoragePort.isProcessed(inboxEntry.filename!!))
         return InboxStateQuery(
             id = inboxEntry.id,
             countryCode = inboxEntry.countryCode,
@@ -172,7 +172,7 @@ class InboxService(
 
     private fun updateInboxEntry(inboxEntry: InboxEntry): InboxEntry {
         val filename = inboxEntry.filename
-        val processed = filename?.let { photoStorage.isProcessed(it) } ?: false
+        val processed = filename?.let { photoStoragePort.isProcessed(it) } ?: false
         val inboxUrl = if (filename != null) {
             getInboxUrl(inboxEntry.filename, inboxEntry.done, inboxEntry.rejectReason, processed)
         } else if (inboxEntry.hasPhoto) {
@@ -222,7 +222,7 @@ class InboxService(
             throw ManageInboxUseCase.InboxEntryNotOwnerException()
         }
         inboxPort.reject(id, "Withdrawn by user")
-        monitor.sendMessage("InboxEntry $id ${inboxEntry.title} has been withdrawn by ${user.name}")
+        monitorPort.sendMessage("InboxEntry $id ${inboxEntry.title} has been withdrawn by ${user.name}")
     }
 
     override fun updateLocation(command: InboxCommand) {
@@ -370,7 +370,7 @@ class InboxService(
         require(country != null) { "Country ${station.key.country} not found" }
 
         try {
-            val urlPath = photoStorage.importPhoto(inboxEntry, station)
+            val urlPath = photoStoragePort.importPhoto(inboxEntry, station)
 
             val photo = Photo(
                 id = 0,
@@ -460,7 +460,7 @@ class InboxService(
         log.info("Rejecting upload {}, {}, {}", inboxEntry.id, command.rejectReason, inboxEntry.filename)
 
         try {
-            photoStorage.reject(inboxEntry)
+            photoStoragePort.reject(inboxEntry)
         } catch (e: IOException) {
             log.warn("Unable to move rejected file {}", inboxEntry.filename, e)
         }
@@ -546,7 +546,7 @@ class InboxService(
             id = inboxPort.insert(inboxEntry)
             if (extension != null) {
                 filename = createFilename(id, extension)
-                crc32 = photoStorage.storeUpload(body!!, filename)
+                crc32 = photoStoragePort.storeUpload(body!!, filename)
                 inboxPort.updateCrc32(id, crc32)
                 inboxUrl = "$inboxBaseUrl/${UriUtils.encodePath(filename, StandardCharsets.UTF_8)}"
             }
@@ -554,25 +554,25 @@ class InboxService(
             val duplicateInfo = if (conflict) " (possible duplicate!)" else ""
             val countryCodeParam = countryCode?.let { "countryCode=$countryCode&" } ?: ""
             if (station != null) {
-                monitor.sendMessage(
+                monitorPort.sendMessage(
                     "New photo upload for ${station.title} - ${station.key.country}:${station.key.id}\n${
                         StringUtils.trimToEmpty(
                             comment
                         )
                     }\n$inboxUrl$duplicateInfo\nby ${user.name}\nvia $clientInfo",
-                    photoStorage.getUploadFile(filename!!)
+                    photoStoragePort.getUploadFile(filename!!)
                 )
             } else if (filename != null) {
-                monitor.sendMessage(
+                monitorPort.sendMessage(
                     "Photo upload for missing station $stationTitle at https://map.railway-stations.org/index.php?${countryCodeParam}mlat=$latitude&mlon=$longitude&zoom=18&layers=M\n${
                         StringUtils.trimToEmpty(
                             comment
                         )
                     }\n$inboxUrl$duplicateInfo\nby ${user.name}\nvia $clientInfo",
-                    photoStorage.getUploadFile(filename)
+                    photoStoragePort.getUploadFile(filename)
                 )
             } else {
-                monitor.sendMessage(
+                monitorPort.sendMessage(
                     "Report missing station $stationTitle at https://map.railway-stations.org/index.php?${countryCodeParam}mlat=$latitude&mlon=$longitude&zoom=18&layers=M\n${
                         StringUtils.trimToEmpty(
                             comment
@@ -640,7 +640,7 @@ class InboxService(
             status += "\n${inboxEntry.comment}"
         }
 
-        mastodonBot.tootNewPhoto(status)
+        mastodonPort.tootNewPhoto(status)
         inboxPort.updatePosted(inboxEntry.id)
     }
 

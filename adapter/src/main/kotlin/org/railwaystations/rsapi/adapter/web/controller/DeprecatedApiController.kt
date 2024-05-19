@@ -10,9 +10,9 @@ import org.railwaystations.rsapi.adapter.web.model.RegisterProfileDto
 import org.railwaystations.rsapi.core.model.Country
 import org.railwaystations.rsapi.core.model.Station
 import org.railwaystations.rsapi.core.model.User
-import org.railwaystations.rsapi.core.ports.FindPhotoStationsUseCase
-import org.railwaystations.rsapi.core.ports.ListCountriesUseCase
-import org.railwaystations.rsapi.core.ports.ManageProfileUseCase
+import org.railwaystations.rsapi.core.ports.inbound.FindPhotoStationsUseCase
+import org.railwaystations.rsapi.core.ports.inbound.ListCountriesUseCase
+import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus

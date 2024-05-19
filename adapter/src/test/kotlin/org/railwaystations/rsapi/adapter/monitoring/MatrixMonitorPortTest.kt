@@ -29,7 +29,7 @@ const val ANY_TEXT_MESSAGE: String = "textMessage"
 const val ANY_CONTENT_URI: String = "/contentUri"
 
 @WireMockTest
-internal class MatrixMonitorTest {
+internal class MatrixMonitorPortTest {
     @Test
     fun sendTextMessage(wmRuntimeInfo: WireMockRuntimeInfo) {
         val client = createMatrixMonitor(wmRuntimeInfo)

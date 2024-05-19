@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.spring.dependency.management)
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.spring)
+    alias(libs.plugins.kotlin.kapt)
 }
 
 springBoot {
@@ -35,6 +36,8 @@ dependencies {
     implementation(libs.commons.lang3)
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+
+    kapt(libs.spring.boot.configuration.processor)
 
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
     runtimeOnly("org.webjars:webjars-locator-core")

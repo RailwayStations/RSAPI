@@ -1,6 +1,6 @@
 package org.railwaystations.rsapi.adapter.task
 
-import org.railwaystations.rsapi.core.ports.NotifyUsersUseCase
+import org.railwaystations.rsapi.core.ports.inbound.NotifyUsersUseCase
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 

@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.core.ports
+package org.railwaystations.rsapi.core.ports.outbound
 
 import org.railwaystations.rsapi.core.model.InboxEntry
 import org.railwaystations.rsapi.core.model.Station
@@ -6,7 +6,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.nio.file.Path
 
-interface PhotoStorage {
+interface PhotoStoragePort {
     fun isProcessed(filename: String): Boolean
 
     @Throws(IOException::class)

@@ -7,7 +7,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest
 import org.junit.jupiter.api.Test
 
 @WireMockTest
-internal class MastodonBotHttpClientTest {
+internal class MastodonPortHttpClientTest {
     @Test
     fun tootNewPhoto(wmRuntimeInfo: WireMockRuntimeInfo) {
         val config = MastodonBotConfig("token", "https://station.url", wmRuntimeInfo.httpBaseUrl)

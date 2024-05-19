@@ -1,8 +1,8 @@
 package org.railwaystations.rsapi.core.services
 
 import org.railwaystations.rsapi.core.model.Station
-import org.railwaystations.rsapi.core.ports.FindPhotoStationsUseCase
-import org.railwaystations.rsapi.core.ports.StationPort
+import org.railwaystations.rsapi.core.ports.inbound.FindPhotoStationsUseCase
+import org.railwaystations.rsapi.core.ports.outbound.StationPort
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.time.temporal.ChronoUnit

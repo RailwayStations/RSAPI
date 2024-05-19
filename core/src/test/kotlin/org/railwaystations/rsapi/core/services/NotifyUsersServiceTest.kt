@@ -12,9 +12,9 @@ import org.railwaystations.rsapi.core.config.MessageSourceConfig
 import org.railwaystations.rsapi.core.model.InboxEntry
 import org.railwaystations.rsapi.core.model.License
 import org.railwaystations.rsapi.core.model.User
-import org.railwaystations.rsapi.core.ports.InboxPort
-import org.railwaystations.rsapi.core.ports.Mailer
-import org.railwaystations.rsapi.core.ports.UserPort
+import org.railwaystations.rsapi.core.ports.outbound.InboxPort
+import org.railwaystations.rsapi.core.ports.outbound.MailerPort
+import org.railwaystations.rsapi.core.ports.outbound.UserPort
 import java.time.Instant
 import java.util.*
 import java.util.stream.Stream
@@ -23,8 +23,8 @@ import java.util.stream.Stream
 internal class NotifyUsersServiceTest {
     private val userPort = mockk<UserPort>()
     private val inboxPort = mockk<InboxPort>(relaxed = true)
-    private val mailer = mockk<Mailer>(relaxed = true)
-    private val service = NotifyUsersService(userPort, inboxPort, mailer, MessageSourceConfig().messageSource())
+    private val mailerPort = mockk<MailerPort>(relaxed = true)
+    private val service = NotifyUsersService(userPort, inboxPort, mailerPort, MessageSourceConfig().messageSource())
 
     @ParameterizedTest
     @MethodSource("provideUsersToNotNotify")
@@ -32,7 +32,7 @@ internal class NotifyUsersServiceTest {
         every { inboxPort.findInboxEntriesToNotify() } returns createInboxEntriesToNotify()
         every { userPort.findById(1) } returns user
         service.notifyUsers()
-        verify(exactly = 0) { mailer.send(any(), any(), any()) }
+        verify(exactly = 0) { mailerPort.send(any(), any(), any()) }
     }
 
     @Test
@@ -41,7 +41,7 @@ internal class NotifyUsersServiceTest {
         every { userPort.findById(1) } returns createUser("nickname@example.com", User.EMAIL_VERIFIED, true)
         service.notifyUsers()
         verify {
-            mailer.send(
+            mailerPort.send(
                 "nickname@example.com", "Railway-Stations.org review result", """
                 Hallo nickname,
 

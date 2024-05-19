@@ -20,7 +20,7 @@ import org.railwaystations.rsapi.core.model.UserTestFixtures.EXISTING_USER_ID
 import org.railwaystations.rsapi.core.model.UserTestFixtures.USER_AGENT
 import org.railwaystations.rsapi.core.model.UserTestFixtures.USER_EMAIL
 import org.railwaystations.rsapi.core.model.UserTestFixtures.USER_NAME
-import org.railwaystations.rsapi.core.ports.ManageProfileUseCase.ProfileConflictException
+import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase.ProfileConflictException
 import org.railwaystations.rsapi.core.services.ProfileService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest

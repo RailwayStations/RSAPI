@@ -16,7 +16,6 @@ import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.railwaystations.rsapi.adapter.db.AbstractMariaDBBaseTest
 import org.railwaystations.rsapi.adapter.db.PhotoDao
-import org.railwaystations.rsapi.adapter.monitoring.LoggingMonitor
 import org.railwaystations.rsapi.adapter.photostorage.WorkDir
 import org.railwaystations.rsapi.adapter.web.controller.DeprecatedApiController.StationDto
 import org.railwaystations.rsapi.adapter.web.model.PhotoDto
@@ -28,7 +27,6 @@ import org.railwaystations.rsapi.core.model.License
 import org.railwaystations.rsapi.core.model.Photo
 import org.railwaystations.rsapi.core.model.Station
 import org.railwaystations.rsapi.core.model.User
-import org.railwaystations.rsapi.core.ports.Monitor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
@@ -58,6 +56,9 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.*
 import javax.imageio.ImageIO
+
+private val IMAGE: ByteArray = Base64.getDecoder()
+    .decode("/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=")
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -880,11 +881,6 @@ internal class RsapiIntegrationTest : AbstractMariaDBBaseTest() {
             return WorkDir(createTempWorkDir(), null)
         }
 
-        @Bean
-        fun monitor(): Monitor {
-            return LoggingMonitor()
-        }
-
         private fun createTempWorkDir(): String {
             try {
                 return Files.createTempDirectory("workDir-" + System.currentTimeMillis()).toFile().absolutePath
@@ -912,8 +908,4 @@ internal class RsapiIntegrationTest : AbstractMariaDBBaseTest() {
         }
     }
 
-    companion object {
-        private val IMAGE: ByteArray = Base64.getDecoder()
-            .decode("/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=")
-    }
 }

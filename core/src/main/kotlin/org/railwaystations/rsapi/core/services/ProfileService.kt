@@ -6,12 +6,12 @@ import org.railwaystations.rsapi.core.model.User
 import org.railwaystations.rsapi.core.model.User.Companion.createNewEmailVerificationToken
 import org.railwaystations.rsapi.core.model.User.Companion.normalizeEmail
 import org.railwaystations.rsapi.core.model.User.Companion.normalizeName
-import org.railwaystations.rsapi.core.ports.Mailer
-import org.railwaystations.rsapi.core.ports.ManageProfileUseCase
-import org.railwaystations.rsapi.core.ports.ManageProfileUseCase.ProfileConflictException
-import org.railwaystations.rsapi.core.ports.Monitor
-import org.railwaystations.rsapi.core.ports.OAuth2AuthorizationPort
-import org.railwaystations.rsapi.core.ports.UserPort
+import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase
+import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase.ProfileConflictException
+import org.railwaystations.rsapi.core.ports.outbound.MailerPort
+import org.railwaystations.rsapi.core.ports.outbound.MonitorPort
+import org.railwaystations.rsapi.core.ports.outbound.OAuth2AuthorizationPort
+import org.railwaystations.rsapi.core.ports.outbound.UserPort
 import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.MessageSource
@@ -22,8 +22,8 @@ import java.util.*
 
 @Service
 class ProfileService(
-    private val monitor: Monitor,
-    private val mailer: Mailer,
+    private val monitorPort: MonitorPort,
+    private val mailerPort: MailerPort,
     private val userPort: UserPort,
     private val authorizationPort: OAuth2AuthorizationPort,
     @param:Value(
@@ -51,14 +51,14 @@ class ProfileService(
         requireNotNull(user) { "Can't reset password for unknown user" }
 
         if (user.email.isNullOrBlank()) {
-            monitor.sendMessage("Can't reset password for '$nameOrEmail' failed: no email available\nvia $clientInfo")
+            monitorPort.sendMessage("Can't reset password for '$nameOrEmail' failed: no email available\nvia $clientInfo")
             throw IllegalArgumentException("Email '${user.email}' is empty")
         }
 
         val newPassword = createNewPassword()
         val key = encryptPassword(newPassword)
         userPort.updateCredentials(user.id, key)
-        monitor.sendMessage("Reset Password for '${user.name}', email='${user.email}'")
+        monitorPort.sendMessage("Reset Password for '${user.name}', email='${user.email}'")
 
         sendPasswordMail(user.email, newPassword, user.locale)
         if (!user.isEmailVerified) {
@@ -79,7 +79,7 @@ class ProfileService(
         )
         existingName?.let {
             if (newUser.email != it.email) {
-                monitor.sendMessage(
+                monitorPort.sendMessage(
                     "Registration for user '${newUser.name}' with eMail '${newUser.email}' failed, name is already taken by different eMail '${it.email}'\nvia $clientInfo"
                 )
                 throw ProfileConflictException()
@@ -87,14 +87,14 @@ class ProfileService(
         }
 
         if (userPort.countBlockedUsername(newUser.normalizedName) != 0) {
-            monitor.sendMessage(
+            monitorPort.sendMessage(
                 "Registration for user '${newUser.name}' with eMail '${newUser.email}' failed, name is blocked\nvia $clientInfo"
             )
             throw ProfileConflictException()
         }
 
         userPort.findByEmail(newUser.email!!)?.let {
-            monitor.sendMessage(
+            monitorPort.sendMessage(
                 "Registration for user '${newUser.name}' with eMail '${newUser.email}' failed, eMail is already taken\nvia $clientInfo"
             )
             throw ProfileConflictException()
@@ -117,7 +117,7 @@ class ProfileService(
             sendPasswordMail(newUser.email, password!!, newUser.locale)
         }
 
-        monitor.sendMessage("New registration{nickname='${newUser.name}', email='${newUser.email}'}\nvia $clientInfo")
+        monitorPort.sendMessage("New registration{nickname='${newUser.name}', email='${newUser.email}'}\nvia $clientInfo")
     }
 
     private fun createNewPassword(): String {
@@ -152,7 +152,7 @@ class ProfileService(
                 log.info("Name conflict '{}'", newProfile.name)
                 throw ProfileConflictException()
             }
-            monitor.sendMessage("Update nickname for user '${user.name}' to '${newProfile.name}'\nvia $clientInfo")
+            monitorPort.sendMessage("Update nickname for user '${user.name}' to '${newProfile.name}'\nvia $clientInfo")
         }
 
         if (newProfile.email != user.email) {
@@ -160,7 +160,7 @@ class ProfileService(
                 log.info("Email conflict '{}'", newProfile.email)
                 throw ProfileConflictException()
             }
-            monitor.sendMessage(
+            monitorPort.sendMessage(
                 "Update email for user '${user.name}' from email '${user.email}' to '${newProfile.email}'\nvia $clientInfo"
             )
             val emailVerificationToken = createNewEmailVerificationToken()
@@ -182,7 +182,7 @@ class ProfileService(
         return userPort.findByEmailVerification(token)
             ?.let { user: User ->
                 userPort.updateEmailVerification(user.id, User.EMAIL_VERIFIED)
-                monitor.sendMessage("Email verified {nickname='${user.name}', email='${user.email}'}")
+                monitorPort.sendMessage("Email verified {nickname='${user.name}', email='${user.email}'}")
                 user
             }
     }
@@ -192,7 +192,7 @@ class ProfileService(
         userPort.anonymizeUser(user.id)
         userPort.addUsernameToBlocklist(normalizedName)
         authorizationPort.deleteAllByUser(user.name)
-        monitor.sendMessage("Closed account ${user.id} - ${user.name}")
+        monitorPort.sendMessage("Closed account ${user.id} - ${user.name}")
     }
 
     override fun updateLocale(user: User, locale: Locale) {
@@ -201,7 +201,7 @@ class ProfileService(
 
     private fun sendPasswordMail(email: String, newPassword: String, locale: Locale) {
         val text = messageSource.getMessage("password_mail", arrayOf(newPassword), locale)
-        mailer.send(email, "Railway-Stations.org new password", text)
+        mailerPort.send(email, "Railway-Stations.org new password", text)
         log.info("Password sent to {}", email)
     }
 
@@ -223,7 +223,7 @@ class ProfileService(
                 Viele Grüße
                 Dein Bahnhofsfoto-Team
                 """.trimIndent()
-        mailer.send(email, "Railway-Stations.org eMail verification", text)
+        mailerPort.send(email, "Railway-Stations.org eMail verification", text)
         log.info("Email verification sent to {}", email)
     }
 

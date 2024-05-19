@@ -2,7 +2,7 @@ package org.railwaystations.rsapi.adapter.web.controller
 
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Size
-import org.railwaystations.rsapi.core.ports.PhotoStorage
+import org.railwaystations.rsapi.core.ports.outbound.PhotoStoragePort
 import org.railwaystations.rsapi.core.utils.ImageUtil.extensionToMimeType
 import org.railwaystations.rsapi.core.utils.ImageUtil.getExtension
 import org.railwaystations.rsapi.core.utils.ImageUtil.scalePhoto
@@ -23,7 +23,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 @RestController
-class PhotoDownloadController(private val photoStorage: PhotoStorage) {
+class PhotoDownloadController(private val photoStoragePort: PhotoStoragePort) {
 
     private val log by Logger()
 
@@ -37,7 +37,7 @@ class PhotoDownloadController(private val photoStorage: PhotoStorage) {
         @Valid @RequestParam(required = false, value = "width") width: Int?
     ): ResponseEntity<Resource> {
         log.info("Download inbox file={}", filename)
-        return downloadPhoto(photoStorage.getInboxDoneFile(filename), width)
+        return downloadPhoto(photoStoragePort.getInboxDoneFile(filename), width)
     }
 
     @RequestMapping(
@@ -50,7 +50,7 @@ class PhotoDownloadController(private val photoStorage: PhotoStorage) {
         @Valid @RequestParam(required = false, value = "width") width: Int?
     ): ResponseEntity<Resource> {
         log.info("Download inbox file={}", filename)
-        return downloadPhoto(photoStorage.getInboxFile(filename), width)
+        return downloadPhoto(photoStoragePort.getInboxFile(filename), width)
     }
 
     @RequestMapping(
@@ -63,7 +63,7 @@ class PhotoDownloadController(private val photoStorage: PhotoStorage) {
         @Valid @RequestParam(required = false, value = "width") width: Int?
     ): ResponseEntity<Resource> {
         log.info("Download inbox file={}", filename)
-        return downloadPhoto(photoStorage.getInboxProcessedFile(filename), width)
+        return downloadPhoto(photoStoragePort.getInboxProcessedFile(filename), width)
     }
 
     @RequestMapping(
@@ -76,7 +76,7 @@ class PhotoDownloadController(private val photoStorage: PhotoStorage) {
         @Valid @RequestParam(required = false, value = "width") width: Int?
     ): ResponseEntity<Resource> {
         log.info("Download inbox file={}", filename)
-        return downloadPhoto(photoStorage.getInboxRejectedFile(filename), width)
+        return downloadPhoto(photoStoragePort.getInboxRejectedFile(filename), width)
     }
 
     @RequestMapping(
@@ -90,7 +90,7 @@ class PhotoDownloadController(private val photoStorage: PhotoStorage) {
         @Valid @RequestParam(required = false, value = "width") width: Int?
     ): ResponseEntity<Resource> {
         log.info("Download photo country={}, file={}", country, filename)
-        return downloadPhoto(photoStorage.getPhotoFile(country, filename), width)
+        return downloadPhoto(photoStoragePort.getPhotoFile(country, filename), width)
     }
 
     private fun downloadPhoto(photoPath: Path, width: Int?): ResponseEntity<Resource> {

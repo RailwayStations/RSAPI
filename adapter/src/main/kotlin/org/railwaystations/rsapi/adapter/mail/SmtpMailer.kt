@@ -10,12 +10,12 @@ import jakarta.mail.internet.MimeBodyPart
 import jakarta.mail.internet.MimeMessage
 import jakarta.mail.internet.MimeMultipart
 import org.apache.commons.lang3.StringUtils
-import org.railwaystations.rsapi.core.ports.Mailer
+import org.railwaystations.rsapi.core.ports.outbound.MailerPort
 import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.stereotype.Service
 
 @Service
-class SmtpMailer(private val config: MailerConfig) : Mailer {
+class SmtpMailer(private val config: MailerConfig) : MailerPort {
     private lateinit var session: Session
     private val log by Logger()
 

@@ -22,8 +22,8 @@ import org.railwaystations.rsapi.core.model.ProblemReportType
 import org.railwaystations.rsapi.core.model.PublicInboxEntry
 import org.railwaystations.rsapi.core.model.User
 import org.railwaystations.rsapi.core.model.UserTestFixtures
-import org.railwaystations.rsapi.core.ports.ManageInboxUseCase
-import org.railwaystations.rsapi.core.ports.ManageProfileUseCase
+import org.railwaystations.rsapi.core.ports.inbound.ManageInboxUseCase
+import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.context.annotation.Import

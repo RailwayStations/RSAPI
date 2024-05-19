@@ -5,7 +5,7 @@ import org.railwaystations.rsapi.adapter.mastodon.MastodonBotConfig
 import org.railwaystations.rsapi.adapter.mastodon.MastodonBotHttpClient
 import org.railwaystations.rsapi.adapter.monitoring.FakeMonitor
 import org.railwaystations.rsapi.adapter.photostorage.WorkDir
-import org.railwaystations.rsapi.core.ports.MastodonBot
+import org.railwaystations.rsapi.core.ports.outbound.MastodonPort
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Profile
@@ -15,7 +15,7 @@ import java.nio.file.Files
 @Profile("mockMvcTest")
 class MockMvcTestConfiguration {
     @Bean
-    fun mastodonBot(objectMapper: ObjectMapper): MastodonBot {
+    fun mastodonBot(objectMapper: ObjectMapper): MastodonPort {
         return MastodonBotHttpClient(MastodonBotConfig("", "", ""), objectMapper)
     }
 

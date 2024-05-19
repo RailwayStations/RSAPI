@@ -1,6 +1,6 @@
 package org.railwaystations.rsapi.adapter.task
 
-import org.railwaystations.rsapi.core.ports.PostRecentlyImportedPhotoUseCase
+import org.railwaystations.rsapi.core.ports.inbound.PostRecentlyImportedPhotoUseCase
 import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component

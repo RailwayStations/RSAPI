@@ -13,25 +13,25 @@ import org.railwaystations.rsapi.core.model.UserTestFixtures.EXISTING_USER_ID
 import org.railwaystations.rsapi.core.model.UserTestFixtures.USER_AGENT
 import org.railwaystations.rsapi.core.model.UserTestFixtures.USER_EMAIL
 import org.railwaystations.rsapi.core.model.UserTestFixtures.USER_NAME
-import org.railwaystations.rsapi.core.ports.Mailer
-import org.railwaystations.rsapi.core.ports.ManageProfileUseCase.ProfileConflictException
-import org.railwaystations.rsapi.core.ports.Monitor
-import org.railwaystations.rsapi.core.ports.OAuth2AuthorizationPort
-import org.railwaystations.rsapi.core.ports.UserPort
+import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase.ProfileConflictException
+import org.railwaystations.rsapi.core.ports.outbound.MailerPort
+import org.railwaystations.rsapi.core.ports.outbound.MonitorPort
+import org.railwaystations.rsapi.core.ports.outbound.OAuth2AuthorizationPort
+import org.railwaystations.rsapi.core.ports.outbound.UserPort
 import org.springframework.security.crypto.password.PasswordEncoder
 
 internal class ProfileServiceTest {
     private val userPort = mockk<UserPort>()
 
-    private val monitor = mockk<Monitor>()
+    private val monitorPort = mockk<MonitorPort>()
 
-    private val mailer = mockk<Mailer>(relaxed = true)
+    private val mailerPort = mockk<MailerPort>(relaxed = true)
 
     private val authorizationPort = mockk<OAuth2AuthorizationPort>(relaxed = true)
 
     private val sut = ProfileService(
-        monitor = monitor,
-        mailer = mailer,
+        monitorPort = monitorPort,
+        mailerPort = mailerPort,
         userPort = userPort,
         authorizationPort = authorizationPort,
         eMailVerificationUrl = "EMAIL_VERIFICATION_URL",
@@ -51,7 +51,7 @@ internal class ProfileServiceTest {
         every { userPort.update(any(), any()) } returns Unit
         every { userPort.updateCredentials(any(), any()) } returns Unit
         every { userPort.updateEmailVerification(any(), any()) } returns Unit
-        every { monitor.sendMessage(any()) } returns Unit
+        every { monitorPort.sendMessage(any()) } returns Unit
     }
 
     @Test
@@ -77,7 +77,7 @@ internal class ProfileServiceTest {
         verify { userPort.insert(any(), any(), any()) }
         verify(exactly = 0) { userPort.updateCredentials(any(), any()) }
         verify {
-            monitor.sendMessage(
+            monitorPort.sendMessage(
                 "New registration{nickname='%s', email='%s'}\nvia %s".format(
                     USER_NAME, USER_EMAIL, USER_AGENT
                 )
@@ -101,13 +101,13 @@ internal class ProfileServiceTest {
         verify { userPort.insert(any(), any(), any()) }
         verify(exactly = 0) { userPort.updateCredentials(any(), any()) }
         verify {
-            monitor.sendMessage(
+            monitorPort.sendMessage(
                 "New registration{nickname='%s', email='%s'}\nvia %s".format(
                     USER_NAME, USER_EMAIL, USER_AGENT
                 )
             )
         }
-        assertVerificationEmail(mailer)
+        assertVerificationEmail(mailerPort)
     }
 
     @Test
@@ -121,7 +121,7 @@ internal class ProfileServiceTest {
 
         sut.updateProfile(existingUser, updatedUser, USER_AGENT)
 
-        assertVerificationEmail(mailer)
+        assertVerificationEmail(mailerPort)
         val user = givenExistingUser().copy(
             email = "newname@example.com"
         )
@@ -158,7 +158,7 @@ internal class ProfileServiceTest {
         sut.emailVerification(token)
 
         verify {
-            monitor.sendMessage(
+            monitorPort.sendMessage(
                 "Email verified {nickname='${USER_NAME}', email='${USER_EMAIL}'}"
             )
         }
@@ -176,7 +176,7 @@ internal class ProfileServiceTest {
 
         sut.emailVerification("wrong_token")
 
-        verify(exactly = 0) { monitor.sendMessage(any()) }
+        verify(exactly = 0) { monitorPort.sendMessage(any()) }
         verify(exactly = 0) {
             userPort.updateEmailVerification(
                 EXISTING_USER_ID,
@@ -191,7 +191,7 @@ internal class ProfileServiceTest {
 
         sut.resendEmailVerification(user)
 
-        assertVerificationEmail(mailer)
+        assertVerificationEmail(mailerPort)
         verify { userPort.updateEmailVerification(eq(EXISTING_USER_ID), any()) }
     }
 
@@ -239,7 +239,7 @@ internal class ProfileServiceTest {
         assertThatThrownBy { sut.register(newUser, USER_AGENT) }
             .isInstanceOf(ProfileConflictException::class.java)
 
-        verify { monitor.sendMessage("Registration for user 'othername' with eMail 'existing@example.com' failed, eMail is already taken\nvia UserAgent") }
+        verify { monitorPort.sendMessage("Registration for user 'othername' with eMail 'existing@example.com' failed, eMail is already taken\nvia UserAgent") }
     }
 
     @Test
@@ -254,7 +254,7 @@ internal class ProfileServiceTest {
             .isInstanceOf(ProfileConflictException::class.java)
 
         verify {
-            monitor.sendMessage(
+            monitorPort.sendMessage(
                 "Registration for user '%s' with eMail '%s' failed, name is already taken by different eMail '%s'%nvia %s"
                     .format(user.name, newUser.email, user.email, USER_AGENT)
             )
@@ -273,7 +273,7 @@ internal class ProfileServiceTest {
 
     private fun assertNewPasswordEmail() {
         verify(exactly = 1) {
-            mailer.send(
+            mailerPort.send(
                 any(),
                 any(), match {
                     it.matches(
@@ -337,7 +337,7 @@ internal class ProfileServiceTest {
 
         verify { userPort.updateCredentials(eq(123), any()) }
         verify {
-            monitor.sendMessage(
+            monitorPort.sendMessage(
                 "Reset Password for '%s', email='%s'".format(
                     USER_NAME, USER_EMAIL
                 )
@@ -361,7 +361,7 @@ internal class ProfileServiceTest {
 
         verify { userPort.updateCredentials(eq(123), any()) }
         verify {
-            monitor.sendMessage(
+            monitorPort.sendMessage(
                 "Reset Password for '%s', email='%s'".format(
                     USER_NAME, USER_EMAIL
                 )
@@ -372,9 +372,9 @@ internal class ProfileServiceTest {
         verify { authorizationPort.deleteAllByUser(user.name) }
     }
 
-    fun assertVerificationEmail(mailer: Mailer) {
+    fun assertVerificationEmail(mailerPort: MailerPort) {
         verify(exactly = 0) {
-            mailer.send(
+            mailerPort.send(
                 any(),
                 any(), match {
                     it.matches(

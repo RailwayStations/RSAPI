@@ -16,10 +16,10 @@ import org.railwaystations.rsapi.core.model.CountryTestFixtures
 import org.railwaystations.rsapi.core.model.Station
 import org.railwaystations.rsapi.core.model.StationTestFixtures.createStationDE5
 import org.railwaystations.rsapi.core.model.UserTestFixtures
-import org.railwaystations.rsapi.core.ports.FindPhotoStationsUseCase
-import org.railwaystations.rsapi.core.ports.ListCountriesUseCase
-import org.railwaystations.rsapi.core.ports.ManageProfileUseCase
-import org.railwaystations.rsapi.core.ports.ManageProfileUseCase.ProfileConflictException
+import org.railwaystations.rsapi.core.ports.inbound.FindPhotoStationsUseCase
+import org.railwaystations.rsapi.core.ports.inbound.ListCountriesUseCase
+import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase
+import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase.ProfileConflictException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest

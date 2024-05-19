@@ -31,7 +31,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.railwaystations.rsapi.adapter.db.InboxDao
 import org.railwaystations.rsapi.core.model.InboxEntry
-import org.railwaystations.rsapi.core.ports.PhotoStorage
+import org.railwaystations.rsapi.core.ports.outbound.PhotoStoragePort
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
@@ -48,13 +48,13 @@ const val PROPFIND_METHOD: String = "PROPFIND"
 @WireMockTest
 internal class WebDavSyncTaskTest {
     private lateinit var tempdir: Path
-    private lateinit var photoStorage: PhotoStorage
+    private lateinit var photoStoragePort: PhotoStoragePort
     private lateinit var inboxDao: InboxDao
 
     @BeforeEach
     fun setup() {
         tempdir = Files.createTempDirectory("rsapi")
-        photoStorage = mockk<PhotoStorage>()
+        photoStoragePort = mockk<PhotoStoragePort>()
         inboxDao = mockk<InboxDao>()
         every { inboxDao.findPendingInboxEntries() } returns listOf(createInboxEntry())
     }
@@ -63,8 +63,8 @@ internal class WebDavSyncTaskTest {
     fun shouldAuthenticate(wmRuntimeInfo: WireMockRuntimeInfo) {
         val task = createWebDavSyncTask(wmRuntimeInfo)
         val toProcessPath = createFile(tempdir)
-        every { photoStorage.getInboxToProcessFile(FILENAME) } returns toProcessPath
-        every { photoStorage.getInboxProcessedFile(FILENAME) } returns tempdir.resolve(FILENAME)
+        every { photoStoragePort.getInboxToProcessFile(FILENAME) } returns toProcessPath
+        every { photoStoragePort.getInboxProcessedFile(FILENAME) } returns tempdir.resolve(FILENAME)
 
         stubFor(
             put(TO_PROCESS_PATH_FILE)
@@ -102,8 +102,8 @@ internal class WebDavSyncTaskTest {
     fun shouldUploadToProcessFile(wmRuntimeInfo: WireMockRuntimeInfo) {
         val task = createWebDavSyncTask(wmRuntimeInfo)
         val toProcessPath1 = createFile(tempdir)
-        every { photoStorage.getInboxToProcessFile(FILENAME) } returns toProcessPath1
-        every { photoStorage.getInboxProcessedFile(FILENAME) } returns tempdir.resolve(FILENAME)
+        every { photoStoragePort.getInboxToProcessFile(FILENAME) } returns toProcessPath1
+        every { photoStoragePort.getInboxProcessedFile(FILENAME) } returns tempdir.resolve(FILENAME)
 
         stubFor(put(TO_PROCESS_PATH_FILE).willReturn(created()))
         stubPropfindEmpty()
@@ -122,8 +122,8 @@ internal class WebDavSyncTaskTest {
     fun shouldKeepFileIfUploadFails(wmRuntimeInfo: WireMockRuntimeInfo) {
         val task = createWebDavSyncTask(wmRuntimeInfo)
         val toProcessPath = createFile(tempdir)
-        every { photoStorage.getInboxToProcessFile(FILENAME) } returns toProcessPath
-        every { photoStorage.getInboxProcessedFile(FILENAME) } returns tempdir.resolve(FILENAME)
+        every { photoStoragePort.getInboxToProcessFile(FILENAME) } returns toProcessPath
+        every { photoStoragePort.getInboxProcessedFile(FILENAME) } returns tempdir.resolve(FILENAME)
 
         stubFor(put(TO_PROCESS_PATH_FILE).willReturn(badRequest()))
         stubPropfindEmpty()
@@ -145,9 +145,9 @@ internal class WebDavSyncTaskTest {
     @Test
     fun shouldDownloadProcessedFile(wmRuntimeInfo: WireMockRuntimeInfo) {
         val task = createWebDavSyncTask(wmRuntimeInfo)
-        every { photoStorage.getInboxToProcessFile(FILENAME) } returns tempdir.resolve(FILENAME)
+        every { photoStoragePort.getInboxToProcessFile(FILENAME) } returns tempdir.resolve(FILENAME)
         val processedPath = tempdir.resolve(FILENAME)
-        every { photoStorage.getInboxProcessedFile(FILENAME) } returns processedPath
+        every { photoStoragePort.getInboxProcessedFile(FILENAME) } returns processedPath
 
         stubPropfind(createMultistatusResponseForFile())
         stubFor(get(PROCESSED_PATH_FILE).willReturn(ok(FILENAME)))
@@ -231,9 +231,9 @@ internal class WebDavSyncTaskTest {
     @Test
     fun shouldNotSendDeleteIfDownloadFailed(wmRuntimeInfo: WireMockRuntimeInfo) {
         val task = createWebDavSyncTask(wmRuntimeInfo)
-        every { photoStorage.getInboxToProcessFile(FILENAME) } returns tempdir.resolve(FILENAME)
+        every { photoStoragePort.getInboxToProcessFile(FILENAME) } returns tempdir.resolve(FILENAME)
         val processedPath = tempdir.resolve(FILENAME)
-        every { photoStorage.getInboxProcessedFile(FILENAME) } returns processedPath
+        every { photoStoragePort.getInboxProcessedFile(FILENAME) } returns processedPath
 
         stubPropfind(createMultistatusResponseForFile())
         stubFor(get(PROCESSED_PATH_FILE).willReturn(serverError()))
@@ -253,7 +253,7 @@ internal class WebDavSyncTaskTest {
             toProcessUrl = wmRuntimeInfo.httpBaseUrl + TO_PROCESS_PATH,
             processedUrl = wmRuntimeInfo.httpBaseUrl + PROCESSED_PATH, user = USERNAME, password = PASSWORD
         )
-        return WebDavSyncTask(config, photoStorage, inboxDao)
+        return WebDavSyncTask(config, photoStoragePort, inboxDao)
     }
 
     private fun createInboxEntry(): InboxEntry {

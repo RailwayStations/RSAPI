@@ -6,7 +6,7 @@ import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
 import org.railwaystations.rsapi.core.model.Photo
 import org.railwaystations.rsapi.core.model.Station
-import org.railwaystations.rsapi.core.ports.PhotoPort
+import org.railwaystations.rsapi.core.ports.outbound.PhotoPort
 
 interface PhotoDao : PhotoPort {
     @SqlUpdate("INSERT INTO photos (countryCode, stationId, `primary`, urlPath, license, photographerId, createdAt) VALUES (:stationKey.country, :stationKey.id, :primary, :urlPath, :license, :photographer.id, :createdAt)")

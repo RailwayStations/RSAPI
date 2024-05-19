@@ -8,7 +8,7 @@ import org.railwaystations.rsapi.adapter.web.model.ProfileDto
 import org.railwaystations.rsapi.adapter.web.model.UpdateProfileDto
 import org.railwaystations.rsapi.core.model.License
 import org.railwaystations.rsapi.core.model.User
-import org.railwaystations.rsapi.core.ports.ManageProfileUseCase
+import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase
 import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

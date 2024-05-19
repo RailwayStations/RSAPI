@@ -2,10 +2,10 @@ package org.railwaystations.rsapi.core.services
 
 import org.railwaystations.rsapi.core.model.InboxEntry
 import org.railwaystations.rsapi.core.model.User
-import org.railwaystations.rsapi.core.ports.InboxPort
-import org.railwaystations.rsapi.core.ports.Mailer
-import org.railwaystations.rsapi.core.ports.NotifyUsersUseCase
-import org.railwaystations.rsapi.core.ports.UserPort
+import org.railwaystations.rsapi.core.ports.inbound.NotifyUsersUseCase
+import org.railwaystations.rsapi.core.ports.outbound.InboxPort
+import org.railwaystations.rsapi.core.ports.outbound.MailerPort
+import org.railwaystations.rsapi.core.ports.outbound.UserPort
 import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.context.MessageSource
 import org.springframework.stereotype.Service
@@ -15,7 +15,7 @@ import java.util.*
 class NotifyUsersService(
     private val userPort: UserPort,
     private val inboxPort: InboxPort,
-    private val mailer: Mailer,
+    private val mailerPort: MailerPort,
     private val messageSource: MessageSource
 ) : NotifyUsersUseCase {
 
@@ -58,7 +58,7 @@ class NotifyUsersService(
         }
 
         val text = messageSource.getMessage("review_mail", arrayOf(username, report), locale)
-        mailer.send(email, "Railway-Stations.org review result", text)
+        mailerPort.send(email, "Railway-Stations.org review result", text)
         log.info("Email notification sent to {}", email)
     }
 }

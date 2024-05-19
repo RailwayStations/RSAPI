@@ -2,7 +2,7 @@ package org.railwaystations.rsapi.adapter.db
 
 import org.jdbi.v3.sqlobject.customizer.Bind
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
-import org.railwaystations.rsapi.core.ports.OAuth2AuthorizationPort
+import org.railwaystations.rsapi.core.ports.outbound.OAuth2AuthorizationPort
 import java.time.Instant
 
 interface OAuth2AuthorizationDao : OAuth2AuthorizationPort {

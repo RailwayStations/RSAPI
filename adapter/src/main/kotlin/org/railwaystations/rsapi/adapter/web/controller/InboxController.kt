@@ -25,8 +25,8 @@ import org.railwaystations.rsapi.core.model.InboxStateQuery.InboxState
 import org.railwaystations.rsapi.core.model.ProblemReport
 import org.railwaystations.rsapi.core.model.ProblemReportType
 import org.railwaystations.rsapi.core.model.PublicInboxEntry
-import org.railwaystations.rsapi.core.ports.ManageInboxUseCase
-import org.railwaystations.rsapi.core.ports.ManageProfileUseCase
+import org.railwaystations.rsapi.core.ports.inbound.ManageInboxUseCase
+import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase
 import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

@@ -34,6 +34,7 @@ spring-boot-starter-test = { group = "org.springframework.boot", name = "spring-
 spring-boot-starter-thymeleaf = { group = "org.springframework.boot", name = "spring-boot-starter-thymeleaf", version.ref = "springBoot" }
 spring-boot-starter-web = { group = "org.springframework.boot", name = "spring-boot-starter-web", version.ref = "springBoot" }
 spring-boot-starter-validation = { group = "org.springframework.boot", name = "spring-boot-starter-validation", version.ref = "springBoot" }
+spring-boot-configuration-processor = { group = "org.springframework.boot", name = "spring-boot-configuration-processor", version.ref = "springBoot" }
 spring-security-test = { group = "org.springframework.security", name = "spring-security-test", version.ref = "springFramework" }
 jdbi3-spring5 = { group = "org.jdbi", name = "jdbi3-spring5", version.ref = "jdbi" }
 jdbi3-kotlin = { group = "org.jdbi", name = "jdbi3-kotlin", version.ref = "jdbi" }

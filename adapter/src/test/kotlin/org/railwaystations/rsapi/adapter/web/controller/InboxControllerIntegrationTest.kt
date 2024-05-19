@@ -32,7 +32,7 @@ import org.railwaystations.rsapi.core.model.UserTestFixtures
 import org.railwaystations.rsapi.core.model.UserTestFixtures.USER_AGENT
 import org.railwaystations.rsapi.core.model.UserTestFixtures.createUserJimKnopf
 import org.railwaystations.rsapi.core.model.UserTestFixtures.createUserNickname
-import org.railwaystations.rsapi.core.ports.ManageProfileUseCase
+import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase
 import org.railwaystations.rsapi.core.services.InboxService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest

@@ -13,7 +13,7 @@ import org.railwaystations.rsapi.core.model.Coordinates
 import org.railwaystations.rsapi.core.model.InboxEntry
 import org.railwaystations.rsapi.core.model.ProblemReportType
 import org.railwaystations.rsapi.core.model.PublicInboxEntry
-import org.railwaystations.rsapi.core.ports.InboxPort
+import org.railwaystations.rsapi.core.ports.outbound.InboxPort
 import java.sql.ResultSet
 import java.sql.SQLException
 

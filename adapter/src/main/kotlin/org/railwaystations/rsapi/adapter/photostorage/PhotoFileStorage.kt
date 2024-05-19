@@ -3,8 +3,8 @@ package org.railwaystations.rsapi.adapter.photostorage
 import org.apache.commons.io.IOUtils
 import org.railwaystations.rsapi.core.model.InboxEntry
 import org.railwaystations.rsapi.core.model.Station
-import org.railwaystations.rsapi.core.ports.PhotoStorage
-import org.railwaystations.rsapi.core.ports.PhotoStorage.PhotoTooLargeException
+import org.railwaystations.rsapi.core.ports.outbound.PhotoStoragePort
+import org.railwaystations.rsapi.core.ports.outbound.PhotoStoragePort.PhotoTooLargeException
 import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.stereotype.Repository
 import java.io.IOException
@@ -18,7 +18,7 @@ import java.util.zip.CRC32
 import java.util.zip.CheckedOutputStream
 
 @Repository
-class PhotoFileStorage(private val workDir: WorkDir) : PhotoStorage {
+class PhotoFileStorage(private val workDir: WorkDir) : PhotoStoragePort {
 
 
     override fun isProcessed(filename: String): Boolean {

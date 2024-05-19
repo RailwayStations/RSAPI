@@ -4,7 +4,7 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.Size
 import org.railwaystations.rsapi.adapter.web.model.StatisticDto
 import org.railwaystations.rsapi.core.model.Statistic
-import org.railwaystations.rsapi.core.ports.GetStatisticUseCase
+import org.railwaystations.rsapi.core.ports.inbound.GetStatisticUseCase
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod

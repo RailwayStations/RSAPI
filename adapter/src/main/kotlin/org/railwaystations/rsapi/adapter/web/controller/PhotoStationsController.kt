@@ -10,7 +10,7 @@ import org.railwaystations.rsapi.adapter.web.model.PhotoStationDto
 import org.railwaystations.rsapi.adapter.web.model.PhotoStationsDto
 import org.railwaystations.rsapi.adapter.web.model.PhotographerDto
 import org.railwaystations.rsapi.core.model.Station
-import org.railwaystations.rsapi.core.ports.FindPhotoStationsUseCase
+import org.railwaystations.rsapi.core.ports.inbound.FindPhotoStationsUseCase
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

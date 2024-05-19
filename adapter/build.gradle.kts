@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.spring.dependency.management)
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.spring)
+    alias(libs.plugins.kotlin.kapt)
     id("java-library")
     id("java-test-fixtures")
 }
@@ -26,6 +27,8 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation(libs.bootstrap)
+
+    kapt(libs.spring.boot.configuration.processor)
 
     runtimeOnly(libs.mariadb.java.client)
     runtimeOnly(libs.webjars.locator)

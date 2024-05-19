@@ -2,8 +2,8 @@ package org.railwaystations.rsapi.adapter.web
 
 import jakarta.validation.ConstraintViolation
 import jakarta.validation.ConstraintViolationException
-import org.railwaystations.rsapi.core.ports.ManageInboxUseCase
-import org.railwaystations.rsapi.core.ports.ManageProfileUseCase
+import org.railwaystations.rsapi.core.ports.inbound.ManageInboxUseCase
+import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.ErrorResponse

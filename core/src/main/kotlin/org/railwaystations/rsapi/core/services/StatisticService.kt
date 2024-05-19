@@ -1,9 +1,9 @@
 package org.railwaystations.rsapi.core.services
 
 import org.railwaystations.rsapi.core.model.Statistic
-import org.railwaystations.rsapi.core.ports.CountryPort
-import org.railwaystations.rsapi.core.ports.GetStatisticUseCase
-import org.railwaystations.rsapi.core.ports.StationPort
+import org.railwaystations.rsapi.core.ports.inbound.GetStatisticUseCase
+import org.railwaystations.rsapi.core.ports.outbound.CountryPort
+import org.railwaystations.rsapi.core.ports.outbound.StationPort
 import org.springframework.stereotype.Service
 
 @Service

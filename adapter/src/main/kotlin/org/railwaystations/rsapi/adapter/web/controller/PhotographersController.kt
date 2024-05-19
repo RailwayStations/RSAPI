@@ -2,7 +2,7 @@ package org.railwaystations.rsapi.adapter.web.controller
 
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Size
-import org.railwaystations.rsapi.core.ports.LoadPhotographersUseCase
+import org.railwaystations.rsapi.core.ports.inbound.LoadPhotographersUseCase
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod

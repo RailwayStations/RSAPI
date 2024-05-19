@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.core.ports
+package org.railwaystations.rsapi.core.ports.inbound
 
 import org.railwaystations.rsapi.core.model.Station
 

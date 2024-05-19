@@ -11,8 +11,8 @@ import org.railwaystations.rsapi.adapter.web.model.InboxResponseDto
 import org.railwaystations.rsapi.app.auth.AuthUser
 import org.railwaystations.rsapi.core.model.InboxResponse
 import org.railwaystations.rsapi.core.model.User
-import org.railwaystations.rsapi.core.ports.ManageInboxUseCase
-import org.railwaystations.rsapi.core.ports.ManageProfileUseCase
+import org.railwaystations.rsapi.core.ports.inbound.ManageInboxUseCase
+import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase
 import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus

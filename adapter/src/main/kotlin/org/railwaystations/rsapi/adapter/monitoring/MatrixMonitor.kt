@@ -2,7 +2,7 @@ package org.railwaystations.rsapi.adapter.monitoring
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.railwaystations.rsapi.core.ports.Monitor
+import org.railwaystations.rsapi.core.ports.outbound.MonitorPort
 import org.railwaystations.rsapi.core.utils.ImageUtil.extensionToMimeType
 import org.railwaystations.rsapi.core.utils.ImageUtil.getExtension
 import org.railwaystations.rsapi.core.utils.ImageUtil.scalePhoto
@@ -21,7 +21,7 @@ import java.time.temporal.ChronoUnit
 
 @Service
 @ConditionalOnProperty(prefix = "monitor", name = ["service"], havingValue = "matrix")
-class MatrixMonitor(private val config: MatrixMonitorConfig, private val objectMapper: ObjectMapper) : Monitor {
+class MatrixMonitor(private val config: MatrixMonitorConfig, private val objectMapper: ObjectMapper) : MonitorPort {
 
     private val log by Logger()
 

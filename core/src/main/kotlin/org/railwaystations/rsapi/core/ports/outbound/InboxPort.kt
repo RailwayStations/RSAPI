@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.core.ports
+package org.railwaystations.rsapi.core.ports.outbound
 
 import org.railwaystations.rsapi.core.model.Coordinates
 import org.railwaystations.rsapi.core.model.InboxEntry

@@ -25,15 +25,15 @@ import org.railwaystations.rsapi.core.model.ProblemReport
 import org.railwaystations.rsapi.core.model.ProblemReportType
 import org.railwaystations.rsapi.core.model.Station
 import org.railwaystations.rsapi.core.model.User
-import org.railwaystations.rsapi.core.ports.CountryPort
-import org.railwaystations.rsapi.core.ports.InboxPort
-import org.railwaystations.rsapi.core.ports.ManageInboxUseCase
-import org.railwaystations.rsapi.core.ports.MastodonBot
-import org.railwaystations.rsapi.core.ports.Monitor
-import org.railwaystations.rsapi.core.ports.PhotoPort
-import org.railwaystations.rsapi.core.ports.PhotoStorage
-import org.railwaystations.rsapi.core.ports.StationPort
-import org.railwaystations.rsapi.core.ports.UserPort
+import org.railwaystations.rsapi.core.ports.inbound.ManageInboxUseCase
+import org.railwaystations.rsapi.core.ports.outbound.CountryPort
+import org.railwaystations.rsapi.core.ports.outbound.InboxPort
+import org.railwaystations.rsapi.core.ports.outbound.MastodonPort
+import org.railwaystations.rsapi.core.ports.outbound.MonitorPort
+import org.railwaystations.rsapi.core.ports.outbound.PhotoPort
+import org.railwaystations.rsapi.core.ports.outbound.PhotoStoragePort
+import org.railwaystations.rsapi.core.ports.outbound.StationPort
+import org.railwaystations.rsapi.core.ports.outbound.UserPort
 import org.railwaystations.rsapi.core.services.InboxService.Companion.getLicenseForPhoto
 import java.io.IOException
 import java.time.Clock
@@ -46,9 +46,9 @@ internal class InboxServiceTest {
 
     var stationPort = mockk<StationPort>()
 
-    var photoStorage = mockk<PhotoStorage>()
+    var photoStoragePort = mockk<PhotoStoragePort>()
 
-    private var monitor = mockk<Monitor>()
+    private var monitorPort = mockk<MonitorPort>()
 
     var inboxPort = mockk<InboxPort>()
 
@@ -58,7 +58,7 @@ internal class InboxServiceTest {
 
     var photoPort = mockk<PhotoPort>()
 
-    private var mastodonBot = mockk<MastodonBot>(relaxed = true)
+    private var mastodonPort = mockk<MastodonPort>(relaxed = true)
 
     var photoCaptor = slot<Photo>()
     private val clock: Clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
@@ -67,19 +67,28 @@ internal class InboxServiceTest {
     fun setup() {
         inboxService = InboxService(
             stationPort = stationPort,
-            photoStorage = photoStorage,
-            monitor = monitor,
+            photoStoragePort = photoStoragePort,
+            monitorPort = monitorPort,
             inboxPort = inboxPort,
             userPort = userPort,
             countryPort = countryPort,
             photoPort = photoPort,
             inboxBaseUrl = "inboxBaseUrl",
-            mastodonBot = mastodonBot,
+            mastodonPort = mastodonPort,
             photoBaseUrl = "photoBaseUrl",
             clock = clock,
             stationUrl = "stationUrl"
         )
-        clearMocks(stationPort, photoStorage, monitor, inboxPort, userPort, countryPort, photoPort, mastodonBot)
+        clearMocks(
+            stationPort,
+            photoStoragePort,
+            monitorPort,
+            inboxPort,
+            userPort,
+            countryPort,
+            photoPort,
+            mastodonPort
+        )
 
         every { countryPort.findById(any()) } returns null
         every { countryPort.findById(DE.code) } returns DE
@@ -91,7 +100,7 @@ internal class InboxServiceTest {
         every { inboxPort.countPendingInboxEntriesForNearbyCoordinates(any(), any()) } returns 0
         every { inboxPort.updateMissingStationImported(any(), any(), any(), any()) } returns Unit
         every { inboxPort.insert(any()) } returns 0
-        every { monitor.sendMessage(any()) } returns Unit
+        every { monitorPort.sendMessage(any()) } returns Unit
         every { photoPort.setAllPhotosForStationSecondary(any()) } returns Unit
         every { photoPort.update(any()) } returns Unit
         every { stationPort.findByKey(any(), any()) } returns null
@@ -139,7 +148,7 @@ internal class InboxServiceTest {
         inboxService.postRecentlyImportedPhotoNotYetPosted()
 
         verify {
-            mastodonBot.tootNewPhoto(
+            mastodonPort.tootNewPhoto(
                 """
                 title
                 by name
@@ -160,12 +169,12 @@ internal class InboxServiceTest {
             val station = createStationDe1()
             every { stationPort.findByKey(STATION_KEY_DE_1.country, STATION_KEY_DE_1.id) } returns station
             every { photoPort.insert(capture(photoCaptor)) } returns IMPORTED_PHOTO_ID
-            every { photoStorage.importPhoto(inboxEntry, station) } returns IMPORTED_PHOTO_URL_PATH
+            every { photoStoragePort.importPhoto(inboxEntry, station) } returns IMPORTED_PHOTO_URL_PATH
 
             inboxService.importPhoto(command)
 
             assertPhotoCapture(NEW_PHOTO_ID, STATION_KEY_DE_1, true)
-            verify { photoStorage.importPhoto(inboxEntry, station) }
+            verify { photoStoragePort.importPhoto(inboxEntry, station) }
             verify { inboxPort.done(inboxEntry.id) }
         }
 
@@ -180,13 +189,13 @@ internal class InboxServiceTest {
             val station = createStationDe1()
             whenStation1ExistsWithPhoto()
             every { photoPort.insert(capture(photoCaptor)) } returns IMPORTED_PHOTO_ID
-            every { photoStorage.importPhoto(inboxEntry, station) } returns IMPORTED_PHOTO_URL_PATH
+            every { photoStoragePort.importPhoto(inboxEntry, station) } returns IMPORTED_PHOTO_URL_PATH
 
             inboxService.importPhoto(command)
 
             assertPhotoCapture(NEW_PHOTO_ID, STATION_KEY_DE_1, true)
             verify { photoPort.setAllPhotosForStationSecondary(STATION_KEY_DE_1) }
-            verify { photoStorage.importPhoto(inboxEntry, station) }
+            verify { photoStoragePort.importPhoto(inboxEntry, station) }
             verify { inboxPort.done(inboxEntry.id) }
         }
 
@@ -201,13 +210,13 @@ internal class InboxServiceTest {
             val station = createStationDe1()
             whenStation1ExistsWithPhoto()
             every { photoPort.insert(capture(photoCaptor)) } returns IMPORTED_PHOTO_ID
-            every { photoStorage.importPhoto(inboxEntry, station) } returns IMPORTED_PHOTO_URL_PATH
+            every { photoStoragePort.importPhoto(inboxEntry, station) } returns IMPORTED_PHOTO_URL_PATH
 
             inboxService.importPhoto(command)
 
             assertPhotoCapture(NEW_PHOTO_ID, STATION_KEY_DE_1, false)
             verify(exactly = 0) { photoPort.setAllPhotosForStationSecondary(STATION_KEY_DE_1) }
-            verify { photoStorage.importPhoto(inboxEntry, station) }
+            verify { photoStoragePort.importPhoto(inboxEntry, station) }
             verify { inboxPort.done(inboxEntry.id) }
         }
 
@@ -221,14 +230,14 @@ internal class InboxServiceTest {
             every { inboxPort.findById(INBOX_ENTRY1_ID) } returns inboxEntry
             val station = createStationDe1()
             whenStation1ExistsWithPhoto()
-            every { photoStorage.importPhoto(inboxEntry, station) } returns IMPORTED_PHOTO_URL_PATH
+            every { photoStoragePort.importPhoto(inboxEntry, station) } returns IMPORTED_PHOTO_URL_PATH
 
             inboxService.importPhoto(command)
 
             verify { photoPort.update(capture(photoCaptor)) }
             assertPhotoCapture(EXISTING_PHOTO_ID, STATION_KEY_DE_1, true)
             verify(exactly = 0) { photoPort.setAllPhotosForStationSecondary(STATION_KEY_DE_1) }
-            verify { photoStorage.importPhoto(inboxEntry, station) }
+            verify { photoStoragePort.importPhoto(inboxEntry, station) }
             verify { inboxPort.done(inboxEntry.id) }
         }
 
@@ -416,7 +425,7 @@ internal class InboxServiceTest {
             every { stationPort.maxZ } returns 1024
             val newStation = createNewStationByCommand(command, "Z1025")
             every { photoPort.insert(capture(photoCaptor)) } returns IMPORTED_PHOTO_ID
-            every { photoStorage.importPhoto(inboxEntry, newStation) } returns IMPORTED_PHOTO_URL_PATH
+            every { photoStoragePort.importPhoto(inboxEntry, newStation) } returns IMPORTED_PHOTO_URL_PATH
 
             inboxService.importMissingStation(command)
 
@@ -424,7 +433,7 @@ internal class InboxServiceTest {
             verify { stationPort.countNearbyCoordinates(command.coordinates!!) }
             verify { stationPort.insert(newStation) }
             assertPhotoCapture(NEW_PHOTO_ID, newStation.key, true)
-            verify { photoStorage.importPhoto(inboxEntry, newStation) }
+            verify { photoStoragePort.importPhoto(inboxEntry, newStation) }
             verify {
                 inboxPort.updateMissingStationImported(
                     inboxEntry.id,
@@ -453,7 +462,7 @@ internal class InboxServiceTest {
             verify { stationPort.countNearbyCoordinates(command.coordinates!!) }
             verify { stationPort.insert(newStation) }
             verify(exactly = 0) { photoPort.insert(any()) }
-            verify(exactly = 0) { photoStorage.importPhoto(any(), any()) }
+            verify(exactly = 0) { photoStoragePort.importPhoto(any(), any()) }
             verify {
                 inboxPort.updateMissingStationImported(
                     inboxEntry.id,
@@ -608,7 +617,7 @@ internal class InboxServiceTest {
             inboxService.deleteUserInboxEntry(PHOTOGRAPHER, inboxEntry.id)
 
             verify { inboxPort.reject(inboxEntry.id, "Withdrawn by user") }
-            verify { monitor.sendMessage("InboxEntry ${inboxEntry.id} ${inboxEntry.title} has been withdrawn by ${PHOTOGRAPHER.name}") }
+            verify { monitorPort.sendMessage("InboxEntry ${inboxEntry.id} ${inboxEntry.title} has been withdrawn by ${PHOTOGRAPHER.name}") }
         }
 
         @Test
@@ -844,7 +853,7 @@ internal class InboxServiceTest {
             )
             every { stationPort.delete(any()) } returns Unit
             every { inboxPort.reject(any(), any()) } returns Unit
-            every { photoStorage.reject(any()) } returns Unit
+            every { photoStoragePort.reject(any()) } returns Unit
 
             inboxService.deleteStation(
                 InboxCommand(
@@ -857,7 +866,7 @@ internal class InboxServiceTest {
             verify { stationPort.delete(STATION_KEY_DE_1) }
             verify { inboxPort.done(inboxEntry1.id) }
             verify { inboxPort.reject(inboxEntry2.id, "Station has been deleted") }
-            verify { photoStorage.reject(inboxEntry2) }
+            verify { photoStoragePort.reject(inboxEntry2) }
         }
 
 

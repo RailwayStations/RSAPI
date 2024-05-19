@@ -1,7 +1,7 @@
 package org.railwaystations.rsapi.adapter.mastodon
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.railwaystations.rsapi.core.ports.MastodonBot
+import org.railwaystations.rsapi.core.ports.outbound.MastodonPort
 import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.http.MediaType
 import org.springframework.scheduling.annotation.Async
@@ -17,7 +17,7 @@ import java.time.temporal.ChronoUnit
 class MastodonBotHttpClient(
     private val config: MastodonBotConfig,
     private val objectMapper: ObjectMapper,
-) : MastodonBot {
+) : MastodonPort {
 
     private val log by Logger()
 

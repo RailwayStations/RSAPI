@@ -7,7 +7,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.railwaystations.rsapi.adapter.db.InboxDao
 import org.railwaystations.rsapi.core.model.InboxEntry
-import org.railwaystations.rsapi.core.ports.PhotoStorage
+import org.railwaystations.rsapi.core.ports.outbound.PhotoStoragePort
 import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.http.HttpStatus
@@ -29,7 +29,7 @@ import java.time.temporal.ChronoUnit
 @ConditionalOnProperty(prefix = "webdavsync", name = ["enabled"], havingValue = "true")
 class WebDavSyncTask(
     private val config: WebDavSyncConfig,
-    private val photoStorage: PhotoStorage,
+    private val photoStoragePort: PhotoStoragePort,
     private val inboxDao: InboxDao,
 ) {
 
@@ -98,7 +98,7 @@ class WebDavSyncTask(
     }
 
     private fun checkWebDav(inboxEntry: InboxEntry, processedFiles: List<MultistatusResponse>) {
-        val toProcessPath = photoStorage.getInboxToProcessFile(inboxEntry.filename!!)
+        val toProcessPath = photoStoragePort.getInboxToProcessFile(inboxEntry.filename!!)
         if (Files.exists(toProcessPath)) {
             try {
                 uploadToProcess(toProcessPath)
@@ -107,7 +107,7 @@ class WebDavSyncTask(
                 log.error("Unable to upload toProcess {}", toProcessPath, e)
             }
         }
-        val processedPath = photoStorage.getInboxProcessedFile(inboxEntry.filename!!)
+        val processedPath = photoStoragePort.getInboxProcessedFile(inboxEntry.filename!!)
         if (checkIfDownloadProcessedNeeded(processedPath, processedFiles)) {
             try {
                 downloadProcessed(processedPath)

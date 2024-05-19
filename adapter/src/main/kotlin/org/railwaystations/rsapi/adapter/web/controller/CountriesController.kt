@@ -5,7 +5,7 @@ import org.railwaystations.rsapi.adapter.web.model.CountryDto
 import org.railwaystations.rsapi.adapter.web.model.ProviderAppDto
 import org.railwaystations.rsapi.core.model.Country
 import org.railwaystations.rsapi.core.model.ProviderApp
-import org.railwaystations.rsapi.core.ports.ListCountriesUseCase
+import org.railwaystations.rsapi.core.ports.inbound.ListCountriesUseCase
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod

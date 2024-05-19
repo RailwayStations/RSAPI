@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size
 import org.apache.commons.lang3.StringUtils
 import org.railwaystations.rsapi.adapter.web.RequestUtil
 import org.railwaystations.rsapi.core.model.User
-import org.railwaystations.rsapi.core.ports.ManageProfileUseCase
+import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase
 import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Controller

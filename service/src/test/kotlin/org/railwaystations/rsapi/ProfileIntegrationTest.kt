@@ -11,7 +11,7 @@ import org.railwaystations.rsapi.adapter.db.AbstractMariaDBBaseTest
 import org.railwaystations.rsapi.adapter.db.UserDao
 import org.railwaystations.rsapi.core.model.License
 import org.railwaystations.rsapi.core.model.User
-import org.railwaystations.rsapi.core.ports.Mailer
+import org.railwaystations.rsapi.core.ports.outbound.MailerPort
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -59,7 +59,7 @@ internal class ProfileIntegrationTest : AbstractMariaDBBaseTest() {
     private lateinit var userDao: UserDao
 
     @MockkBean(relaxed = true)
-    private lateinit var mailer: Mailer
+    private lateinit var mailerPort: MailerPort
 
     @Test
     fun getProfileForbidden() {
