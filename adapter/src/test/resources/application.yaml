@@ -1,0 +1,54 @@
+---
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+  liquibase:
+    change-log: classpath:migrations.xml
+    contexts: junit
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  jackson:
+    default-property-inclusion: non_null
+
+# application
+workDir: /var/rsapi
+salt: dummy
+photoBaseUrl: http://localhost:8080/photos
+inboxBaseUrl: http://localhost:8080/inbox
+keepFileCopiesInDays: 60
+mailVerificationUrl: http://localhost:8000/emailVerification.php?token=
+jwkSourceKeyFile: jwkSourceTestKeys.json
+
+# mailer
+mailer:
+  host:
+  port:
+  user:
+  passwd:
+  from: info@railway-stations.org
+
+# Mastodon Bot
+mastodonBot:
+  instanceUrl: https://botsin.space
+  token:
+  stationUrl: https://map.railway-stations.org/station.php
+
+monitor:
+  service: logging
+
+# Matrix Monitor
+matrix:
+  uploadUrl: https://matrix.org/_matrix/media/r0/upload
+  roomUrl:
+  accessToken:
+
+webdavsync:
+  enabled: false
+  toProcessUrl: https://cloud.railway-stations.org/remote.php/webdav/VsionAI/roh
+  processedUrl: https://cloud.railway-stations.org/remote.php/webdav/VsionAI/verpixelt
+  user: rsapi
+  password:
