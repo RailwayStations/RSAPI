@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.app
+package org.railwaystations.rsapi
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan

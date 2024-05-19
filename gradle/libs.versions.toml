@@ -2,13 +2,17 @@
 springBoot = "3.2.5"
 springDependency = "1.1.5"
 springOauth2AuthorizationServer = "1.2.4"
+springFramework = "6.2.4"
 openapiGenerator = "7.5.0"
 kotlin = "1.9.24"
 testContainers = "1.19.8"
 jdbi = "3.45.1"
 swaggerRequestValidator = "2.40.0"
 lazysodium = "5.1.4"
+liquibase = "4.24.0"
+mariadbJavaClient = "3.3.3"
 jna = "5.14.0"
+commonsCodec = "1.16.1"
 commonsIo = "2.16.1"
 commonsLang = "3.13.0"
 swaggerAnnotations = "2.2.22"
@@ -19,12 +23,18 @@ wiremock = "3.0.1"
 mockk = "1.13.11"
 springMockk = "4.0.2"
 greenmail = "2.0.1"
+webjarsLocator = "0.55"
+xmlunit = "2.9.1"
 
 [libraries]
+spring-boot-starter-jdbc = { group = "org.springframework.boot", name = "spring-boot-starter-jdbc", version.ref = "springBoot" }
+spring-boot-starter-mail = { group = "org.springframework.boot", name = "spring-boot-starter-mail", version.ref = "springBoot" }
 spring-boot-starter-security = { group = "org.springframework.boot", name = "spring-boot-starter-security", version.ref = "springBoot" }
 spring-boot-starter-test = { group = "org.springframework.boot", name = "spring-boot-starter-test", version.ref = "springBoot" }
+spring-boot-starter-thymeleaf = { group = "org.springframework.boot", name = "spring-boot-starter-thymeleaf", version.ref = "springBoot" }
 spring-boot-starter-web = { group = "org.springframework.boot", name = "spring-boot-starter-web", version.ref = "springBoot" }
 spring-boot-starter-validation = { group = "org.springframework.boot", name = "spring-boot-starter-validation", version.ref = "springBoot" }
+spring-security-test = { group = "org.springframework.security", name = "spring-security-test", version.ref = "springFramework" }
 jdbi3-spring5 = { group = "org.jdbi", name = "jdbi3-spring5", version.ref = "jdbi" }
 jdbi3-kotlin = { group = "org.jdbi", name = "jdbi3-kotlin", version.ref = "jdbi" }
 jdbi3-kotlin-sqlobject = { group = "org.jdbi", name = "jdbi3-kotlin-sqlobject", version.ref = "jdbi" }
@@ -36,19 +46,24 @@ swagger-request-validator-spring-webmvc = { group = "com.atlassian.oai", name = 
 swagger-request-validator-mockmvc = { group = "com.atlassian.oai", name = "swagger-request-validator-mockmvc", version.ref = "swaggerRequestValidator" }
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
 kotlin-stdlib-jdk8 = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib-jdk8", version.ref = "kotlin" }
+mariadb-java-client = { group = "org.mariadb.jdbc", name = "mariadb-java-client", version.ref = "mariadbJavaClient" }
 spring-security-oauth2-authorization-server = { group = "org.springframework.security", name = "spring-security-oauth2-authorization-server", version.ref = "springOauth2AuthorizationServer" }
 lazysodium-java = { group = "com.goterl", name = "lazysodium-java", version.ref = "lazysodium" }
+liquibase-core = { group = "org.liquibase", name = "liquibase-core", version.ref = "liquibase" }
 jna = { group = "net.java.dev.jna", name = "jna", version.ref = "jna" }
+commons-codec = { group = "commons-codec", name = "commons-codec", version.ref = "commonsCodec" }
 commons-io = { group = "commons-io", name = "commons-io", version.ref = "commonsIo" }
 commons-lang3 = { group = "org.apache.commons", name = "commons-lang3", version.ref = "commonsLang" }
 swagger-annotations = { group = "io.swagger.core.v3", name = "swagger-annotations", version.ref = "swaggerAnnotations" }
 jakarta-validation-api = { group = "jakarta.validation", name = "jakarta.validation-api", version.ref = "jakartaValidationApi" }
 bootstrap = { group = "org.webjars", name = "bootstrap", version.ref = "bootstrap" }
+webjars-locator = { group = "org.webjars", name = "webjars-locator-core", version.ref = "webjarsLocator" }
 json-unit-spring = { group = "net.javacrumbs.json-unit", name = "json-unit-spring", version.ref = "jsonUnitSpring" }
 wiremock-jre8-standalone = { group = "com.github.tomakehurst", name = "wiremock-jre8-standalone", version.ref = "wiremock" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 springmockk = { group = "com.ninja-squad", name = "springmockk", version.ref = "springMockk" }
 greenmail = { group = "com.icegreen", name = "greenmail", version.ref = "greenmail" }
+xmlunit-assertj3 = { group = "org.xmlunit", name = "xmlunit-assertj3", version.ref = "xmlunit" }
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }

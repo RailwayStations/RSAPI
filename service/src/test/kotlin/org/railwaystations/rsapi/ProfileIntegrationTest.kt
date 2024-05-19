@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.app
+package org.railwaystations.rsapi
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -7,6 +7,7 @@ import com.ninjasquad.springmockk.MockkBean
 import jakarta.validation.constraints.NotNull
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.railwaystations.rsapi.adapter.db.AbstractMariaDBBaseTest
 import org.railwaystations.rsapi.adapter.db.UserDao
 import org.railwaystations.rsapi.core.model.License
 import org.railwaystations.rsapi.core.model.User

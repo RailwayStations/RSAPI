@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.app
+package org.railwaystations.rsapi
 
 import com.atlassian.oai.validator.springmvc.OpenApiValidationFilter
 import com.atlassian.oai.validator.springmvc.OpenApiValidationInterceptor
@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.ValueSource
+import org.railwaystations.rsapi.adapter.db.AbstractMariaDBBaseTest
 import org.railwaystations.rsapi.adapter.db.PhotoDao
 import org.railwaystations.rsapi.adapter.monitoring.LoggingMonitor
 import org.railwaystations.rsapi.adapter.photostorage.WorkDir

@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.app.config
+package org.railwaystations.rsapi.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

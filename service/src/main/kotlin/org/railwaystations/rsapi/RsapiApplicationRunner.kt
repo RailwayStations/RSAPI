@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.app
+package org.railwaystations.rsapi
 
 import org.railwaystations.rsapi.core.ports.GetStatisticUseCase
 import org.railwaystations.rsapi.core.ports.Monitor

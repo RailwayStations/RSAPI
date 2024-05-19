@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.app
+package org.railwaystations.rsapi.adapter.db
 
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
@@ -7,7 +7,8 @@ import org.testcontainers.utility.DockerImageName
 
 abstract class AbstractMariaDBBaseTest {
     companion object {
-        private val mariadb = MariaDBContainer(DockerImageName.parse("mariadb:10.8"))
+        private val mariadb =
+            MariaDBContainer(DockerImageName.parse("mariadb:10.8"))
 
         init {
             mariadb.withEnv("TZ", "UTC")
