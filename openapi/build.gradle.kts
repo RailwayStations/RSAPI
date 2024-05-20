@@ -53,3 +53,10 @@ tasks.compileKotlin {
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KaptGenerateStubs>().configureEach {
     dependsOn(tasks.openApiGenerate)
 }
+
+dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation(rootProject.project.libs.swagger.annotations)
+    implementation("jakarta.validation:jakarta.validation-api")
+}

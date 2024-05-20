@@ -1,6 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    alias(libs.plugins.spring.boot) apply false
+    alias(libs.plugins.spring.dependency.management)
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.kapt) apply false
 }
@@ -35,16 +37,18 @@ allprojects {
 subprojects {
     apply {
         plugin(rootProject.project.libs.plugins.kotlin.jvm.get().pluginId)
+        plugin(rootProject.project.libs.plugins.spring.dependency.management.get().pluginId)
+    }
+    dependencyManagement {
+        imports {
+            mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+        }
     }
     repositories {
         mavenCentral()
         dependencies {
             implementation("org.jetbrains.kotlin:kotlin-reflect")
             implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-            implementation(rootProject.project.libs.spring.boot.starter.web)
-            implementation(rootProject.project.libs.spring.boot.starter.validation)
-            implementation(rootProject.project.libs.swagger.annotations)
-            implementation(rootProject.project.libs.jakarta.validation.api)
         }
     }
 }

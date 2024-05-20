@@ -1,7 +1,5 @@
 plugins {
     alias(libs.plugins.spring.boot)
-    alias(libs.plugins.spring.dependency.management)
-    alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.spring)
     alias(libs.plugins.kotlin.kapt)
 }
@@ -28,16 +26,15 @@ dependencies {
     implementation(project("::openapi"))
     implementation(project("::adapter"))
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation(libs.spring.boot.starter.jdbc)
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation(libs.spring.security.oauth2.authorization.server)
-    implementation(libs.liquibase.core)
-    implementation("commons-codec:commons-codec")
-    implementation(libs.commons.io)
-    implementation(libs.commons.lang3)
+    implementation("org.liquibase:liquibase-core")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-    kapt(libs.spring.boot.configuration.processor)
+    kapt("org.springframework.boot:spring-boot-configuration-processor")
 
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
     runtimeOnly("org.webjars:webjars-locator-core")
@@ -50,9 +47,9 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.awaitility:awaitility")
-    testImplementation(libs.testcontainers)
-    testImplementation(libs.testcontainers.junit.jupiter)
-    testImplementation(libs.testcontainers.mariadb)
+    testImplementation("org.testcontainers:testcontainers")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:mariadb")
     testImplementation(libs.swagger.request.validator.core)
     testImplementation(libs.swagger.request.validator.spring.webmvc)
     testImplementation(libs.swagger.request.validator.mockmvc)
@@ -62,7 +59,6 @@ dependencies {
     testImplementation(libs.wiremock.jre8.standalone)
     testImplementation(libs.mockk)
     testImplementation(libs.springmockk)
-    testImplementation(libs.greenmail)
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
