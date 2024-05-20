@@ -23,7 +23,7 @@ wiremock = "3.0.1"
 mockk = "1.13.11"
 springMockk = "4.0.2"
 greenmail = "2.0.1"
-webjarsLocator = "0.55"
+webjarsLocator = "0.58"
 xmlunit = "2.9.1"
 
 [libraries]
