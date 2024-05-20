@@ -4,9 +4,6 @@ spring:
     allow-bean-definition-overriding: true
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-  liquibase:
-    change-log: classpath:migrations.xml
-    contexts: junit
   servlet:
     multipart:
       max-file-size: 20MB
