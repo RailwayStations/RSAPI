@@ -7,6 +7,9 @@ spring:
     username: rsapi
     password: rsapi
     url: jdbc:mariadb://localhost:3306/rsapi?useUnicode=yes&characterEncoding=UTF-8&serverTimezone=UTC&useLegacyDatetimeCode=false&sessionVariables=time_zone='+00:00'
+  flyway:
+    baseline-on-migrate: true
+    baseline-version: 1
   liquibase:
     change-log: classpath:migrations.xml
     contexts: test

@@ -44,6 +44,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.jdbc.Sql
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import java.io.ByteArrayInputStream
@@ -65,6 +66,17 @@ private val IMAGE: ByteArray = Base64.getDecoder()
     properties = ["server.error.include-message=always"]
 )
 @ActiveProfiles("test")
+@Sql(
+    scripts = [
+        "/testdata/cleanup.sql",
+        "/testdata/countries.sql",
+        "/testdata/providerApps.sql",
+        "/testdata/users.sql",
+        "/testdata/stations.sql",
+        "/testdata/photos.sql",
+        "/testdata/oauth2_registered_client.sql",
+    ], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS
+)
 internal class RsapiIntegrationTest : AbstractMariaDBBaseTest() {
     @Autowired
     private lateinit var mapper: ObjectMapper

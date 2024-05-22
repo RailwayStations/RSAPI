@@ -9,7 +9,7 @@ plugins {
 
 group = "org.railwaystations.rsapi"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_21
+
 
 repositories {
     mavenCentral()
@@ -31,6 +31,10 @@ allprojects {
         group = "other"
         description = "Compiles all the modules."
         dependsOn(subprojects.map { it.tasks.named("compileKotlin") })
+    }
+
+    tasks.withType<JavaCompile> {
+        sourceCompatibility = "21"
     }
 }
 

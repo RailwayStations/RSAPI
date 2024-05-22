@@ -46,3 +46,4 @@ target
 /.rewrite-cache/
 /spring-boot-migrator.log
 /.run/RsapiApplication.run.xml
+/.kotlin/sessions/
