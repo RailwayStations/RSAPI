@@ -6,6 +6,7 @@ plugins {
 
 buildscript {
     dependencies {
+        // workaround for https://github.com/OpenAPITools/openapi-generator/issues/18753
         classpath("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml") {
             version { strictly("2.14.2") }
         }
