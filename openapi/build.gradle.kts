@@ -4,6 +4,14 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
 }
 
+buildscript {
+    dependencies {
+        classpath("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml") {
+            version { strictly("2.14.2") }
+        }
+    }
+}
+
 openApiValidate {
     inputSpec = "$projectDir/src/main/resources/static/openapi.yaml"
     recommend = true
