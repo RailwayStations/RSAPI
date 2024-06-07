@@ -6,7 +6,7 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.Size
 import org.railwaystations.rsapi.adapter.web.RequestUtil
 import org.railwaystations.rsapi.adapter.web.model.CountryDto
-import org.railwaystations.rsapi.adapter.web.model.RegisterProfileDto
+import org.railwaystations.rsapi.adapter.web.model.LicenseDto
 import org.railwaystations.rsapi.core.model.Country
 import org.railwaystations.rsapi.core.model.Station
 import org.railwaystations.rsapi.core.model.User
@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.LocaleResolver
+import java.net.URI
 import java.util.*
 
 @Validated
@@ -139,6 +140,19 @@ class DeprecatedApiController(
         val active: Boolean,
         val outdated: Boolean?,
     )
+
+    @JsonTypeName("RegisterProfile")
+    @Deprecated("")
+    data class RegisterProfileDto(
+        val nickname: String,
+        val email: String,
+        val license: LicenseDto,
+        val photoOwner: Boolean,
+        val link: URI?,
+        val anonymous: Boolean?,
+        val sendNotifications: Boolean?,
+        val newPassword: String?,
+    )
 }
 
 private fun Station.toDto(photoBaseUrl: String) =
@@ -167,7 +181,7 @@ private fun Station.Key.legacyStationId() = try {
     -1
 }
 
-private fun RegisterProfileDto.toDomain(locale: Locale) = User(
+private fun DeprecatedApiController.RegisterProfileDto.toDomain(locale: Locale) = User(
     name = nickname,
     email = email,
     url = link?.toString(),

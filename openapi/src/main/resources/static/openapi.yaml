@@ -8,15 +8,19 @@ info:
   license:
     name: MIT
     url: https://github.com/RailwayStations/RSAPI/blob/master/LICENSE.txt
-  version: "20240329.0800"
+  version: "20240607.2121"
 servers:
-  - url: https://api.railway-stations.org/
+  - url: https://api.railway-stations.org
 tags:
-  - name: bahnhofsfotos
-    description: Photos of railway stations
-    externalDocs:
-      description: Find out more
-      url: https://www.railway-stations.org
+  - name: oauth
+  - name: photoStations
+  - name: photographers
+  - name: statistic
+  - name: countries
+  - name: photoUpload
+  - name: inbox
+  - name: profile
+  - name: photoDownload
 
 paths:
   /oauth2/authorize:
@@ -26,15 +30,18 @@ paths:
         Redirect the user to this URL to start the authorization code flow.
         Specification: https://datatracker.ietf.org/doc/html/rfc6749#section-3.1
         PKCE: https://tools.ietf.org/html/rfc7636
+      operationId: getOAuth2Authorize
       tags:
         - oauth
       parameters:
         - name: client_id
+          description: ID of the OAuth client
           in: query
           required: true
           schema:
             type: string
         - name: scope
+          description: OAuth scope
           in: query
           required: true
           schema:
@@ -42,6 +49,7 @@ paths:
             enum:
               - all
         - name: response_type
+          description: OAuth response type
           in: query
           required: true
           schema:
@@ -50,12 +58,14 @@ paths:
               - code
               - token
         - name: redirect_uri
+          description: OAuth redirect URI
           in: query
           required: true
           schema:
             type: string
             format: uri
         - name: state
+          description: OAuth state
           in: query
           schema:
             type: string
@@ -65,13 +75,14 @@ paths:
           schema:
             type: string
         - name: code_challenge_method
+          description: OAuth code chellenge method
           in: query
           schema:
             type: string
             enum:
               - S256
       responses:
-        302:
+        "302":
           description: redirect to `redirect_uri` with `code` and `state` query parameter
         default:
           description: Unexpected error
@@ -84,18 +95,20 @@ paths:
     post:
       summary: OAuth2 token endpoint
       description: https://datatracker.ietf.org/doc/html/rfc6749#section-3.2
+      operationId: postOAuth2Token
       tags:
         - oauth
       parameters:
         - $ref: '#/components/parameters/Authorization'
       requestBody:
         required: true
+        description: OAuth token request body
         content:
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/OAuthTokenRequest'
       responses:
-        200:
+        "200":
           description: successfull token request
           content:
             application/json:
@@ -112,6 +125,7 @@ paths:
     post:
       summary: OAuth2 revoke token endpoint
       description: https://datatracker.ietf.org/doc/html/rfc7009#section-2.1
+      operationId: postOAuth2Revoke
       tags:
         - oauth
       parameters:
@@ -123,7 +137,7 @@ paths:
             schema:
               $ref: '#/components/schemas/OAuthRevokeTokenRequest'
       responses:
-        200:
+        "200":
           description: successfully revoked the token
         default:
           description: Unexpected error
@@ -135,6 +149,7 @@ paths:
   /photoStationById/{country}/{id}:
     get:
       summary: Get a railway station of a country by its id with all its photos
+      operationId: getPhotoStationById
       tags:
         - photoStations
       parameters:
@@ -151,13 +166,13 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PhotoStations'
-        404:
+        "404":
           description: Station not found
           content: { }
         default:
@@ -173,6 +188,7 @@ paths:
       description: |
         Returns only the primary photo of each station.
         Stations can optionally be filtered by 'hasPhoto' and/or 'isActive' flag.
+      operationId: getPhotoStationByCountry
       tags:
         - photoStations
       parameters:
@@ -193,7 +209,7 @@ paths:
           schema:
             type: boolean
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -212,6 +228,7 @@ paths:
       description: |
         Returns only the photos of a station which belong to the photographer.
         Can return several photos per station, not necessarily the primary photo.
+      operationId: getPhotoStationsByPhotographer
       tags:
         - photoStations
       parameters:
@@ -227,7 +244,7 @@ paths:
           schema:
             $ref: '#/components/schemas/CountryCode'
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -246,6 +263,7 @@ paths:
       description: |
         Returns only the recently imported photos of a station, defined by the sinceHours parameter.
         Can return several photos per station, not necessarily the primary photo.
+      operationId: getPhotoStationsByRecentPhotoImports
       tags:
         - photoStations
       parameters:
@@ -261,7 +279,7 @@ paths:
             minimum: 1
             maximum: 800
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -277,6 +295,7 @@ paths:
   /photographers:
     get:
       summary: List of all photographers with their number of photos taken
+      operationId: getPhotographers
       tags:
         - photographers
       parameters:
@@ -287,13 +306,13 @@ paths:
           schema:
             $ref: '#/components/schemas/CountryCode'
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Photographers'
-        400:
+        "400":
           description: Bad Request
           content:
             application/json:
@@ -309,6 +328,7 @@ paths:
   /stats:
     get:
       summary: Overall statistic of photos with and without photos
+      operationId: getStats
       tags:
         - statistic
       parameters:
@@ -318,13 +338,13 @@ paths:
           schema:
             $ref: '#/components/schemas/CountryCode'
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Statistic'
-        404:
+        "404":
           description: Country not found
           content: { }
         default:
@@ -337,6 +357,7 @@ paths:
   /countries:
     get:
       summary: List of all supported countries with their configuration
+      operationId: getCountries
       tags:
         - countries
       parameters:
@@ -346,7 +367,7 @@ paths:
           schema:
             type: boolean
       responses:
-        200:
+        "200":
           description: successful operation
           content:
             application/json:
@@ -364,6 +385,7 @@ paths:
   /photoUpload:
     post:
       summary: Upload a new Photo
+      operationId: postPhotoUpload
       tags:
         - photoUpload
       parameters:
@@ -431,34 +453,34 @@ paths:
               type: string
               format: byte
       responses:
-        202:
+        "202":
           description: upload successful
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InboxResponse'
-        400:
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InboxResponse'
-        401:
+        "401":
           description: authorization failed
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InboxResponse'
-        403:
+        "403":
           description: forbidden
           content: { }
-        409:
+        "409":
           description: photo already exists
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InboxResponse'
-        413:
+        "413":
           description: image too large (maximum 20 MB)
           content:
             application/json:
@@ -475,6 +497,7 @@ paths:
   /reportProblem:
     post:
       summary: Report a for a Railway-Station
+      operationId: postReportProblem
       tags:
         - inbox
       parameters:
@@ -487,25 +510,25 @@ paths:
               $ref: '#/components/schemas/ProblemReport'
         required: true
       responses:
-        202:
+        "202":
           description: report successful
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InboxResponse'
-        400:
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InboxResponse'
-        401:
+        "401":
           description: authorization failed
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InboxResponse'
-        403:
+        "403":
           description: forbidden
           content: { }
         default:
@@ -519,6 +542,7 @@ paths:
   /userInbox:
     get:
       summary: Query all uploads of the authorized user
+      operationId: getUserInbox
       tags:
         - inbox
       parameters:
@@ -530,7 +554,7 @@ paths:
           schema:
             type: boolean
       responses:
-        200:
+        "200":
           description: array of InboxStateQueryResponse objects
           content:
             application/json:
@@ -546,11 +570,13 @@ paths:
                 $ref: '#/components/schemas/GeneralErrorMessage'
     post:
       summary: Query the state of photo uploads of the authorized user
+      operationId: postUserInbox
       tags:
         - inbox
       parameters:
         - $ref: '#/components/parameters/Authorization'
       requestBody:
+        description: Inbox state query request
         content:
           application/json:
             schema:
@@ -559,7 +585,7 @@ paths:
                 $ref: '#/components/schemas/InboxStateQueryRequest'
         required: true
       responses:
-        200:
+        "200":
           description: array of InboxStateQueryResponse objects
           content:
             application/json:
@@ -578,6 +604,7 @@ paths:
   /userInbox/{id}:
     delete:
       summary: Delete an unprocessed inbox entry
+      operationId: deleteUserInbox
       tags:
         - inbox
       parameters:
@@ -589,15 +616,15 @@ paths:
             type: integer
             format: int64
       responses:
-        204:
+        "204":
           description: inbox entry got deleted
-        400:
+        "400":
           description: bad request, e.g. if the inbox entry is already done and can't be deleted anymore
           content: { }
-        401:
+        "401":
           description: authorization failed
           content: { }
-        403:
+        "403":
           description: forbidden
           content: { }
         default:
@@ -610,10 +637,11 @@ paths:
   /publicInbox:
     get:
       summary: Get the current public inbox, stations where photos have been uploaded
+      operationId: getPublicInbox
       tags:
         - inbox
       responses:
-        200:
+        "200":
           description: array of public inbox objects
           content:
             application/json:
@@ -631,10 +659,11 @@ paths:
   /adminInboxCount:
     get:
       summary: Count pending inbox items
+      operationId: getAdminInboxCount
       tags:
         - inbox
       responses:
-        200:
+        "200":
           description: count of pending inbox items
           content:
             application/json:
@@ -650,12 +679,13 @@ paths:
   /adminInbox:
     get:
       summary: Get the current inbox, photos and problem reports under review.
+      operationId: getAdminInbox
       tags:
         - inbox
       parameters:
         - $ref: '#/components/parameters/Authorization'
       responses:
-        200:
+        "200":
           description: array of inbox objects
           content:
             application/json:
@@ -663,10 +693,10 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/InboxEntry'
-        401:
+        "401":
           description: not authorized
           content: { }
-        403:
+        "403":
           description: forbidden
           content: { }
         default:
@@ -678,6 +708,7 @@ paths:
     post:
       summary: |
         Import or reject an uploaded photo or a problem report from the inbox
+      operationId: postAdminInbox
       tags:
         - inbox
       parameters:
@@ -689,22 +720,22 @@ paths:
               $ref: '#/components/schemas/InboxCommand'
         required: true
       responses:
-        200:
+        "200":
           description: command successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AdminInboxCommandResponse'
-        400:
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AdminInboxCommandResponse'
-        401:
+        "401":
           description: not authorized
           content: { }
-        403:
+        "403":
           description: forbidden
           content: { }
         default:
@@ -718,22 +749,24 @@ paths:
   /emailVerification/{token}:
     get:
       summary: Verify eMail-Address with verification token
+      operationId: getEmailVerification
       tags:
         - profile
       parameters:
         - name: token
+          description: email verification token
           in: path
           required: true
           schema:
             type: string
       responses:
-        200:
+        "200":
           description: email successfully verified
           content:
             text/plain:
               schema:
                 type: string
-        404:
+        "404":
           description: token not found, verification failed
           content: { }
         default:
@@ -746,12 +779,13 @@ paths:
   /resendEmailVerification:
     post:
       summary: Sends a new eMail-Verification mail
+      operationId: postResendEmailVerification
       tags:
         - profile
       parameters:
         - $ref: '#/components/parameters/Authorization'
       responses:
-        200:
+        "200":
           description: email successfully sent
           content: { }
         default:
@@ -764,6 +798,7 @@ paths:
   /changePassword:
     post:
       summary: Change user password
+      operationId: postChangePassword
       tags:
         - profile
       parameters:
@@ -776,16 +811,16 @@ paths:
               $ref: '#/components/schemas/ChangePassword'
         required: true
       responses:
-        200:
+        "200":
           description: password changed
           content: { }
-        400:
+        "400":
           description: Bad Request
           content:
             text/plain:
               schema:
                 type: string
-        404:
+        "404":
           description: User not found
           content: { }
         default:
@@ -798,21 +833,22 @@ paths:
   /myProfile:
     get:
       summary: Get the users profile
+      operationId: getMyProfile
       tags:
         - profile
       parameters:
         - $ref: '#/components/parameters/Authorization'
       responses:
-        200:
+        "200":
           description: ok
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Profile'
-        401:
+        "401":
           description: authorization failed
           content: { }
-        403:
+        "403":
           description: forbidden
           content: { }
         default:
@@ -825,6 +861,7 @@ paths:
       summary: Update the users profile.
       description: |
         In case the email has been changed, only the email is saved and a new password is send.
+      operationId: postMyProfile
       tags:
         - profile
       parameters:
@@ -837,22 +874,22 @@ paths:
               $ref: '#/components/schemas/UpdateProfile'
         required: true
       responses:
-        200:
+        "200":
           description: ok
           content: { }
-        400:
+        "400":
           description: Bad Request
           content:
             text/plain:
               schema:
                 type: string
-        401:
+        "401":
           description: authorization failed
           content: { }
-        403:
+        "403":
           description: forbidden
           content: { }
-        409:
+        "409":
           description: conflict with existing name or email
           content:
             text/plain:
@@ -872,17 +909,18 @@ paths:
         The account will be changed to anonymous. 
         The email-address, nickname, link and credentials will be removed from the account.
         All OAuth tokens will be removed as well. No further login will be possible.
+      operationId: deleteMyProfile
       tags:
         - profile
       parameters:
         - $ref: '#/components/parameters/Authorization'
       responses:
-        204:
+        "204":
           description: delete action has been enacted, no further information
-        401:
+        "401":
           description: authorization failed
           content: { }
-        403:
+        "403":
           description: forbidden
           content: { }
         default:
@@ -895,6 +933,7 @@ paths:
   /photos/{country}/{filename}:
     get:
       summary: downloads the given photo
+      operationId: getPhotos
       tags:
         - photoDownload
       parameters:
@@ -917,7 +956,7 @@ paths:
             type: integer
             format: int32
       responses:
-        200:
+        "200":
           description: ok
           content:
             image/jpeg:
@@ -928,7 +967,7 @@ paths:
               schema:
                 type: string
                 format: binary
-        404:
+        "404":
           description: file not found
           content: { }
         default:
@@ -941,6 +980,7 @@ paths:
   /inbox/{filename}:
     get:
       summary: downloads the given photo from the inbox
+      operationId: getInboxFile
       tags:
         - photoDownload
       parameters:
@@ -957,7 +997,7 @@ paths:
             type: integer
             format: int32
       responses:
-        200:
+        "200":
           description: ok
           content:
             image/jpeg:
@@ -968,7 +1008,7 @@ paths:
               schema:
                 type: string
                 format: binary
-        404:
+        "404":
           description: file not found
           content: { }
         default:
@@ -981,6 +1021,7 @@ paths:
   /inbox/processed/{filename}:
     get:
       summary: downloads the given photo from the processed inbox
+      operationId: getInboxProcessedFile
       tags:
         - photoDownload
       parameters:
@@ -997,7 +1038,7 @@ paths:
             type: integer
             format: int32
       responses:
-        200:
+        "200":
           description: ok
           content:
             image/jpeg:
@@ -1008,7 +1049,7 @@ paths:
               schema:
                 type: string
                 format: binary
-        404:
+        "404":
           description: file not found
           content: { }
         default:
@@ -1021,6 +1062,7 @@ paths:
   /inbox/done/{filename}:
     get:
       summary: downloads the given photo from the done inbox
+      operationId: getInboxDoneFile
       tags:
         - photoDownload
       parameters:
@@ -1037,7 +1079,7 @@ paths:
             type: integer
             format: int32
       responses:
-        200:
+        "200":
           description: ok
           content:
             image/jpeg:
@@ -1048,7 +1090,7 @@ paths:
               schema:
                 type: string
                 format: binary
-        404:
+        "404":
           description: file not found
           content: { }
         default:
@@ -1061,6 +1103,7 @@ paths:
   /inbox/rejected/{filename}:
     get:
       summary: downloads the given photo from the rejected inbox
+      operationId: getInboxRejectedFile
       tags:
         - photoDownload
       parameters:
@@ -1077,7 +1120,7 @@ paths:
             type: integer
             format: int32
       responses:
-        200:
+        "200":
           description: ok
           content:
             image/jpeg:
@@ -1088,7 +1131,7 @@ paths:
               schema:
                 type: string
                 format: binary
-        404:
+        "404":
           description: file not found
           content: { }
         default:
@@ -1184,7 +1227,6 @@ components:
         - access_token
         - scope
         - token_type
-        - redirect
 
     OAuthRevokeTokenRequest:
       description: OAuth2 token revokation request
@@ -1271,8 +1313,6 @@ components:
       properties:
         country:
           $ref: '#/components/schemas/CountryCode'
-          description: 2 letter code of the country
-          example: "uk"
         id:
           type: string
           description: Id of the station within the country
@@ -1366,8 +1406,7 @@ components:
           type: integer
           format: int64
         countryCode:
-          $ref: '#/components/schemas/CountryCode'
-          nullable: true
+          $ref: '#/components/schemas/CountryCodeOptional'
       required:
         - total
         - withPhoto
@@ -1380,7 +1419,6 @@ components:
       properties:
         code:
           $ref: '#/components/schemas/CountryCode'
-          description: Two letter country code
         name:
           type: string
           description: Name of the country
@@ -1465,34 +1503,6 @@ components:
         - nickname
         - email
 
-    RegisterProfile:
-      description: User profile information
-      type: object
-      properties:
-        nickname:
-          type: string
-        email:
-          type: string
-          format: email
-        license:
-          $ref: '#/components/schemas/License'
-        photoOwner:
-          type: boolean
-        link:
-          type: string
-          format: uri
-        anonymous:
-          type: boolean
-        sendNotifications:
-          type: boolean
-        newPassword:
-          type: string
-      required:
-        - nickname
-        - email
-        - license
-        - photoOwner
-
     Profile:
       description: User profile information
       type: object
@@ -1556,6 +1566,7 @@ components:
           format: int64
 
     InboxStateQueryRequest:
+      description: Contains an inbox entry ID to query its state
       type: object
       properties:
         id:
@@ -1723,7 +1734,6 @@ components:
           format: int64
         countryCode:
           $ref: '#/components/schemas/CountryCode'
-          description: country of a new station
         stationId:
           type: string
           description: ID of a new station
@@ -1782,6 +1792,7 @@ components:
         - pendingInboxEntries
 
     AdminInboxCommandResponse:
+      description: Response object for an AdminInbox command
       type: object
       properties:
         status:
@@ -1827,6 +1838,7 @@ components:
         - type
 
     ProblemReportType:
+      description: types of problem reports
       type: string
       enum:
         - WRONG_LOCATION
@@ -1840,6 +1852,7 @@ components:
         - DUPLICATE
 
     ChangePassword:
+      description: Change password request object
       type: object
       properties:
         newPassword:
@@ -1848,6 +1861,7 @@ components:
         - newPassword
 
     GeneralErrorMessage:
+      description: General error message
       type: object
       properties:
         timestamp:
@@ -1867,6 +1881,14 @@ components:
         - message
 
     CountryCode:
+      description: a two character country code
       type: string
       maxLength: 2
       minLength: 2
+
+    CountryCodeOptional:
+      description: an optional two character country code
+      type: string
+      maxLength: 2
+      minLength: 2
+      nullable: true
