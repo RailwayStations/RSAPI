@@ -27,6 +27,9 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Vacuum OpenAPI Spec linter
+        uses: eduelias/gha-vacuum@v0.0.1
+
       - name: Validate Gradle wrapper
         uses: gradle/actions/wrapper-validation@v3
 
