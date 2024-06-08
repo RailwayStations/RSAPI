@@ -30,7 +30,8 @@ openApiGenerate {
         mapOf(
             "sourceFolder" to "",
             "useTags" to "true",
-            "interfaceOnly" to "true",
+            "interfaceOnly" to "false",
+            "delegatePattern" to "true",
             "documentationProvider" to "none",
             "useBeanValidation" to "true",
             "useSpringBoot3" to "true",
