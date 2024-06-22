@@ -2,7 +2,7 @@ package org.railwaystations.rsapi.adapter.web.controller
 
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Size
-import org.railwaystations.rsapi.adapter.web.model.StatisticDto
+import org.railwaystations.openapi.model.StatisticDto
 import org.railwaystations.rsapi.core.model.Statistic
 import org.railwaystations.rsapi.core.ports.inbound.GetStatisticUseCase
 import org.springframework.http.ResponseEntity

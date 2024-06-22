@@ -1,8 +1,8 @@
 package org.railwaystations.rsapi.adapter.web.controller
 
-import org.railwaystations.rsapi.adapter.web.api.CountriesApiDelegate
-import org.railwaystations.rsapi.adapter.web.model.CountryDto
-import org.railwaystations.rsapi.adapter.web.model.ProviderAppDto
+import org.railwaystations.openapi.api.CountriesApiDelegate
+import org.railwaystations.openapi.model.CountryDto
+import org.railwaystations.openapi.model.ProviderAppDto
 import org.railwaystations.rsapi.core.model.Country
 import org.railwaystations.rsapi.core.model.ProviderApp
 import org.railwaystations.rsapi.core.ports.inbound.ListCountriesUseCase

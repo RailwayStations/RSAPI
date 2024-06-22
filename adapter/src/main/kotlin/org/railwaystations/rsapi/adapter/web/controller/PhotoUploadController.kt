@@ -4,10 +4,10 @@ import jakarta.servlet.http.HttpServletRequest
 import org.apache.commons.io.IOUtils
 import org.apache.commons.io.output.NullOutputStream
 import org.apache.commons.lang3.StringUtils
+import org.railwaystations.openapi.model.InboxResponseDto
 import org.railwaystations.rsapi.adapter.web.InboxResponseMapper.toDto
 import org.railwaystations.rsapi.adapter.web.InboxResponseMapper.toHttpStatus
 import org.railwaystations.rsapi.adapter.web.RequestUtil
-import org.railwaystations.rsapi.adapter.web.model.InboxResponseDto
 import org.railwaystations.rsapi.app.auth.AuthUser
 import org.railwaystations.rsapi.core.model.InboxResponse
 import org.railwaystations.rsapi.core.model.User

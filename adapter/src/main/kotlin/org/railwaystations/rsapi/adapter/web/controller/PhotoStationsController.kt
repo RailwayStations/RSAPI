@@ -4,11 +4,11 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.Size
-import org.railwaystations.rsapi.adapter.web.model.PhotoDto
-import org.railwaystations.rsapi.adapter.web.model.PhotoLicenseDto
-import org.railwaystations.rsapi.adapter.web.model.PhotoStationDto
-import org.railwaystations.rsapi.adapter.web.model.PhotoStationsDto
-import org.railwaystations.rsapi.adapter.web.model.PhotographerDto
+import org.railwaystations.openapi.model.PhotoDto
+import org.railwaystations.openapi.model.PhotoLicenseDto
+import org.railwaystations.openapi.model.PhotoStationDto
+import org.railwaystations.openapi.model.PhotoStationsDto
+import org.railwaystations.openapi.model.PhotographerDto
 import org.railwaystations.rsapi.core.model.Station
 import org.railwaystations.rsapi.core.ports.inbound.FindPhotoStationsUseCase
 import org.springframework.beans.factory.annotation.Value

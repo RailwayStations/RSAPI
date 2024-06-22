@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeName
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Size
+import org.railwaystations.openapi.model.CountryDto
+import org.railwaystations.openapi.model.LicenseDto
 import org.railwaystations.rsapi.adapter.web.RequestUtil
-import org.railwaystations.rsapi.adapter.web.model.CountryDto
-import org.railwaystations.rsapi.adapter.web.model.LicenseDto
 import org.railwaystations.rsapi.core.model.Country
 import org.railwaystations.rsapi.core.model.Station
 import org.railwaystations.rsapi.core.model.User

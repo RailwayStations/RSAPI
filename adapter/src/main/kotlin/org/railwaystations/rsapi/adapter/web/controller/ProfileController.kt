@@ -1,11 +1,11 @@
 package org.railwaystations.rsapi.adapter.web.controller
 
 import jakarta.validation.Valid
+import org.railwaystations.openapi.model.ChangePasswordDto
+import org.railwaystations.openapi.model.LicenseDto
+import org.railwaystations.openapi.model.ProfileDto
+import org.railwaystations.openapi.model.UpdateProfileDto
 import org.railwaystations.rsapi.adapter.web.RequestUtil
-import org.railwaystations.rsapi.adapter.web.model.ChangePasswordDto
-import org.railwaystations.rsapi.adapter.web.model.LicenseDto
-import org.railwaystations.rsapi.adapter.web.model.ProfileDto
-import org.railwaystations.rsapi.adapter.web.model.UpdateProfileDto
 import org.railwaystations.rsapi.core.model.License
 import org.railwaystations.rsapi.core.model.User
 import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase

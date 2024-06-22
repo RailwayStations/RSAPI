@@ -1,6 +1,6 @@
 package org.railwaystations.rsapi.adapter.web
 
-import org.railwaystations.rsapi.adapter.web.model.InboxResponseDto
+import org.railwaystations.openapi.model.InboxResponseDto
 import org.railwaystations.rsapi.core.model.InboxResponse
 import org.springframework.http.HttpStatus
 

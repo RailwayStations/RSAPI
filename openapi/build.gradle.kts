@@ -22,8 +22,8 @@ openApiGenerate {
     generatorName = "kotlin-spring"
     inputSpec = "$projectDir/src/main/resources/static/openapi.yaml"
     outputDir = layout.buildDirectory.file("openapi").get().asFile.toString()
-    apiPackage = "org.railwaystations.rsapi.adapter.web.api"
-    modelPackage = "org.railwaystations.rsapi.adapter.web.model"
+    apiPackage = "org.railwaystations.openapi.api"
+    modelPackage = "org.railwaystations.openapi.model"
     modelNameSuffix = "Dto"
     cleanupOutput = true
     configOptions.set(

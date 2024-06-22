@@ -6,10 +6,10 @@ import io.mockk.every
 import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.railwaystations.openapi.model.CountryDto
 import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
 import org.railwaystations.rsapi.adapter.web.RequestUtil
 import org.railwaystations.rsapi.adapter.web.controller.CountriesApiTest.Companion.assertCountry
-import org.railwaystations.rsapi.adapter.web.model.CountryDto
 import org.railwaystations.rsapi.app.auth.LazySodiumPasswordEncoder
 import org.railwaystations.rsapi.core.config.MessageSourceConfig
 import org.railwaystations.rsapi.core.model.CountryTestFixtures
