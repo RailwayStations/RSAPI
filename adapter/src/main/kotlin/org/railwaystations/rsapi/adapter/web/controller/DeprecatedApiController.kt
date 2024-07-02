@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonTypeName
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Size
-import org.railwaystations.openapi.model.CountryDto
-import org.railwaystations.openapi.model.LicenseDto
 import org.railwaystations.rsapi.adapter.web.RequestUtil
+import org.railwaystations.rsapi.adapter.web.model.CountryDto
+import org.railwaystations.rsapi.adapter.web.model.LicenseDto
 import org.railwaystations.rsapi.core.model.Country
 import org.railwaystations.rsapi.core.model.Station
 import org.railwaystations.rsapi.core.model.User
@@ -19,11 +19,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.validation.annotation.Validated
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.LocaleResolver
 import java.net.URI

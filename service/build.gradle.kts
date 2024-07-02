@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.kotlin.spring)
-    alias(libs.plugins.kotlin.kapt)
 }
 
 springBoot {
@@ -34,8 +33,6 @@ dependencies {
     implementation("org.flywaydb:flyway-mysql")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-
-    kapt("org.springframework.boot:spring-boot-configuration-processor")
 
     runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
     runtimeOnly("org.webjars:webjars-locator-core")

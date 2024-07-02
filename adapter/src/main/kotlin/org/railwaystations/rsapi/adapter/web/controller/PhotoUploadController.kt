@@ -4,10 +4,10 @@ import jakarta.servlet.http.HttpServletRequest
 import org.apache.commons.io.IOUtils
 import org.apache.commons.io.output.NullOutputStream
 import org.apache.commons.lang3.StringUtils
-import org.railwaystations.openapi.model.InboxResponseDto
 import org.railwaystations.rsapi.adapter.web.InboxResponseMapper.toDto
 import org.railwaystations.rsapi.adapter.web.InboxResponseMapper.toHttpStatus
 import org.railwaystations.rsapi.adapter.web.RequestUtil
+import org.railwaystations.rsapi.adapter.web.model.InboxResponseDto
 import org.railwaystations.rsapi.app.auth.AuthUser
 import org.railwaystations.rsapi.core.model.InboxResponse
 import org.railwaystations.rsapi.core.model.User
@@ -21,11 +21,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.annotation.Validated
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestHeader
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.LocaleResolver
 import java.io.IOException

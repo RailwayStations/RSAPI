@@ -44,4 +44,3 @@ spring-dependency-management = { id = "io.spring.dependency-management", version
 openapi-generator = { id = "org.openapi.generator", version.ref = "openapiGenerator" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }

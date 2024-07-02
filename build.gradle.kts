@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.spring.boot) apply false
     alias(libs.plugins.spring.dependency.management)
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.kapt) apply false
 }
 
 group = "org.railwaystations.rsapi"
