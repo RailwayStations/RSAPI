@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test
 import org.railwaystations.rsapi.adapter.db.CountryDao
 import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
 import org.railwaystations.rsapi.adapter.web.OpenApiValidatorUtil.validOpenApiResponse
-import org.railwaystations.rsapi.adapter.web.api.CountriesApiController
 import org.railwaystations.rsapi.adapter.web.model.CountryDto
 import org.railwaystations.rsapi.adapter.web.model.ProviderAppDto
 import org.railwaystations.rsapi.core.model.CountryTestFixtures.createCountryList
@@ -24,10 +23,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.util.function.Consumer
 
-@WebMvcTest(controllers = [CountriesApiController::class])
-@ContextConfiguration(classes = [WebMvcTestApplication::class, ErrorHandlingControllerAdvice::class, CountryService::class, CountriesDelegate::class, CountriesApiController::class])
+@WebMvcTest(controllers = [CountriesController::class])
+@ContextConfiguration(classes = [WebMvcTestApplication::class, ErrorHandlingControllerAdvice::class, CountryService::class])
 @AutoConfigureMockMvc(addFilters = false)
-internal class CountriesApiTest {
+internal class CountriesControllerTest {
 
     @Autowired
     private lateinit var mvc: MockMvc

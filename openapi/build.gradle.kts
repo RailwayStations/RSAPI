@@ -20,6 +20,7 @@ openApiValidate {
 }
 
 openApiGenerate {
+    // https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/kotlin-spring.md
     generatorName = "kotlin-spring"
     inputSpec = "$projectDir/src/main/resources/static/openapi.yaml"
     outputDir = layout.buildDirectory.file("openapi").get().asFile.toString()
@@ -31,13 +32,14 @@ openApiGenerate {
         mapOf(
             "sourceFolder" to "",
             "useTags" to "true",
-            "interfaceOnly" to "false",
-            "delegatePattern" to "true",
+            "interfaceOnly" to "true",
+            "delegatePattern" to "false",
             "documentationProvider" to "none",
             "useBeanValidation" to "true",
             "useSpringBoot3" to "true",
             "enumPropertyNaming" to "UPPERCASE",
             "requestMappingMode" to "none",
+            "skipDefaultInterface" to "true",
         )
     )
     typeMappings.set(

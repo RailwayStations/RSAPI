@@ -1,9 +1,9 @@
 package org.railwaystations.rsapi.adapter.web.controller
 
-import jakarta.validation.Valid
 import org.railwaystations.rsapi.adapter.web.InboxResponseMapper
 import org.railwaystations.rsapi.adapter.web.InboxResponseMapper.toHttpStatus
 import org.railwaystations.rsapi.adapter.web.RequestUtil
+import org.railwaystations.rsapi.adapter.web.api.InboxApi
 import org.railwaystations.rsapi.adapter.web.model.*
 import org.railwaystations.rsapi.adapter.web.model.InboxCommandDto.Command
 import org.railwaystations.rsapi.adapter.web.model.InboxCommandDto.ConflictResolution
@@ -17,7 +17,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.LocaleResolver
 import java.util.*
 
@@ -28,55 +28,33 @@ class InboxController(
     private val manageProfileUseCase: ManageProfileUseCase,
     private val localeResolver: LocaleResolver,
     private val requestUtil: RequestUtil,
-) {
+) : InboxApi {
 
     private val log by Logger()
 
-
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(
-        method = [RequestMethod.GET],
-        value = ["/adminInboxCount"],
-        produces = ["application/json"]
-    )
-    fun adminInboxCountGet(): ResponseEntity<InboxCountResponseDto> {
+    override fun getAdminInboxCount(): ResponseEntity<InboxCountResponseDto> {
         return ResponseEntity.ok(InboxCountResponseDto(manageInboxUseCase.countPendingInboxEntries()))
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(
-        method = [RequestMethod.GET],
-        value = ["/adminInbox"],
-        produces = ["application/json"]
-    )
-    fun adminInboxGet(
-        @RequestHeader(
-            required = true,
-            value = "Authorization"
-        ) authorization: String
-    ): ResponseEntity<List<InboxEntryDto>> {
+    override fun getAdminInbox(authorization: String): ResponseEntity<List<InboxEntryDto>> {
         return ResponseEntity.ok(manageInboxUseCase.listAdminInbox(requestUtil.authUser.user).map(InboxEntry::toDto))
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @RequestMapping(
-        method = [RequestMethod.POST],
-        value = ["/adminInbox"],
-        produces = ["application/json"],
-        consumes = ["application/json"]
-    )
-    fun adminInboxPost(
-        @RequestHeader(required = true, value = "Authorization") authorization: String,
-        @Valid @RequestBody inboxCommandDto: InboxCommandDto
+    override fun postAdminInbox(
+        authorization: String,
+        uploadCommand: InboxCommandDto
     ): ResponseEntity<AdminInboxCommandResponseDto> {
         log.info(
             "Executing adminInbox commandDto {} for Nickname: {}",
-            inboxCommandDto.command,
+            uploadCommand.command,
             requestUtil.authUser.username
         )
         try {
-            val command: InboxCommand = inboxCommandDto.toDomain()
-            when (inboxCommandDto.command) {
+            val command: InboxCommand = uploadCommand.toDomain()
+            when (uploadCommand.command) {
                 Command.REJECT -> manageInboxUseCase.rejectInboxEntry(command)
                 Command.IMPORT_PHOTO -> manageInboxUseCase.importPhoto(command)
                 Command.IMPORT_MISSING_STATION -> manageInboxUseCase.importMissingStation(command)
@@ -98,7 +76,7 @@ class InboxController(
                 Command.PHOTO_OUTDATED -> manageInboxUseCase.markPhotoOutdated(command)
             }
         } catch (e: IllegalArgumentException) {
-            log.warn("adminInbox commandDto {} failed", inboxCommandDto, e)
+            log.warn("adminInbox commandDto {} failed", uploadCommand, e)
             return ResponseEntity<AdminInboxCommandResponseDto>(
                 AdminInboxCommandResponseDto(
                     HttpStatus.BAD_REQUEST.value(),
@@ -113,24 +91,14 @@ class InboxController(
         )
     }
 
-    @RequestMapping(
-        method = [RequestMethod.GET],
-        value = ["/publicInbox"],
-        produces = ["application/json"]
-    )
-    fun publicInboxGet(): ResponseEntity<List<PublicInboxEntryDto>> {
+    override fun getPublicInbox(): ResponseEntity<List<PublicInboxEntryDto>> {
         return ResponseEntity.ok(manageInboxUseCase.publicInbox().map(PublicInboxEntry::toDto))
     }
 
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping(
-        method = [RequestMethod.POST],
-        value = ["/reportProblem"],
-        produces = ["application/json"]
-    )
-    fun reportProblemPost(
-        @RequestHeader(required = true, value = "Authorization") authorization: String,
-        @Valid @RequestBody problemReport: ProblemReportDto
+    override fun postReportProblem(
+        authorization: String,
+        problemReport: ProblemReportDto
     ): ResponseEntity<InboxResponseDto> {
         val locale: Locale = localeResolver.resolveLocale(requestUtil.request)
         val user = requestUtil.authUser.user
@@ -150,14 +118,9 @@ class InboxController(
     }
 
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping(
-        method = [RequestMethod.GET],
-        value = ["/userInbox"],
-        produces = ["application/json"]
-    )
-    fun userInboxGet(
-        @RequestHeader(required = true, value = "Authorization") authorization: String,
-        @Valid @RequestParam(value = "showCompletedEntries", required = false) showCompletedEntries: Boolean?
+    override fun getUserInbox(
+        authorization: String,
+        showCompletedEntries: Boolean?
     ): ResponseEntity<List<InboxStateQueryResponseDto>> {
         return ResponseEntity.ok(
             manageInboxUseCase.userInbox(
@@ -168,15 +131,9 @@ class InboxController(
     }
 
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping(
-        method = [RequestMethod.POST],
-        value = ["/userInbox"],
-        produces = ["application/json"],
-        consumes = ["application/json"]
-    )
-    fun userInboxPost(
-        @RequestHeader(required = true, value = "Authorization") authorization: String,
-        @Valid @RequestBody uploadStateQueries: List<InboxStateQueryRequestDto>
+    override fun postUserInbox(
+        authorization: String,
+        uploadStateQueries: List<InboxStateQueryRequestDto>
     ): ResponseEntity<List<InboxStateQueryResponseDto>> {
         return ResponseEntity.ok(
             manageInboxUseCase.userInbox(
@@ -187,12 +144,7 @@ class InboxController(
     }
 
     @PreAuthorize("isAuthenticated()")
-    @RequestMapping(
-        method = [RequestMethod.DELETE],
-        value = ["/userInbox/{id}"],
-        produces = ["application/json"]
-    )
-    fun userInboxIdDelete(@PathVariable("id") id: Long): ResponseEntity<Unit> {
+    override fun deleteUserInbox(id: Long): ResponseEntity<Unit> {
         manageInboxUseCase.deleteUserInboxEntry(requestUtil.authUser.user, id)
         return ResponseEntity.noContent().build()
     }

@@ -8,7 +8,6 @@ import org.railwaystations.rsapi.adapter.db.CountryDao
 import org.railwaystations.rsapi.adapter.db.StationDao
 import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
 import org.railwaystations.rsapi.adapter.web.OpenApiValidatorUtil.validOpenApiResponse
-import org.railwaystations.rsapi.adapter.web.api.StatisticApiController
 import org.railwaystations.rsapi.core.model.CountryTestFixtures
 import org.railwaystations.rsapi.core.model.Statistic
 import org.railwaystations.rsapi.core.services.StatisticService
@@ -21,8 +20,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-@WebMvcTest(controllers = [StatisticApiController::class])
-@ContextConfiguration(classes = [WebMvcTestApplication::class, ErrorHandlingControllerAdvice::class, StatisticDelegate::class, StatisticService::class, StatisticApiController::class])
+@WebMvcTest(controllers = [StatisticController::class])
+@ContextConfiguration(classes = [WebMvcTestApplication::class, ErrorHandlingControllerAdvice::class, StatisticService::class])
 @AutoConfigureMockMvc(addFilters = false)
 internal class StatisticControllerTest {
     @Autowired

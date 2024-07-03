@@ -1,16 +1,18 @@
 package org.railwaystations.rsapi.adapter.web.controller
 
-import org.railwaystations.rsapi.adapter.web.api.CountriesApiDelegate
+import org.railwaystations.rsapi.adapter.web.api.CountriesApi
 import org.railwaystations.rsapi.adapter.web.model.CountryDto
 import org.railwaystations.rsapi.adapter.web.model.ProviderAppDto
 import org.railwaystations.rsapi.core.model.Country
 import org.railwaystations.rsapi.core.model.ProviderApp
 import org.railwaystations.rsapi.core.ports.inbound.ListCountriesUseCase
 import org.springframework.http.ResponseEntity
-import org.springframework.stereotype.Component
+import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.RestController
 
-@Component
-class CountriesDelegate(private val listCountriesUseCase: ListCountriesUseCase) : CountriesApiDelegate {
+@RestController
+@Validated
+class CountriesController(private val listCountriesUseCase: ListCountriesUseCase) : CountriesApi {
 
     override fun getCountries(onlyActive: Boolean?): ResponseEntity<List<CountryDto>> {
         return ResponseEntity.ok(

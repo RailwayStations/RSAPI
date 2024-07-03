@@ -1,9 +1,6 @@
 package org.railwaystations.rsapi.adapter.web.controller
 
-import jakarta.validation.Valid
-import jakarta.validation.constraints.Max
-import jakarta.validation.constraints.Min
-import jakarta.validation.constraints.Size
+import org.railwaystations.rsapi.adapter.web.api.PhotoStationsApi
 import org.railwaystations.rsapi.adapter.web.model.*
 import org.railwaystations.rsapi.core.model.Station
 import org.railwaystations.rsapi.core.ports.inbound.FindPhotoStationsUseCase
@@ -11,7 +8,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 import java.net.URI
 
@@ -20,20 +17,9 @@ import java.net.URI
 class PhotoStationsController(
     private val findPhotoStationsUseCase: FindPhotoStationsUseCase,
     @Value("\${photoBaseUrl}") private val photoBaseUrl: String,
-) {
+) : PhotoStationsApi {
 
-    @RequestMapping(
-        method = [RequestMethod.GET],
-        value = ["/photoStationById/{country}/{id}"],
-        produces = ["application/json"]
-    )
-    fun photoStationByIdCountryIdGet(
-        @Size(
-            max = 2,
-            min = 2
-        ) @PathVariable(value = "country") country: String,
-        @PathVariable(value = "id") id: String
-    ): ResponseEntity<PhotoStationsDto> {
+    override fun getPhotoStationById(country: String, id: String): ResponseEntity<PhotoStationsDto> {
         val stations = setOf(
             findPhotoStationsUseCase.findByCountryAndId(country, id)
                 ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
@@ -41,64 +27,29 @@ class PhotoStationsController(
         return ResponseEntity.ok(stations.toDto(photoBaseUrl))
     }
 
-    @RequestMapping(
-        method = [RequestMethod.GET],
-        value = ["/photoStationsByCountry/{country}"],
-        produces = ["application/json"]
-    )
-    fun photoStationsByCountryCountryGet(
-        @Size(
-            max = 2,
-            min = 2
-        ) @PathVariable(value = "country") country: String,
-        @Valid @RequestParam(
-            required = false,
-            value = "hasPhoto"
-        ) hasPhoto: Boolean?,
-        @Valid @RequestParam(
-            required = false,
-            value = "isActive"
-        ) isActive: Boolean?
+    override fun getPhotoStationByCountry(
+        country: String,
+        hasPhoto: Boolean?,
+        isActive: Boolean?
     ): ResponseEntity<PhotoStationsDto> {
         val stations =
             findPhotoStationsUseCase.findByCountry(mutableSetOf(country), hasPhoto, isActive)
         return ResponseEntity.ok(stations.toDto(photoBaseUrl))
     }
 
-    @RequestMapping(
-        method = [RequestMethod.GET],
-        value = ["/photoStationsByPhotographer/{photographer}"],
-        produces = ["application/json"]
-    )
-    fun photoStationsByPhotographerPhotographerGet(
-        @PathVariable(value = "photographer") photographer: String,
-        @Size(
-            max = 2,
-            min = 2
-        ) @Valid @RequestParam(
-            required = false,
-            value = "country"
-        ) country: String?
+    override fun getPhotoStationsByPhotographer(
+        photographer: String,
+        country: String?
     ): ResponseEntity<PhotoStationsDto> {
         val stations = findPhotoStationsUseCase.findByPhotographer(photographer, country)
         return ResponseEntity.ok(stations.toDto(photoBaseUrl))
     }
 
-    @RequestMapping(
-        method = [RequestMethod.GET],
-        value = ["/photoStationsByRecentPhotoImports"],
-        produces = ["application/json"]
-    )
-    fun photoStationsByRecentPhotoImportsGet(
-        @Min(1) @Max(800) @Valid @RequestParam(
-            value = "sinceHours",
-            required = false,
-            defaultValue = "10"
-        ) sinceHours: Int
-    ): ResponseEntity<PhotoStationsDto> {
+    override fun getPhotoStationsByRecentPhotoImports(sinceHours: Int): ResponseEntity<PhotoStationsDto> {
         val stations = findPhotoStationsUseCase.findRecentImports(sinceHours.toLong())
         return ResponseEntity.ok(stations.toDto(photoBaseUrl))
     }
+
 }
 
 
