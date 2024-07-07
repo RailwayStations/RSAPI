@@ -1,3 +1,4 @@
+DELETE FROM inbox;
 DELETE FROM photos;
 DELETE FROM stations;
 DELETE FROM users;

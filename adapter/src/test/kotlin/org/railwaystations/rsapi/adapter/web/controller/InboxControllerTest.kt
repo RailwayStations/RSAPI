@@ -40,7 +40,7 @@ private const val USER_AGENT = "UserAgent"
 @Import(RequestUtil::class, ErrorHandlingControllerAdvice::class)
 @ActiveProfiles("mockMvcTest")
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity(proxyTargetClass = true)
 internal class InboxControllerTest {
 
     @Autowired

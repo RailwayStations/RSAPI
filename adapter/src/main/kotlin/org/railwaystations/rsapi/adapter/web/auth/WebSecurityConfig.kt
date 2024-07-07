@@ -51,7 +51,7 @@ import org.springframework.web.cors.CorsConfiguration
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity(proxyTargetClass = true)
 class WebSecurityConfig(
     private val authenticationProvider: RSAuthenticationProvider,
     private val userDetailsService: UserDetailsService,
