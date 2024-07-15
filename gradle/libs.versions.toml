@@ -13,7 +13,7 @@ swaggerAnnotations = "2.2.22"
 bootstrap = "5.3.3"
 jsonUnitSpring = "3.3.0"
 wiremock = "3.0.1"
-mockk = "1.13.11"
+mockk = "1.13.12"
 springMockk = "4.0.2"
 greenmail = "2.0.1"
 
