@@ -1,3 +1,10 @@
+pluginManagement {
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+    }
+}
+
 rootProject.name = 'rsapi'
 
 include(":openapi", ":adapter", ":service", ":core")
