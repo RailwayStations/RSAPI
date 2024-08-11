@@ -33,7 +33,7 @@ jobs:
           cmd: vacuum lint -d openapi/src/main/resources/static/openapi.yaml
 
       - name: Validate Gradle wrapper
-        uses: gradle/actions/wrapper-validation@v3
+        uses: gradle/actions/wrapper-validation@v4
 
       - name: Build with Gradle
         run: ./gradlew --no-daemon test bootJar
