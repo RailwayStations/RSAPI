@@ -12,12 +12,6 @@ class StatisticService(
     private val stationPort: StationPort,
 ) : GetStatisticUseCase {
 
-    override val countryStatisticMessage: String
-        get() = "Countries statistic: \n" + countryPort.list(true)
-            .sortedBy { it.code }
-            .map { country -> getStatistic(country.code) }
-            .joinToString("\n") { statistic -> "- ${statistic.countryCode}: ${statistic.withPhoto} of ${statistic.total}" }
-
     override fun getStatistic(country: String?): Statistic {
         require(!(country != null && countryPort.findById(country) == null)) { "Country $country does not exist" }
         return stationPort.getStatistic(country)
