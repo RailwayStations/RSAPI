@@ -5,11 +5,7 @@ import io.mockk.every
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.railwaystations.rsapi.adapter.db.CountryDao
-import org.railwaystations.rsapi.adapter.db.InboxDao
-import org.railwaystations.rsapi.adapter.db.PhotoDao
-import org.railwaystations.rsapi.adapter.db.StationDao
-import org.railwaystations.rsapi.adapter.db.UserDao
+import org.railwaystations.rsapi.adapter.db.*
 import org.railwaystations.rsapi.adapter.monitoring.FakeMonitor
 import org.railwaystations.rsapi.adapter.photostorage.PhotoFileStorage
 import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
@@ -20,15 +16,10 @@ import org.railwaystations.rsapi.app.auth.AuthUser
 import org.railwaystations.rsapi.app.auth.RSAuthenticationProvider
 import org.railwaystations.rsapi.app.auth.RSUserDetailsService
 import org.railwaystations.rsapi.app.auth.WebSecurityConfig
-import org.railwaystations.rsapi.core.model.Coordinates
-import org.railwaystations.rsapi.core.model.InboxEntry
+import org.railwaystations.rsapi.core.model.*
 import org.railwaystations.rsapi.core.model.InboxEntryTestFixtures.createInboxEntry
 import org.railwaystations.rsapi.core.model.PhotoTestFixtures.createPhoto
-import org.railwaystations.rsapi.core.model.ProblemReportType
-import org.railwaystations.rsapi.core.model.Station
 import org.railwaystations.rsapi.core.model.StationTestFixtures.createStation
-import org.railwaystations.rsapi.core.model.User
-import org.railwaystations.rsapi.core.model.UserTestFixtures
 import org.railwaystations.rsapi.core.model.UserTestFixtures.USER_AGENT
 import org.railwaystations.rsapi.core.model.UserTestFixtures.createUserJimKnopf
 import org.railwaystations.rsapi.core.model.UserTestFixtures.createUserNickname
@@ -188,7 +179,7 @@ internal class InboxControllerIntegrationTest {
                     { "countryCode": "de", "stationId": "1234", "type": "OTHER", "comment": "something is wrong" }
                 """.trimIndent()
 
-        whenPostProblemReport(User.EMAIL_VERIFIED, problemReportJson)
+        whenPostProblemReport(EMAIL_VERIFIED, problemReportJson)
             .andExpect(status().isAccepted())
             .andExpect(jsonPath("$.state").value("REVIEW"))
             .andExpect(jsonPath("$.id").value(6))
@@ -223,7 +214,7 @@ internal class InboxControllerIntegrationTest {
                     { "countryCode": "de", "stationId": "1234", "type": "WRONG_LOCATION", "lat": 50.0, "lon": 9.1, "comment": "coordinates are slightly off" }
                 """.trimIndent()
 
-        whenPostProblemReport(User.EMAIL_VERIFIED, problemReportJson)
+        whenPostProblemReport(EMAIL_VERIFIED, problemReportJson)
             .andExpect(status().isAccepted())
             .andExpect(jsonPath("$.state").value("REVIEW"))
             .andExpect(jsonPath("$.id").value(6))
@@ -258,7 +249,7 @@ internal class InboxControllerIntegrationTest {
                     { "countryCode": "de", "stationId": "1234", "type": "WRONG_NAME", "title": "New Name", "comment": "name is wrong" }
                 """.trimIndent()
 
-        whenPostProblemReport(User.EMAIL_VERIFIED, problemReportJson)
+        whenPostProblemReport(EMAIL_VERIFIED, problemReportJson)
             .andExpect(status().isAccepted())
             .andExpect(jsonPath("$.state").value("REVIEW"))
             .andExpect(jsonPath("$.id").value(6))

@@ -6,6 +6,12 @@ import java.net.URI
 import java.net.URISyntaxException
 import java.util.*
 
+const val EMAIL_VERIFIED: String = "VERIFIED"
+const val EMAIL_VERIFIED_AT_NEXT_LOGIN: String = "NEXT_LOGIN"
+const val ROLE_ADMIN: String = "ROLE_ADMIN"
+const val ROLE_USER: String = "ROLE_USER"
+const val ANONYM: String = "Anonym"
+
 data class User(
     val id: Int = 0,
     val name: String,
@@ -21,8 +27,6 @@ data class User(
     val sendNotifications: Boolean = false,
     val locale: Locale = Locale.ENGLISH,
 ) {
-    val normalizedName: String
-        get() = normalizeName(name)
 
     val displayUrl: String
         get() = if (anonymous || url.isNullOrBlank()) "https://railway-stations.org" else url
@@ -81,27 +85,13 @@ data class User(
     val localeLanguageTag: String
         get() = locale.toLanguageTag()
 
-    companion object {
-        const val EMAIL_VERIFIED: String = "VERIFIED"
-        const val EMAIL_VERIFIED_AT_NEXT_LOGIN: String = "NEXT_LOGIN"
-        const val ROLE_ADMIN: String = "ROLE_ADMIN"
-        const val ROLE_USER: String = "ROLE_USER"
-        const val ANONYM: String = "Anonym"
+}
 
-        @JvmStatic
-        fun normalizeName(name: String?): String {
-            return StringUtils.trimToEmpty(name).lowercase().replace("[^a-z\\d]".toRegex(), "")
-        }
+fun normalizeEmail(email: String): String {
+    val trimmedEmail = StringUtils.trimToNull(email)
+    return trimmedEmail.lowercase()
+}
 
-        @JvmStatic
-        fun normalizeEmail(email: String): String {
-            val trimmedEmail = StringUtils.trimToNull(email)
-            return trimmedEmail.lowercase()
-        }
-
-        @JvmStatic
-        fun createNewEmailVerificationToken(): String {
-            return UUID.randomUUID().toString()
-        }
-    }
+fun createNewEmailVerificationToken(): String {
+    return UUID.randomUUID().toString()
 }

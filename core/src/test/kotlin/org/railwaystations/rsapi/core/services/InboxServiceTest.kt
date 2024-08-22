@@ -1,10 +1,6 @@
 package org.railwaystations.rsapi.core.services
 
-import io.mockk.clearMocks
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.slot
-import io.mockk.verify
+import io.mockk.*
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
@@ -14,26 +10,10 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.railwaystations.rsapi.core.model.Coordinates
-import org.railwaystations.rsapi.core.model.Country
-import org.railwaystations.rsapi.core.model.InboxCommand
-import org.railwaystations.rsapi.core.model.InboxEntry
+import org.railwaystations.rsapi.core.model.*
 import org.railwaystations.rsapi.core.model.InboxResponse.InboxResponseState
-import org.railwaystations.rsapi.core.model.License
-import org.railwaystations.rsapi.core.model.Photo
-import org.railwaystations.rsapi.core.model.ProblemReport
-import org.railwaystations.rsapi.core.model.ProblemReportType
-import org.railwaystations.rsapi.core.model.Station
-import org.railwaystations.rsapi.core.model.User
 import org.railwaystations.rsapi.core.ports.inbound.ManageInboxUseCase
-import org.railwaystations.rsapi.core.ports.outbound.CountryPort
-import org.railwaystations.rsapi.core.ports.outbound.InboxPort
-import org.railwaystations.rsapi.core.ports.outbound.MastodonPort
-import org.railwaystations.rsapi.core.ports.outbound.MonitorPort
-import org.railwaystations.rsapi.core.ports.outbound.PhotoPort
-import org.railwaystations.rsapi.core.ports.outbound.PhotoStoragePort
-import org.railwaystations.rsapi.core.ports.outbound.StationPort
-import org.railwaystations.rsapi.core.ports.outbound.UserPort
+import org.railwaystations.rsapi.core.ports.outbound.*
 import org.railwaystations.rsapi.core.services.InboxService.Companion.getLicenseForPhoto
 import java.io.IOException
 import java.time.Clock
@@ -926,7 +906,7 @@ internal class InboxServiceTest {
                 license = License.CC0_10,
                 email = "email@example.com",
                 ownPhotos = true,
-                emailVerification = User.EMAIL_VERIFIED,
+                emailVerification = EMAIL_VERIFIED,
             )
         }
     }

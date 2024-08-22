@@ -10,11 +10,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import org.railwaystations.rsapi.adapter.db.CountryDao
-import org.railwaystations.rsapi.adapter.db.InboxDao
-import org.railwaystations.rsapi.adapter.db.PhotoDao
-import org.railwaystations.rsapi.adapter.db.StationDao
-import org.railwaystations.rsapi.adapter.db.UserDao
+import org.railwaystations.rsapi.adapter.db.*
 import org.railwaystations.rsapi.adapter.monitoring.FakeMonitor
 import org.railwaystations.rsapi.adapter.photostorage.PhotoFileStorage
 import org.railwaystations.rsapi.adapter.photostorage.WorkDir
@@ -26,13 +22,9 @@ import org.railwaystations.rsapi.app.auth.AuthUser
 import org.railwaystations.rsapi.app.auth.RSAuthenticationProvider
 import org.railwaystations.rsapi.app.auth.RSUserDetailsService
 import org.railwaystations.rsapi.app.auth.WebSecurityConfig
-import org.railwaystations.rsapi.core.model.Coordinates
-import org.railwaystations.rsapi.core.model.InboxEntry
-import org.railwaystations.rsapi.core.model.Photo
+import org.railwaystations.rsapi.core.model.*
 import org.railwaystations.rsapi.core.model.PhotoTestFixtures.createPhoto
-import org.railwaystations.rsapi.core.model.Station
 import org.railwaystations.rsapi.core.model.StationTestFixtures.createStation
-import org.railwaystations.rsapi.core.model.User
 import org.railwaystations.rsapi.core.model.UserTestFixtures.createSomeUser
 import org.railwaystations.rsapi.core.model.UserTestFixtures.createUserJimKnopf
 import org.railwaystations.rsapi.core.model.UserTestFixtures.createUserNickname
@@ -150,7 +142,7 @@ internal class PhotoUploadControllerTest {
         latitude: Double?,
         longitude: Double?,
         comment: String?,
-        emailVerification: String = User.EMAIL_VERIFIED
+        emailVerification: String = EMAIL_VERIFIED
     ): ResultActions {
         return whenPostPhotoUpload(
             nickname,
@@ -247,7 +239,7 @@ internal class PhotoUploadControllerTest {
     fun postPhotoForExistingStationViaMultipartFormdata() {
         val uploadCaptor = slot<InboxEntry>()
         every { inboxDao.insert(any()) } returns 1L
-        val response = whenPostImageMultipartFormdata("nickname@example.com", User.EMAIL_VERIFIED)
+        val response = whenPostImageMultipartFormdata("nickname@example.com", EMAIL_VERIFIED)
 
         assertThat(response).contains("REVIEW")
         assertFileWithContentExistsInInbox("image-content", "1.jpg")
@@ -436,7 +428,7 @@ internal class PhotoUploadControllerTest {
             latitude = 50.9876,
             longitude = 9.1234,
             comment = "Some Comment",
-            emailVerification = User.EMAIL_VERIFIED,
+            emailVerification = EMAIL_VERIFIED,
             inputBytes = null,
             contentType = "application/octet-stream"
         )

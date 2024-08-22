@@ -9,6 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.railwaystations.rsapi.core.config.MessageSourceConfig
+import org.railwaystations.rsapi.core.model.EMAIL_VERIFIED
 import org.railwaystations.rsapi.core.model.InboxEntry
 import org.railwaystations.rsapi.core.model.License
 import org.railwaystations.rsapi.core.model.User
@@ -38,7 +39,7 @@ internal class NotifyUsersServiceTest {
     @Test
     fun sendEmail() {
         every { inboxPort.findInboxEntriesToNotify() } returns createInboxEntriesToNotify()
-        every { userPort.findById(1) } returns createUser("nickname@example.com", User.EMAIL_VERIFIED, true)
+        every { userPort.findById(1) } returns createUser("nickname@example.com", EMAIL_VERIFIED, true)
         service.notifyUsers()
         verify {
             mailerPort.send(
@@ -88,7 +89,7 @@ internal class NotifyUsersServiceTest {
             return Stream.of(
                 Arguments.of(createUser(null, null, true)),
                 Arguments.of(createUser("nickname@example.com", null, true)),
-                Arguments.of(createUser("nickname@example.com", User.EMAIL_VERIFIED, false))
+                Arguments.of(createUser("nickname@example.com", EMAIL_VERIFIED, false))
             )
         }
 

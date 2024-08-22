@@ -1,31 +1,13 @@
 package org.railwaystations.rsapi.core.services
 
 import org.apache.commons.lang3.StringUtils
-import org.railwaystations.rsapi.core.model.Coordinates
-import org.railwaystations.rsapi.core.model.Country
-import org.railwaystations.rsapi.core.model.InboxCommand
-import org.railwaystations.rsapi.core.model.InboxEntry
+import org.railwaystations.rsapi.core.model.*
 import org.railwaystations.rsapi.core.model.InboxEntry.Companion.createFilename
-import org.railwaystations.rsapi.core.model.InboxResponse
-import org.railwaystations.rsapi.core.model.InboxStateQuery
 import org.railwaystations.rsapi.core.model.InboxStateQuery.InboxState
-import org.railwaystations.rsapi.core.model.License
-import org.railwaystations.rsapi.core.model.Photo
-import org.railwaystations.rsapi.core.model.ProblemReport
-import org.railwaystations.rsapi.core.model.PublicInboxEntry
-import org.railwaystations.rsapi.core.model.Station
-import org.railwaystations.rsapi.core.model.User
 import org.railwaystations.rsapi.core.ports.inbound.ManageInboxUseCase
 import org.railwaystations.rsapi.core.ports.inbound.PostRecentlyImportedPhotoUseCase
-import org.railwaystations.rsapi.core.ports.outbound.CountryPort
-import org.railwaystations.rsapi.core.ports.outbound.InboxPort
-import org.railwaystations.rsapi.core.ports.outbound.MastodonPort
-import org.railwaystations.rsapi.core.ports.outbound.MonitorPort
-import org.railwaystations.rsapi.core.ports.outbound.PhotoPort
-import org.railwaystations.rsapi.core.ports.outbound.PhotoStoragePort
+import org.railwaystations.rsapi.core.ports.outbound.*
 import org.railwaystations.rsapi.core.ports.outbound.PhotoStoragePort.PhotoTooLargeException
-import org.railwaystations.rsapi.core.ports.outbound.StationPort
-import org.railwaystations.rsapi.core.ports.outbound.UserPort
 import org.railwaystations.rsapi.core.utils.ImageUtil.mimeToExtension
 import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.beans.factory.annotation.Value
@@ -635,7 +617,7 @@ class InboxService(
         val inboxEntry = inboxEntriesToPost[rand.nextInt(inboxEntriesToPost.size)]
         val photographer = userPort.findById(inboxEntry.photographerId)
         var status =
-            "${inboxEntry.title}\nby ${photographer?.displayName ?: User.ANONYM}\n$stationUrl?countryCode=${inboxEntry.countryCode}&stationId=${inboxEntry.stationId}&photoId=${inboxEntry.photoId}"
+            "${inboxEntry.title}\nby ${photographer?.displayName ?: ANONYM}\n$stationUrl?countryCode=${inboxEntry.countryCode}&stationId=${inboxEntry.stationId}&photoId=${inboxEntry.photoId}"
         if (!inboxEntry.comment.isNullOrBlank()) {
             status += "\n${inboxEntry.comment}"
         }

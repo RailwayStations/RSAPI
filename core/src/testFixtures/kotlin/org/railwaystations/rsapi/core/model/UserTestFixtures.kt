@@ -26,7 +26,7 @@ object UserTestFixtures {
             email = "nickname@example.com",
             ownPhotos = true,
             anonymous = true,
-            emailVerification = User.EMAIL_VERIFIED,
+            emailVerification = EMAIL_VERIFIED,
         )
     }
 
@@ -37,7 +37,7 @@ object UserTestFixtures {
             license = License.CC0_10,
             email = "someuser@example.com",
             ownPhotos = true,
-            emailVerification = User.EMAIL_VERIFIED,
+            emailVerification = EMAIL_VERIFIED,
         )
     }
 }

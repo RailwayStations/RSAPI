@@ -20,11 +20,11 @@ interface UserDao : UserPort {
     @RegisterRowMapper(UserMapper::class)
     override fun list(): List<User>
 
-    @SqlQuery("SELECT * FROM users WHERE normalizedName = :normalizedName")
+    @SqlQuery("SELECT * FROM users WHERE name = :name")
     @RegisterRowMapper(
         UserMapper::class
     )
-    override fun findByNormalizedName(@Bind("normalizedName") normalizedName: String): User?
+    override fun findByName(@Bind("name") name: String): User?
 
     @SqlQuery("SELECT * FROM users WHERE id = :id")
     @RegisterRowMapper(UserMapper::class)
@@ -39,8 +39,8 @@ interface UserDao : UserPort {
 
     @SqlUpdate(
         """
-            INSERT INTO users (id, name, url, license, email, normalizedName, ownPhotos, anonymous, `key`, emailVerification, sendNotifications, locale)
-                VALUES (:id, :name, :url, :license, :email, :normalizedName, :ownPhotos, :anonymous, :key, :emailVerification, :sendNotifications, :localeLanguageTag)
+            INSERT INTO users (id, name, url, license, email, ownPhotos, anonymous, `key`, emailVerification, sendNotifications, locale)
+                VALUES (:id, :name, :url, :license, :email, :ownPhotos, :anonymous, :key, :emailVerification, :sendNotifications, :localeLanguageTag)
             
             """
     )
@@ -53,7 +53,7 @@ interface UserDao : UserPort {
 
     @SqlUpdate(
         """
-            UPDATE users SET name = :name, url = :url, license = :license, email = :email, normalizedName = :normalizedName, ownPhotos = :ownPhotos,
+            UPDATE users SET name = :name, url = :url, license = :license, email = :email, ownPhotos = :ownPhotos,
                             anonymous = :anonymous, sendNotifications = :sendNotifications, locale = :localeLanguageTag
             WHERE id = :id
             
@@ -75,7 +75,6 @@ interface UserDao : UserPort {
             UPDATE users
              SET name = CONCAT('deleteduser', id),
                  url = NULL,
-                 normalizedName = CONCAT('deleteduser', id),
                  anonymous = true,
                  email = NULL,
                  emailVerification = NULL,
@@ -92,15 +91,15 @@ interface UserDao : UserPort {
 
     @SqlUpdate(
         """
-            INSERT INTO blocked_usernames (normalizedName)
-                VALUES (:normalizedName)
+            INSERT INTO blocked_usernames (name)
+                VALUES (:name)
             
             """
     )
-    override fun addUsernameToBlocklist(@Bind("normalizedName") normalizedName: String)
+    override fun addUsernameToBlocklist(@Bind("name") name: String)
 
-    @SqlQuery("SELECT COUNT(*) FROM blocked_usernames WHERE normalizedName = :normalizedName")
-    override fun countBlockedUsername(@Bind("normalizedName") normalizedName: String): Int
+    @SqlQuery("SELECT COUNT(*) FROM blocked_usernames WHERE name = :name")
+    override fun countBlockedUsername(@Bind("name") name: String): Int
 
     @SqlUpdate("UPDATE users SET locale = :localeLanguageTag WHERE id = :id")
     override fun updateLocale(@Bind("id") id: Int, @Bind("localeLanguageTag") locallocaleLanguageTage: String)

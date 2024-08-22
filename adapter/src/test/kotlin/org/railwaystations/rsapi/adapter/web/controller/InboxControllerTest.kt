@@ -12,16 +12,8 @@ import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
 import org.railwaystations.rsapi.adapter.web.OpenApiValidatorUtil.validOpenApiResponse
 import org.railwaystations.rsapi.adapter.web.RequestUtil
 import org.railwaystations.rsapi.app.auth.AuthUser
-import org.railwaystations.rsapi.core.model.Coordinates
-import org.railwaystations.rsapi.core.model.InboxEntry
-import org.railwaystations.rsapi.core.model.InboxResponse
-import org.railwaystations.rsapi.core.model.InboxStateQuery
+import org.railwaystations.rsapi.core.model.*
 import org.railwaystations.rsapi.core.model.InboxStateQuery.InboxState
-import org.railwaystations.rsapi.core.model.ProblemReport
-import org.railwaystations.rsapi.core.model.ProblemReportType
-import org.railwaystations.rsapi.core.model.PublicInboxEntry
-import org.railwaystations.rsapi.core.model.User
-import org.railwaystations.rsapi.core.model.UserTestFixtures
 import org.railwaystations.rsapi.core.ports.inbound.ManageInboxUseCase
 import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase
 import org.springframework.beans.factory.annotation.Autowired
@@ -36,9 +28,7 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActions
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.web.servlet.LocaleResolver
 import java.time.Instant
@@ -88,7 +78,7 @@ internal class InboxControllerTest {
         mvc.perform(
             get("/adminInbox")
                 .header(HttpHeaders.AUTHORIZATION, "any")
-                .with(user(AuthUser(userNickname, listOf(SimpleGrantedAuthority(User.ROLE_USER)))))
+                .with(user(AuthUser(userNickname, listOf(SimpleGrantedAuthority(ROLE_USER)))))
                 .with(csrf())
         )
             .andExpect(validOpenApiResponse())
@@ -120,7 +110,7 @@ internal class InboxControllerTest {
         mvc.perform(
             get("/adminInbox")
                 .header(HttpHeaders.AUTHORIZATION, "any")
-                .with(user(AuthUser(userNickname, listOf(SimpleGrantedAuthority(User.ROLE_ADMIN)))))
+                .with(user(AuthUser(userNickname, listOf(SimpleGrantedAuthority(ROLE_ADMIN)))))
                 .with(csrf())
         )
             .andExpect(validOpenApiResponse())

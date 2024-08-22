@@ -7,6 +7,8 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.railwaystations.rsapi.core.config.MessageSourceConfig
+import org.railwaystations.rsapi.core.model.EMAIL_VERIFIED
+import org.railwaystations.rsapi.core.model.EMAIL_VERIFIED_AT_NEXT_LOGIN
 import org.railwaystations.rsapi.core.model.License
 import org.railwaystations.rsapi.core.model.User
 import org.railwaystations.rsapi.core.model.UserTestFixtures.EXISTING_USER_ID
@@ -45,7 +47,7 @@ internal class ProfileServiceTest {
         every { userPort.anonymizeUser(any()) } returns Unit
         every { userPort.countBlockedUsername(any()) } returns 0
         every { userPort.findByEmail(any()) } returns null
-        every { userPort.findByNormalizedName(any()) } returns null
+        every { userPort.findByName(any()) } returns null
         every { userPort.findByEmailVerification(any()) } returns null
         every { userPort.insert(any(), any(), any()) } returns 0
         every { userPort.update(any(), any()) } returns Unit
@@ -71,7 +73,7 @@ internal class ProfileServiceTest {
 
         sut.register(newUser, USER_AGENT)
 
-        verify { userPort.findByNormalizedName(USER_NAME) }
+        verify { userPort.findByName(USER_NAME) }
         verify { userPort.countBlockedUsername(USER_NAME) }
         verify { userPort.findByEmail(USER_EMAIL) }
         verify { userPort.insert(any(), any(), any()) }
@@ -95,7 +97,7 @@ internal class ProfileServiceTest {
 
         sut.register(newUser, USER_AGENT)
 
-        verify { userPort.findByNormalizedName(USER_NAME) }
+        verify { userPort.findByName(USER_NAME) }
         verify { userPort.countBlockedUsername(USER_NAME) }
         verify { userPort.findByEmail(USER_EMAIL) }
         verify { userPort.insert(any(), any(), any()) }
@@ -162,7 +164,7 @@ internal class ProfileServiceTest {
                 "Email verified {nickname='${USER_NAME}', email='${USER_EMAIL}'}"
             )
         }
-        verify { userPort.updateEmailVerification(EXISTING_USER_ID, User.EMAIL_VERIFIED) }
+        verify { userPort.updateEmailVerification(EXISTING_USER_ID, EMAIL_VERIFIED) }
     }
 
     @Test
@@ -180,7 +182,7 @@ internal class ProfileServiceTest {
         verify(exactly = 0) {
             userPort.updateEmailVerification(
                 EXISTING_USER_ID,
-                User.EMAIL_VERIFIED
+                EMAIL_VERIFIED
             )
         }
     }
@@ -222,7 +224,7 @@ internal class ProfileServiceTest {
         val newUser = createNewUser().copy(
             name = "Blocked Name"
         )
-        every { userPort.countBlockedUsername("blockedname") } returns 1
+        every { userPort.countBlockedUsername("Blocked Name") } returns 1
 
         assertThatThrownBy { sut.register(newUser, USER_AGENT) }
             .isInstanceOf(ProfileConflictException::class.java)
@@ -308,7 +310,7 @@ internal class ProfileServiceTest {
             id = EXISTING_USER_ID
         )
         every { userPort.findByEmail(user.email!!) } returns user
-        every { userPort.findByNormalizedName(user.name) } returns user
+        every { userPort.findByName(user.name) } returns user
         return user
     }
 
@@ -320,7 +322,7 @@ internal class ProfileServiceTest {
 
     @Test
     fun resetPasswordEmptyEmail() {
-        every { userPort.findByNormalizedName(USER_NAME) } returns createNewUser().copy(email = null)
+        every { userPort.findByName(USER_NAME) } returns createNewUser().copy(email = null)
 
         assertThatThrownBy { sut.resetPassword(USER_NAME, USER_AGENT) }
             .isInstanceOf(IllegalArgumentException::class.java)
@@ -331,7 +333,7 @@ internal class ProfileServiceTest {
         val user = createNewUser().copy(
             id = 123
         )
-        every { userPort.findByNormalizedName(USER_NAME) } returns user
+        every { userPort.findByName(USER_NAME) } returns user
 
         sut.resetPassword(USER_NAME, USER_AGENT)
 
@@ -344,7 +346,7 @@ internal class ProfileServiceTest {
             )
         }
         assertNewPasswordEmail()
-        verify { userPort.updateEmailVerification(123, User.EMAIL_VERIFIED_AT_NEXT_LOGIN) }
+        verify { userPort.updateEmailVerification(123, EMAIL_VERIFIED_AT_NEXT_LOGIN) }
         verify { authorizationPort.deleteAllByUser(USER_NAME) }
     }
 
@@ -352,7 +354,7 @@ internal class ProfileServiceTest {
     fun resetPasswordViaEmailAndEmailVerified() {
         val user = createNewUser().copy(
             id = 123,
-            emailVerification = User.EMAIL_VERIFIED
+            emailVerification = EMAIL_VERIFIED
 
         )
         every { userPort.findByEmail(user.email!!) } returns user
@@ -368,11 +370,11 @@ internal class ProfileServiceTest {
             )
         }
         assertNewPasswordEmail()
-        verify(exactly = 0) { userPort.updateEmailVerification(123, User.EMAIL_VERIFIED_AT_NEXT_LOGIN) }
+        verify(exactly = 0) { userPort.updateEmailVerification(123, EMAIL_VERIFIED_AT_NEXT_LOGIN) }
         verify { authorizationPort.deleteAllByUser(user.name) }
     }
 
-    fun assertVerificationEmail(mailerPort: MailerPort) {
+    private fun assertVerificationEmail(mailerPort: MailerPort) {
         verify(exactly = 0) {
             mailerPort.send(
                 any(),

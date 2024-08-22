@@ -51,9 +51,9 @@ internal class UserTest {
 
     @ParameterizedTest
     @CsvSource(
-        "nickname, email@example.com, " + User.EMAIL_VERIFIED + "              , true",
-        "nickname,                  , " + User.EMAIL_VERIFIED + "              , false",
-        "nickname, email@example.com, " + User.EMAIL_VERIFIED_AT_NEXT_LOGIN + ", false",
+        "nickname, email@example.com, $EMAIL_VERIFIED              , true",
+        "nickname,                  , $EMAIL_VERIFIED              , false",
+        "nickname, email@example.com, $EMAIL_VERIFIED_AT_NEXT_LOGIN, false",
         "        , email@example.com, VERIFICATION_TOKEN                       , false"
     )
     fun isEligibleToReportProblem(name: String?, email: String?, emailVerification: String?, expected: Boolean) {
@@ -63,10 +63,10 @@ internal class UserTest {
 
     @ParameterizedTest
     @CsvSource(
-        "nickname, email@example.com, CC0 1.0 Universell (CC0 1.0), true,  " + User.EMAIL_VERIFIED + "              , true",
-        "nickname, email@example.com, CC0 1.0 Universell (CC0 1.0), false, " + User.EMAIL_VERIFIED + "              , false",
-        "nickname, email@example.com, CC0 1.0 Universell (CC0 1.0), true,  " + User.EMAIL_VERIFIED_AT_NEXT_LOGIN + ", false",
-        "nickname, email@example.com, CC4,                          true,  " + User.EMAIL_VERIFIED + "              , false",
+        "nickname, email@example.com, CC0 1.0 Universell (CC0 1.0), true,  $EMAIL_VERIFIED              , true",
+        "nickname, email@example.com, CC0 1.0 Universell (CC0 1.0), false, $EMAIL_VERIFIED              , false",
+        "nickname, email@example.com, CC0 1.0 Universell (CC0 1.0), true,  $EMAIL_VERIFIED_AT_NEXT_LOGIN, false",
+        "nickname, email@example.com, CC4,                          true,  $EMAIL_VERIFIED              , false",
         "        , email@example.com, CC0 1.0 Universell (CC0 1.0), true,  VERIFICATION_TOKEN                       , false"
     )
     fun isEligibleToUploadPhoto(
@@ -93,8 +93,8 @@ internal class UserTest {
         val user = createUser("@Nick Name", null, null, null)
         val roles = user.roles
         assertThat(roles.size).isEqualTo(1)
-        assertThat(roles.contains(User.ROLE_USER)).isEqualTo(true)
-        assertThat(roles.contains(User.ROLE_ADMIN)).isEqualTo(false)
+        assertThat(roles.contains(ROLE_USER)).isEqualTo(true)
+        assertThat(roles.contains(ROLE_ADMIN)).isEqualTo(false)
     }
 
     @Test
@@ -104,8 +104,8 @@ internal class UserTest {
         )
         val roles = admin.roles
         assertThat(roles.size).isEqualTo(2)
-        assertThat(roles.contains(User.ROLE_USER)).isEqualTo(true)
-        assertThat(roles.contains(User.ROLE_ADMIN)).isEqualTo(true)
+        assertThat(roles.contains(ROLE_USER)).isEqualTo(true)
+        assertThat(roles.contains(ROLE_ADMIN)).isEqualTo(true)
     }
 
     @ParameterizedTest

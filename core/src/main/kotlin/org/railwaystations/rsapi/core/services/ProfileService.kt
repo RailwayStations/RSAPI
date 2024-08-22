@@ -2,10 +2,7 @@ package org.railwaystations.rsapi.core.services
 
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.commons.lang3.StringUtils
-import org.railwaystations.rsapi.core.model.User
-import org.railwaystations.rsapi.core.model.User.Companion.createNewEmailVerificationToken
-import org.railwaystations.rsapi.core.model.User.Companion.normalizeEmail
-import org.railwaystations.rsapi.core.model.User.Companion.normalizeName
+import org.railwaystations.rsapi.core.model.*
 import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase
 import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase.ProfileConflictException
 import org.railwaystations.rsapi.core.ports.outbound.MailerPort
@@ -46,7 +43,7 @@ class ProfileService(
     override fun resetPassword(nameOrEmail: String, clientInfo: String?) {
         log.info("Password reset requested for '{}'", nameOrEmail)
         val user = userPort.findByEmail(normalizeEmail(nameOrEmail))
-            ?: userPort.findByNormalizedName(normalizeName(nameOrEmail))
+            ?: userPort.findByName(nameOrEmail)
 
         requireNotNull(user) { "Can't reset password for unknown user" }
 
@@ -63,7 +60,7 @@ class ProfileService(
         sendPasswordMail(user.email, newPassword, user.locale)
         if (!user.isEmailVerified) {
             // if the email is not yet verified, we can verify it with the next login
-            userPort.updateEmailVerification(user.id, User.EMAIL_VERIFIED_AT_NEXT_LOGIN)
+            userPort.updateEmailVerification(user.id, EMAIL_VERIFIED_AT_NEXT_LOGIN)
         }
         authorizationPort.deleteAllByUser(user.name)
     }
@@ -74,9 +71,7 @@ class ProfileService(
 
         require(newUser.isValidForRegistration) { "Invalid data" }
 
-        val existingName = userPort.findByNormalizedName(
-            newUser.normalizedName
-        )
+        val existingName = userPort.findByName(newUser.name)
         existingName?.let {
             if (newUser.email != it.email) {
                 monitorPort.sendMessage(
@@ -86,7 +81,7 @@ class ProfileService(
             }
         }
 
-        if (userPort.countBlockedUsername(newUser.normalizedName) != 0) {
+        if (userPort.countBlockedUsername(newUser.name) != 0) {
             monitorPort.sendMessage(
                 "Registration for user '${newUser.name}' with eMail '${newUser.email}' failed, name is blocked\nvia $clientInfo"
             )
@@ -105,7 +100,7 @@ class ProfileService(
         val passwordProvided = !password.isNullOrBlank()
         if (!passwordProvided) {
             password = createNewPassword()
-            emailVerificationToken = User.EMAIL_VERIFIED_AT_NEXT_LOGIN
+            emailVerificationToken = EMAIL_VERIFIED_AT_NEXT_LOGIN
         }
 
         val key = encryptPassword(password)
@@ -147,8 +142,8 @@ class ProfileService(
             throw IllegalArgumentException()
         }
 
-        if (newProfile.normalizedName != user.normalizedName) {
-            userPort.findByNormalizedName(newProfile.normalizedName)?.let {
+        if (newProfile.name != user.name) {
+            userPort.findByName(newProfile.name)?.let {
                 log.info("Name conflict '{}'", newProfile.name)
                 throw ProfileConflictException()
             }
@@ -181,16 +176,15 @@ class ProfileService(
     override fun emailVerification(token: String): User? {
         return userPort.findByEmailVerification(token)
             ?.let { user: User ->
-                userPort.updateEmailVerification(user.id, User.EMAIL_VERIFIED)
+                userPort.updateEmailVerification(user.id, EMAIL_VERIFIED)
                 monitorPort.sendMessage("Email verified {nickname='${user.name}', email='${user.email}'}")
                 user
             }
     }
 
     override fun deleteProfile(user: User, userAgent: String?) {
-        val normalizedName = user.normalizedName
         userPort.anonymizeUser(user.id)
-        userPort.addUsernameToBlocklist(normalizedName)
+        userPort.addUsernameToBlocklist(user.name)
         authorizationPort.deleteAllByUser(user.name)
         monitorPort.sendMessage("Closed account ${user.id} - ${user.name}")
     }
