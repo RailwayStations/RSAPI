@@ -18,7 +18,7 @@ internal class UserTest {
         "nickname,' ', false"
     )
     fun isValidForRegistration(name: String?, email: String?, expected: Boolean) {
-        assertThat(createUser(StringUtils.trimToEmpty(name), email, null, null).isValidForRegistration).isEqualTo(
+        assertThat(createUser(StringUtils.trimToEmpty(name), email, null, null).isValid).isEqualTo(
             expected
         )
     }

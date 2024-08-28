@@ -69,7 +69,7 @@ class ProfileService(
     override fun register(newUser: User, clientInfo: String?) {
         log.info("New registration for '{}' with '{}'", newUser.name, newUser.email)
 
-        require(newUser.isValidForRegistration) { "Invalid data" }
+        require(newUser.isValid) { "Invalid data" }
 
         val existingName = userPort.findByName(newUser.name)
         existingName?.let {

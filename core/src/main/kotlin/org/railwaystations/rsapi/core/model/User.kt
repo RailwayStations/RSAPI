@@ -34,17 +34,12 @@ data class User(
     val displayName: String
         get() = if (anonymous) ANONYM else name
 
-    val isValidForRegistration: Boolean
-        /**
-         * Checks if we have got a name and valid email for registration.
-         */
-        get() = name.isNotBlank() &&
-                !email.isNullOrBlank() &&
-                EmailValidator().isValid(email, null)
-
     val isValid: Boolean
         get() {
-            if (!isValidForRegistration) {
+            if (name.isBlank() ||
+                email.isNullOrBlank() ||
+                !EmailValidator().isValid(email, null)
+            ) {
                 return false
             }
             StringUtils.trimToNull(url)?.let {
