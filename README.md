@@ -5,13 +5,11 @@ for [Android](https://github.com/RailwayStations/RSAndroidApp)
 and [iOS](https://github.com/RailwayStations/Bahnhofsfotos) of
 the [Bahnhofsfotos opendata Project](https://github.com/RailwayStations).
 
-This API is hosted at https://api.railway-stations.org or at the Deutsche Bahn developer
-site: https://developer.deutschebahn.com/store/apis/list where you can also find an online and executable version of the
-OpenAPI documentation.
+This API is hosted at https://api.railway-stations.org.
 
 ## build
 
-To build the project, you need Java 20.
+To build the project, you need Java 21.
 
 Run on Unix like systems:
 
