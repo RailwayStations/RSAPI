@@ -79,7 +79,7 @@ class MatrixMonitor(private val config: MatrixMonitorConfig, private val objectM
             .uri(URI.create(config.uploadUrl + "?filename=" + photo.fileName + "&access_token=" + config.accessToken))
             .header("Content-Type", extensionToMimeType(getExtension(photo.fileName.toString())))
             .timeout(Duration.of(1, ChronoUnit.MINUTES))
-            .POST(HttpRequest.BodyPublishers.ofByteArray(scalePhoto(photo, 300)))
+            .POST(HttpRequest.BodyPublishers.ofByteArray(scalePhoto(photo, 640)))
             .build()
 
         val responseUpload = client.send(request, HttpResponse.BodyHandlers.ofString())
