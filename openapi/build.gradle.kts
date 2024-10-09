@@ -1,4 +1,5 @@
 plugins {
+    alias(libs.plugins.kotlin.spring)
     alias(libs.plugins.spring.dependency.management)
     alias(libs.plugins.openapi.generator)
     alias(libs.plugins.kotlin.jvm)
