@@ -104,9 +104,6 @@ class PhotoUploadController(
         produces = [MediaType.APPLICATION_JSON_VALUE],
         value = ["/photoUpload"]
     )
-    @Throws(
-        IOException::class
-    )
     fun photoUpload(
         request: HttpServletRequest,
         @RequestHeader(value = HttpHeaders.USER_AGENT, required = false) userAgent: String,
@@ -173,13 +170,14 @@ class PhotoUploadController(
 /**
  * jQuery.ajax treats anything different to 2xx as error, so we have to simplify the response codes
  */
-private fun InboxResponseDto.State.toHttpStatusMultipartFormdata() = when (this) {
-    InboxResponseDto.State.REVIEW, InboxResponseDto.State.CONFLICT
-    -> HttpStatus.ACCEPTED
+private fun InboxResponseDto.State.toHttpStatusMultipartFormdata() =
+    when (this) {
+        InboxResponseDto.State.REVIEW, InboxResponseDto.State.CONFLICT
+            -> HttpStatus.ACCEPTED
 
-    InboxResponseDto.State.PHOTO_TOO_LARGE, InboxResponseDto.State.LAT_LON_OUT_OF_RANGE, InboxResponseDto.State.NOT_ENOUGH_DATA, InboxResponseDto.State.UNSUPPORTED_CONTENT_TYPE
-    -> HttpStatus.OK
+        InboxResponseDto.State.PHOTO_TOO_LARGE, InboxResponseDto.State.LAT_LON_OUT_OF_RANGE, InboxResponseDto.State.NOT_ENOUGH_DATA, InboxResponseDto.State.UNSUPPORTED_CONTENT_TYPE
+            -> HttpStatus.OK
 
-    else -> HttpStatus.INTERNAL_SERVER_ERROR
-}
+        else -> HttpStatus.INTERNAL_SERVER_ERROR
+    }
 
