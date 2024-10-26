@@ -5,12 +5,10 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
-import org.railwaystations.rsapi.adapter.photostorage.PhotoFileStorage.Companion.sanitizeFilename
 import org.railwaystations.rsapi.core.model.InboxEntry
 import org.railwaystations.rsapi.core.model.Station
-import org.railwaystations.rsapi.core.model.StationTestFixtures.createStationDe0815
-import org.railwaystations.rsapi.core.model.StationTestFixtures.createStationDe4711
-import java.io.IOException
+import org.railwaystations.rsapi.core.model.StationTestFixtures.stationDe0815
+import org.railwaystations.rsapi.core.model.StationTestFixtures.stationDe4711
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.attribute.FileTime
@@ -25,7 +23,6 @@ internal class PhotoFileStorageTest {
     private lateinit var workDir: WorkDir
 
     @BeforeEach
-    @Throws(IOException::class)
     fun setup() {
         tempdir = Files.createTempDirectory("rsapi")
         workDir = WorkDir(tempdir.toString(), KEEP_FILE_COPIES_IN_DAYS)
@@ -40,7 +37,6 @@ internal class PhotoFileStorageTest {
 
     @ParameterizedTest
     @ValueSource(strings = ["done", "rejected"])
-    @Throws(IOException::class)
     fun cleanupOldCopies(subdirName: String) {
         val subdir = workDir.inboxDir.resolve(subdirName)
         val newFile = createFileWithLastModifiedInPast(subdir, "newFile.txt", KEEP_FILE_COPIES_IN_DAYS - 1)
@@ -52,7 +48,6 @@ internal class PhotoFileStorageTest {
         assertThat(Files.exists(oldFile)).isEqualTo(false)
     }
 
-    @Throws(IOException::class)
     private fun createFileWithLastModifiedInPast(subdir: Path, filename: String, lastModifiedDaysInPast: Int): Path {
         val path = createFile(subdir, filename)
         Files.setLastModifiedTime(
@@ -62,7 +57,6 @@ internal class PhotoFileStorageTest {
         return path
     }
 
-    @Throws(IOException::class)
     private fun createFile(subdir: Path, filename: String): Path {
         val path = subdir.resolve(filename)
         Files.createDirectories(subdir)
@@ -71,15 +65,13 @@ internal class PhotoFileStorageTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun importPhoto() {
-        val station = createStationDe4711()
-        val inboxEntry = createInboxEntryWithId(1, station.key)
+        val inboxEntry = createInboxEntryWithId(1, stationDe4711.key)
         val filename = inboxEntry.filename!!
         createFile(workDir.inboxDir, filename)
         createFile(workDir.inboxProcessedDir, filename)
 
-        val urlPath = storage.importPhoto(inboxEntry, station)
+        val urlPath = storage.importPhoto(inboxEntry, stationDe4711)
 
         assertThat(urlPath).isEqualTo("/de/4711_1.jpg")
         assertThat(workDir.photosDir.resolve("de").resolve("4711_1.jpg")).exists()
@@ -89,16 +81,14 @@ internal class PhotoFileStorageTest {
     }
 
     @Test
-    @Throws(IOException::class)
     fun importSecondPhoto() {
-        val station = createStationDe0815()
-        val inboxEntry = createInboxEntryWithId(2, station.key)
+        val inboxEntry = createInboxEntryWithId(2, stationDe0815.key)
         val filename = inboxEntry.filename!!
         createFile(workDir.inboxDir, filename)
         createFile(workDir.inboxProcessedDir, filename)
         createFile(workDir.photosDir.resolve("de"), "0815_1.jpg")
 
-        val urlPath = storage.importPhoto(inboxEntry, station)
+        val urlPath = storage.importPhoto(inboxEntry, stationDe0815)
 
         assertThat(urlPath).isEqualTo("/de/0815_2.jpg")
         assertThat(workDir.photosDir.resolve("de").resolve("0815_2.jpg")).exists()

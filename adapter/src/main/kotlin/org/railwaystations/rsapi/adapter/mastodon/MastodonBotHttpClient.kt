@@ -26,9 +26,9 @@ class MastodonBotHttpClient(
         .build()
 
     @Async
-    override fun tootNewPhoto(status: String) {
+    override fun postPhoto(status: String) {
         if (config.instanceUrl.isBlank() || config.token.isBlank()) {
-            log.info("New photo not tooted: {}", status)
+            log.warn("Photo not tooted: {}", status)
             return
         }
         log.info("Sending toot for new photo: {}", status)

@@ -4,5 +4,5 @@ import org.springframework.scheduling.annotation.Async
 
 interface MastodonPort {
     @Async
-    fun tootNewPhoto(status: String)
+    fun postPhoto(status: String)
 }

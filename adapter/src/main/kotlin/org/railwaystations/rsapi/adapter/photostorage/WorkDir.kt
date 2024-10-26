@@ -6,6 +6,8 @@ import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 
+private const val KEEP_FILE_COPIES_IN_DAYS_DEFAULT: Int = 60
+
 @Component
 class WorkDir(
     @Value("\${workDir}") workDir: String,
@@ -33,7 +35,4 @@ class WorkDir(
         keepFileCopiesInDays = keepFileCopiesInDaysInit ?: KEEP_FILE_COPIES_IN_DAYS_DEFAULT
     }
 
-    companion object {
-        const val KEEP_FILE_COPIES_IN_DAYS_DEFAULT: Int = 60
-    }
 }

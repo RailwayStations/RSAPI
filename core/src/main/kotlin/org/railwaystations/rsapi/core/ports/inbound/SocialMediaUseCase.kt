@@ -1,5 +1,6 @@
 package org.railwaystations.rsapi.core.ports.inbound
 
-interface PostRecentlyImportedPhotoUseCase {
+interface SocialMediaUseCase {
     fun postRecentlyImportedPhotoNotYetPosted()
+    fun postDailyRandomPhoto()
 }

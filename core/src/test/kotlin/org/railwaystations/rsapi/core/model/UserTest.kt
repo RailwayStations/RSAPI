@@ -80,7 +80,7 @@ internal class UserTest {
         assertThat(
             User(
                 name = StringUtils.trimToEmpty(name),
-                license = License.ofDisplayName(licenseDisplayName),
+                license = licenseDisplayName.displayNameToLicense(),
                 email = email,
                 ownPhotos = photoOwner,
                 emailVerification = emailVerification,

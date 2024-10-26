@@ -17,7 +17,7 @@ internal class MastodonPortHttpClientTest {
                 .willReturn(WireMock.ok())
         )
 
-        client.tootNewPhoto("status message")
+        client.postPhoto("status message")
 
         WireMock.verify(
             WireMock.postRequestedFor(WireMock.urlEqualTo("/api/v1/statuses"))

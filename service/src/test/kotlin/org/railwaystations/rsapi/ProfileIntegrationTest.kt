@@ -29,7 +29,6 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory
 import org.springframework.security.oauth2.core.OAuth2AccessToken
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.jdbc.Sql
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.exchange
@@ -46,13 +45,6 @@ import java.util.regex.Pattern
     properties = ["server.error.include-message=always"]
 )
 @ActiveProfiles("test")
-@Sql(
-    scripts = [
-        "/testdata/cleanup.sql",
-        "/testdata/users.sql",
-        "/testdata/oauth2_registered_client.sql",
-    ], executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS
-)
 internal class ProfileIntegrationTest : AbstractMariaDBBaseTest() {
     @Autowired
     private lateinit var mapper: ObjectMapper

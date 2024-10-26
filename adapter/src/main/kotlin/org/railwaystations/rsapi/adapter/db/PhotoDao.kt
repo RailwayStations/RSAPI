@@ -3,6 +3,7 @@ package org.railwaystations.rsapi.adapter.db
 import org.jdbi.v3.sqlobject.customizer.Bind
 import org.jdbi.v3.sqlobject.customizer.BindBean
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys
+import org.jdbi.v3.sqlobject.statement.SqlQuery
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
 import org.railwaystations.rsapi.core.model.Photo
 import org.railwaystations.rsapi.core.model.Station
@@ -27,4 +28,10 @@ interface PhotoDao : PhotoPort {
 
     @SqlUpdate("UPDATE photos SET `primary` = true WHERE id = :id")
     override fun setPrimary(@Bind("id") id: Long)
+
+    @SqlQuery("SELECT count(*) FROM photos")
+    override fun countPhotos(): Long
+
+    @SqlQuery("SELECT id FROM photos LIMIT 1 OFFSET :n")
+    override fun findNthPhotoId(@Bind("n") n: Long): Long
 }

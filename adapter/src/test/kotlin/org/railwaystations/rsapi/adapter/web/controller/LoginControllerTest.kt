@@ -230,12 +230,10 @@ internal class LoginControllerTest {
             )
     }
 
-    companion object {
-        private fun createValidUser(): User {
-            return UserTestFixtures.createUserNickname().copy(
-                newPassword = "very_secret",
-                locale = Locale.GERMAN,
-            )
-        }
+    private fun createValidUser(): User {
+        return UserTestFixtures.createUserNickname().copy(
+            newPassword = "very_secret",
+            locale = Locale.GERMAN,
+        )
     }
 }

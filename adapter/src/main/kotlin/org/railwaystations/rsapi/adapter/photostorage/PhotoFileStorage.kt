@@ -17,9 +17,12 @@ import java.time.temporal.ChronoUnit
 import java.util.zip.CRC32
 import java.util.zip.CheckedOutputStream
 
+private const val MAX_FILE_SIZE = 20000000L
+
 @Repository
 class PhotoFileStorage(private val workDir: WorkDir) : PhotoStoragePort {
 
+    private val log by Logger()
 
     override fun isProcessed(filename: String): Boolean {
         return Files.exists(workDir.inboxProcessedDir.resolve(filename))
@@ -77,10 +80,10 @@ class PhotoFileStorage(private val workDir: WorkDir) : PhotoStoragePort {
 
         // write the file to the inbox directory
         val cos = CheckedOutputStream(Files.newOutputStream(file), CRC32())
-        val bytesRead = IOUtils.copyLarge(body, cos, 0L, MAX_SIZE)
-        if (bytesRead == MAX_SIZE) {
+        val bytesRead = IOUtils.copyLarge(body, cos, 0L, MAX_FILE_SIZE)
+        if (bytesRead == MAX_FILE_SIZE) {
             Files.deleteIfExists(file)
-            throw PhotoTooLargeException(MAX_SIZE)
+            throw PhotoTooLargeException(MAX_FILE_SIZE)
         }
         cos.close()
 
@@ -128,53 +131,48 @@ class PhotoFileStorage(private val workDir: WorkDir) : PhotoStoragePort {
         return workDir.inboxRejectedDir.resolve(sanitizeFilename(filename))
     }
 
-    companion object {
-        private val log by Logger()
-
-        private const val MAX_SIZE = 20000000L
-
-        fun cleanupOldCopiesFrom(dir: Path, maxAge: Instant) {
-            try {
-                Files.list(dir).use { pathStream ->
-                    pathStream
-                        .filter { path -> Files.isRegularFile(path) }
-                        .filter { path -> isOlderThan(path, maxAge) }
-                        .forEach { path -> deleteSilently(path) }
-                }
-            } catch (e: Exception) {
-                log.error("Failed to cleanup old copies from {}", dir, e)
+    fun cleanupOldCopiesFrom(dir: Path, maxAge: Instant) {
+        try {
+            Files.list(dir).use { pathStream ->
+                pathStream
+                    .filter { path -> Files.isRegularFile(path) }
+                    .filter { path -> isOlderThan(path, maxAge) }
+                    .forEach { path -> deleteSilently(path) }
             }
-        }
-
-        private fun deleteSilently(path: Path) {
-            try {
-                Files.delete(path)
-                log.info("Deleted {}", path)
-            } catch (e: IOException) {
-                log.warn("Unable to delete {}", path)
-            }
-        }
-
-        private fun isOlderThan(path: Path, maxAge: Instant): Boolean {
-            try {
-                return Files.getLastModifiedTime(path).toInstant().isBefore(maxAge)
-            } catch (e: IOException) {
-                log.warn("Unable to getLastModifiedTime of {}", path.fileName)
-            }
-            return false
-        }
-
-        fun sanitizeFilename(fileName: String): String {
-            return fileName.replace(" ", "_")
-                .replace("/", "_")
-                .replace(":", "_")
-                .replace("\"", "_")
-                .replace("|", "_")
-                .replace("*", "_")
-                .replace("?", "_")
-                .replace("<", "_")
-                .replace(">", "_")
-                .replace('\\', '_')
+        } catch (e: Exception) {
+            log.error("Failed to cleanup old copies from {}", dir, e)
         }
     }
+
+    private fun deleteSilently(path: Path) {
+        try {
+            Files.delete(path)
+            log.info("Deleted {}", path)
+        } catch (_: IOException) {
+            log.warn("Unable to delete {}", path)
+        }
+    }
+
+    private fun isOlderThan(path: Path, maxAge: Instant): Boolean {
+        try {
+            return Files.getLastModifiedTime(path).toInstant().isBefore(maxAge)
+        } catch (_: IOException) {
+            log.warn("Unable to getLastModifiedTime of {}", path.fileName)
+        }
+        return false
+    }
+
+}
+
+fun sanitizeFilename(fileName: String): String {
+    return fileName.replace(" ", "_")
+        .replace("/", "_")
+        .replace(":", "_")
+        .replace("\"", "_")
+        .replace("|", "_")
+        .replace("*", "_")
+        .replace("?", "_")
+        .replace("<", "_")
+        .replace(">", "_")
+        .replace('\\', '_')
 }

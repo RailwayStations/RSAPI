@@ -52,23 +52,20 @@ internal class CountriesControllerTest {
         countries.forEach(Consumer { country -> assertCountry(country) })
     }
 
-    companion object {
+}
 
-        fun assertCountry(country: CountryDto) {
-            assertThat(country.name).isEqualTo("name-" + country.code)
-            assertThat(country.email).isEqualTo("email-" + country.code)
-            assertThat(country.timetableUrlTemplate).isEqualTo("timetable-" + country.code)
-            assertThat(country.overrideLicense).isEqualTo(License.CC_BY_NC_40_INT.displayName)
-            assertThat(country.providerApps!!.size).isEqualTo(3)
-            country.providerApps!!.forEach(Consumer { app ->
-                when (app.type) {
-                    ProviderAppDto.Type.ANDROID -> assertThat(app.url).isEqualTo("androidApp-" + country.code)
-                    ProviderAppDto.Type.IOS -> assertThat(app.url).isEqualTo("iosApp-" + country.code)
-                    ProviderAppDto.Type.WEB -> assertThat(app.url).isEqualTo("webApp-" + country.code)
-                    else -> Fail.fail<Any>("unknown app type")
-                }
-            })
+fun assertCountry(country: CountryDto) {
+    assertThat(country.name).isEqualTo("name-" + country.code)
+    assertThat(country.email).isEqualTo("email-" + country.code)
+    assertThat(country.timetableUrlTemplate).isEqualTo("timetable-" + country.code)
+    assertThat(country.overrideLicense).isEqualTo(License.CC_BY_NC_40_INT.displayName)
+    assertThat(country.providerApps!!.size).isEqualTo(3)
+    country.providerApps!!.forEach(Consumer { app ->
+        when (app.type) {
+            ProviderAppDto.Type.ANDROID -> assertThat(app.url).isEqualTo("androidApp-" + country.code)
+            ProviderAppDto.Type.IOS -> assertThat(app.url).isEqualTo("iosApp-" + country.code)
+            ProviderAppDto.Type.WEB -> assertThat(app.url).isEqualTo("webApp-" + country.code)
+            else -> Fail.fail<Any>("unknown app type")
         }
-    }
-
+    })
 }

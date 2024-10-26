@@ -17,6 +17,28 @@ import org.railwaystations.rsapi.core.ports.outbound.InboxPort
 import java.sql.ResultSet
 import java.sql.SQLException
 
+private const val JOIN_QUERY: String = """
+            SELECT i.id, i.countryCode, i.stationId, i.photoId, i.title i_title, s.title s_title, i.lat i_lat, i.lon i_lon, s.lat s_lat, s.lon s_lon,
+                 i.photographerId, u.name photographerNickname, u.email photographerEmail, i.extension, i.comment, i.rejectReason, i.createdAt,
+                 i.done, i.problemReportType, i.active, i.crc32, i.notified, p.urlPath, i.posted,
+                 (
+                    SELECT COUNT(*)
+                        FROM inbox i2
+                        WHERE i2.countryCode IS NOT NULL AND i2.countryCode = i.countryCode
+                        AND i2.stationId IS NOT NULL AND i2.stationId = i.stationId AND i2.done = false AND i2.id != i.id
+                 ) AS conflict
+               FROM inbox i
+                    LEFT JOIN stations s ON s.countryCode = i.countryCode AND s.id = i.stationId
+                    LEFT JOIN users u ON u.id = i.photographerId
+                    LEFT JOIN photos p ON p.countryCode = i.countryCode AND p.stationId = i.stationId AND ( ( p.primary = true AND i.photoId IS NULL) OR ( p.id = i.photoId ) )
+            
+            """
+private const val COUNTRY_CODE: String = "countryCode"
+private const val STATION_ID: String = "stationId"
+private const val ID: String = "id"
+private const val PHOTOGRAPHER_ID: String = "photographerId"
+private const val COORDS: String = "coords"
+
 interface InboxDao : InboxPort {
     @SqlQuery("$JOIN_QUERY WHERE i.id = :id")
     @RegisterRowMapper(
@@ -30,11 +52,11 @@ interface InboxDao : InboxPort {
     )
     override fun findPendingInboxEntries(): List<InboxEntry>
 
-    @SqlQuery("$JOIN_QUERY WHERE i.done = true AND i.rejectReason IS NULL AND i.extension IS NOT NULL AND i.posted = false ORDER BY id DESC LIMIT 100")
+    @SqlQuery("$JOIN_QUERY WHERE i.done = true AND i.rejectReason IS NULL AND i.extension IS NOT NULL AND i.posted = false ORDER BY createdAt DESC LIMIT 1")
     @RegisterRowMapper(
         InboxEntryMapper::class
     )
-    override fun findRecentlyImportedPhotosNotYetPosted(): List<InboxEntry>
+    override fun findOldestImportedPhotoNotYetPosted(): InboxEntry?
 
     @SqlQuery(
         """
@@ -171,7 +193,6 @@ interface InboxDao : InboxPort {
     }
 
     class PublicInboxEntryMapper : RowMapper<PublicInboxEntry> {
-        @Throws(SQLException::class)
         override fun map(rs: ResultSet, ctx: StatementContext): PublicInboxEntry {
             var title = rs.getString("s_title")
             var coordinates = getCoordinates(rs, "s_")
@@ -189,35 +210,11 @@ interface InboxDao : InboxPort {
         }
     }
 
-    companion object {
-        /**
-         * Get the uploaded coordinates, if not present or not valid gets the station coordinates
-         */
-        @Throws(SQLException::class)
-        fun getCoordinates(rs: ResultSet, columnPrefix: String): Coordinates {
-            return Coordinates(rs.getDouble(columnPrefix + "lat"), rs.getDouble(columnPrefix + "lon"))
-        }
+}
 
-        const val JOIN_QUERY: String = """
-            SELECT i.id, i.countryCode, i.stationId, i.photoId, i.title i_title, s.title s_title, i.lat i_lat, i.lon i_lon, s.lat s_lat, s.lon s_lon,
-                 i.photographerId, u.name photographerNickname, u.email photographerEmail, i.extension, i.comment, i.rejectReason, i.createdAt,
-                 i.done, i.problemReportType, i.active, i.crc32, i.notified, p.urlPath, i.posted,
-                 (
-                    SELECT COUNT(*)
-                        FROM inbox i2
-                        WHERE i2.countryCode IS NOT NULL AND i2.countryCode = i.countryCode
-                        AND i2.stationId IS NOT NULL AND i2.stationId = i.stationId AND i2.done = false AND i2.id != i.id
-                 ) AS conflict
-               FROM inbox i
-                    LEFT JOIN stations s ON s.countryCode = i.countryCode AND s.id = i.stationId
-                    LEFT JOIN users u ON u.id = i.photographerId
-                    LEFT JOIN photos p ON p.countryCode = i.countryCode AND p.stationId = i.stationId AND ( ( p.primary = true AND i.photoId IS NULL) OR ( p.id = i.photoId ) )
-            
-            """
-        const val COUNTRY_CODE: String = "countryCode"
-        const val STATION_ID: String = "stationId"
-        const val ID: String = "id"
-        const val PHOTOGRAPHER_ID: String = "photographerId"
-        const val COORDS: String = "coords"
-    }
+/**
+ * Get the uploaded coordinates, if not present or not valid gets the station coordinates
+ */
+fun getCoordinates(rs: ResultSet, columnPrefix: String): Coordinates {
+    return Coordinates(rs.getDouble(columnPrefix + "lat"), rs.getDouble(columnPrefix + "lon"))
 }

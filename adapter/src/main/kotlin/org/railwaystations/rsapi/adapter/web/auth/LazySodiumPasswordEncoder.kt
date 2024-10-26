@@ -8,6 +8,9 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Component
 import java.nio.charset.StandardCharsets
 
+private val LAZY_SODIUM = LazySodiumJava(SodiumJava(), StandardCharsets.UTF_8)
+private val PW_HASH_LAZY: PwHash.Lazy = LAZY_SODIUM
+
 @Component
 class LazySodiumPasswordEncoder : PasswordEncoder {
     override fun encode(rawPassword: CharSequence): String {
@@ -29,8 +32,4 @@ class LazySodiumPasswordEncoder : PasswordEncoder {
         return PW_HASH_LAZY.cryptoPwHashStrVerify(encodedPassword, rawPassword.toString())
     }
 
-    companion object {
-        private val LAZY_SODIUM = LazySodiumJava(SodiumJava(), StandardCharsets.UTF_8)
-        private val PW_HASH_LAZY: PwHash.Lazy = LAZY_SODIUM
-    }
 }

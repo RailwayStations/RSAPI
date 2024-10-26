@@ -8,11 +8,10 @@ import org.jdbi.v3.sqlobject.customizer.BindBean
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys
 import org.jdbi.v3.sqlobject.statement.SqlQuery
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
-import org.railwaystations.rsapi.core.model.License.Companion.of
 import org.railwaystations.rsapi.core.model.User
+import org.railwaystations.rsapi.core.model.nameToLicense
 import org.railwaystations.rsapi.core.ports.outbound.UserPort
 import java.sql.ResultSet
-import java.sql.SQLException
 import java.util.*
 
 interface UserDao : UserPort {
@@ -105,14 +104,13 @@ interface UserDao : UserPort {
     override fun updateLocale(@Bind("id") id: Int, @Bind("localeLanguageTag") locallocaleLanguageTage: String)
 
     class UserMapper : RowMapper<User> {
-        @Throws(SQLException::class)
         override fun map(rs: ResultSet, ctx: StatementContext): User {
             val locale = rs.getString("locale")
             return User(
                 id = rs.getInt("id"),
                 name = rs.getString("name"),
                 url = rs.getString("url"),
-                license = of(rs.getString("license")),
+                license = rs.getString("license").nameToLicense(),
                 email = rs.getString("email"),
                 ownPhotos = rs.getBoolean("ownPhotos"),
                 anonymous = rs.getBoolean("anonymous"),

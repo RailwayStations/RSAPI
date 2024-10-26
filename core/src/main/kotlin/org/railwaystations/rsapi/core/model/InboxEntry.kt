@@ -51,15 +51,13 @@ data class InboxEntry(
         get() = problemReportType != null
 
     val filename: String?
-        get() = extension?.let { createFilename(id, it) }
+        get() = extension?.let { createInboxFilename(id, it) }
 
     val hasPhoto: Boolean
         get() = existingPhotoUrlPath != null
 
-    companion object {
+}
 
-        fun createFilename(id: Long, extension: String): String {
-            return "$id.$extension"
-        }
-    }
+fun createInboxFilename(id: Long, extension: String): String {
+    return "$id.$extension"
 }

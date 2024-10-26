@@ -19,4 +19,5 @@ interface StationPort {
     val maxZ: Int
     fun changeStationTitle(key: Station.Key, newTitle: String)
     fun updateLocation(key: Station.Key, coordinates: Coordinates)
+    fun findByPhotoId(photoId: Long): Station
 }

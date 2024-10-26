@@ -2,10 +2,8 @@ package org.railwaystations.rsapi.core.services
 
 import org.apache.commons.lang3.StringUtils
 import org.railwaystations.rsapi.core.model.*
-import org.railwaystations.rsapi.core.model.InboxEntry.Companion.createFilename
 import org.railwaystations.rsapi.core.model.InboxStateQuery.InboxState
 import org.railwaystations.rsapi.core.ports.inbound.ManageInboxUseCase
-import org.railwaystations.rsapi.core.ports.inbound.PostRecentlyImportedPhotoUseCase
 import org.railwaystations.rsapi.core.ports.outbound.*
 import org.railwaystations.rsapi.core.ports.outbound.PhotoStoragePort.PhotoTooLargeException
 import org.railwaystations.rsapi.core.utils.ImageUtil.mimeToExtension
@@ -18,7 +16,6 @@ import java.io.InputStream
 import java.nio.charset.StandardCharsets
 import java.time.Clock
 import java.time.Instant
-import java.util.*
 
 @Service
 class InboxService(
@@ -30,13 +27,9 @@ class InboxService(
     private val countryPort: CountryPort,
     private val photoPort: PhotoPort,
     @param:Value("\${inboxBaseUrl}") private val inboxBaseUrl: String,
-    private val mastodonPort: MastodonPort,
     @param:Value("\${photoBaseUrl}") private val photoBaseUrl: String,
     private val clock: Clock,
-    @param:Value(
-        "\${mastodon-bot.stationUrl}"
-    ) private val stationUrl: String
-) : ManageInboxUseCase, PostRecentlyImportedPhotoUseCase {
+) : ManageInboxUseCase {
 
     private val log by Logger()
 
@@ -313,7 +306,7 @@ class InboxService(
 
     override fun importMissingStation(command: InboxCommand) {
         val inboxEntry = assertPendingInboxEntryExists(command)
-        log.info("Importing photo {}, {}", inboxEntry.id, inboxEntry.filename)
+        log.info("Importing photo of missing stations {}, {}", inboxEntry.id, inboxEntry.filename)
 
         require(!inboxEntry.isProblemReport) { "Can't import a problem report" }
 
@@ -421,7 +414,7 @@ class InboxService(
         val newStation = Station(
             key = Station.Key(country.code, "Z${stationPort.maxZ + 1}"),
             title = command.title,
-            coordinates = command.coordinates!!,
+            coordinates = command.coordinates,
             ds100 = command.ds100,
             photos = mutableListOf(),
             active = command.active
@@ -527,7 +520,7 @@ class InboxService(
 
             id = inboxPort.insert(inboxEntry)
             if (extension != null) {
-                filename = createFilename(id, extension)
+                filename = createInboxFilename(id, extension)
                 crc32 = photoStoragePort.storeUpload(body!!, filename)
                 inboxPort.updateCrc32(id, crc32)
                 inboxUrl = "$inboxBaseUrl/${UriUtils.encodePath(filename, StandardCharsets.UTF_8)}"
@@ -608,32 +601,6 @@ class InboxService(
         return stationPort.findByKey(countryCode, stationId)
     }
 
-    override fun postRecentlyImportedPhotoNotYetPosted() {
-        val inboxEntriesToPost = inboxPort.findRecentlyImportedPhotosNotYetPosted()
-        if (inboxEntriesToPost.isEmpty()) {
-            return
-        }
-        val rand = Random()
-        val inboxEntry = inboxEntriesToPost[rand.nextInt(inboxEntriesToPost.size)]
-        val photographer = userPort.findById(inboxEntry.photographerId)
-        var status =
-            "${inboxEntry.title}\nby ${photographer?.displayName ?: ANONYM}\n$stationUrl?countryCode=${inboxEntry.countryCode}&stationId=${inboxEntry.stationId}&photoId=${inboxEntry.photoId}"
-        if (!inboxEntry.comment.isNullOrBlank()) {
-            status += "\n${inboxEntry.comment}"
-        }
-
-        mastodonPort.tootNewPhoto(status)
-        inboxPort.updatePosted(inboxEntry.id)
-    }
-
-    companion object {
-        /**
-         * Gets the applicable license for the given country.
-         * We need to override the license for some countries, because of limitations of the "Freedom of panorama".
-         */
-        @JvmStatic
-        fun getLicenseForPhoto(photographer: User, country: Country): License {
-            return country.overrideLicense ?: photographer.license
-        }
-    }
 }
+
+fun getLicenseForPhoto(photographer: User, country: Country) = country.overrideLicense ?: photographer.license

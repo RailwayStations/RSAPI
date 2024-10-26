@@ -10,4 +10,6 @@ interface PhotoPort {
     fun updatePhotoOutdated(id: Long)
     fun setAllPhotosForStationSecondary(key: Station.Key?)
     fun setPrimary(id: Long)
+    fun countPhotos(): Long
+    fun findNthPhotoId(n: Long): Long
 }

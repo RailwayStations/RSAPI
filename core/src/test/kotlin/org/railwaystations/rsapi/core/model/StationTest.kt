@@ -5,6 +5,8 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import java.time.Instant
 
+private val TEST_KEY = Station.Key("", "0")
+
 internal class StationTest {
     @ParameterizedTest
     @CsvSource(
@@ -49,7 +51,4 @@ internal class StationTest {
         )
     }
 
-    companion object {
-        private val TEST_KEY = Station.Key("", "0")
-    }
 }

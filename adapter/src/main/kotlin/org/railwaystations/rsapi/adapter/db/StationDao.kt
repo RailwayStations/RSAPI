@@ -16,11 +16,11 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate
 import org.jdbi.v3.sqlobject.statement.UseRowReducer
 import org.railwaystations.rsapi.core.model.Coordinates
 import org.railwaystations.rsapi.core.model.License
-import org.railwaystations.rsapi.core.model.License.Companion.of
 import org.railwaystations.rsapi.core.model.Photo
 import org.railwaystations.rsapi.core.model.Station
 import org.railwaystations.rsapi.core.model.Statistic
 import org.railwaystations.rsapi.core.model.User
+import org.railwaystations.rsapi.core.model.nameToLicense
 import org.railwaystations.rsapi.core.ports.outbound.StationPort
 import java.sql.ResultSet
 import java.sql.SQLException
@@ -174,7 +174,7 @@ interface StationDao : StationPort {
                     id = rs.getInt("photographerId"),
                     name = rs.getString("name"),
                     url = rs.getString("photographerUrl"),
-                    license = of(rs.getString("photographerLicense")),
+                    license = rs.getString("photographerLicense").nameToLicense(),
                     email = null,
                     ownPhotos = true,
                     anonymous = rs.getBoolean("anonymous"),
@@ -244,6 +244,24 @@ interface StationDao : StationPort {
     @SqlUpdate("UPDATE stations SET lat = :coords.lat, lon = :coords.lon WHERE countryCode = :key.country AND id = :key.id")
     override fun updateLocation(@BindBean("key") key: Station.Key, @BindBean("coords") coordinates: Coordinates)
 
+    @SqlQuery(
+        """
+            SELECT s.countryCode, s.id, s.DS100, s.title, s.lat, s.lon, s.active,
+                    p.id AS photoId, p.primary, p.urlPath, p.license, p.createdAt, p.outdated, u.id AS photographerId,
+                    u.name, u.url AS photographerUrl, u.license AS photographerLicense, u.anonymous
+            FROM stations s
+                JOIN photos p ON p.countryCode = s.countryCode AND p.stationId = s.id
+                JOIN users u ON u.id = p.photographerId
+            WHERE p.id = :photoId
+            """
+    )
+    @UseRowReducer(SingleStationReducer::class)
+    @RegisterRowMapper(SingleStationMapper::class)
+    @RegisterRowMapper(
+        PhotoMapper::class
+    )
+    override fun findByPhotoId(@Bind("photoId") photoId: Long): Station
+
     class StationMapper : RowMapper<Station> {
         @Throws(SQLException::class)
         override fun map(rs: ResultSet, ctx: StatementContext): Station {
@@ -261,7 +279,7 @@ interface StationDao : StationPort {
                                 id = rs.getInt("photographerId"),
                                 name = rs.getString("name"),
                                 url = rs.getString("photographerUrl"),
-                                license = of(rs.getString("photographerLicense")),
+                                license = rs.getString("photographerLicense").nameToLicense(),
                                 ownPhotos = true,
                                 anonymous = rs.getBoolean("anonymous"),
                             ),
@@ -285,7 +303,6 @@ interface StationDao : StationPort {
     }
 
     class StatisticMapper : RowMapper<Statistic> {
-        @Throws(SQLException::class)
         override fun map(rs: ResultSet, ctx: StatementContext): Statistic {
             return Statistic(
                 countryCode = rs.getString("countryCode"),

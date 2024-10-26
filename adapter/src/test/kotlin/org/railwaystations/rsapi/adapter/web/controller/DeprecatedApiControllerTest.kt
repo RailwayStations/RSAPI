@@ -8,13 +8,12 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
 import org.railwaystations.rsapi.adapter.web.RequestUtil
-import org.railwaystations.rsapi.adapter.web.controller.CountriesControllerTest.Companion.assertCountry
 import org.railwaystations.rsapi.adapter.web.model.CountryDto
 import org.railwaystations.rsapi.app.auth.LazySodiumPasswordEncoder
 import org.railwaystations.rsapi.core.config.MessageSourceConfig
 import org.railwaystations.rsapi.core.model.CountryTestFixtures
 import org.railwaystations.rsapi.core.model.Station
-import org.railwaystations.rsapi.core.model.StationTestFixtures.createStationDE5
+import org.railwaystations.rsapi.core.model.StationTestFixtures.stationDe5WithPhoto
 import org.railwaystations.rsapi.core.model.UserTestFixtures
 import org.railwaystations.rsapi.core.ports.inbound.FindPhotoStationsUseCase
 import org.railwaystations.rsapi.core.ports.inbound.ListCountriesUseCase
@@ -62,38 +61,36 @@ internal class DeprecatedApiControllerTest {
     @Autowired
     private lateinit var objectMapper: ObjectMapper
 
-    private val stationDE5 = createStationDE5()
-
     @Test
     fun getCountryStations() {
         every {
             findPhotoStationsUseCase.findByCountry(
                 setOf("de"),
                 true,
-                stationDE5.photos[0].photographer.displayName,
-                stationDE5.active
+                stationDe5WithPhoto.photos[0].photographer.displayName,
+                stationDe5WithPhoto.active
             )
-        } returns setOf(stationDE5)
+        } returns setOf(stationDe5WithPhoto)
 
         val request = mvc.perform(
             get("/de/stations")
                 .param("hasPhoto", "true")
-                .param("photographer", stationDE5.photos[0].photographer.displayName)
-                .param("active", stationDE5.active.toString())
+                .param("photographer", stationDe5WithPhoto.photos[0].photographer.displayName)
+                .param("active", stationDe5WithPhoto.active.toString())
         )
 
-        assertJsonResponse(request, stationDE5, "$.[0]")
+        assertJsonResponse(request, stationDe5WithPhoto, "$.[0]")
     }
 
     @Test
     fun countryStationId() {
         every {
-            findPhotoStationsUseCase.findByCountryAndId(stationDE5.key.country, stationDE5.key.id)
-        } returns stationDE5
+            findPhotoStationsUseCase.findByCountryAndId(stationDe5WithPhoto.key.country, stationDe5WithPhoto.key.id)
+        } returns stationDe5WithPhoto
 
         val request = mvc.perform(get("/de/stations/5"))
 
-        assertJsonResponse(request, stationDE5, "$")
+        assertJsonResponse(request, stationDe5WithPhoto, "$")
     }
 
     @Test
@@ -106,11 +103,13 @@ internal class DeprecatedApiControllerTest {
 
     @Test
     fun getStationsByCountryXY() {
-        every { findPhotoStationsUseCase.findByCountry(setOf("de"), null, null, null) } returns setOf(stationDE5)
+        every { findPhotoStationsUseCase.findByCountry(setOf("de"), null, null, null) } returns setOf(
+            stationDe5WithPhoto
+        )
 
         val request = mvc.perform(get("/stations?country=de"))
 
-        assertJsonResponse(request, stationDE5, "$.[0]")
+        assertJsonResponse(request, stationDe5WithPhoto, "$.[0]")
     }
 
     @Test
@@ -126,7 +125,9 @@ internal class DeprecatedApiControllerTest {
 
     @Test
     fun getAllStationsDefaultsToDE() {
-        every { findPhotoStationsUseCase.findByCountry(setOf("de"), null, null, null) } returns setOf(stationDE5)
+        every { findPhotoStationsUseCase.findByCountry(setOf("de"), null, null, null) } returns setOf(
+            stationDe5WithPhoto
+        )
 
         mvc.perform(get("/stations"))
             .andExpect(status().isOk())
@@ -138,7 +139,7 @@ internal class DeprecatedApiControllerTest {
     fun getStationsIsLimitedToThreeCountries() {
         every {
             findPhotoStationsUseCase.findByCountry(setOf("ab", "de", "xy"), null, null, null)
-        } returns setOf(stationDE5)
+        } returns setOf(stationDe5WithPhoto)
 
         mvc.perform(get("/stations?country=ab&country=de&country=xy&country=zz"))
             .andExpect(status().isOk())
@@ -258,29 +259,27 @@ internal class DeprecatedApiControllerTest {
         postRegistration(givenUserProfileWithEmptyName).andExpect(status().isBadRequest())
     }
 
-    companion object {
-        private fun assertJsonResponse(request: ResultActions, station: Station, prefix: String) {
-            val photo = station.photos[0]
-            request
-                .andExpect(status().isOk())
-                .andExpect(deprecationHeader())
-                .andExpect(jsonPath("$prefix.country").value(station.key.country))
-                .andExpect(jsonPath("$prefix.idStr").value(station.key.id))
-                .andExpect(jsonPath("$prefix.id").value(station.key.id.toInt()))
-                .andExpect(jsonPath("$prefix.title").value(station.title))
-                .andExpect(jsonPath("$prefix.lat").value(station.coordinates.lat))
-                .andExpect(jsonPath("$prefix.lon").value(station.coordinates.lon))
-                .andExpect(jsonPath("$prefix.photographer").value(photo.photographer.displayName))
-                .andExpect(jsonPath("$prefix.DS100").value(station.ds100))
-                .andExpect(jsonPath("$prefix.photoUrl").value("http://localhost:8080/photos${photo.urlPath}"))
-                .andExpect(jsonPath("$prefix.license").value(photo.license.displayName))
-                .andExpect(jsonPath("$prefix.photographerUrl").value(photo.photographer.displayUrl))
-                .andExpect(jsonPath("$prefix.active").value(station.active))
-        }
+    private fun assertJsonResponse(request: ResultActions, station: Station, prefix: String) {
+        val photo = station.photos[0]
+        request
+            .andExpect(status().isOk())
+            .andExpect(deprecationHeader())
+            .andExpect(jsonPath("$prefix.country").value(station.key.country))
+            .andExpect(jsonPath("$prefix.idStr").value(station.key.id))
+            .andExpect(jsonPath("$prefix.id").value(station.key.id.toInt()))
+            .andExpect(jsonPath("$prefix.title").value(station.title))
+            .andExpect(jsonPath("$prefix.lat").value(station.coordinates.lat))
+            .andExpect(jsonPath("$prefix.lon").value(station.coordinates.lon))
+            .andExpect(jsonPath("$prefix.photographer").value(photo.photographer.displayName))
+            .andExpect(jsonPath("$prefix.DS100").value(station.ds100))
+            .andExpect(jsonPath("$prefix.photoUrl").value("http://localhost:8080/photos${photo.urlPath}"))
+            .andExpect(jsonPath("$prefix.license").value(photo.license.displayName))
+            .andExpect(jsonPath("$prefix.photographerUrl").value(photo.photographer.displayUrl))
+            .andExpect(jsonPath("$prefix.active").value(station.active))
+    }
 
-        private fun deprecationHeader(): ResultMatcher {
-            return header().string("Deprecation", "@1661983200")
-        }
+    private fun deprecationHeader(): ResultMatcher {
+        return header().string("Deprecation", "@1661983200")
     }
 
 }

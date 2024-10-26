@@ -14,33 +14,43 @@ import org.railwaystations.rsapi.core.model.*
 import org.railwaystations.rsapi.core.model.InboxResponse.InboxResponseState
 import org.railwaystations.rsapi.core.ports.inbound.ManageInboxUseCase
 import org.railwaystations.rsapi.core.ports.outbound.*
-import org.railwaystations.rsapi.core.services.InboxService.Companion.getLicenseForPhoto
 import java.io.IOException
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
-import java.util.*
+
+private val DE: Country = Country(
+    code = "de",
+    name = "Germany",
+    email = "email@example.com",
+)
+private val STATION_KEY_DE_1: Station.Key = Station.Key(DE.code, "1")
+private const val INBOX_ENTRY1_ID: Long = 1
+private val PHOTOGRAPHER: User = User(
+    id = 1,
+    name = "nickname",
+    license = License.CC0_10,
+    ownPhotos = true,
+)
+private const val EXISTING_PHOTO_ID: Long = 1L
+private const val IMPORTED_PHOTO_ID: Long = 2L
+private const val IMPORTED_PHOTO_URL_PATH: String = "/de/1.jpg"
+private val NEW_COORDINATES: Coordinates = Coordinates(1.0, 2.0)
+private const val NEW_STATION_ID: String = "Z1"
+private const val NEW_STATION_TITLE: String = "New Station"
+private const val NEW_PHOTO_ID: Long = 0L
 
 internal class InboxServiceTest {
     private lateinit var inboxService: InboxService
-
-    var stationPort = mockk<StationPort>()
-
-    var photoStoragePort = mockk<PhotoStoragePort>()
-
+    private var stationPort = mockk<StationPort>()
+    private var photoStoragePort = mockk<PhotoStoragePort>()
     private var monitorPort = mockk<MonitorPort>()
-
-    var inboxPort = mockk<InboxPort>()
-
+    private var inboxPort = mockk<InboxPort>()
     private var userPort = mockk<UserPort>()
-
     private var countryPort = mockk<CountryPort>()
-
-    var photoPort = mockk<PhotoPort>()
-
+    private var photoPort = mockk<PhotoPort>()
     private var mastodonPort = mockk<MastodonPort>(relaxed = true)
-
-    var photoCaptor = slot<Photo>()
+    private var photoCaptor = slot<Photo>()
     private val clock: Clock = Clock.fixed(Instant.now(), ZoneId.systemDefault())
 
     @BeforeEach
@@ -54,10 +64,8 @@ internal class InboxServiceTest {
             countryPort = countryPort,
             photoPort = photoPort,
             inboxBaseUrl = "inboxBaseUrl",
-            mastodonPort = mastodonPort,
             photoBaseUrl = "photoBaseUrl",
             clock = clock,
-            stationUrl = "stationUrl"
         )
         clearMocks(
             stationPort,
@@ -74,7 +82,6 @@ internal class InboxServiceTest {
         every { countryPort.findById(DE.code) } returns DE
         every { inboxPort.findById(any()) } returns null
         every { inboxPort.done(any()) } returns Unit
-        every { inboxPort.updatePosted(any()) } returns Unit
         every { inboxPort.updatePhotoId(any(), any()) } returns Unit
         every { inboxPort.countPendingInboxEntriesForStation(any(), any(), any()) } returns 0
         every { inboxPort.countPendingInboxEntriesForNearbyCoordinates(any(), any()) } returns 0
@@ -102,41 +109,6 @@ internal class InboxServiceTest {
         val licenseForPhoto =
             getLicenseForPhoto(createValidUser(), createCountryWithOverrideLicense(License.CC_BY_NC_SA_30_DE))
         assertThat(licenseForPhoto).isEqualTo(License.CC_BY_NC_SA_30_DE)
-    }
-
-    @Test
-    fun postNewPhotoToMastodon() {
-        val user = User(
-            id = 0,
-            name = "name",
-            url = "url",
-            license = License.CC0_10,
-            email = "email",
-            ownPhotos = true,
-            sendNotifications = true,
-        )
-        val inboxEntry = InboxEntry(
-            countryCode = "de",
-            stationId = "1234",
-            photoId = 2L,
-            title = "title",
-            comment = "comment",
-        )
-        every { userPort.findById(0) } returns user
-        every { inboxPort.findRecentlyImportedPhotosNotYetPosted() } returns listOf(inboxEntry)
-
-        inboxService.postRecentlyImportedPhotoNotYetPosted()
-
-        verify {
-            mastodonPort.tootNewPhoto(
-                """
-                title
-                by name
-                stationUrl?countryCode=de&stationId=1234&photoId=2
-                comment
-                """.trimIndent()
-            )
-        }
     }
 
     @Nested
@@ -849,7 +821,7 @@ internal class InboxServiceTest {
             verify { photoStoragePort.reject(inboxEntry2) }
         }
 
-
+        @Suppress("unused")
         private fun invalidUsersForReportProblem(): List<Arguments> {
             val userWithoutName = createValidUser().copy(
                 name = ""
@@ -868,46 +840,23 @@ internal class InboxServiceTest {
         }
     }
 
-    companion object {
-        val DE: Country = Country(
-            code = "de",
-            name = "Germany",
+    fun createCountryWithOverrideLicense(overrideLicense: License?): Country {
+        return Country(
+            code = "xx",
+            name = "XX",
             email = "email@example.com",
+            timetableUrlTemplate = null,
+            overrideLicense = overrideLicense,
         )
-        val STATION_KEY_DE_1: Station.Key = Station.Key(DE.code, "1")
-        const val INBOX_ENTRY1_ID: Long = 1
-        val PHOTOGRAPHER: User = User(
-            id = 1,
-            name = "nickname",
+    }
+
+    fun createValidUser(): User {
+        return User(
+            name = "name",
             license = License.CC0_10,
+            email = "email@example.com",
             ownPhotos = true,
+            emailVerification = EMAIL_VERIFIED,
         )
-        const val EXISTING_PHOTO_ID: Long = 1L
-        const val IMPORTED_PHOTO_ID: Long = 2L
-        const val IMPORTED_PHOTO_URL_PATH: String = "/de/1.jpg"
-        val NEW_COORDINATES: Coordinates = Coordinates(1.0, 2.0)
-        const val NEW_STATION_ID: String = "Z1"
-        const val NEW_STATION_TITLE: String = "New Station"
-        const val NEW_PHOTO_ID: Long = 0L
-
-        fun createCountryWithOverrideLicense(overrideLicense: License?): Country {
-            return Country(
-                code = "xx",
-                name = "XX",
-                email = "email@example.com",
-                timetableUrlTemplate = null,
-                overrideLicense = overrideLicense,
-            )
-        }
-
-        fun createValidUser(): User {
-            return User(
-                name = "name",
-                license = License.CC0_10,
-                email = "email@example.com",
-                ownPhotos = true,
-                emailVerification = EMAIL_VERIFIED,
-            )
-        }
     }
 }

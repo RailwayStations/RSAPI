@@ -7,7 +7,7 @@ import org.railwaystations.rsapi.core.model.PublicInboxEntry
 interface InboxPort {
     fun findById(id: Long): InboxEntry?
     fun findPendingInboxEntries(): List<InboxEntry>
-    fun findRecentlyImportedPhotosNotYetPosted(): List<InboxEntry>
+    fun findOldestImportedPhotoNotYetPosted(): InboxEntry?
     fun findPublicInboxEntries(): List<PublicInboxEntry>
     fun insert(inboxEntry: InboxEntry): Long
     fun reject(id: Long, rejectReason: String)
