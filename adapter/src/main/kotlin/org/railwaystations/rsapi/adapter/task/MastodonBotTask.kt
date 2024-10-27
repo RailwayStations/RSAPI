@@ -12,7 +12,7 @@ class MastodonBotTask(private val socialMediaUseCase: SocialMediaUseCase) {
         socialMediaUseCase.postRecentlyImportedPhotoNotYetPosted()
     }
 
-    @Scheduled(fixedRate = 60000 * 60 * 24) // every day
+    @Scheduled(cron = "0 0 8 * * *")
     fun postDailyPhoto() {
         socialMediaUseCase.postDailyRandomPhoto()
     }
