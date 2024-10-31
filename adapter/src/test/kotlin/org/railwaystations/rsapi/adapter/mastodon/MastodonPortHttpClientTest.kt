@@ -26,7 +26,7 @@ internal class MastodonPortHttpClientTest {
                 .withRequestBody(
                     WireMock.equalToJson(
                         """
-                        {"status": "status message"}
+                        {"status": "status message", "visibility" : "unlisted"}
                         """.trimIndent()
                     )
                 )
