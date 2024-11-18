@@ -15,7 +15,7 @@ jsonUnitSpring = "3.5.0"
 wiremock = "3.0.1"
 mockk = "1.13.13"
 springMockk = "4.0.2"
-greenmail = "2.1.0"
+greenmail = "2.1.1"
 
 [libraries]
 jdbi3-spring5 = { group = "org.jdbi", name = "jdbi3-spring5", version.ref = "jdbi" }
