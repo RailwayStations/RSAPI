@@ -1,4 +1,4 @@
-INSERT INTO providerApps (countryCode,`type`,name,url) VALUES
+INSERT INTO providerApps (countryCode,type,name,url) VALUES
 	 ('ch','android','SBB Mobile','https://play.google.com/store/apps/details?id=ch.sbb.mobile.android.b2c'),
 	 ('ch','ios','SBB Mobile','https://apps.apple.com/app/sbb-mobile/id294855237'),
 	 ('de','android','DB Navigator','https://play.google.com/store/apps/details?id=de.hafas.android.db'),

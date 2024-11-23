@@ -14,13 +14,6 @@ tasks {
     }
 }
 
-tasks.withType<Test> {
-    environment(
-        "LIQUIBASE_DUPLICATE_FILE_MODE",
-        "WARN"
-    ) // because of bug: https://stackoverflow.com/questions/77301370/unable-to-set-duplicatefilemode-property-in-application-yaml-for-liquibase
-}
-
 dependencies {
     implementation(project("::core"))
     implementation(project("::openapi"))
@@ -31,13 +24,13 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation(libs.spring.security.oauth2.authorization.server)
     implementation("org.flywaydb:flyway-core")
-    implementation("org.flywaydb:flyway-mysql")
+    implementation("org.flywaydb:flyway-database-postgresql")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     kapt("org.springframework.boot:spring-boot-configuration-processor")
 
-    runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
+    runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("org.webjars:webjars-locator-core")
 
     testImplementation(testFixtures(project("::core")))
@@ -50,7 +43,7 @@ dependencies {
     testImplementation("org.awaitility:awaitility")
     testImplementation("org.testcontainers:testcontainers")
     testImplementation("org.testcontainers:junit-jupiter")
-    testImplementation("org.testcontainers:mariadb")
+    testImplementation("org.testcontainers:postgresql")
     testImplementation(libs.swagger.request.validator.core)
     testImplementation(libs.swagger.request.validator.spring.webmvc)
     testImplementation(libs.swagger.request.validator.mockmvc)

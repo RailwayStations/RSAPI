@@ -4,17 +4,13 @@ version: '2.1'
 services:
 
   mariadb:
-    image: mariadb:11.6
-    container_name: mariadb
+    image: postgres:17
+    container_name: postgres
     restart: unless-stopped
     environment:
-      - MARIADB_ROOT_PASSWORD=root
-      - MARIADB_DATABASE=rsapi
-      - MARIADB_USER=rsapi
-      - MARIADB_PASSWORD=rsapi
+      - POSTGRES_PASSWORD=rsapi
+      - POSTGRES_USER=rsapi
+      - POSTGRES_DB=rsapi
     network_mode: "host"
-    command:
-      - "--character-set-server=utf8mb4"
-      - "--collation-server=utf8mb4_unicode_ci"
     labels:
       org.label-schema.group: "rsapi"
