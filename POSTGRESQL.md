@@ -19,21 +19,15 @@ delete from oauth2_registered_client ;
 Run pgloader:
 
 ```shell
-pgloader --set "timezone='Europe/Berlin'" mysql://rsapi:rsapi@localhost:3306/rsapi postgresql://rsapi:rsapi@localhost:
-5432/rsapi
+pgloader --set "timezone='Europe/Berlin'" mysql://rsapi:rsapi@localhost:3306/rsapi postgresql://rsapi:rsapi@localhost:5432/rsapi
 ```
 
 Update sequences:
 
 ```sql
-select max(id) from users;
-SELECT setval('users_seq', 1305);
-
-select max(id) from photos;
-SELECT setval('photos_seq', 130);
-
-select max(id) from inbox;
-SELECT setval('inbox_seq', 130);
+SELECT setval('users_seq', (select max(id) from users));
+SELECT setval('photos_seq', (select max(id) from photos));
+SELECT setval('inbox_seq', (select max(id) from inbox));
 ```
 
 Delete versions 2 and 3 from flyway schema history:
