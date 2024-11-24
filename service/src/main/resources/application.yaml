@@ -3,10 +3,10 @@ spring:
   profiles:
     active: dev
   datasource:
-    driver-class-name: org.mariadb.jdbc.Driver
+    driver-class-name: org.postgresql.Driver
     username: rsapi
     password: rsapi
-    url: jdbc:mariadb://localhost:3306/rsapi?useUnicode=yes&characterEncoding=UTF-8&serverTimezone=UTC&useLegacyDatetimeCode=false&sessionVariables=time_zone='+00:00'
+    url: jdbc:postgresql://localhost:5432/rsapi
   flyway:
     baseline-on-migrate: true
     baseline-version: 1

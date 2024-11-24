@@ -2,8 +2,6 @@
 spring:
   main:
     allow-bean-definition-overriding: true
-  liquibase:
-    contexts: junit
   http:
     client:
       factory: simple
