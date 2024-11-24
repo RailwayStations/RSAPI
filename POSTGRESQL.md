@@ -26,6 +26,7 @@ Update sequences:
 
 ```sql
 SELECT setval('users_seq', (select max(id) from users));
+SELECT setval('blocked_usernames_seq', (select max(id) from blocked_usernames));
 SELECT setval('photos_seq', (select max(id) from photos));
 SELECT setval('inbox_seq', (select max(id) from inbox));
 ```
