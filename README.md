@@ -52,15 +52,9 @@ The following subdirectories are being used:
 
 ## Run
 
-The API can be started via IntelliJ. A local Maria DB can be started via `docker compose up -d` locally.
+The API can be started via IntelliJ. A local PostgreSQL can be started via `docker compose up -d` locally.
 
 The API is then available via `http://localhost:8080`.
-
-## Maria DB
-
-For local testing and debugging you can enter mariadb via CLI:
-
-`docker exec -it mariadb mysql -ursapi -prsapi rsapi --default-character-set=utf8mb4`
 
 ## Usage
 
@@ -182,3 +176,6 @@ https://github.com/RailwayStations/RSAPI/commit/c713f70c564c4d764614c39cdf2815f9
 Split into multi modules:
 https://github.com/RailwayStations/RSAPI/commit/7c94f5464fe3fe21cba3eefe58a73e98c5d1ab68
 
+### November 2024
+
+Migration from MariaDB 10.3 to PostgreSQL 17

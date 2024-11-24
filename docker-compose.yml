@@ -3,7 +3,7 @@ version: '2.1'
 
 services:
 
-  mariadb:
+  postgres:
     image: postgres:17
     container_name: postgres
     restart: unless-stopped
