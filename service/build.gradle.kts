@@ -31,7 +31,7 @@ dependencies {
     kapt("org.springframework.boot:spring-boot-configuration-processor")
 
     runtimeOnly("org.postgresql:postgresql")
-    runtimeOnly("org.webjars:webjars-locator-core")
+    runtimeOnly("org.webjars:webjars-locator-lite")
 
     testImplementation(testFixtures(project("::core")))
     testImplementation(testFixtures(project("::adapter")))
