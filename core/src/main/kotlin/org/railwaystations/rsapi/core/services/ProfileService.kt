@@ -1,7 +1,6 @@
 package org.railwaystations.rsapi.core.services
 
 import org.apache.commons.lang3.RandomStringUtils
-import org.apache.commons.lang3.StringUtils
 import org.railwaystations.rsapi.core.model.*
 import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase
 import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase.ProfileConflictException
@@ -16,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.security.SecureRandom
 import java.util.*
+import kotlin.Throws
 
 @Service
 class ProfileService(
@@ -34,7 +34,7 @@ class ProfileService(
 
     override fun changePassword(user: User, newPassword: String) {
         log.info("Password change for '{}'", user.email)
-        val trimmedPassword = StringUtils.trimToEmpty(newPassword)
+        val trimmedPassword = newPassword.trim()
         require(trimmedPassword.length >= 8) { "Password too short" }
         userPort.updateCredentials(user.id, passwordEncoder.encode(trimmedPassword))
         authorizationPort.deleteAllByUser(user.name)
@@ -109,10 +109,15 @@ class ProfileService(
         if (passwordProvided) {
             sendEmailVerification(newUser.email, emailVerificationToken)
         } else {
-            sendPasswordMail(newUser.email, password!!, newUser.locale)
+            sendPasswordMail(newUser.email, password, newUser.locale)
         }
 
-        monitorPort.sendMessage("New registration{nickname='${newUser.name}', email='${newUser.email}'}\nvia $clientInfo")
+        monitorPort.sendMessage(
+            """
+                New registration{nickname='${newUser.name}', email='${newUser.email}'}
+                via $clientInfo
+            """.trimIndent()
+        )
     }
 
     private fun createNewPassword(): String {

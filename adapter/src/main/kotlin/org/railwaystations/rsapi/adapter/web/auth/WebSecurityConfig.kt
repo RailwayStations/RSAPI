@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.app.auth
+package org.railwaystations.rsapi.adapter.web.auth
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.nimbusds.jose.jwk.JWKSet

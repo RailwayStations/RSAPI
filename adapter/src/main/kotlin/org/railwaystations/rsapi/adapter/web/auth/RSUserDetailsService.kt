@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.app.auth
+package org.railwaystations.rsapi.adapter.web.auth
 
 import org.railwaystations.rsapi.adapter.db.UserDao
 import org.railwaystations.rsapi.core.model.EMAIL_VERIFIED
@@ -20,8 +20,9 @@ class RSUserDetailsService(private val userDao: UserDao) : UserDetailsService {
         if (user == null) {
             throw UsernameNotFoundException("User '$username' not found")
         }
-        return AuthUser(user, user.roles
-            .map { role -> SimpleGrantedAuthority(role) })
+        return AuthUser(
+            user, user.roles
+                .map { role -> SimpleGrantedAuthority(role) })
     }
 
     fun updateEmailVerification(user: User?) {

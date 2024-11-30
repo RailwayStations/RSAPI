@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.app.auth
+package org.railwaystations.rsapi.adapter.web.auth
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

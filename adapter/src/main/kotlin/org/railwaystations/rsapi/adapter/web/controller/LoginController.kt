@@ -4,7 +4,6 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
-import org.apache.commons.lang3.StringUtils
 import org.railwaystations.rsapi.adapter.web.RequestUtil
 import org.railwaystations.rsapi.core.model.User
 import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase
@@ -13,11 +12,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Controller
 import org.springframework.validation.BindingResult
 import org.springframework.validation.ObjectError
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.ModelAttribute
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestHeader
-import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.LocaleResolver
 
 
@@ -43,11 +38,13 @@ class LoginController(
         try {
             manageProfileUseCase.resetPassword(username, userAgent)
         } catch (e: Exception) {
+            log.error("Error resetting password", e)
             return "redirect:/login?reset_password_error&username=$username"
         }
         return "redirect:/login?reset_password_success&username=$username"
     }
 
+    @Suppress("unused")
     @GetMapping("/loginRegister")
     fun register(@ModelAttribute newAccount: NewAccount): String {
         return "register"
@@ -70,13 +67,13 @@ class LoginController(
 
         try {
             val user = User(
-                name = StringUtils.trimToEmpty(newAccount.username),
-                email = StringUtils.trimToEmpty(newAccount.email),
+                name = newAccount.username?.trim() ?: "",
+                email = newAccount.email?.trim() ?: "",
                 newPassword = newAccount.password,
                 locale = localeResolver.resolveLocale(requestUtil.request),
             )
             manageProfileUseCase.register(user, userAgent)
-        } catch (e: ManageProfileUseCase.ProfileConflictException) {
+        } catch (_: ManageProfileUseCase.ProfileConflictException) {
             log.warn("Register conflict with {}, '{}", newAccount.username, newAccount.email)
             bindingResult.reject("register.conflict")
             return "register"

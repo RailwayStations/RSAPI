@@ -1,6 +1,5 @@
 package org.railwaystations.rsapi.core.model
 
-import org.apache.commons.lang3.StringUtils
 import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator
 import java.net.URI
 import java.net.URISyntaxException
@@ -42,11 +41,11 @@ data class User(
             ) {
                 return false
             }
-            StringUtils.trimToNull(url)?.let {
+            if (url?.isNotBlank() == true) {
                 val validatedUri: URI
                 try {
-                    validatedUri = URI(it)
-                } catch (e: URISyntaxException) {
+                    validatedUri = URI(url.trim())
+                } catch (_: URISyntaxException) {
                     return false
                 }
                 return validatedUri.scheme != null && validatedUri.scheme.matches("https?".toRegex())
@@ -82,11 +81,6 @@ data class User(
 
 }
 
-fun normalizeEmail(email: String): String {
-    val trimmedEmail = StringUtils.trimToNull(email)
-    return trimmedEmail.lowercase()
-}
+fun normalizeEmail(email: String) = email.trim().lowercase()
 
-fun createNewEmailVerificationToken(): String {
-    return UUID.randomUUID().toString()
-}
+fun createNewEmailVerificationToken() = UUID.randomUUID().toString()

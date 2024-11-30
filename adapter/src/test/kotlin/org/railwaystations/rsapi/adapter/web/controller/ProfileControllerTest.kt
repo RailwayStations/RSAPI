@@ -9,10 +9,10 @@ import org.railwaystations.rsapi.adapter.db.UserDao
 import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
 import org.railwaystations.rsapi.adapter.web.OpenApiValidatorUtil.validOpenApiResponse
 import org.railwaystations.rsapi.adapter.web.RequestUtil
-import org.railwaystations.rsapi.app.auth.LazySodiumPasswordEncoder
-import org.railwaystations.rsapi.app.auth.RSAuthenticationProvider
-import org.railwaystations.rsapi.app.auth.RSUserDetailsService
-import org.railwaystations.rsapi.app.auth.WebSecurityConfig
+import org.railwaystations.rsapi.adapter.web.auth.LazySodiumPasswordEncoder
+import org.railwaystations.rsapi.adapter.web.auth.RSAuthenticationProvider
+import org.railwaystations.rsapi.adapter.web.auth.RSUserDetailsService
+import org.railwaystations.rsapi.adapter.web.auth.WebSecurityConfig
 import org.railwaystations.rsapi.core.config.MessageSourceConfig
 import org.railwaystations.rsapi.core.model.User
 import org.railwaystations.rsapi.core.model.UserTestFixtures

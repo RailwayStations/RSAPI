@@ -1,7 +1,7 @@
 package org.railwaystations.rsapi.adapter.web
 
 import jakarta.servlet.http.HttpServletRequest
-import org.railwaystations.rsapi.app.auth.AuthUser
+import org.railwaystations.rsapi.adapter.web.auth.AuthUser
 import org.springframework.http.HttpHeaders
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component

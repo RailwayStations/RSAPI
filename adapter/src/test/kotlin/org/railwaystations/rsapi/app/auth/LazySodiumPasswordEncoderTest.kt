@@ -3,6 +3,7 @@ package org.railwaystations.rsapi.app.auth
 import org.apache.commons.lang3.RandomStringUtils
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
+import org.railwaystations.rsapi.adapter.web.auth.LazySodiumPasswordEncoder
 
 internal class LazySodiumPasswordEncoderTest {
     private val encoder = LazySodiumPasswordEncoder()
