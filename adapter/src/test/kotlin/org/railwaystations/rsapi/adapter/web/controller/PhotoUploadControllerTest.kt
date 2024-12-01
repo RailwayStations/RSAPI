@@ -50,7 +50,6 @@ import java.nio.charset.Charset
 import java.nio.file.Files
 import java.time.Duration
 import java.time.Instant
-import kotlin.Throws
 
 const val IMAGE_CONTENT: String = "image-content"
 
@@ -412,7 +411,6 @@ internal class PhotoUploadControllerTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun postMissingStationWithoutPhoto() {
         every { inboxDao.insert(any()) } returns 4L
         val uploadCaptor = slot<InboxEntry>()

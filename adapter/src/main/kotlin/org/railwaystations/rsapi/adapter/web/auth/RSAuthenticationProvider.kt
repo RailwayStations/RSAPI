@@ -27,7 +27,7 @@ class RSAuthenticationProvider(
 
         val user = try {
             userDetailsService.loadUserByUsername(token.principal.toString())
-        } catch (ex: UsernameNotFoundException) {
+        } catch (_: UsernameNotFoundException) {
             null
         }
         if (user == null) {

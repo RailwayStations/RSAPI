@@ -26,7 +26,6 @@ dependencies {
     implementation(libs.jna)
     implementation("commons-codec:commons-codec")
     implementation(libs.commons.io)
-    implementation("org.apache.commons:commons-lang3")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation(libs.bootstrap)

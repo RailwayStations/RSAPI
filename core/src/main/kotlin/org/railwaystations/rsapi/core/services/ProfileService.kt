@@ -1,6 +1,5 @@
 package org.railwaystations.rsapi.core.services
 
-import org.apache.commons.lang3.RandomStringUtils
 import org.railwaystations.rsapi.core.model.*
 import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase
 import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase.ProfileConflictException
@@ -13,9 +12,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.MessageSource
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import java.security.SecureRandom
 import java.util.*
-import kotlin.Throws
 
 @Service
 class ProfileService(
@@ -65,7 +62,6 @@ class ProfileService(
         authorizationPort.deleteAllByUser(user.name)
     }
 
-    @Throws(ProfileConflictException::class)
     override fun register(newUser: User, clientInfo: String?) {
         log.info("New registration for '{}' with '{}'", newUser.name, newUser.email)
 
@@ -120,25 +116,10 @@ class ProfileService(
         )
     }
 
-    private fun createNewPassword(): String {
-        val possibleCharacters =
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~`!@#$%^&*()-_=+[{]}\\|;:\'\",<.>/?".toCharArray()
-        return RandomStringUtils.random(
-            16,
-            0,
-            possibleCharacters.size - 1,
-            false,
-            false,
-            possibleCharacters,
-            SecureRandom()
-        )
-    }
-
     private fun encryptPassword(password: String?): String {
         return passwordEncoder.encode(password)
     }
 
-    @Throws(ProfileConflictException::class)
     override fun updateProfile(user: User, newProfile: User, clientInfo: String?) {
         log.info("Update profile for '{}'", user.email)
 
@@ -231,3 +212,8 @@ class ProfileService(
         log.info("User '{}' created with id {}", registration.name, id)
     }
 }
+
+private val possibleCharacters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~`!@#$%^&*()-_=+[{]}\\|;:\'\",<.>/?".toCharArray()
+
+private fun createNewPassword() = List(20) { possibleCharacters.random() }.joinToString("")
