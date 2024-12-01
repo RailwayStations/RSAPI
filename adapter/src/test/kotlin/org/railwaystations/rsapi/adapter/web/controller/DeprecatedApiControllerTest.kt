@@ -8,8 +8,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
 import org.railwaystations.rsapi.adapter.web.RequestUtil
+import org.railwaystations.rsapi.adapter.web.auth.LazySodiumPasswordEncoder
 import org.railwaystations.rsapi.adapter.web.model.CountryDto
-import org.railwaystations.rsapi.app.auth.LazySodiumPasswordEncoder
 import org.railwaystations.rsapi.core.config.MessageSourceConfig
 import org.railwaystations.rsapi.core.model.CountryTestFixtures
 import org.railwaystations.rsapi.core.model.Station
@@ -31,9 +31,7 @@ import org.springframework.test.web.servlet.ResultActions
 import org.springframework.test.web.servlet.ResultMatcher
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.header
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.util.function.Consumer
 
 private const val USER_AGENT = "UserAgent"

@@ -60,5 +60,5 @@ class MastodonBotHttpClient(
         }
     }
 
-    data class Toot(val status: String)
+    data class Toot(val status: String, val visibility: String = "unlisted")
 }

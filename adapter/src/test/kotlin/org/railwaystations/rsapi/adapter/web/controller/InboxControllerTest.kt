@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.CsvSource
 import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
 import org.railwaystations.rsapi.adapter.web.OpenApiValidatorUtil.validOpenApiResponse
 import org.railwaystations.rsapi.adapter.web.RequestUtil
-import org.railwaystations.rsapi.app.auth.AuthUser
+import org.railwaystations.rsapi.adapter.web.auth.AuthUser
 import org.railwaystations.rsapi.core.model.*
 import org.railwaystations.rsapi.core.model.InboxStateQuery.InboxState
 import org.railwaystations.rsapi.core.ports.inbound.ManageInboxUseCase

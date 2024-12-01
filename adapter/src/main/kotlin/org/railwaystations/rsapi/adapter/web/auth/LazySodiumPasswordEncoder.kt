@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.app.auth
+package org.railwaystations.rsapi.adapter.web.auth
 
 import com.goterl.lazysodium.LazySodiumJava
 import com.goterl.lazysodium.SodiumJava

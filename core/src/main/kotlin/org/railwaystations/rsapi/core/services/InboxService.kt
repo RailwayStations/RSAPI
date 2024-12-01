@@ -1,6 +1,5 @@
 package org.railwaystations.rsapi.core.services
 
-import org.apache.commons.lang3.StringUtils
 import org.railwaystations.rsapi.core.model.*
 import org.railwaystations.rsapi.core.model.InboxStateQuery.InboxState
 import org.railwaystations.rsapi.core.ports.inbound.ManageInboxUseCase
@@ -336,12 +335,14 @@ class InboxService(
     private fun importPhoto(command: InboxCommand, inboxEntry: InboxEntry, station: Station) {
         if (hasConflict(inboxEntry.id, station)) {
             require(command.conflictResolution!!.solvesPhotoConflict()) { "There is a conflict with another photo" }
-            require(!(!station.hasPhoto && command.conflictResolution != InboxCommand.ConflictResolution.IMPORT_AS_NEW_PRIMARY_PHOTO)) { "Conflict with another upload! The only possible ConflictResolution strategy is IMPORT_AS_NEW_PRIMARY_PHOTO." }
+            require(!(!station.hasPhoto && command.conflictResolution != InboxCommand.ConflictResolution.IMPORT_AS_NEW_PRIMARY_PHOTO)) {
+                "Conflict with another upload! The only possible ConflictResolution strategy is IMPORT_AS_NEW_PRIMARY_PHOTO."
+            }
         }
 
         val photographer = userPort.findById(inboxEntry.photographerId)
         require(photographer != null) { "Photographer ${inboxEntry.photographerId} not found" }
-        val country = countryPort.findById(StringUtils.lowerCase(station.key.country))
+        val country = countryPort.findById(station.key.country.lowercase())
         require(country != null) { "Country ${station.key.country} not found" }
 
         try {
@@ -398,7 +399,7 @@ class InboxService(
         }
 
         // create station
-        val country = countryPort.findById(StringUtils.lowerCase(command.countryCode))
+        val country = countryPort.findById(command.countryCode.lowercase())
         require(country != null) { "Country not found" }
         require(command.stationId.startsWith("Z")) { "Station ID can't be empty and must start with Z" }
         require(!(!command.hasCoords || !command.coordinates!!.isValid)) { "No valid coordinates provided" }
@@ -530,29 +531,34 @@ class InboxService(
             val countryCodeParam = countryCode?.let { "countryCode=$countryCode&" } ?: ""
             if (station != null) {
                 monitorPort.sendMessage(
-                    "New photo upload for ${station.title} - ${station.key.country}:${station.key.id}\n${
-                        StringUtils.trimToEmpty(
-                            comment
-                        )
-                    }\n$inboxUrl$duplicateInfo\nby ${user.name}\nvia $clientInfo",
+                    """
+                        New photo upload for ${station.title} - ${station.key.country}:${station.key.id}$duplicateInfo
+                        ${comment?.trim() ?: ""}
+                        $inboxUrl
+                        by ${user.name}
+                        via $clientInfo
+                    """.trimIndent(),
                     photoStoragePort.getUploadFile(filename!!)
                 )
             } else if (filename != null) {
                 monitorPort.sendMessage(
-                    "Photo upload for missing station $stationTitle at https://map.railway-stations.org/index.php?${countryCodeParam}mlat=$latitude&mlon=$longitude&zoom=18&layers=M\n${
-                        StringUtils.trimToEmpty(
-                            comment
-                        )
-                    }\n$inboxUrl$duplicateInfo\nby ${user.name}\nvia $clientInfo",
+                    """
+                        Photo upload for missing station $stationTitle$duplicateInfo at https://map.railway-stations.org/index.php?${countryCodeParam}mlat=$latitude&mlon=$longitude&zoom=18&layers=M
+                        ${comment?.trim() ?: ""}
+                        $inboxUrl
+                        by ${user.name}
+                        via $clientInfo
+                    """.trimIndent(),
                     photoStoragePort.getUploadFile(filename)
                 )
             } else {
                 monitorPort.sendMessage(
-                    "Report missing station $stationTitle at https://map.railway-stations.org/index.php?${countryCodeParam}mlat=$latitude&mlon=$longitude&zoom=18&layers=M\n${
-                        StringUtils.trimToEmpty(
-                            comment
-                        )
-                    }$duplicateInfo\nby ${user.name}\nvia $clientInfo"
+                    """
+                        Report missing station $stationTitle$duplicateInfo at https://map.railway-stations.org/index.php?${countryCodeParam}mlat=$latitude&mlon=$longitude&zoom=18&layers=M
+                        ${comment?.trim() ?: ""}
+                        by ${user.name}
+                        via $clientInfo
+                    """.trimIndent()
                 )
             }
         } catch (e: PhotoTooLargeException) {

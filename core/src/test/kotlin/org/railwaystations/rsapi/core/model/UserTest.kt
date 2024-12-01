@@ -1,6 +1,5 @@
 package org.railwaystations.rsapi.core.model
 
-import org.apache.commons.lang3.StringUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -11,14 +10,13 @@ internal class UserTest {
     @CsvSource(
         "nickname, email@example.com, true",
         "nickname, email@example., false",
-        ", email@example.com, false",
         "'', email@example.com, false",
         "nickname, email.example.com, false",
         "nickname,, false",
         "nickname,' ', false"
     )
-    fun isValidForRegistration(name: String?, email: String?, expected: Boolean) {
-        assertThat(createUser(StringUtils.trimToEmpty(name), email, null, null).isValid).isEqualTo(
+    fun isValidForRegistration(name: String, email: String?, expected: Boolean) {
+        assertThat(createUser(name.trim(), email, null, null).isValid).isEqualTo(
             expected
         )
     }
@@ -32,10 +30,10 @@ internal class UserTest {
         "nickname, email@example.com, ftp://example.com  , false",
         "nickname, email@example.com, email@example.com  , false",
         "nickname, email@example.com, '                 ', true",
-        "        , email@example.com,                    , false"
+        "''      , email@example.com,                    , false"
     )
-    fun testIsValid(name: String?, email: String?, link: String?, expected: Boolean) {
-        assertThat(createUser(StringUtils.trimToEmpty(name), email, link, null).isValid).isEqualTo(expected)
+    fun testIsValid(name: String, email: String?, link: String?, expected: Boolean) {
+        assertThat(createUser(name.trim(), email, link, null).isValid).isEqualTo(expected)
     }
 
     private fun createUser(name: String, email: String?, url: String?, emailVerification: String?): User {
@@ -54,10 +52,10 @@ internal class UserTest {
         "nickname, email@example.com, $EMAIL_VERIFIED              , true",
         "nickname,                  , $EMAIL_VERIFIED              , false",
         "nickname, email@example.com, $EMAIL_VERIFIED_AT_NEXT_LOGIN, false",
-        "        , email@example.com, VERIFICATION_TOKEN                       , false"
+        "''      , email@example.com, VERIFICATION_TOKEN                       , false"
     )
-    fun isEligibleToReportProblem(name: String?, email: String?, emailVerification: String?, expected: Boolean) {
-        assertThat(createUser(StringUtils.trimToEmpty(name), email, null, emailVerification).isEligibleToReportProblem)
+    fun isEligibleToReportProblem(name: String, email: String?, emailVerification: String?, expected: Boolean) {
+        assertThat(createUser(name.trim(), email, null, emailVerification).isEligibleToReportProblem)
             .isEqualTo(expected)
     }
 
@@ -79,7 +77,7 @@ internal class UserTest {
     ) {
         assertThat(
             User(
-                name = StringUtils.trimToEmpty(name),
+                name = name?.trim() ?: "",
                 license = licenseDisplayName.displayNameToLicense(),
                 email = email,
                 ownPhotos = photoOwner,

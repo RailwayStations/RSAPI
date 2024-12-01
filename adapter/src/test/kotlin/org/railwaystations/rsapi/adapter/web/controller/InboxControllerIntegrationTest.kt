@@ -11,11 +11,11 @@ import org.railwaystations.rsapi.adapter.photostorage.PhotoFileStorage
 import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
 import org.railwaystations.rsapi.adapter.web.OpenApiValidatorUtil.validOpenApiResponse
 import org.railwaystations.rsapi.adapter.web.RequestUtil
+import org.railwaystations.rsapi.adapter.web.auth.AuthUser
+import org.railwaystations.rsapi.adapter.web.auth.RSAuthenticationProvider
+import org.railwaystations.rsapi.adapter.web.auth.RSUserDetailsService
+import org.railwaystations.rsapi.adapter.web.auth.WebSecurityConfig
 import org.railwaystations.rsapi.app.ClockTestConfiguration
-import org.railwaystations.rsapi.app.auth.AuthUser
-import org.railwaystations.rsapi.app.auth.RSAuthenticationProvider
-import org.railwaystations.rsapi.app.auth.RSUserDetailsService
-import org.railwaystations.rsapi.app.auth.WebSecurityConfig
 import org.railwaystations.rsapi.core.model.*
 import org.railwaystations.rsapi.core.model.InboxEntryTestFixtures.createInboxEntry
 import org.railwaystations.rsapi.core.model.PhotoTestFixtures.createPhoto

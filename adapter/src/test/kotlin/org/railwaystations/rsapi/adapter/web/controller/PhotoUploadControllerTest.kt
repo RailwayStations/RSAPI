@@ -17,11 +17,11 @@ import org.railwaystations.rsapi.adapter.photostorage.WorkDir
 import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
 import org.railwaystations.rsapi.adapter.web.OpenApiValidatorUtil.validOpenApiResponse
 import org.railwaystations.rsapi.adapter.web.RequestUtil
+import org.railwaystations.rsapi.adapter.web.auth.AuthUser
+import org.railwaystations.rsapi.adapter.web.auth.RSAuthenticationProvider
+import org.railwaystations.rsapi.adapter.web.auth.RSUserDetailsService
+import org.railwaystations.rsapi.adapter.web.auth.WebSecurityConfig
 import org.railwaystations.rsapi.app.ClockTestConfiguration
-import org.railwaystations.rsapi.app.auth.AuthUser
-import org.railwaystations.rsapi.app.auth.RSAuthenticationProvider
-import org.railwaystations.rsapi.app.auth.RSUserDetailsService
-import org.railwaystations.rsapi.app.auth.WebSecurityConfig
 import org.railwaystations.rsapi.core.model.*
 import org.railwaystations.rsapi.core.model.PhotoTestFixtures.createPhoto
 import org.railwaystations.rsapi.core.model.StationTestFixtures.createStation
@@ -50,7 +50,6 @@ import java.nio.charset.Charset
 import java.nio.file.Files
 import java.time.Duration
 import java.time.Instant
-import java.util.*
 
 const val IMAGE_CONTENT: String = "image-content"
 
@@ -412,7 +411,6 @@ internal class PhotoUploadControllerTest {
     }
 
     @Test
-    @Throws(Exception::class)
     fun postMissingStationWithoutPhoto() {
         every { inboxDao.insert(any()) } returns 4L
         val uploadCaptor = slot<InboxEntry>()
@@ -508,9 +506,9 @@ internal class PhotoUploadControllerTest {
         assertFileWithContentExistsInInbox(IMAGE_CONTENT, "2.jpg")
         assertThat(monitor.getMessages()[0]).isEqualTo(
             """
-                New photo upload for de 4711 - de:4711
+                New photo upload for de 4711 - de:4711 (possible duplicate!)
                 
-                http://inbox.railway-stations.org/2.jpg (possible duplicate!)
+                http://inbox.railway-stations.org/2.jpg
                 by @nick name
                 via $USER_AGENT
                 """.trimIndent()
@@ -539,9 +537,9 @@ internal class PhotoUploadControllerTest {
         assertFileWithContentExistsInInbox(IMAGE_CONTENT, "5.jpg")
         assertThat(monitor.getMessages()[0]).isEqualTo(
             """
-                New photo upload for de 1234 - de:1234
+                New photo upload for de 1234 - de:1234 (possible duplicate!)
                 
-                http://inbox.railway-stations.org/5.jpg (possible duplicate!)
+                http://inbox.railway-stations.org/5.jpg
                 by @nick name
                 via $USER_AGENT
                 """.trimIndent()

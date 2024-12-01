@@ -52,15 +52,9 @@ The following subdirectories are being used:
 
 ## Run
 
-The API can be started via IntelliJ. A local Maria DB can be started via `docker compose up -d` locally.
+The API can be started via IntelliJ. A local PostgreSQL can be started via `docker compose up -d` locally.
 
 The API is then available via `http://localhost:8080`.
-
-## Maria DB
-
-For local testing and debugging you can enter mariadb via CLI:
-
-`docker exec -it mariadb mysql -ursapi -prsapi rsapi --default-character-set=utf8mb4`
 
 ## Usage
 
@@ -95,3 +89,93 @@ at [developer.deutschebahn.com](https://developer.deutschebahn.com/store/apis/li
 - german photographers: https://api.railway-stations.org/photographers?country=de
 
 - statistic per country (de): https://api.railway-stations.org/stats?country=de
+
+## History
+
+Some historic milestones of the app.
+
+### 11./12.12.2015
+
+Project founded on the
+[3rd DB-Hackathon](https://www.eventbrite.de/e/3rd-dbhackathon-commit-open-data-tickets-19270040209)
+as "Deutschlands Bahnhöfe".
+
+Railway-station data of germany where imported into an Elasticsearch DB.
+Photos could be sent via eMail or a Dropbox folder. Photos were manually imported into a Drupal CMS.
+
+### March 2016
+
+Start as a Dropwizard service to provide the railway-station data from the Elasticsearch database as GPX files:
+https://github.com/RailwayStations/RSAPI/commit/f8dcefd950e776266b4463d0d414599a23f17d94
+
+### May 2016
+
+Add Json and text endpoints of the railway-station data:
+https://github.com/RailwayStations/RSAPI/commit/f102eb475e8bc29751cfb85e2773376c088817d2
+
+### August 2016
+
+The app serves the railway-station data as Json for the Android app.
+
+### May 2017
+
+Photos could be uploaded via API Endpoint:
+https://github.com/RailwayStations/RSAPI/commit/a6171ce5a420fce11b6975a41397ab92e3cb266a
+
+### April 2018
+
+Replacement of the Drupal CMS. Mass import of photos from filesystem via Slack command:
+https://github.com/RailwayStations/RSAPI/commit/d7b2baf48a39911b1913706b8e0b9d6f6dcf958a
+
+### November 2018
+
+Migration from Elasticsearch to Mariadb:
+https://github.com/RailwayStations/RSAPI/commit/12519f916ba31447b002b63d24e01a31c3821207
+
+Account registration via API Endpoint.
+
+### January 2020
+
+Admin Endpoints to import or reject uploaded photos:
+https://github.com/RailwayStations/RSAPI/commit/d0fea732d24b0362f10f0992e63e301c42a0d04c
+
+### December 2021
+
+Migration from Dropwizard to Springboot:
+https://github.com/RailwayStations/RSAPI/commit/a327d815dec4c31965ebd4d4e8a805ea8fa7dfb0
+
+Included Maven to Gradle migration.
+
+### February 2022
+
+Refactor towards hexagonal architecture:
+https://github.com/RailwayStations/RSAPI/commit/3e01a36c1b9e3f9bba4e60ec648211ba07c1ac09
+
+### April 2022
+
+Added OpenApi generation:
+https://github.com/RailwayStations/RSAPI/commit/4fe7b29495ffa4eed4422102815ed312b7e5c73d
+
+### February 2023
+
+Spring authorization server integration:
+https://github.com/RailwayStations/RSAPI/commit/24e1ffdc28db75f0cea5db3c26e915957321fba4
+
+Apps and webclient can now authorize users via OAuth2.
+
+### February 2024
+
+Java to Kotlin migration:
+https://github.com/RailwayStations/RSAPI/commit/a55a5ab02a3dd47f2bb14d3cdce5d55a0ef361f9
+
+### May 2024
+
+Liquibase to Flyway migration:
+https://github.com/RailwayStations/RSAPI/commit/c713f70c564c4d764614c39cdf2815f98abfa917
+
+Split into multi modules:
+https://github.com/RailwayStations/RSAPI/commit/7c94f5464fe3fe21cba3eefe58a73e98c5d1ab68
+
+### November 2024
+
+Migration from MariaDB 10.3 to PostgreSQL 17

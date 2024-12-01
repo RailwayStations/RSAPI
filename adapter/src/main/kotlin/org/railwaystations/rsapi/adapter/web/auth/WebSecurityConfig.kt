@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.app.auth
+package org.railwaystations.rsapi.adapter.web.auth
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.nimbusds.jose.jwk.JWKSet
@@ -63,17 +63,24 @@ class WebSecurityConfig(
     @Order(1)
     @Profile("!mockMvcTest")
     fun oauthFilterChain(http: HttpSecurity): SecurityFilterChain {
-        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http)
+        val authorizationServerConfigurer = OAuth2AuthorizationServerConfigurer.authorizationServer()
         http
+            .with(authorizationServerConfigurer) {
+                it.oidc(withDefaults())
+                    .authorizationEndpoint { authorizationEndpoint -> authorizationEndpoint.consentPage("/oauth2/consent") }
+            }
+            .authorizeHttpRequests { authorize ->
+                authorize.anyRequest().authenticated()
+            }
             .securityMatcher("/oauth2/**")
             .cors { corsConfigurer ->
                 corsConfigurer.configurationSource {
-                    val cors = CorsConfiguration()
-                    cors.setAllowedOriginPatterns(listOf("*"))
-                    cors.allowedMethods = listOf("GET", "POST", "OPTIONS")
-                    cors.allowedHeaders = listOf("Authorization")
-                    cors.allowCredentials = true
-                    cors
+                    CorsConfiguration().apply {
+                        allowedOriginPatterns = listOf("*")
+                        allowedMethods = listOf("GET", "POST", "OPTIONS")
+                        allowedHeaders = listOf("Authorization")
+                        allowCredentials = true
+                    }
                 }
             }
             .exceptionHandling { exceptions ->
@@ -83,9 +90,6 @@ class WebSecurityConfig(
                     )
             }
             .oauth2ResourceServer { serverConfigurer -> serverConfigurer.jwt(withDefaults()) }
-            .getConfigurer(OAuth2AuthorizationServerConfigurer::class.java)
-            .oidc(withDefaults())
-            .authorizationEndpoint { authorizationEndpoint -> authorizationEndpoint.consentPage("/oauth2/consent") }
 
         return http.build()
     }

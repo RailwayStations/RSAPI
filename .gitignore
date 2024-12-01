@@ -5,6 +5,10 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+### Codeage ###
+codeage.csv
+codeage.svg
+
 ### STS ###
 .apt_generated
 .classpath

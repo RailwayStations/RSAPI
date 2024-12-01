@@ -18,7 +18,7 @@ dependencies {
     implementation("jakarta.validation:jakarta.validation-api")
     implementation(libs.spring.security.oauth2.authorization.server)
     implementation("org.flywaydb:flyway-core")
-    implementation("org.flywaydb:flyway-mysql")
+    implementation("org.flywaydb:flyway-database-postgresql")
     implementation(libs.jdbi3.spring5)
     implementation(libs.jdbi3.kotlin)
     implementation(libs.jdbi3.kotlin.sqlobject)
@@ -26,15 +26,14 @@ dependencies {
     implementation(libs.jna)
     implementation("commons-codec:commons-codec")
     implementation(libs.commons.io)
-    implementation("org.apache.commons:commons-lang3")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation(libs.bootstrap)
 
     kapt("org.springframework.boot:spring-boot-configuration-processor")
 
-    runtimeOnly("org.mariadb.jdbc:mariadb-java-client")
-    runtimeOnly("org.webjars:webjars-locator-core")
+    runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("org.webjars:webjars-locator-lite")
 
     testImplementation(testFixtures(project("::core")))
     testFixturesImplementation("org.springframework.boot:spring-boot-starter-test") {
@@ -46,7 +45,7 @@ dependencies {
     testImplementation("org.awaitility:awaitility")
     testFixturesImplementation("org.testcontainers:testcontainers")
     testFixturesImplementation("org.testcontainers:junit-jupiter")
-    testFixturesImplementation("org.testcontainers:mariadb")
+    testFixturesImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:testcontainers")
     testImplementation(libs.swagger.request.validator.spring.webmvc)
     testImplementation(libs.swagger.request.validator.mockmvc)

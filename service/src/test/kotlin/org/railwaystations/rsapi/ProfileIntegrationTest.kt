@@ -7,7 +7,7 @@ import com.ninjasquad.springmockk.MockkBean
 import jakarta.validation.constraints.NotNull
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.railwaystations.rsapi.adapter.db.AbstractMariaDBBaseTest
+import org.railwaystations.rsapi.adapter.db.AbstractPostgreSqlTest
 import org.railwaystations.rsapi.adapter.db.UserDao
 import org.railwaystations.rsapi.core.model.License
 import org.railwaystations.rsapi.core.model.User
@@ -19,12 +19,7 @@ import org.springframework.boot.test.web.client.exchange
 import org.springframework.boot.test.web.client.getForEntity
 import org.springframework.boot.test.web.client.postForEntity
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
+import org.springframework.http.*
 import org.springframework.http.client.SimpleClientHttpRequestFactory
 import org.springframework.security.oauth2.core.OAuth2AccessToken
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse
@@ -39,13 +34,14 @@ import java.security.MessageDigest
 import java.security.SecureRandom
 import java.util.*
 import java.util.regex.Pattern
+import kotlin.Throws
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = ["server.error.include-message=always"]
 )
 @ActiveProfiles("test")
-internal class ProfileIntegrationTest : AbstractMariaDBBaseTest() {
+internal class ProfileIntegrationTest : AbstractPostgreSqlTest() {
     @Autowired
     private lateinit var mapper: ObjectMapper
 

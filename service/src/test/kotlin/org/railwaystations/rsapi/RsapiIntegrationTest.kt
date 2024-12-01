@@ -14,15 +14,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.ValueSource
-import org.railwaystations.rsapi.adapter.db.AbstractMariaDBBaseTest
+import org.railwaystations.rsapi.adapter.db.AbstractPostgreSqlTest
 import org.railwaystations.rsapi.adapter.db.PhotoDao
 import org.railwaystations.rsapi.adapter.photostorage.WorkDir
 import org.railwaystations.rsapi.adapter.web.controller.DeprecatedApiController.StationDto
-import org.railwaystations.rsapi.adapter.web.model.PhotoDto
-import org.railwaystations.rsapi.adapter.web.model.PhotoLicenseDto
-import org.railwaystations.rsapi.adapter.web.model.PhotoStationDto
-import org.railwaystations.rsapi.adapter.web.model.PhotoStationsDto
-import org.railwaystations.rsapi.adapter.web.model.PhotographerDto
+import org.railwaystations.rsapi.adapter.web.model.*
 import org.railwaystations.rsapi.core.model.License
 import org.railwaystations.rsapi.core.model.Photo
 import org.railwaystations.rsapi.core.model.Station
@@ -38,11 +34,7 @@ import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.context.annotation.Bean
 import org.springframework.core.io.Resource
 import org.springframework.core.io.support.EncodedResource
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
+import org.springframework.http.*
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
@@ -56,6 +48,7 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.*
 import javax.imageio.ImageIO
+import kotlin.Throws
 
 private val IMAGE: ByteArray = Base64.getDecoder()
     .decode("/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=")
@@ -65,7 +58,7 @@ private val IMAGE: ByteArray = Base64.getDecoder()
     properties = ["server.error.include-message=always"]
 )
 @ActiveProfiles("test")
-internal class RsapiIntegrationTest : AbstractMariaDBBaseTest() {
+internal class RsapiIntegrationTest : AbstractPostgreSqlTest() {
     @Autowired
     private lateinit var mapper: ObjectMapper
 

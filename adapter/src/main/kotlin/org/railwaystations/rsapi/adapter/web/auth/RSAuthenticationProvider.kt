@@ -1,4 +1,4 @@
-package org.railwaystations.rsapi.app.auth
+package org.railwaystations.rsapi.adapter.web.auth
 
 import org.railwaystations.rsapi.core.utils.Logger
 import org.springframework.security.authentication.AuthenticationProvider
@@ -27,7 +27,7 @@ class RSAuthenticationProvider(
 
         val user = try {
             userDetailsService.loadUserByUsername(token.principal.toString())
-        } catch (ex: UsernameNotFoundException) {
+        } catch (_: UsernameNotFoundException) {
             null
         }
         if (user == null) {

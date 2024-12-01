@@ -33,12 +33,12 @@ interface UserDao : UserPort {
     @RegisterRowMapper(UserMapper::class)
     override fun findByEmail(@Bind("email") email: String): User?
 
-    @SqlUpdate("UPDATE users SET `key` = :key WHERE id = :id")
+    @SqlUpdate("UPDATE users SET \"key\" = :key WHERE id = :id")
     override fun updateCredentials(@Bind("id") id: Int, @Bind("key") key: String)
 
     @SqlUpdate(
         """
-            INSERT INTO users (id, name, url, license, email, ownPhotos, anonymous, `key`, emailVerification, sendNotifications, locale)
+            INSERT INTO users (id, name, url, license, email, ownPhotos, anonymous, \"key\", emailVerification, sendNotifications, locale)
                 VALUES (:id, :name, :url, :license, :email, :ownPhotos, :anonymous, :key, :emailVerification, :sendNotifications, :localeLanguageTag)
             
             """
@@ -79,7 +79,7 @@ interface UserDao : UserPort {
                  emailVerification = NULL,
                  ownPhotos = false,
                  license = NULL,
-                 `key` = NULL,
+                 \"key\" = NULL,
                  sendNotifications = false,
                  admin = false
              WHERE id = :id
