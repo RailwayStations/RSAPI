@@ -20,7 +20,7 @@ flyway = "10.15.0"
 testcontainers = "1.19.8"
 jooq = "3.19.10"
 jooqPlugin = "9.0"
-mariadb = "3.3.3"
+postgresql = "42.7.4"
 
 [libraries]
 jdbi3-spring5 = { group = "org.jdbi", name = "jdbi3-spring5", version.ref = "jdbi" }
@@ -40,10 +40,11 @@ wiremock-jre8-standalone = { group = "com.github.tomakehurst", name = "wiremock-
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 springmockk = { group = "com.ninja-squad", name = "springmockk", version.ref = "springMockk" }
 greenmail = { group = "com.icegreen", name = "greenmail", version.ref = "greenmail" }
-flyway-mysql = { module = "org.flywaydb:flyway-mysql", version.ref = "flyway" }
+flyway-postgresql = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway" }
 jooq-codegen = { module = "org.jooq:jooq-codegen", version.ref = "jooq" }
-mariadb = { module = "org.mariadb.jdbc:mariadb-java-client", version.ref = "mariadb" }
-testcontainers-mariadb = { module = "org.testcontainers:mariadb", version.ref = "testcontainers" }
+jooq-core = { module = "org.jooq:jooq", version.ref = "jooq" }
+postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
