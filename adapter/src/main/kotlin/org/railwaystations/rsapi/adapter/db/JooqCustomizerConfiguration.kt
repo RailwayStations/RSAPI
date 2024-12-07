@@ -5,13 +5,12 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-class JooqConfiguration {
+class JooqCustomizerConfiguration {
 
     @Bean
-    fun jooqCustomizer() =
-        DefaultConfigurationCustomizer { c ->
-            c.settings()
-                .withExecuteWithOptimisticLocking(true)
+    fun configurationCustomizer() =
+        DefaultConfigurationCustomizer {
+            it.settings().withExecuteWithOptimisticLocking(true)
         }
 
 }

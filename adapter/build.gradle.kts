@@ -7,6 +7,7 @@ plugins {
 
 dependencies {
     implementation(project("::openapi"))
+    implementation(project("::db-migration"))
     implementation(project("::core"))
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-security")
