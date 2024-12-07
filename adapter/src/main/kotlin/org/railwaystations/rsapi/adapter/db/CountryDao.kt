@@ -14,15 +14,14 @@ import org.railwaystations.rsapi.core.model.ProviderApp
 import org.railwaystations.rsapi.core.ports.outbound.CountryPort
 import java.sql.ResultSet
 import java.sql.SQLException
-import java.util.*
 
 interface CountryDao : CountryPort {
     @SqlQuery(
         """
             SELECT c.id c_id, c.name c_name, c.email c_email, c.timetableUrlTemplate c_timetableUrlTemplate,
                     c.overrideLicense c_overrideLicense, c.active c_active, p.type p_type, p.name p_name, p.url p_url
-            FROM countries c
-                LEFT JOIN providerApps p ON c.id = p.countryCode
+            FROM country c
+                LEFT JOIN providerApp p ON c.id = p.countryCode
             WHERE c.id = :id
             
             """
@@ -38,8 +37,8 @@ interface CountryDao : CountryPort {
         """
             SELECT c.id c_id, c.name c_name, c.email c_email, c.timetableUrlTemplate c_timetableUrlTemplate,
                     c.overrideLicense c_overrideLicense, c.active c_active, p.type p_type, p.name p_name, p.url p_url
-            FROM countries c
-                LEFT JOIN providerApps p ON c.id = p.countryCode
+            FROM country c
+                LEFT JOIN providerApp p ON c.id = p.countryCode
             WHERE :onlyActive = false OR c.active = true
             
             """

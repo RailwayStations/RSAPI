@@ -10,7 +10,11 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import org.railwaystations.rsapi.adapter.db.*
+import org.railwaystations.rsapi.adapter.db.CountryDao
+import org.railwaystations.rsapi.adapter.db.InboxDao
+import org.railwaystations.rsapi.adapter.db.PhotoAdapter
+import org.railwaystations.rsapi.adapter.db.StationDao
+import org.railwaystations.rsapi.adapter.db.UserDao
 import org.railwaystations.rsapi.adapter.monitoring.FakeMonitor
 import org.railwaystations.rsapi.adapter.photostorage.PhotoFileStorage
 import org.railwaystations.rsapi.adapter.photostorage.WorkDir
@@ -22,8 +26,12 @@ import org.railwaystations.rsapi.adapter.web.auth.RSAuthenticationProvider
 import org.railwaystations.rsapi.adapter.web.auth.RSUserDetailsService
 import org.railwaystations.rsapi.adapter.web.auth.WebSecurityConfig
 import org.railwaystations.rsapi.app.ClockTestConfiguration
-import org.railwaystations.rsapi.core.model.*
+import org.railwaystations.rsapi.core.model.Coordinates
+import org.railwaystations.rsapi.core.model.EMAIL_VERIFIED
+import org.railwaystations.rsapi.core.model.InboxEntry
+import org.railwaystations.rsapi.core.model.Photo
 import org.railwaystations.rsapi.core.model.PhotoTestFixtures.createPhoto
+import org.railwaystations.rsapi.core.model.Station
 import org.railwaystations.rsapi.core.model.StationTestFixtures.createStation
 import org.railwaystations.rsapi.core.model.UserTestFixtures.createSomeUser
 import org.railwaystations.rsapi.core.model.UserTestFixtures.createUserJimKnopf
@@ -94,7 +102,7 @@ internal class PhotoUploadControllerTest {
     private lateinit var countryDao: CountryDao
 
     @MockkBean(relaxed = true)
-    private lateinit var photoDao: PhotoDao
+    private lateinit var photoAdapter: PhotoAdapter
 
     @MockkBean(relaxed = true)
     private lateinit var manageProfileUseCase: ManageProfileUseCase
@@ -133,7 +141,7 @@ internal class PhotoUploadControllerTest {
 
     private fun whenPostImage(
         nickname: String,
-        userId: Int,
+        userId: Long,
         email: String,
         stationId: String?,
         country: String?,
@@ -163,7 +171,7 @@ internal class PhotoUploadControllerTest {
 
     private fun whenPostPhotoUpload(
         nickname: String,
-        userId: Int,
+        userId: Long,
         email: String,
         stationId: String?,
         country: String?,

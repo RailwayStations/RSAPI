@@ -29,11 +29,6 @@ class JdbiConfiguration {
     }
 
     @Bean
-    fun photoDao(jdbi: Jdbi): PhotoDao {
-        return jdbi.onDemand(PhotoDao::class.java)
-    }
-
-    @Bean
     fun stationDao(jdbi: Jdbi): StationDao {
         return jdbi.onDemand(StationDao::class.java)
     }

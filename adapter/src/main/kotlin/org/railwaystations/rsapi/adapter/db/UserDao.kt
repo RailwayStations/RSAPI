@@ -15,30 +15,30 @@ import java.sql.ResultSet
 import java.util.*
 
 interface UserDao : UserPort {
-    @SqlQuery("SELECT * FROM users")
+    @SqlQuery("SELECT * FROM \"user\"")
     @RegisterRowMapper(UserMapper::class)
     override fun list(): List<User>
 
-    @SqlQuery("SELECT * FROM users WHERE name = :name")
+    @SqlQuery("SELECT * FROM \"user\" WHERE name = :name")
     @RegisterRowMapper(
         UserMapper::class
     )
     override fun findByName(@Bind("name") name: String): User?
 
-    @SqlQuery("SELECT * FROM users WHERE id = :id")
+    @SqlQuery("SELECT * FROM \"user\" WHERE id = :id")
     @RegisterRowMapper(UserMapper::class)
-    override fun findById(@Bind("id") id: Int): User?
+    override fun findById(@Bind("id") id: Long): User?
 
-    @SqlQuery("SELECT * FROM users WHERE email = :email")
+    @SqlQuery("SELECT * FROM \"user\" WHERE email = :email")
     @RegisterRowMapper(UserMapper::class)
     override fun findByEmail(@Bind("email") email: String): User?
 
-    @SqlUpdate("UPDATE users SET \"key\" = :key WHERE id = :id")
-    override fun updateCredentials(@Bind("id") id: Int, @Bind("key") key: String)
+    @SqlUpdate("UPDATE \"user\" SET \"key\" = :key WHERE id = :id")
+    override fun updateCredentials(@Bind("id") id: Long, @Bind("key") key: String)
 
     @SqlUpdate(
         """
-            INSERT INTO users (id, name, url, license, email, ownPhotos, anonymous, \"key\", emailVerification, sendNotifications, locale)
+            INSERT INTO "user" (id, name, url, license, email, ownPhotos, anonymous, \"key\", emailVerification, sendNotifications, locale)
                 VALUES (:id, :name, :url, :license, :email, :ownPhotos, :anonymous, :key, :emailVerification, :sendNotifications, :localeLanguageTag)
             
             """
@@ -48,30 +48,30 @@ interface UserDao : UserPort {
         @BindBean user: User,
         @Bind("key") key: String?,
         @Bind("emailVerification") emailVerification: String?
-    ): Int
+    ): Long
 
     @SqlUpdate(
         """
-            UPDATE users SET name = :name, url = :url, license = :license, email = :email, ownPhotos = :ownPhotos,
+            UPDATE "user" SET name = :name, url = :url, license = :license, email = :email, ownPhotos = :ownPhotos,
                             anonymous = :anonymous, sendNotifications = :sendNotifications, locale = :localeLanguageTag
             WHERE id = :id
             
             """
     )
-    override fun update(@Bind("id") id: Int, @BindBean user: User)
+    override fun update(@Bind("id") id: Long, @BindBean user: User)
 
-    @SqlQuery("SELECT * FROM users WHERE emailVerification = :emailVerification")
+    @SqlQuery("SELECT * FROM \"user\" WHERE emailVerification = :emailVerification")
     @RegisterRowMapper(
         UserMapper::class
     )
     override fun findByEmailVerification(@Bind("emailVerification") emailVerification: String): User?
 
-    @SqlUpdate("UPDATE users SET emailVerification = :emailVerification WHERE id = :id")
-    override fun updateEmailVerification(@Bind("id") id: Int, @Bind("emailVerification") emailVerification: String?)
+    @SqlUpdate("UPDATE \"user\" SET emailVerification = :emailVerification WHERE id = :id")
+    override fun updateEmailVerification(@Bind("id") id: Long, @Bind("emailVerification") emailVerification: String?)
 
     @SqlUpdate(
         """
-            UPDATE users
+            UPDATE "user"
              SET name = CONCAT('deleteduser', id),
                  url = NULL,
                  anonymous = true,
@@ -86,28 +86,28 @@ interface UserDao : UserPort {
             
             """
     )
-    override fun anonymizeUser(@Bind("id") id: Int)
+    override fun anonymizeUser(@Bind("id") id: Long)
 
     @SqlUpdate(
         """
-            INSERT INTO blocked_usernames (name)
+            INSERT INTO blocked_username (name)
                 VALUES (:name)
             
             """
     )
     override fun addUsernameToBlocklist(@Bind("name") name: String)
 
-    @SqlQuery("SELECT COUNT(*) FROM blocked_usernames WHERE name = :name")
+    @SqlQuery("SELECT COUNT(*) FROM blocked_username WHERE name = :name")
     override fun countBlockedUsername(@Bind("name") name: String): Int
 
-    @SqlUpdate("UPDATE users SET locale = :localeLanguageTag WHERE id = :id")
-    override fun updateLocale(@Bind("id") id: Int, @Bind("localeLanguageTag") locallocaleLanguageTage: String)
+    @SqlUpdate("UPDATE \"user\" SET locale = :localeLanguageTag WHERE id = :id")
+    override fun updateLocale(@Bind("id") id: Long, @Bind("localeLanguageTag") locallocaleLanguageTage: String)
 
     class UserMapper : RowMapper<User> {
         override fun map(rs: ResultSet, ctx: StatementContext): User {
             val locale = rs.getString("locale")
             return User(
-                id = rs.getInt("id"),
+                id = rs.getLong("id"),
                 name = rs.getString("name"),
                 url = rs.getString("url"),
                 license = rs.getString("license").nameToLicense(),

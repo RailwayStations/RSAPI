@@ -2,10 +2,10 @@ package org.railwaystations.rsapi.core.model
 
 object UserTestFixtures {
 
-    const val USER_AGENT: String = "UserAgent"
-    const val USER_NAME: String = "existing"
-    const val USER_EMAIL: String = "existing@example.com"
-    const val EXISTING_USER_ID: Int = 42
+    const val USER_AGENT = "UserAgent"
+    const val USER_NAME = "existing"
+    const val USER_EMAIL = "existing@example.com"
+    const val EXISTING_USER_ID = 42L
 
     fun createUserJimKnopf(): User {
         return User(
