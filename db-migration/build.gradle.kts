@@ -36,8 +36,6 @@ jooq {
     edition.set(nu.studer.gradle.jooq.JooqEdition.OSS)
     configurations {
         create("main") {
-            generateSchemaSourceOnCompilation.set(false)
-
             jooqConfiguration.apply {
                 logging = Logging.WARN
                 generator.apply {
