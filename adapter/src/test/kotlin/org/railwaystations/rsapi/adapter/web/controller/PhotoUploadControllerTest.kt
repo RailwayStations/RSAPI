@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import org.railwaystations.rsapi.adapter.db.CountryDao
+import org.railwaystations.rsapi.adapter.db.CountryAdapter
 import org.railwaystations.rsapi.adapter.db.InboxDao
 import org.railwaystations.rsapi.adapter.db.PhotoAdapter
 import org.railwaystations.rsapi.adapter.db.StationDao
@@ -99,7 +99,7 @@ internal class PhotoUploadControllerTest {
     private lateinit var userDao: UserDao
 
     @MockkBean
-    private lateinit var countryDao: CountryDao
+    private lateinit var countryAdapter: CountryAdapter
 
     @MockkBean(relaxed = true)
     private lateinit var photoAdapter: PhotoAdapter

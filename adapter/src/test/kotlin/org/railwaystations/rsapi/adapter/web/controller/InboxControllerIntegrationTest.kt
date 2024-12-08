@@ -5,7 +5,7 @@ import io.mockk.every
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.railwaystations.rsapi.adapter.db.CountryDao
+import org.railwaystations.rsapi.adapter.db.CountryAdapter
 import org.railwaystations.rsapi.adapter.db.InboxDao
 import org.railwaystations.rsapi.adapter.db.PhotoAdapter
 import org.railwaystations.rsapi.adapter.db.StationDao
@@ -84,7 +84,7 @@ internal class InboxControllerIntegrationTest {
     private lateinit var userDao: UserDao
 
     @MockkBean
-    private lateinit var countryDao: CountryDao
+    private lateinit var countryAdapter: CountryAdapter
 
     @MockkBean
     private lateinit var photoAdapter: PhotoAdapter

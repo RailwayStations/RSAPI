@@ -19,11 +19,6 @@ class JdbiConfiguration {
     }
 
     @Bean
-    fun countryDao(jdbi: Jdbi): CountryDao {
-        return jdbi.onDemand(CountryDao::class.java)
-    }
-
-    @Bean
     fun inboxDao(jdbi: Jdbi): InboxDao {
         return jdbi.onDemand(InboxDao::class.java)
     }

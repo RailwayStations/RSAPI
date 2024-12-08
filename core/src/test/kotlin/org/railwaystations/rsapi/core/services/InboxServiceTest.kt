@@ -16,6 +16,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.railwaystations.rsapi.core.model.Coordinates
 import org.railwaystations.rsapi.core.model.Country
+import org.railwaystations.rsapi.core.model.CountryTestFixtures
 import org.railwaystations.rsapi.core.model.EMAIL_VERIFIED
 import org.railwaystations.rsapi.core.model.InboxCommand
 import org.railwaystations.rsapi.core.model.InboxEntry
@@ -40,12 +41,7 @@ import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
 
-private val DE: Country = Country(
-    code = "de",
-    name = "Germany",
-    email = "email@example.com",
-)
-private val STATION_KEY_DE_1: Station.Key = Station.Key(DE.code, "1")
+private val STATION_KEY_DE_1: Station.Key = Station.Key(CountryTestFixtures.countryDe.code, "1")
 private const val INBOX_ENTRY1_ID: Long = 1
 private val PHOTOGRAPHER: User = User(
     id = 1,
@@ -100,7 +96,7 @@ internal class InboxServiceTest {
         )
 
         every { countryPort.findById(any()) } returns null
-        every { countryPort.findById(DE.code) } returns DE
+        every { countryPort.findById(CountryTestFixtures.countryDe.code) } returns CountryTestFixtures.countryDe
         every { inboxPort.findById(any()) } returns null
         every { inboxPort.done(any()) } returns Unit
         every { inboxPort.updatePhotoId(any(), any()) } returns Unit
@@ -360,7 +356,7 @@ internal class InboxServiceTest {
     }
 
     private fun createNewStationCommand1(): InboxCommand = createInboxCommand1().copy(
-        countryCode = DE.code,
+        countryCode = CountryTestFixtures.countryDe.code,
         stationId = NEW_STATION_ID,
         title = NEW_STATION_TITLE,
         coordinates = NEW_COORDINATES,
@@ -861,23 +857,21 @@ internal class InboxServiceTest {
         }
     }
 
-    fun createCountryWithOverrideLicense(overrideLicense: License?): Country {
-        return Country(
+    fun createCountryWithOverrideLicense(overrideLicense: License?) =
+        Country(
             code = "xx",
             name = "XX",
-            email = "email@example.com",
+            _email = "email@example.com",
             timetableUrlTemplate = null,
             overrideLicense = overrideLicense,
         )
-    }
 
-    fun createValidUser(): User {
-        return User(
+    fun createValidUser() =
+        User(
             name = "name",
             license = License.CC0_10,
             email = "email@example.com",
             ownPhotos = true,
             emailVerification = EMAIL_VERIFIED,
         )
-    }
 }

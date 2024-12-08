@@ -6,7 +6,7 @@ import io.mockk.every
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Fail
 import org.junit.jupiter.api.Test
-import org.railwaystations.rsapi.adapter.db.CountryDao
+import org.railwaystations.rsapi.adapter.db.CountryAdapter
 import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
 import org.railwaystations.rsapi.adapter.web.OpenApiValidatorUtil.validOpenApiResponse
 import org.railwaystations.rsapi.adapter.web.model.CountryDto
@@ -35,11 +35,11 @@ internal class CountriesControllerTest {
     private lateinit var objectMapper: ObjectMapper
 
     @MockkBean
-    private lateinit var countryDao: CountryDao
+    private lateinit var countryAdapter: CountryAdapter
 
     @Test
     fun listCountries() {
-        every { countryDao.list(true) } returns createCountryList(setOf("xy", "ab"))
+        every { countryAdapter.list(true) } returns createCountryList(setOf("xy", "ab"))
 
         val contentAsString = mvc.perform(get("/countries"))
             .andExpect(status().isOk())

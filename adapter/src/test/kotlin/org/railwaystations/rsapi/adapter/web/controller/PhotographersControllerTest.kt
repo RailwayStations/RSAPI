@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
-import org.railwaystations.rsapi.adapter.db.CountryDao
+import org.railwaystations.rsapi.adapter.db.CountryAdapter
 import org.railwaystations.rsapi.adapter.db.StationDao
 import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
 import org.railwaystations.rsapi.adapter.web.OpenApiValidatorUtil.validOpenApiResponse
@@ -33,11 +33,11 @@ internal class PhotographersControllerTest {
     private lateinit var stationDao: StationDao
 
     @MockkBean
-    private lateinit var countryDao: CountryDao
+    private lateinit var countryAdapter: CountryAdapter
 
     @BeforeEach
     fun setup() {
-        every { countryDao.findById("de") } returns CountryTestFixtures.createCountry("de")
+        every { countryAdapter.findById("de") } returns CountryTestFixtures.createCountry("de")
     }
 
     @ParameterizedTest
