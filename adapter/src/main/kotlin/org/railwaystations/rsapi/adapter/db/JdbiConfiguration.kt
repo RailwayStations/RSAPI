@@ -28,9 +28,4 @@ class JdbiConfiguration {
         return jdbi.onDemand(StationDao::class.java)
     }
 
-    @Bean
-    fun userDao(jdbi: Jdbi): UserDao {
-        return jdbi.onDemand(UserDao::class.java)
-    }
-
 }

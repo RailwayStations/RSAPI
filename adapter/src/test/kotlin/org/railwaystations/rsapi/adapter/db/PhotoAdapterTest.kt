@@ -33,7 +33,7 @@ class PhotoAdapterTest : AbstractPostgreSqlTest() {
     fun insert() {
         val photoCountBefore = sut.countPhotos()
         val photo =
-            PhotoTestFixtures.createPhoto(Station.Key("de", "5081"), UserTestFixtures.createSomeUser())
+            PhotoTestFixtures.createPhoto(Station.Key("de", "5081"), UserTestFixtures.someUser)
 
         val photoId = sut.insert(photo)
 
@@ -62,7 +62,7 @@ class PhotoAdapterTest : AbstractPostgreSqlTest() {
             stationKey = Station.Key(photoRecord.countrycode, photoRecord.stationid),
             primary = false,
             urlPath = "newUrlPath",
-            photographer = UserTestFixtures.createSomeUser(),
+            photographer = UserTestFixtures.someUser,
             createdAt = Instant.now(),
             license = License.CC_BY_NC_SA_30_DE,
             outdated = true,

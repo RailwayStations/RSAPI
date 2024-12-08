@@ -19,7 +19,7 @@ object StationTestFixtures {
         title = "Lummerland",
         coordinates = Coordinates(50.0, 9.0),
         ds100 = "XYZ",
-        photos = listOf(createPhoto(keyDe5, UserTestFixtures.createUserJimKnopf()))
+        photos = listOf(createPhoto(keyDe5, UserTestFixtures.userJimKnopf))
     )
 
     fun createStation(key: Station.Key, coordinates: Coordinates, photo: Photo?): Station =

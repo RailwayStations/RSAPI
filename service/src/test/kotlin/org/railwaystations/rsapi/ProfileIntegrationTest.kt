@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.railwaystations.rsapi.adapter.db.AbstractPostgreSqlTest
-import org.railwaystations.rsapi.adapter.db.UserDao
+import org.railwaystations.rsapi.adapter.db.UserAdapter
 import org.railwaystations.rsapi.core.model.License
 import org.railwaystations.rsapi.core.model.User
 import org.railwaystations.rsapi.core.ports.outbound.MailerPort
@@ -19,7 +19,12 @@ import org.springframework.boot.test.web.client.exchange
 import org.springframework.boot.test.web.client.getForEntity
 import org.springframework.boot.test.web.client.postForEntity
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.http.*
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.http.client.SimpleClientHttpRequestFactory
 import org.springframework.security.oauth2.core.OAuth2AccessToken
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse
@@ -34,7 +39,6 @@ import java.security.MessageDigest
 import java.security.SecureRandom
 import java.util.*
 import java.util.regex.Pattern
-import kotlin.Throws
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -52,7 +56,7 @@ internal class ProfileIntegrationTest : AbstractPostgreSqlTest() {
     private lateinit var restTemplate: TestRestTemplate
 
     @Autowired
-    private lateinit var userDao: UserDao
+    private lateinit var userAdapter: UserAdapter
 
     @MockkBean(relaxed = true)
     private lateinit var mailerPort: MailerPort
@@ -482,7 +486,7 @@ internal class ProfileIntegrationTest : AbstractPostgreSqlTest() {
 
         // then
         assertThat(responseDelete.statusCode).isEqualTo(HttpStatus.NO_CONTENT)
-        val user = userDao.findById(22)
+        val user = userAdapter.findById(22)
         assertThat(user).usingRecursiveComparison().isEqualTo(
             User(
                 id = 22,

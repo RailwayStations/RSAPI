@@ -31,7 +31,6 @@ internal class SocialMediaServiceTest {
 
     @Test
     fun postNewPhotoToMastodon() {
-        val user = UserTestFixtures.createSomeUser()
         val inboxEntry = InboxEntry(
             countryCode = "de",
             stationId = "1234",
@@ -39,7 +38,7 @@ internal class SocialMediaServiceTest {
             title = "title",
             comment = "comment",
         )
-        every { userPort.findById(0) } returns user
+        every { userPort.findById(0) } returns UserTestFixtures.someUser
         every { inboxPort.findOldestImportedPhotoNotYetPosted() } returns inboxEntry
         every { inboxPort.updatePosted(any()) } returns Unit
 

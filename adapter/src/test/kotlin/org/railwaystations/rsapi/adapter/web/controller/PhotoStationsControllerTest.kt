@@ -453,7 +453,7 @@ internal class PhotoStationsControllerTest {
 
 private val KEY_XY_1: Station.Key = Station.Key("xy", "1")
 private val KEY_XY_5: Station.Key = Station.Key("xy", "5")
-private val PHOTOGRAPHER_JIM_KNOPF: User = UserTestFixtures.createSomeUser().copy(
+private val PHOTOGRAPHER_JIM_KNOPF: User = UserTestFixtures.someUser.copy(
     name = "Jim Knopf",
     url = "photographerUrlJim",
     license = License.CC0_10,
@@ -461,7 +461,7 @@ private val PHOTOGRAPHER_JIM_KNOPF: User = UserTestFixtures.createSomeUser().cop
 private val KEY_AB_3: Station.Key = Station.Key("ab", "3")
 private val CREATED_AT: Instant = Instant.now()
 private val PHOTOGRAPHER_PETER_PAN: User =
-    UserTestFixtures.createSomeUser().copy(
+    UserTestFixtures.someUser.copy(
         name = "Peter Pan",
         url = "photographerUrlPeter",
         license = License.CC_BY_NC_SA_30_DE,

@@ -14,7 +14,7 @@ import org.railwaystations.rsapi.adapter.db.CountryAdapter
 import org.railwaystations.rsapi.adapter.db.InboxDao
 import org.railwaystations.rsapi.adapter.db.PhotoAdapter
 import org.railwaystations.rsapi.adapter.db.StationDao
-import org.railwaystations.rsapi.adapter.db.UserDao
+import org.railwaystations.rsapi.adapter.db.UserAdapter
 import org.railwaystations.rsapi.adapter.monitoring.FakeMonitor
 import org.railwaystations.rsapi.adapter.photostorage.PhotoFileStorage
 import org.railwaystations.rsapi.adapter.photostorage.WorkDir
@@ -33,9 +33,9 @@ import org.railwaystations.rsapi.core.model.Photo
 import org.railwaystations.rsapi.core.model.PhotoTestFixtures.createPhoto
 import org.railwaystations.rsapi.core.model.Station
 import org.railwaystations.rsapi.core.model.StationTestFixtures.createStation
-import org.railwaystations.rsapi.core.model.UserTestFixtures.createSomeUser
-import org.railwaystations.rsapi.core.model.UserTestFixtures.createUserJimKnopf
-import org.railwaystations.rsapi.core.model.UserTestFixtures.createUserNickname
+import org.railwaystations.rsapi.core.model.UserTestFixtures.someUser
+import org.railwaystations.rsapi.core.model.UserTestFixtures.userJimKnopf
+import org.railwaystations.rsapi.core.model.UserTestFixtures.userNickname
 import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase
 import org.railwaystations.rsapi.core.services.InboxService
 import org.springframework.beans.factory.annotation.Autowired
@@ -96,7 +96,7 @@ internal class PhotoUploadControllerTest {
     private lateinit var authenticator: RSAuthenticationProvider
 
     @MockkBean(relaxed = true)
-    private lateinit var userDao: UserDao
+    private lateinit var userAdapter: UserAdapter
 
     @MockkBean
     private lateinit var countryAdapter: CountryAdapter
@@ -109,16 +109,16 @@ internal class PhotoUploadControllerTest {
 
     @BeforeEach
     fun setUp() {
-        val userNickname = createUserNickname()
-        every { userDao.findByEmail(userNickname.email!!) } returns userNickname
-        val userSomeuser = createSomeUser()
-        every { userDao.findByEmail(userSomeuser.email!!) } returns userSomeuser
+        val userNickname = userNickname
+        every { userAdapter.findByEmail(userNickname.email!!) } returns userNickname
+        val userSomeuser = someUser
+        every { userAdapter.findByEmail(userSomeuser.email!!) } returns userSomeuser
 
         val key4711 = Station.Key("de", "4711")
         val station4711 = createStationWithDs100(key4711, Coordinates(50.0, 9.0), "XYZ", null)
         val key1234 = Station.Key("de", "1234")
         val station1234 =
-            createStationWithDs100(key1234, Coordinates(40.1, 7.0), "LAL", createPhoto(key1234, createUserJimKnopf()))
+            createStationWithDs100(key1234, Coordinates(40.1, 7.0), "LAL", createPhoto(key1234, userJimKnopf))
 
         every { stationDao.findByKey(key4711.country, key4711.id) } returns station4711
         every { stationDao.findByKey(key1234.country, key1234.id) } returns station1234
@@ -212,7 +212,7 @@ internal class PhotoUploadControllerTest {
                 .with(
                     user(
                         AuthUser(
-                            createUserNickname().copy(
+                            userNickname.copy(
                                 name = nickname,
                                 id = userId,
                                 email = email,
@@ -281,7 +281,7 @@ internal class PhotoUploadControllerTest {
                 .with(
                     user(
                         AuthUser(
-                            createUserNickname().copy(
+                            userNickname.copy(
                                 email = email,
                                 emailVerification = emailVerified,
                             ), listOf()
@@ -306,7 +306,7 @@ internal class PhotoUploadControllerTest {
         val response = mvc.perform(
             multipart("/photoUploadMultipartFormdata")
                 .file(MockMultipartFile("file", null, "application/octet-stream", null as ByteArray?))
-                .with(user(AuthUser(createUserNickname(), listOf())))
+                .with(user(AuthUser(userNickname, listOf())))
                 .param("stationTitle", "Missing Station")
                 .param("latitude", "10")
                 .param("longitude", "20")
@@ -385,7 +385,6 @@ internal class PhotoUploadControllerTest {
     fun postMissingStation() {
         every { inboxDao.insert(any()) } returns 4L
         val uploadCaptor = slot<InboxEntry>()
-        val userNickname = createUserNickname()
 
         whenPostImage(
             nickname = userNickname.name,
@@ -422,7 +421,6 @@ internal class PhotoUploadControllerTest {
     fun postMissingStationWithoutPhoto() {
         every { inboxDao.insert(any()) } returns 4L
         val uploadCaptor = slot<InboxEntry>()
-        val userNickname = createUserNickname()
 
         whenPostPhotoUpload(
             nickname = userNickname.name,
@@ -461,7 +459,6 @@ internal class PhotoUploadControllerTest {
         "-91d, 9.1234d", "91d, 9.1234d", "50.9876d, -181d", "50.9876d, 181d"
     )
     fun postMissingStationLatLonOutOfRange(latitude: Double?, longitude: Double?) {
-        val userNickname = createUserNickname()
         whenPostImage(
             nickname = userNickname.name,
             userId = userNickname.id,

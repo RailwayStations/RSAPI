@@ -9,7 +9,7 @@ import org.railwaystations.rsapi.adapter.db.CountryAdapter
 import org.railwaystations.rsapi.adapter.db.InboxDao
 import org.railwaystations.rsapi.adapter.db.PhotoAdapter
 import org.railwaystations.rsapi.adapter.db.StationDao
-import org.railwaystations.rsapi.adapter.db.UserDao
+import org.railwaystations.rsapi.adapter.db.UserAdapter
 import org.railwaystations.rsapi.adapter.monitoring.FakeMonitor
 import org.railwaystations.rsapi.adapter.photostorage.PhotoFileStorage
 import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
@@ -30,8 +30,8 @@ import org.railwaystations.rsapi.core.model.Station
 import org.railwaystations.rsapi.core.model.StationTestFixtures.createStation
 import org.railwaystations.rsapi.core.model.UserTestFixtures
 import org.railwaystations.rsapi.core.model.UserTestFixtures.USER_AGENT
-import org.railwaystations.rsapi.core.model.UserTestFixtures.createUserJimKnopf
-import org.railwaystations.rsapi.core.model.UserTestFixtures.createUserNickname
+import org.railwaystations.rsapi.core.model.UserTestFixtures.userJimKnopf
+import org.railwaystations.rsapi.core.model.UserTestFixtures.userNickname
 import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase
 import org.railwaystations.rsapi.core.services.InboxService
 import org.springframework.beans.factory.annotation.Autowired
@@ -81,7 +81,7 @@ internal class InboxControllerIntegrationTest {
     private lateinit var stationDao: StationDao
 
     @MockkBean
-    private lateinit var userDao: UserDao
+    private lateinit var userAdapter: UserAdapter
 
     @MockkBean
     private lateinit var countryAdapter: CountryAdapter
@@ -97,17 +97,17 @@ internal class InboxControllerIntegrationTest {
 
     @BeforeEach
     fun setUp() {
-        val userNickname = createUserNickname()
-        every { userDao.findByEmail(userNickname.email!!) } returns userNickname
-        val userSomeuser = UserTestFixtures.createSomeUser()
-        every { userDao.findByEmail(userSomeuser.email!!) } returns userSomeuser
+        val userNickname = userNickname
+        every { userAdapter.findByEmail(userNickname.email!!) } returns userNickname
+        val userSomeuser = UserTestFixtures.someUser
+        every { userAdapter.findByEmail(userSomeuser.email!!) } returns userSomeuser
 
         val key0815 = Station.Key("ch", "0815")
-        val station0815 = createStation(key0815, Coordinates(40.1, 7.0), createPhoto(key0815, createUserJimKnopf()))
+        val station0815 = createStation(key0815, Coordinates(40.1, 7.0), createPhoto(key0815, userJimKnopf))
         every { stationDao.findByKey(key0815.country, key0815.id) } returns station0815
 
         val key1234 = Station.Key("de", "1234")
-        val station1234 = createStation(key1234, Coordinates(40.1, 7.0), createPhoto(key1234, createUserJimKnopf()))
+        val station1234 = createStation(key1234, Coordinates(40.1, 7.0), createPhoto(key1234, userJimKnopf))
         every { stationDao.findByKey(key1234.country, key1234.id) } returns station1234
 
         monitor.reset()
@@ -115,7 +115,7 @@ internal class InboxControllerIntegrationTest {
 
     @Test
     fun userInbox() {
-        val user = createUserNickname()
+        val user = userNickname
 
         every { inboxDao.findById(1) } returns createInboxEntry(user, 1, "de", "4711", null, false)
         every { inboxDao.findById(2) } returns createInboxEntry(user, 2, "de", "1234", null, true)
@@ -159,7 +159,7 @@ internal class InboxControllerIntegrationTest {
                 .with(
                     user(
                         AuthUser(
-                            createUserNickname().copy(
+                            userNickname.copy(
                                 emailVerification = emailVerification
                             ), listOf()
                         )
@@ -289,10 +289,9 @@ internal class InboxControllerIntegrationTest {
 
     @Test
     fun adminInbox() {
-        val user = createUserNickname()
 
         every { inboxDao.findPendingInboxEntries() } returns listOf(
-            createInboxEntry(user, 1, "de", "4711", null, false),
+            createInboxEntry(userNickname, 1, "de", "4711", null, false),
         )
 
         mvc.perform(
@@ -300,7 +299,7 @@ internal class InboxControllerIntegrationTest {
                 .header(HttpHeaders.USER_AGENT, USER_AGENT)
                 .header(HttpHeaders.AUTHORIZATION, "not_used_but_required")
                 .contentType("application/json")
-                .with(user(AuthUser(user, listOf())))
+                .with(user(AuthUser(userNickname, listOf())))
                 .with(csrf())
         )
             .andExpect(validOpenApiResponse())
