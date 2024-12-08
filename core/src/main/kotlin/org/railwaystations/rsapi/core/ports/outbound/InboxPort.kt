@@ -21,6 +21,6 @@ interface InboxPort {
     fun updatePosted(id: Long)
     fun updatePhotoId(id: Long, photoId: Long)
     fun updateMissingStationImported(id: Long, countryCode: String, stationId: String, title: String)
-    fun findByUser(photographerId: Int, showCompletedEntries: Boolean): List<InboxEntry>
+    fun findByUser(photographerId: Long, showCompletedEntries: Boolean): List<InboxEntry>
     fun findPendingByStation(countryCode: String, stationId: String): List<InboxEntry>
 }

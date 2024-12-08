@@ -11,7 +11,7 @@ data class InboxEntry(
     val newTitle: String? = null,
     val coordinates: Coordinates? = null,
     val newCoordinates: Coordinates? = null,
-    val photographerId: Int = 0,
+    val photographerId: Long = 0,
     val photographerNickname: String? = null,
     val photographerEmail: String? = null,
     val extension: String? = null,

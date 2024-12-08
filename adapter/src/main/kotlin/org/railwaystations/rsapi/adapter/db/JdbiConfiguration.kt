@@ -19,18 +19,8 @@ class JdbiConfiguration {
     }
 
     @Bean
-    fun countryDao(jdbi: Jdbi): CountryDao {
-        return jdbi.onDemand(CountryDao::class.java)
-    }
-
-    @Bean
     fun inboxDao(jdbi: Jdbi): InboxDao {
         return jdbi.onDemand(InboxDao::class.java)
-    }
-
-    @Bean
-    fun photoDao(jdbi: Jdbi): PhotoDao {
-        return jdbi.onDemand(PhotoDao::class.java)
     }
 
     @Bean
@@ -38,13 +28,4 @@ class JdbiConfiguration {
         return jdbi.onDemand(StationDao::class.java)
     }
 
-    @Bean
-    fun userDao(jdbi: Jdbi): UserDao {
-        return jdbi.onDemand(UserDao::class.java)
-    }
-
-    @Bean
-    fun oAuth2AuthorizationDao(jdbi: Jdbi): OAuth2AuthorizationDao {
-        return jdbi.onDemand(OAuth2AuthorizationDao::class.java)
-    }
 }

@@ -28,9 +28,9 @@ private const val JOIN_QUERY: String = """
                         AND i2.stationId IS NOT NULL AND i2.stationId = i.stationId AND i2.done = false AND i2.id != i.id
                  ) AS conflict
                FROM inbox i
-                    LEFT JOIN stations s ON s.countryCode = i.countryCode AND s.id = i.stationId
-                    LEFT JOIN users u ON u.id = i.photographerId
-                    LEFT JOIN photos p ON p.countryCode = i.countryCode AND p.stationId = i.stationId AND ( ( p.primary = true AND i.photoId IS NULL) OR ( p.id = i.photoId ) )
+                    LEFT JOIN station s ON s.countryCode = i.countryCode AND s.id = i.stationId
+                    LEFT JOIN "user" u ON u.id = i.photographerId
+                    LEFT JOIN photo p ON p.countryCode = i.countryCode AND p.stationId = i.stationId AND ( ( p.primary = true AND i.photoId IS NULL) OR ( p.id = i.photoId ) )
             
             """
 private const val COUNTRY_CODE: String = "countryCode"
@@ -62,7 +62,7 @@ interface InboxDao : InboxPort {
         """
             SELECT i.countryCode, i.stationId, i.title i_title, s.title s_title, i.lat i_lat, i.lon i_lon, s.lat s_lat, s.lon s_lon
               FROM inbox i
-                  LEFT JOIN stations s ON s.countryCode = i.countryCode AND s.id = i.stationId
+                  LEFT JOIN station s ON s.countryCode = i.countryCode AND s.id = i.stationId
               WHERE i.done = false AND (i.problemReportType IS NULL OR i.problemReportType = '')
             
             """
@@ -130,7 +130,7 @@ interface InboxDao : InboxPort {
     @SqlQuery("$JOIN_QUERY WHERE i.photographerId = :photographerId AND (i.done = false OR :showCompletedEntries = true) ORDER BY i.id DESC")
     @RegisterRowMapper(InboxEntryMapper::class)
     override fun findByUser(
-        @Bind(PHOTOGRAPHER_ID) photographerId: Int,
+        @Bind(PHOTOGRAPHER_ID) photographerId: Long,
         @Bind("showCompletedEntries") showCompletedEntries: Boolean
     ): List<InboxEntry>
 
@@ -169,7 +169,7 @@ interface InboxDao : InboxPort {
                 newTitle = rs.getString("i_title"),
                 coordinates = getCoordinates(rs, "s_"),
                 newCoordinates = getCoordinates(rs, "i_"),
-                photographerId = rs.getInt(PHOTOGRAPHER_ID),
+                photographerId = rs.getLong(PHOTOGRAPHER_ID),
                 photographerNickname = rs.getString("photographerNickname"),
                 photographerEmail = rs.getString("photographerEmail"),
                 extension = extension,

@@ -1,6 +1,10 @@
 package org.railwaystations.rsapi.core.services
 
-import io.mockk.*
+import io.mockk.clearMocks
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
@@ -10,21 +14,34 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.railwaystations.rsapi.core.model.*
+import org.railwaystations.rsapi.core.model.Coordinates
+import org.railwaystations.rsapi.core.model.Country
+import org.railwaystations.rsapi.core.model.CountryTestFixtures
+import org.railwaystations.rsapi.core.model.EMAIL_VERIFIED
+import org.railwaystations.rsapi.core.model.InboxCommand
+import org.railwaystations.rsapi.core.model.InboxEntry
 import org.railwaystations.rsapi.core.model.InboxResponse.InboxResponseState
+import org.railwaystations.rsapi.core.model.License
+import org.railwaystations.rsapi.core.model.Photo
+import org.railwaystations.rsapi.core.model.ProblemReport
+import org.railwaystations.rsapi.core.model.ProblemReportType
+import org.railwaystations.rsapi.core.model.Station
+import org.railwaystations.rsapi.core.model.User
 import org.railwaystations.rsapi.core.ports.inbound.ManageInboxUseCase
-import org.railwaystations.rsapi.core.ports.outbound.*
+import org.railwaystations.rsapi.core.ports.outbound.CountryPort
+import org.railwaystations.rsapi.core.ports.outbound.InboxPort
+import org.railwaystations.rsapi.core.ports.outbound.MastodonPort
+import org.railwaystations.rsapi.core.ports.outbound.MonitorPort
+import org.railwaystations.rsapi.core.ports.outbound.PhotoPort
+import org.railwaystations.rsapi.core.ports.outbound.PhotoStoragePort
+import org.railwaystations.rsapi.core.ports.outbound.StationPort
+import org.railwaystations.rsapi.core.ports.outbound.UserPort
 import java.io.IOException
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
 
-private val DE: Country = Country(
-    code = "de",
-    name = "Germany",
-    email = "email@example.com",
-)
-private val STATION_KEY_DE_1: Station.Key = Station.Key(DE.code, "1")
+private val STATION_KEY_DE_1: Station.Key = Station.Key(CountryTestFixtures.countryDe.code, "1")
 private const val INBOX_ENTRY1_ID: Long = 1
 private val PHOTOGRAPHER: User = User(
     id = 1,
@@ -79,7 +96,7 @@ internal class InboxServiceTest {
         )
 
         every { countryPort.findById(any()) } returns null
-        every { countryPort.findById(DE.code) } returns DE
+        every { countryPort.findById(CountryTestFixtures.countryDe.code) } returns CountryTestFixtures.countryDe
         every { inboxPort.findById(any()) } returns null
         every { inboxPort.done(any()) } returns Unit
         every { inboxPort.updatePhotoId(any(), any()) } returns Unit
@@ -339,7 +356,7 @@ internal class InboxServiceTest {
     }
 
     private fun createNewStationCommand1(): InboxCommand = createInboxCommand1().copy(
-        countryCode = DE.code,
+        countryCode = CountryTestFixtures.countryDe.code,
         stationId = NEW_STATION_ID,
         title = NEW_STATION_TITLE,
         coordinates = NEW_COORDINATES,
@@ -620,7 +637,7 @@ internal class InboxServiceTest {
 
         @Test
         fun reportWrongPhotoWithWrongPhotoId() {
-            val problemReport = createWrongPhotoProblemReport(0L)
+            val problemReport = createWrongPhotoProblemReport(0)
             whenStation1ExistsWithPhoto()
 
             val inboxResponse = inboxService.reportProblem(problemReport, createValidUser(), null)
@@ -840,23 +857,21 @@ internal class InboxServiceTest {
         }
     }
 
-    fun createCountryWithOverrideLicense(overrideLicense: License?): Country {
-        return Country(
+    fun createCountryWithOverrideLicense(overrideLicense: License?) =
+        Country(
             code = "xx",
             name = "XX",
-            email = "email@example.com",
+            _email = "email@example.com",
             timetableUrlTemplate = null,
             overrideLicense = overrideLicense,
         )
-    }
 
-    fun createValidUser(): User {
-        return User(
+    fun createValidUser() =
+        User(
             name = "name",
             license = License.CC0_10,
             email = "email@example.com",
             ownPhotos = true,
             emailVerification = EMAIL_VERIFIED,
         )
-    }
 }

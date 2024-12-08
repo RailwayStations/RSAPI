@@ -51,3 +51,4 @@ target
 /spring-boot-migrator.log
 /.run/RsapiApplication.run.xml
 /.kotlin/sessions/
+/db-migration/jooq-src/main/
