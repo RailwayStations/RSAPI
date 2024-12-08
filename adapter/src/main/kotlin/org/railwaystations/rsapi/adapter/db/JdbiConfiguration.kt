@@ -33,8 +33,4 @@ class JdbiConfiguration {
         return jdbi.onDemand(UserDao::class.java)
     }
 
-    @Bean
-    fun oAuth2AuthorizationDao(jdbi: Jdbi): OAuth2AuthorizationDao {
-        return jdbi.onDemand(OAuth2AuthorizationDao::class.java)
-    }
 }
