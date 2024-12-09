@@ -54,12 +54,34 @@ class UserAdapterTest : AbstractPostgreSqlTest() {
 
     @Test
     fun insert() {
-        TODO()
+        val id = sut.insert(UserTestFixtures.userJimKnopf, "key", "emailVerification")
+        val dbUser = sut.findById(id)
+        assertThat(dbUser).isEqualTo(
+            UserTestFixtures.userJimKnopf.copy(
+                id = id,
+                key = "key",
+                emailVerification = "emailVerification"
+            )
+        )
     }
 
     @Test
     fun update() {
-        TODO()
+        val originalUser = sut.findById(8)
+        val updateUser = originalUser!!.copy(
+            name = "updatedName",
+            url = "updatedUrl",
+            email = "updatedEmail",
+            ownPhotos = !originalUser.ownPhotos,
+            anonymous = !originalUser.anonymous,
+            sendNotifications = !originalUser.sendNotifications,
+            locale = Locale.CANADA,
+        )
+
+        sut.update(updateUser.id, updateUser)
+
+        val updatedUser = sut.findById(updateUser.id)
+        assertThat(updatedUser).isEqualTo(updateUser)
     }
 
     @Test
