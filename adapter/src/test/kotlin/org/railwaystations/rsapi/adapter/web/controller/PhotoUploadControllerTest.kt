@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.railwaystations.rsapi.adapter.db.CountryAdapter
-import org.railwaystations.rsapi.adapter.db.InboxDao
+import org.railwaystations.rsapi.adapter.db.InboxAdapter
 import org.railwaystations.rsapi.adapter.db.PhotoAdapter
 import org.railwaystations.rsapi.adapter.db.StationDao
 import org.railwaystations.rsapi.adapter.db.UserAdapter
@@ -87,7 +87,7 @@ internal class PhotoUploadControllerTest {
     private lateinit var workDir: WorkDir
 
     @MockkBean(relaxed = true)
-    private lateinit var inboxDao: InboxDao
+    private lateinit var inboxAdapter: InboxAdapter
 
     @MockkBean
     private lateinit var stationDao: StationDao
@@ -233,24 +233,24 @@ internal class PhotoUploadControllerTest {
                 UsernamePasswordAuthenticationToken("someuser@example.com", "secretUploadToken")
             )
         } returns UsernamePasswordAuthenticationToken("", "", listOf())
-        every { inboxDao.insert(any()) } returns 1L
+        every { inboxAdapter.insert(any()) } returns 1L
         val response = whenPostImageMultipartFormdata("someuser@example.com", "some_verification_token")
 
         assertThat(response).contains("UNAUTHORIZED")
         assertThat(response).contains("Profile incomplete, not allowed to upload photos")
-        verify(exactly = 0) { inboxDao.insert(any()) }
+        verify(exactly = 0) { inboxAdapter.insert(any()) }
         assertThat(monitor.getMessages().size).isEqualTo(0)
     }
 
     @Test
     fun postPhotoForExistingStationViaMultipartFormdata() {
         val uploadCaptor = slot<InboxEntry>()
-        every { inboxDao.insert(any()) } returns 1L
+        every { inboxAdapter.insert(any()) } returns 1L
         val response = whenPostImageMultipartFormdata("nickname@example.com", EMAIL_VERIFIED)
 
         assertThat(response).contains("REVIEW")
         assertFileWithContentExistsInInbox("image-content", "1.jpg")
-        verify { inboxDao.insert(capture(uploadCaptor)) }
+        verify { inboxAdapter.insert(capture(uploadCaptor)) }
         assertUpload(uploadCaptor.captured, "de", "4711", null, null)
 
         assertThat(monitor.getMessages()[0]).isEqualTo(
@@ -302,7 +302,7 @@ internal class PhotoUploadControllerTest {
     @Test
     fun repostMissingStationWithoutPhotoViaMultipartFormdata() {
         val uploadCaptor = slot<InboxEntry>()
-        every { inboxDao.insert(any()) } returns 1L
+        every { inboxAdapter.insert(any()) } returns 1L
         val response = mvc.perform(
             multipart("/photoUploadMultipartFormdata")
                 .file(MockMultipartFile("file", null, "application/octet-stream", null as ByteArray?))
@@ -321,7 +321,7 @@ internal class PhotoUploadControllerTest {
             .andReturn().response.contentAsString
 
         assertThat(response).contains("REVIEW")
-        verify { inboxDao.insert(capture(uploadCaptor)) }
+        verify { inboxAdapter.insert(capture(uploadCaptor)) }
         assertUpload(uploadCaptor.captured, "de", null, "Missing Station", Coordinates(10.0, 20.0))
 
         assertThat(monitor.getMessages()[0]).isEqualTo(
@@ -337,7 +337,7 @@ internal class PhotoUploadControllerTest {
     @Test
     fun uploadPhoto() {
         val uploadCaptor = slot<InboxEntry>()
-        every { inboxDao.insert(any()) } returns 1L
+        every { inboxAdapter.insert(any()) } returns 1L
 
         whenPostImage("@nick name", 42, "nickname@example.com", "4711", "de", null, null, null, "Some Comment")
             .andExpect(status().isAccepted())
@@ -347,7 +347,7 @@ internal class PhotoUploadControllerTest {
 
 
         assertFileWithContentExistsInInbox("image-content", "1.jpg")
-        verify { inboxDao.insert(capture(uploadCaptor)) }
+        verify { inboxAdapter.insert(capture(uploadCaptor)) }
         assertUpload(uploadCaptor.captured, "de", "4711", null, null)
         assertThat(monitor.getMessages()[0]).isEqualTo(
             """
@@ -383,7 +383,7 @@ internal class PhotoUploadControllerTest {
 
     @Test
     fun postMissingStation() {
-        every { inboxDao.insert(any()) } returns 4L
+        every { inboxAdapter.insert(any()) } returns 4L
         val uploadCaptor = slot<InboxEntry>()
 
         whenPostImage(
@@ -403,7 +403,7 @@ internal class PhotoUploadControllerTest {
             .andExpect(jsonPath("$.filename").value("4.jpg"))
 
         assertFileWithContentExistsInInbox(IMAGE_CONTENT, "4.jpg")
-        verify { inboxDao.insert(capture(uploadCaptor)) }
+        verify { inboxAdapter.insert(capture(uploadCaptor)) }
         assertUpload(uploadCaptor.captured, null, null, "Missing Station", Coordinates(50.9876, 9.1234))
 
         assertThat(monitor.getMessages()[0]).isEqualTo(
@@ -419,7 +419,7 @@ internal class PhotoUploadControllerTest {
 
     @Test
     fun postMissingStationWithoutPhoto() {
-        every { inboxDao.insert(any()) } returns 4L
+        every { inboxAdapter.insert(any()) } returns 4L
         val uploadCaptor = slot<InboxEntry>()
 
         whenPostPhotoUpload(
@@ -441,7 +441,7 @@ internal class PhotoUploadControllerTest {
             .andExpect(jsonPath("$.id").value(4))
             .andExpect(jsonPath("$.filename").doesNotExist())
 
-        verify { inboxDao.insert(capture(uploadCaptor)) }
+        verify { inboxAdapter.insert(capture(uploadCaptor)) }
         assertUpload(uploadCaptor.captured, "de", null, "Missing Station", Coordinates(50.9876, 9.1234))
 
         assertThat(monitor.getMessages()[0]).isEqualTo(
@@ -478,7 +478,7 @@ internal class PhotoUploadControllerTest {
 
     @Test
     fun postPhotoWithSomeUserWithTokenSalt() {
-        every { inboxDao.insert(any()) } returns 3L
+        every { inboxAdapter.insert(any()) } returns 3L
         whenPostImage("@someuser", 11, "someuser@example.com", "4711", "de", null, null, null, null)
             .andExpect(status().isAccepted())
             .andExpect(jsonPath("$.state").value("REVIEW"))
@@ -499,8 +499,8 @@ internal class PhotoUploadControllerTest {
 
     @Test
     fun postDuplicateInbox() {
-        every { inboxDao.insert(any()) } returns 2L
-        every { inboxDao.countPendingInboxEntriesForStation(null, "de", "4711") } returns 1
+        every { inboxAdapter.insert(any()) } returns 2L
+        every { inboxAdapter.countPendingInboxEntriesForStation(null, "de", "4711") } returns 1
 
         whenPostImage("@nick name", 42, "nickname@example.com", "4711", "de", null, null, null, null)
             .andExpect(status().isAccepted())
@@ -532,7 +532,7 @@ internal class PhotoUploadControllerTest {
 
     @Test
     fun postDuplicate() {
-        every { inboxDao.insert(any()) } returns 5L
+        every { inboxAdapter.insert(any()) } returns 5L
         whenPostImage("@nick name", 42, "nickname@example.com", "1234", "de", null, null, null, null)
             .andExpect(status().isAccepted())
             .andExpect(jsonPath("$.state").value("REVIEW"))

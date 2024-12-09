@@ -6,7 +6,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.railwaystations.rsapi.adapter.db.CountryAdapter
-import org.railwaystations.rsapi.adapter.db.InboxDao
+import org.railwaystations.rsapi.adapter.db.InboxAdapter
 import org.railwaystations.rsapi.adapter.db.PhotoAdapter
 import org.railwaystations.rsapi.adapter.db.StationDao
 import org.railwaystations.rsapi.adapter.db.UserAdapter
@@ -75,7 +75,7 @@ internal class InboxControllerIntegrationTest {
     private lateinit var clock: Clock
 
     @MockkBean
-    private lateinit var inboxDao: InboxDao
+    private lateinit var inboxAdapter: InboxAdapter
 
     @MockkBean
     private lateinit var stationDao: StationDao
@@ -117,10 +117,10 @@ internal class InboxControllerIntegrationTest {
     fun userInbox() {
         val user = userNickname
 
-        every { inboxDao.findById(1) } returns createInboxEntry(user, 1, "de", "4711", null, false)
-        every { inboxDao.findById(2) } returns createInboxEntry(user, 2, "de", "1234", null, true)
-        every { inboxDao.findById(3) } returns createInboxEntry(user, 3, "de", "5678", "rejected", true)
-        every { inboxDao.findById(4) } returns createInboxEntry(user, 4, "ch", "0815", null, false)
+        every { inboxAdapter.findById(1) } returns createInboxEntry(user, 1, "de", "4711", null, false)
+        every { inboxAdapter.findById(2) } returns createInboxEntry(user, 2, "de", "1234", null, true)
+        every { inboxAdapter.findById(3) } returns createInboxEntry(user, 3, "de", "5678", "rejected", true)
+        every { inboxAdapter.findById(4) } returns createInboxEntry(user, 4, "ch", "0815", null, false)
 
         val inboxStateQueries = """
                 [
@@ -173,7 +173,7 @@ internal class InboxControllerIntegrationTest {
     @Test
     fun postProblemReportOther() {
         every {
-            inboxDao.insert(
+            inboxAdapter.insert(
                 InboxEntry(
                     countryCode = "de",
                     stationId = "1234",
@@ -207,7 +207,7 @@ internal class InboxControllerIntegrationTest {
     @Test
     fun postProblemReportWrongLocation() {
         every {
-            inboxDao.insert(
+            inboxAdapter.insert(
                 InboxEntry(
                     countryCode = "de",
                     stationId = "1234",
@@ -242,7 +242,7 @@ internal class InboxControllerIntegrationTest {
     @Test
     fun postProblemReportWrongName() {
         every {
-            inboxDao.insert(
+            inboxAdapter.insert(
                 InboxEntry(
                     countryCode = "de",
                     stationId = "1234",
@@ -290,7 +290,7 @@ internal class InboxControllerIntegrationTest {
     @Test
     fun adminInbox() {
 
-        every { inboxDao.findPendingInboxEntries() } returns listOf(
+        every { inboxAdapter.findPendingInboxEntries() } returns listOf(
             createInboxEntry(userNickname, 1, "de", "4711", null, false),
         )
 

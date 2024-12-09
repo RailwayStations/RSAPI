@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import org.railwaystations.rsapi.adapter.db.InboxDao
+import org.railwaystations.rsapi.adapter.db.InboxAdapter
 import org.railwaystations.rsapi.core.model.InboxEntry
 import org.railwaystations.rsapi.core.ports.outbound.PhotoStoragePort
 import org.railwaystations.rsapi.core.utils.Logger
@@ -30,7 +30,7 @@ import java.time.temporal.ChronoUnit
 class WebDavSyncTask(
     private val config: WebDavSyncConfig,
     private val photoStoragePort: PhotoStoragePort,
-    private val inboxDao: InboxDao,
+    private val inboxAdapter: InboxAdapter,
 ) {
 
     private val log by Logger()
@@ -56,7 +56,7 @@ class WebDavSyncTask(
     @Scheduled(fixedRate = 60000)
     fun syncWebDav() {
         log.info("Starting WebDavSync")
-        val pendingInboxEntries: List<InboxEntry> = inboxDao.findPendingInboxEntries()
+        val pendingInboxEntries: List<InboxEntry> = inboxAdapter.findPendingInboxEntries()
         if (pendingInboxEntries.isEmpty()) {
             return  // nothing to do
         }

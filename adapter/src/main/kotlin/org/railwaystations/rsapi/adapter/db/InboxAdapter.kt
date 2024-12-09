@@ -9,11 +9,21 @@ import org.jdbi.v3.sqlobject.customizer.BindList
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys
 import org.jdbi.v3.sqlobject.statement.SqlQuery
 import org.jdbi.v3.sqlobject.statement.SqlUpdate
+import org.jooq.DSLContext
+import org.railwaystations.rsapi.adapter.db.jooq.tables.records.InboxRecord
+import org.railwaystations.rsapi.adapter.db.jooq.tables.records.PhotoRecord
+import org.railwaystations.rsapi.adapter.db.jooq.tables.records.StationRecord
+import org.railwaystations.rsapi.adapter.db.jooq.tables.records.UserRecord
+import org.railwaystations.rsapi.adapter.db.jooq.tables.references.InboxTable
+import org.railwaystations.rsapi.adapter.db.jooq.tables.references.PhotoTable
+import org.railwaystations.rsapi.adapter.db.jooq.tables.references.StationTable
+import org.railwaystations.rsapi.adapter.db.jooq.tables.references.UserTable
 import org.railwaystations.rsapi.core.model.Coordinates
 import org.railwaystations.rsapi.core.model.InboxEntry
 import org.railwaystations.rsapi.core.model.ProblemReportType
 import org.railwaystations.rsapi.core.model.PublicInboxEntry
 import org.railwaystations.rsapi.core.ports.outbound.InboxPort
+import org.springframework.stereotype.Component
 import java.sql.ResultSet
 import java.sql.SQLException
 
@@ -39,12 +49,66 @@ private const val ID: String = "id"
 private const val PHOTOGRAPHER_ID: String = "photographerId"
 private const val COORDS: String = "coords"
 
-interface InboxDao : InboxPort {
-    @SqlQuery("$JOIN_QUERY WHERE i.id = :id")
-    @RegisterRowMapper(
-        InboxEntryMapper::class
-    )
-    override fun findById(@Bind(ID) id: Long): InboxEntry?
+@Component
+class InboxAdapter(private val dsl: DSLContext) : InboxPort {
+
+    override fun findById(id: Long): InboxEntry? {
+        val result = dsl.select(InboxTable, StationTable, UserTable, PhotoTable)
+            .from(InboxTable)
+            .leftJoin(StationTable)
+            .on(StationTable.countrycode.eq(InboxTable.countrycode).and(StationTable.id.eq(InboxTable.stationid)))
+            .join(UserTable).on(UserTable.id.eq(InboxTable.photographerid))
+            .leftJoin(PhotoTable).on(
+                PhotoTable.countrycode.eq(InboxTable.countrycode)
+                    .and(
+                        PhotoTable.stationid.eq(InboxTable.stationid)
+                            .and(
+                                PhotoTable.id.eq(InboxTable.photoid)
+                                    .or(PhotoTable.primary.eq(true).and(InboxTable.photoid.isNull))
+                            )
+                    )
+            )
+            .where(InboxTable.id.eq(id))
+            .fetchOne()
+
+        return result?.let { it.component1().toInboxEntry(it.component2(), it.component3(), it.component4()) }
+    }
+
+    private fun InboxRecord.toInboxEntry(
+        stationRecord: StationRecord?,
+        userRecord: UserRecord,
+        photoRecord: PhotoRecord?
+    ): InboxEntry {
+        return InboxEntry(
+            id = id!!,
+            countryCode = countrycode,
+            stationId = stationid,
+            photoId = photoid,
+            title = stationRecord?.title,
+            newTitle = title,
+            coordinates = stationRecord?.let { Coordinates(it.lat, it.lon) },
+            newCoordinates = Coordinates(lat ?: 0.0, lon ?: 0.0),
+            photographerId = photographerid,
+            photographerNickname = userRecord.name,
+            photographerEmail = userRecord.email,
+            extension = extension,
+            comment = comment,
+            rejectReason = rejectreason,
+            createdAt = createdat,
+            done = done,
+            existingPhotoUrlPath = photoRecord?.urlpath,
+            crc32 = crc32,
+            conflict = TODO(),
+            problemReportType = problemreporttype?.let { ProblemReportType.valueOf(it) },
+            processed = false,
+            inboxUrl = null,
+            ds100 = null,
+            active = active,
+            createStation = null,
+            notified = notified,
+            posted = posted
+        )
+    }
 
     @SqlQuery("$JOIN_QUERY WHERE i.done = false ORDER BY id")
     @RegisterRowMapper(
