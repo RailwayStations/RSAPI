@@ -12,7 +12,7 @@ const val ROLE_USER: String = "ROLE_USER"
 const val ANONYM: String = "Anonym"
 
 data class User(
-    val id: Int = 0,
+    val id: Long = 0,
     val name: String,
     val url: String? = null,
     val license: License = License.UNKNOWN,

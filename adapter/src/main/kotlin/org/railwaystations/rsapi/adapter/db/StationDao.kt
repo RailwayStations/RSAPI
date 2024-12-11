@@ -32,10 +32,10 @@ private const val JOIN_QUERY: String = """
             SELECT s.countryCode, s.id, s.DS100, s.title, s.lat, s.lon, s.active,
                     p.id AS photoId, p.primary, p.urlPath, p.license, p.createdAt, p.outdated, u.id AS photographerId,
                     u.name, u.url AS photographerUrl, u.license AS photographerLicense, u.anonymous
-            FROM countries c
-                LEFT JOIN stations s ON c.id = s.countryCode
-                LEFT JOIN photos p ON p.countryCode = s.countryCode AND p.stationId = s.id AND p.primary = true
-                LEFT JOIN users u ON u.id = p.photographerId
+            FROM country c
+                LEFT JOIN station s ON c.id = s.countryCode
+                LEFT JOIN photo p ON p.countryCode = s.countryCode AND p.stationId = s.id AND p.primary = true
+                LEFT JOIN "user" u ON u.id = p.photographerId
             
             """
 
@@ -55,9 +55,9 @@ interface StationDao : StationPort {
             SELECT s.countryCode, s.id, s.DS100, s.title, s.lat, s.lon, s.active,
                     p.id AS photoId, p.primary, p.urlPath, p.license, p.createdAt, p.outdated, u.id AS photographerId,
                     u.name, u.url AS photographerUrl, u.license AS photographerLicense, u.anonymous
-            FROM stations s
-                LEFT JOIN photos p ON p.countryCode = s.countryCode AND p.stationId = s.id
-                LEFT JOIN users u ON u.id = p.photographerId
+            FROM station s
+                LEFT JOIN photo p ON p.countryCode = s.countryCode AND p.stationId = s.id
+                LEFT JOIN "user" u ON u.id = p.photographerId
             WHERE s.countryCode = :countryCode AND s.id = :id
             
             """
@@ -74,9 +74,9 @@ interface StationDao : StationPort {
             SELECT s.countryCode, s.id, s.DS100, s.title, s.lat, s.lon, s.active,
                     p.id AS photoId, p.primary, p.urlPath, p.license, p.createdAt, p.outdated, u.id AS photographerId,
                     u.name, u.url AS photographerUrl, u.license AS photographerLicense, u.anonymous
-            FROM stations s
-                LEFT JOIN photos p ON p.countryCode = s.countryCode AND p.stationId = s.id
-                LEFT JOIN users u ON u.id = p.photographerId
+            FROM station s
+                LEFT JOIN photo p ON p.countryCode = s.countryCode AND p.stationId = s.id
+                LEFT JOIN "user" u ON u.id = p.photographerId
             WHERE (:countryCode IS NULL OR s.countryCode = :countryCode) AND ((u.name = :photographer AND u.anonymous = false) OR (u.anonymous = true AND :photographer = 'Anonym'))
             
             """
@@ -96,9 +96,9 @@ interface StationDao : StationPort {
             SELECT s.countryCode, s.id, s.DS100, s.title, s.lat, s.lon, s.active,
                     p.id AS photoId, p.primary, p.urlPath, p.license, p.createdAt, p.outdated, u.id AS photographerId,
                     u.name, u.url AS photographerUrl, u.license AS photographerLicense, u.anonymous
-            FROM stations s
-                LEFT JOIN photos p ON p.countryCode = s.countryCode AND p.stationId = s.id
-                LEFT JOIN users u ON u.id = p.photographerId
+            FROM station s
+                LEFT JOIN photo p ON p.countryCode = s.countryCode AND p.stationId = s.id
+                LEFT JOIN "user" u ON u.id = p.photographerId
             WHERE createdAt > :since
             
             """
@@ -171,7 +171,7 @@ interface StationDao : StationPort {
                 primary = rs.getBoolean("primary"),
                 urlPath = photoUrlPath,
                 photographer = User(
-                    id = rs.getInt("photographerId"),
+                    id = rs.getLong("photographerId"),
                     name = rs.getString("name"),
                     url = rs.getString("photographerUrl"),
                     license = rs.getString("photographerLicense").nameToLicense(),
@@ -196,8 +196,8 @@ interface StationDao : StationPort {
     @SqlQuery(
         """
             SELECT :countryCode countryCode, COUNT(*) stations, COUNT(p.urlPath) photos, COUNT(distinct p.photographerId) photographers
-            FROM stations s
-                LEFT JOIN photos p ON p.countryCode = s.countryCode AND p.stationId = s.id AND p.primary = true
+            FROM station s
+                LEFT JOIN photo p ON p.countryCode = s.countryCode AND p.stationId = s.id AND p.primary = true
             WHERE s.countryCode = :countryCode OR :countryCode IS NULL
             """
     )
@@ -208,9 +208,9 @@ interface StationDao : StationPort {
     @SqlQuery(
         """
             SELECT u.name photographer, COUNT(*) photocount
-            FROM stations s
-                JOIN photos p ON p.countryCode = s.countryCode AND p.stationId = s.id AND p.primary = true
-                JOIN users u ON u.id = p.photographerId
+            FROM station s
+                JOIN photo p ON p.countryCode = s.countryCode AND p.stationId = s.id AND p.primary = true
+                JOIN "user" u ON u.id = p.photographerId
             WHERE s.countryCode = :countryCode OR :countryCode IS NULL
             GROUP BY u.name
             ORDER BY COUNT(*) DESC
@@ -220,28 +220,28 @@ interface StationDao : StationPort {
     @ValueColumn("photocount")
     override fun getPhotographerMap(@Bind("countryCode") countryCode: String?): Map<String, Long>
 
-    @SqlUpdate("INSERT INTO stations (countryCode, id, title, lat, lon, ds100, active) VALUES (:key.country, :key.id, :title, :coordinates?.lat, :coordinates?.lon, :ds100, :active)")
+    @SqlUpdate("INSERT INTO station (countryCode, id, title, lat, lon, ds100, active) VALUES (:key.country, :key.id, :title, :coordinates?.lat, :coordinates?.lon, :ds100, :active)")
     override fun insert(@BindBean station: Station)
 
-    @SqlUpdate("DELETE FROM stations WHERE countryCode = :country AND id = :id")
+    @SqlUpdate("DELETE FROM station WHERE countryCode = :country AND id = :id")
     override fun delete(@BindBean key: Station.Key)
 
-    @SqlUpdate("UPDATE stations SET active = :active WHERE countryCode = :key.country AND id = :key.id")
+    @SqlUpdate("UPDATE station SET active = :active WHERE countryCode = :key.country AND id = :key.id")
     override fun updateActive(@BindBean("key") key: Station.Key, @Bind("active") active: Boolean)
 
     /**
      * Count nearby stations using simple pythagoras (only valid for a few km)
      */
-    @SqlQuery("SELECT COUNT(*) FROM stations WHERE SQRT(POWER(71.5 * (lon - :lon),2) + POWER(111.3 * (lat - :lat),2)) < 0.5")
+    @SqlQuery("SELECT COUNT(*) FROM station WHERE SQRT(POWER(71.5 * (lon - :lon),2) + POWER(111.3 * (lat - :lat),2)) < 0.5")
     override fun countNearbyCoordinates(@BindBean coordinates: Coordinates): Int
 
-    @get:SqlQuery("SELECT MAX(CAST(substring(id,2) AS INT)) FROM stations WHERE id LIKE 'Z%'")
+    @get:SqlQuery("SELECT MAX(CAST(substring(id,2) AS INT)) FROM station WHERE id LIKE 'Z%'")
     override val maxZ: Int
 
-    @SqlUpdate("UPDATE stations SET title = :new_title WHERE countryCode = :key.country AND id = :key.id")
+    @SqlUpdate("UPDATE station SET title = :new_title WHERE countryCode = :key.country AND id = :key.id")
     override fun changeStationTitle(@BindBean("key") key: Station.Key, @Bind("new_title") newTitle: String)
 
-    @SqlUpdate("UPDATE stations SET lat = :coords.lat, lon = :coords.lon WHERE countryCode = :key.country AND id = :key.id")
+    @SqlUpdate("UPDATE station SET lat = :coords.lat, lon = :coords.lon WHERE countryCode = :key.country AND id = :key.id")
     override fun updateLocation(@BindBean("key") key: Station.Key, @BindBean("coords") coordinates: Coordinates)
 
     @SqlQuery(
@@ -249,9 +249,9 @@ interface StationDao : StationPort {
             SELECT s.countryCode, s.id, s.DS100, s.title, s.lat, s.lon, s.active,
                     p.id AS photoId, p.primary, p.urlPath, p.license, p.createdAt, p.outdated, u.id AS photographerId,
                     u.name, u.url AS photographerUrl, u.license AS photographerLicense, u.anonymous
-            FROM stations s
-                JOIN photos p ON p.countryCode = s.countryCode AND p.stationId = s.id
-                JOIN users u ON u.id = p.photographerId
+            FROM station s
+                JOIN photo p ON p.countryCode = s.countryCode AND p.stationId = s.id
+                JOIN "user" u ON u.id = p.photographerId
             WHERE p.id = :photoId
             """
     )
@@ -276,7 +276,7 @@ interface StationDao : StationPort {
                             primary = rs.getBoolean("primary"),
                             urlPath = photoUrlPath,
                             photographer = User(
-                                id = rs.getInt("photographerId"),
+                                id = rs.getLong("photographerId"),
                                 name = rs.getString("name"),
                                 url = rs.getString("photographerUrl"),
                                 license = rs.getString("photographerLicense").nameToLicense(),

@@ -13,7 +13,7 @@ interface InboxPort {
     fun reject(id: Long, rejectReason: String)
     fun done(id: Long)
     fun countPendingInboxEntriesForStation(id: Long?, countryCode: String, stationId: String): Int
-    fun countPendingInboxEntries(): Long
+    fun countPendingInboxEntries(): Int
     fun countPendingInboxEntriesForNearbyCoordinates(id: Long?, coordinates: Coordinates): Int
     fun updateCrc32(id: Long, crc32: Long)
     fun findInboxEntriesToNotify(): List<InboxEntry>
@@ -21,6 +21,6 @@ interface InboxPort {
     fun updatePosted(id: Long)
     fun updatePhotoId(id: Long, photoId: Long)
     fun updateMissingStationImported(id: Long, countryCode: String, stationId: String, title: String)
-    fun findByUser(photographerId: Int, showCompletedEntries: Boolean): List<InboxEntry>
+    fun findByUser(photographerId: Long, showCompletedEntries: Boolean): List<InboxEntry>
     fun findPendingByStation(countryCode: String, stationId: String): List<InboxEntry>
 }

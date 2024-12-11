@@ -29,7 +29,7 @@ import io.mockk.mockk
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.railwaystations.rsapi.adapter.db.InboxDao
+import org.railwaystations.rsapi.adapter.db.InboxAdapter
 import org.railwaystations.rsapi.core.model.InboxEntry
 import org.railwaystations.rsapi.core.ports.outbound.PhotoStoragePort
 import java.nio.charset.StandardCharsets
@@ -49,14 +49,14 @@ const val PROPFIND_METHOD: String = "PROPFIND"
 internal class WebDavSyncTaskTest {
     private lateinit var tempdir: Path
     private lateinit var photoStoragePort: PhotoStoragePort
-    private lateinit var inboxDao: InboxDao
+    private lateinit var inboxAdapter: InboxAdapter
 
     @BeforeEach
     fun setup() {
         tempdir = Files.createTempDirectory("rsapi")
         photoStoragePort = mockk<PhotoStoragePort>()
-        inboxDao = mockk<InboxDao>()
-        every { inboxDao.findPendingInboxEntries() } returns listOf(createInboxEntry())
+        inboxAdapter = mockk<InboxAdapter>()
+        every { inboxAdapter.findPendingInboxEntries() } returns listOf(createInboxEntry())
     }
 
     @Test
@@ -253,7 +253,7 @@ internal class WebDavSyncTaskTest {
             toProcessUrl = wmRuntimeInfo.httpBaseUrl + TO_PROCESS_PATH,
             processedUrl = wmRuntimeInfo.httpBaseUrl + PROCESSED_PATH, user = USERNAME, password = PASSWORD
         )
-        return WebDavSyncTask(config, photoStoragePort, inboxDao)
+        return WebDavSyncTask(config, photoStoragePort, inboxAdapter)
     }
 
     private fun createInboxEntry(): InboxEntry {
