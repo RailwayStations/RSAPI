@@ -19,11 +19,6 @@ class JdbiConfiguration {
     }
 
     @Bean
-    fun inboxDao(jdbi: Jdbi): InboxAdapter {
-        return jdbi.onDemand(InboxAdapter::class.java)
-    }
-
-    @Bean
     fun stationDao(jdbi: Jdbi): StationDao {
         return jdbi.onDemand(StationDao::class.java)
     }

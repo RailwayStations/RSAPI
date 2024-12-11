@@ -17,7 +17,7 @@ data class InboxEntry(
     val extension: String? = null,
     val comment: String? = null,
     val rejectReason: String? = null,
-    val createdAt: Instant? = null,
+    val createdAt: Instant = Instant.now(),
     val done: Boolean = false,
     val existingPhotoUrlPath: String? = null,
     val crc32: Long? = null,

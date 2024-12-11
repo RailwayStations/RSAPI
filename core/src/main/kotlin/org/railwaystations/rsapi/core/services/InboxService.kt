@@ -158,12 +158,14 @@ class InboxService(
         InboxState.REVIEW
     }
 
-    override fun listAdminInbox(user: User): List<InboxEntry> =
-        inboxPort.findPendingInboxEntries().map(::updateInboxEntry)
+    override fun listAdminInbox(user: User): List<InboxEntry> {
+        val pendingInboxEntries = inboxPort.findPendingInboxEntries()
+        return pendingInboxEntries.map { updateInboxEntry(it, pendingInboxEntries) }
+    }
 
-    private fun updateInboxEntry(inboxEntry: InboxEntry): InboxEntry {
+    private fun updateInboxEntry(inboxEntry: InboxEntry, pendingInboxEntries: List<InboxEntry>): InboxEntry {
         val filename = inboxEntry.filename
-        val processed = filename?.let { photoStoragePort.isProcessed(it) } ?: false
+        val processed = filename?.let { photoStoragePort.isProcessed(it) } == true
         val inboxUrl = if (filename != null) {
             getInboxUrl(inboxEntry.filename, inboxEntry.done, inboxEntry.rejectReason, processed)
         } else if (inboxEntry.hasPhoto) {
@@ -174,7 +176,7 @@ class InboxService(
         val conflict = if (inboxEntry.stationId == null && !inboxEntry.newCoordinates!!.hasZeroCoords) {
             hasConflict(inboxEntry.id, inboxEntry.newCoordinates)
         } else {
-            inboxEntry.conflict
+            pendingInboxEntries.hasOtherEntryForSameStation(inboxEntry)
         }
 
         return inboxEntry.copy(
@@ -183,6 +185,9 @@ class InboxService(
             conflict = conflict,
         )
     }
+
+    private fun List<InboxEntry>.hasOtherEntryForSameStation(inboxEntry: InboxEntry) =
+        any { it.id != inboxEntry.id && it.countryCode == inboxEntry.countryCode && it.stationId == inboxEntry.stationId }
 
     private fun getInboxUrl(filename: String?, done: Boolean, rejectReason: String?, processed: Boolean): String? {
         if (filename == null) {
@@ -226,7 +231,7 @@ class InboxService(
         inboxPort.done(inboxEntry.id)
     }
 
-    override fun countPendingInboxEntries(): Long {
+    override fun countPendingInboxEntries(): Int {
         return inboxPort.countPendingInboxEntries()
     }
 
@@ -611,10 +616,8 @@ class InboxService(
         if (coordinates == null || coordinates.hasZeroCoords) {
             return false
         }
-        return inboxPort.countPendingInboxEntriesForNearbyCoordinates(
-            id,
-            coordinates
-        ) > 0 || stationPort.countNearbyCoordinates(coordinates) > 0
+        return inboxPort.countPendingInboxEntriesForNearbyCoordinates(id, coordinates) > 0
+                || stationPort.countNearbyCoordinates(coordinates) > 0
     }
 
     private fun findStationByCountryAndId(countryCode: String?, stationId: String?): Station? {

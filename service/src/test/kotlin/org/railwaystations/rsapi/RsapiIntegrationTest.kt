@@ -543,8 +543,7 @@ internal class RsapiIntegrationTest : AbstractPostgreSqlTest() {
         val userInboxProcessedJson = loadUser10UserInboxAsJson()[0]
         assertThat(userInboxProcessedJson["id"].asInt()).isEqualTo(uploadId)
         assertThat(userInboxProcessedJson["state"].asText()).isEqualTo("REVIEW")
-        assertThat(userInboxProcessedJson["inboxUrl"].asText().endsWith("/inbox/processed/$filename"))
-            .isTrue()
+        assertThat(userInboxProcessedJson["inboxUrl"].asText().endsWith("/inbox/processed/$filename")).isTrue()
 
         // send import command
         sendInboxCommand(

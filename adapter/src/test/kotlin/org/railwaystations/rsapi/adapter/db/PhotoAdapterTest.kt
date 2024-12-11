@@ -105,7 +105,7 @@ class PhotoAdapterTest : AbstractPostgreSqlTest() {
         val key = Station.Key("ch", "8503007")
         val primaryCount = dsl.selectCount().from(PhotoTable).where(
             PhotoTable.countrycode.eq(key.country).and(PhotoTable.stationid.eq(key.id).and(PhotoTable.primary.eq(true)))
-        )
+        ).fetchSingle().component1()
         assertThat(primaryCount).isNotEqualTo(0)
 
         sut.setAllPhotosForStationSecondary(key)

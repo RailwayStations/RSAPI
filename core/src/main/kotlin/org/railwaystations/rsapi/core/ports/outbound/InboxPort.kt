@@ -13,7 +13,7 @@ interface InboxPort {
     fun reject(id: Long, rejectReason: String)
     fun done(id: Long)
     fun countPendingInboxEntriesForStation(id: Long?, countryCode: String, stationId: String): Int
-    fun countPendingInboxEntries(): Long
+    fun countPendingInboxEntries(): Int
     fun countPendingInboxEntriesForNearbyCoordinates(id: Long?, coordinates: Coordinates): Int
     fun updateCrc32(id: Long, crc32: Long)
     fun findInboxEntriesToNotify(): List<InboxEntry>
