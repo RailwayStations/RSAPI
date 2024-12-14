@@ -114,7 +114,7 @@ class InboxAdapter(private val dsl: DSLContext) : InboxPort {
             .where(InboxTable.done.eq(false).and(InboxTable.problemreporttype.isNull))
             .fetch()
 
-        return result.map { it.component1().toPublicInboxEntry(it.component2()) }
+        return result.map { it.value1().toPublicInboxEntry(it.value2()) }
     }
 
     private fun InboxRecord.toPublicInboxEntry(stationRecord: StationRecord?) =
@@ -194,7 +194,7 @@ class InboxAdapter(private val dsl: DSLContext) : InboxPort {
             .from(InboxTable)
             .where(
                 InboxTable.done.eq(false)
-                    .and(id?.let { InboxTable.id.ne(id) })
+                    .and(InboxTable.id.ne(id).or(value(id).isNull))
                     .and(
                         sqrt(
                             power(value(71.5).mul(InboxTable.lon.minus(coordinates.lon)), 2)
@@ -253,13 +253,13 @@ class InboxAdapter(private val dsl: DSLContext) : InboxPort {
             .execute()
     }
 
-    override fun findByUser(photographerId: Long, showCompletedEntries: Boolean) =
+    override fun findByUser(photographerId: Long, includeCompletedEntries: Boolean) =
         selectInboxEntries()
             .where(
                 InboxTable.photographerid.eq(photographerId)
-                    .and(InboxTable.done.eq(false).or(value(showCompletedEntries).eq(true)))
+                    .and(InboxTable.done.eq(false).or(value(includeCompletedEntries).eq(true)))
             )
-            .orderBy<Long?>(InboxTable.id.desc())
+            .orderBy(InboxTable.id.desc())
             .fetch().map { it.toInboxEntry() }
 
     override fun findPendingByStation(countryCode: String, stationId: String) =
