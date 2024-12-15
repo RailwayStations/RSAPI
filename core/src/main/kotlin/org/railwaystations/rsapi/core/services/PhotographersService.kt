@@ -11,7 +11,7 @@ class PhotographersService(
     private val countryPort: CountryPort,
 ) : LoadPhotographersUseCase {
 
-    override fun getPhotographersPhotocountMap(country: String?): Map<String, Long> {
+    override fun getPhotographersPhotocountMap(country: String?): Map<String, Int> {
         require(!(country != null && countryPort.findById(country) == null)) { "Country $country does not exist" }
         return stationPort.getPhotographerMap(country)
     }

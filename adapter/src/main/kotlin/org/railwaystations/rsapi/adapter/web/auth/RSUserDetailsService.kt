@@ -1,6 +1,6 @@
 package org.railwaystations.rsapi.adapter.web.auth
 
-import org.railwaystations.rsapi.adapter.db.UserDao
+import org.railwaystations.rsapi.adapter.db.UserAdapter
 import org.railwaystations.rsapi.core.model.EMAIL_VERIFIED
 import org.railwaystations.rsapi.core.model.User
 import org.railwaystations.rsapi.core.model.normalizeEmail
@@ -10,12 +10,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
 
 @Service
-class RSUserDetailsService(private val userDao: UserDao) : UserDetailsService {
+class RSUserDetailsService(private val userAdapter: UserAdapter) : UserDetailsService {
 
     @Throws(UsernameNotFoundException::class)
     override fun loadUserByUsername(username: String): AuthUser {
-        val user = userDao.findByEmail(normalizeEmail(username))
-            ?: userDao.findByName(username)
+        val user = userAdapter.findByEmail(normalizeEmail(username))
+            ?: userAdapter.findByName(username)
 
         if (user == null) {
             throw UsernameNotFoundException("User '$username' not found")
@@ -27,7 +27,7 @@ class RSUserDetailsService(private val userDao: UserDao) : UserDetailsService {
 
     fun updateEmailVerification(user: User?) {
         if (user!!.isEmailVerifiedWithNextLogin) {
-            userDao.updateEmailVerification(user.id, EMAIL_VERIFIED)
+            userAdapter.updateEmailVerification(user.id, EMAIL_VERIFIED)
         }
     }
 }
