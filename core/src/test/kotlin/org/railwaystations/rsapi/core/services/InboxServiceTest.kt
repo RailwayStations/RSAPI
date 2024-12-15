@@ -391,7 +391,7 @@ internal class InboxServiceTest {
             )
             every { inboxPort.findById(INBOX_ENTRY1_ID) } returns inboxEntry
             every { stationPort.findByKey(STATION_KEY_DE_1.country, command.stationId!!) } returns null
-            every { stationPort.maxZ } returns 1024
+            every { stationPort.maxZ() } returns 1024
             val newStation = createNewStationByCommand(command, "Z1025")
             every { photoPort.insert(capture(photoCaptor)) } returns IMPORTED_PHOTO_ID
             every { photoStoragePort.importPhoto(inboxEntry, newStation) } returns IMPORTED_PHOTO_URL_PATH
@@ -422,7 +422,7 @@ internal class InboxServiceTest {
             )
             every { inboxPort.findById(INBOX_ENTRY1_ID) } returns inboxEntry
             every { stationPort.findByKey(STATION_KEY_DE_1.country, command.stationId!!) } returns null
-            every { stationPort.maxZ } returns 4711
+            every { stationPort.maxZ() } returns 4711
             val newStation = createNewStationByCommand(command, "Z4712")
 
             inboxService.importMissingStation(command)

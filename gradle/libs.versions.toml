@@ -4,7 +4,6 @@ springDependency = "1.1.6"
 springOauth2AuthorizationServer = "1.4.0"
 openapiGenerator = "7.10.0"
 kotlin = "2.1.0"
-jdbi = "3.47.0"
 swaggerRequestValidator = "2.44.1"
 lazysodium = "5.1.4"
 jna = "5.15.0"
@@ -23,9 +22,6 @@ jooqPlugin = "9.0"
 postgresql = "42.7.4"
 
 [libraries]
-jdbi3-spring5 = { group = "org.jdbi", name = "jdbi3-spring5", version.ref = "jdbi" }
-jdbi3-kotlin = { group = "org.jdbi", name = "jdbi3-kotlin", version.ref = "jdbi" }
-jdbi3-kotlin-sqlobject = { group = "org.jdbi", name = "jdbi3-kotlin-sqlobject", version.ref = "jdbi" }
 swagger-request-validator-core = { group = "com.atlassian.oai", name = "swagger-request-validator-core", version.ref = "swaggerRequestValidator" }
 swagger-request-validator-spring-webmvc = { group = "com.atlassian.oai", name = "swagger-request-validator-spring-webmvc", version.ref = "swaggerRequestValidator" }
 swagger-request-validator-mockmvc = { group = "com.atlassian.oai", name = "swagger-request-validator-mockmvc", version.ref = "swaggerRequestValidator" }

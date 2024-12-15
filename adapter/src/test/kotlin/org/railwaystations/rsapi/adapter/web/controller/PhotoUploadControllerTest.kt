@@ -13,7 +13,7 @@ import org.junit.jupiter.params.provider.CsvSource
 import org.railwaystations.rsapi.adapter.db.CountryAdapter
 import org.railwaystations.rsapi.adapter.db.InboxAdapter
 import org.railwaystations.rsapi.adapter.db.PhotoAdapter
-import org.railwaystations.rsapi.adapter.db.StationDao
+import org.railwaystations.rsapi.adapter.db.StationAdapter
 import org.railwaystations.rsapi.adapter.db.UserAdapter
 import org.railwaystations.rsapi.adapter.monitoring.FakeMonitor
 import org.railwaystations.rsapi.adapter.photostorage.PhotoFileStorage
@@ -90,7 +90,7 @@ internal class PhotoUploadControllerTest {
     private lateinit var inboxAdapter: InboxAdapter
 
     @MockkBean
-    private lateinit var stationDao: StationDao
+    private lateinit var stationAdapter: StationAdapter
 
     @MockkBean(relaxed = true)
     private lateinit var authenticator: RSAuthenticationProvider
@@ -120,9 +120,9 @@ internal class PhotoUploadControllerTest {
         val station1234 =
             createStationWithDs100(key1234, Coordinates(40.1, 7.0), "LAL", createPhoto(key1234, userJimKnopf))
 
-        every { stationDao.findByKey(key4711.country, key4711.id) } returns station4711
-        every { stationDao.findByKey(key1234.country, key1234.id) } returns station1234
-        every { stationDao.countNearbyCoordinates(any()) } returns 0
+        every { stationAdapter.findByKey(key4711.country, key4711.id) } returns station4711
+        every { stationAdapter.findByKey(key1234.country, key1234.id) } returns station1234
+        every { stationAdapter.countNearbyCoordinates(any()) } returns 0
 
         monitor.reset()
     }
@@ -562,7 +562,7 @@ internal class PhotoUploadControllerTest {
 
     @Test
     fun postInvalidCountry() {
-        every { stationDao.findByKey(eq("xy"), any()) } returns null
+        every { stationAdapter.findByKey(eq("xy"), any()) } returns null
 
         whenPostImage("nickname", 42, "nickname@example.com", "4711", "xy", null, null, null, null)
             .andExpect(status().isBadRequest())

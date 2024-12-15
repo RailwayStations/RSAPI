@@ -435,7 +435,7 @@ class InboxService(
         requireNotNull(command.active) { "No Active flag provided" }
 
         val newStation = Station(
-            key = Station.Key(country.code, "Z${stationPort.maxZ + 1}"),
+            key = Station.Key(country.code, "Z${stationPort.maxZ() + 1}"),
             title = command.title,
             coordinates = command.coordinates,
             ds100 = command.ds100,

@@ -5,7 +5,7 @@ import io.mockk.every
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.railwaystations.rsapi.adapter.db.CountryAdapter
-import org.railwaystations.rsapi.adapter.db.StationDao
+import org.railwaystations.rsapi.adapter.db.StationAdapter
 import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
 import org.railwaystations.rsapi.adapter.web.OpenApiValidatorUtil.validOpenApiResponse
 import org.railwaystations.rsapi.core.model.CountryTestFixtures
@@ -28,7 +28,7 @@ internal class StatisticControllerTest {
     private lateinit var mvc: MockMvc
 
     @MockkBean
-    private lateinit var stationDao: StationDao
+    private lateinit var stationAdapter: StationAdapter
 
     @MockkBean
     private lateinit var countryAdapter: CountryAdapter
@@ -47,7 +47,7 @@ internal class StatisticControllerTest {
 
     @Test
     fun getOverallStatistic() {
-        every { stationDao.getStatistic(null) } returns Statistic(null, 954, 91, 6)
+        every { stationAdapter.getStatistic(null) } returns Statistic(null, 954, 91, 6)
 
         mvc.perform(get("/stats"))
             .andExpect(status().isOk())
@@ -61,7 +61,7 @@ internal class StatisticControllerTest {
 
     @Test
     fun getStatisticForCountryDe() {
-        every { stationDao.getStatistic("de") } returns Statistic("de", 729, 84, 4)
+        every { stationAdapter.getStatistic("de") } returns Statistic("de", 729, 84, 4)
 
         mvc.perform(get("/stats?country=de"))
             .andExpect(status().isOk())
