@@ -624,7 +624,7 @@ class InboxService(
         if (countryCode == null || stationId == null) {
             return null
         }
-        return stationPort.findByKey(countryCode, stationId)
+        return stationPort.findByKey(Station.Key(countryCode, stationId))
     }
 
 }

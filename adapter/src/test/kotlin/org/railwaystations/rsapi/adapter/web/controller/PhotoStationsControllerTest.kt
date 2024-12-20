@@ -7,7 +7,6 @@ import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
 import org.railwaystations.rsapi.adapter.web.OpenApiValidatorUtil.validOpenApiResponse
 import org.railwaystations.rsapi.core.model.Coordinates
 import org.railwaystations.rsapi.core.model.License
-import org.railwaystations.rsapi.core.model.Photo
 import org.railwaystations.rsapi.core.model.PhotoTestFixtures
 import org.railwaystations.rsapi.core.model.Station
 import org.railwaystations.rsapi.core.model.StationTestFixtures.createStation
@@ -36,9 +35,9 @@ internal class PhotoStationsControllerTest {
 
     @Test
     fun getPhotoStationsByCountry() {
-        val stationXY1 = createStationXY1()
-        val stationXY5 = createStationXY5().copy(
-            photos = listOf(createPhotoXY5())
+        val stationXY1 = stationXY1
+        val stationXY5 = stationXY5.copy(
+            photos = listOf(photoXY5)
         )
         every { photoStationsService.findByCountry(setOf("xy"), null, null) } returns setOf(stationXY1, stationXY5)
 
@@ -75,7 +74,7 @@ internal class PhotoStationsControllerTest {
             )
             .andExpect(
                 jsonPath("$.stations[?(@.id == '5')].photos[0].createdAt")
-                    .value(CREATED_AT.toEpochMilli())
+                    .value(createdAt.toEpochMilli())
             )
             .andExpect(
                 jsonPath("$.stations[?(@.id == '5')].photos[0].outdated").doesNotExist()
@@ -93,7 +92,7 @@ internal class PhotoStationsControllerTest {
 
     @Test
     fun getPhotoStationsByCountryWithIsActiveFilter() {
-        every { photoStationsService.findByCountry(setOf("xy"), null, false) } returns setOf(createStationXY1())
+        every { photoStationsService.findByCountry(setOf("xy"), null, false) } returns setOf(stationXY1)
 
         mvc.perform(get("/photoStationsByCountry/xy?isActive=false"))
             .andExpect(status().isOk())
@@ -114,8 +113,8 @@ internal class PhotoStationsControllerTest {
 
     @Test
     fun getPhotoStationsByCountryWithHasPhotoFilter() {
-        val stationXY5 = createStationXY5().copy(
-            photos = listOf(createPhotoXY5())
+        val stationXY5 = stationXY5.copy(
+            photos = listOf(photoXY5)
         )
         every { photoStationsService.findByCountry(setOf("xy"), true, null) } returns setOf(stationXY5)
 
@@ -145,7 +144,7 @@ internal class PhotoStationsControllerTest {
             .andExpect(jsonPath("$.stations[0].photos[0].path").value("/xy/5.jpg"))
             .andExpect(jsonPath("$.stations[0].photos[0].license").value("CC0_10"))
             .andExpect(
-                jsonPath("$.stations[0].photos[0].createdAt").value(CREATED_AT.toEpochMilli())
+                jsonPath("$.stations[0].photos[0].createdAt").value(createdAt.toEpochMilli())
             )
             .andExpect(jsonPath("$.stations[0].photos[0].outdated").doesNotExist())
             .andExpect(jsonPath("$.stations[0].photos[1]").doesNotExist())
@@ -167,7 +166,7 @@ internal class PhotoStationsControllerTest {
 
     @Test
     fun getPhotoStationByIdOfInactiveStationWithoutPhotos() {
-        every { photoStationsService.findByCountryAndId("xy", "1") } returns createStationXY1()
+        every { photoStationsService.findByKey(stationXY1.key) } returns stationXY1
 
         mvc.perform(get("/photoStationById/xy/1"))
             .andExpect(status().isOk())
@@ -188,10 +187,10 @@ internal class PhotoStationsControllerTest {
 
     @Test
     fun getPhotoStationByIdOfActiveStationWithTwoPhotos() {
-        val stationAB3 = createStationAB3().copy(
-            photos = listOf(createPhotoAB3_1(), createPhotoAB3_2())
+        val stationAB3 = stationAB3.copy(
+            photos = listOf(photoAB3_1, photoAB3_2)
         )
-        every { photoStationsService.findByCountryAndId("ab", "3") } returns stationAB3
+        every { photoStationsService.findByKey(stationAB3.key) } returns stationAB3
 
         mvc.perform(get("/photoStationById/ab/3"))
             .andExpect(status().isOk())
@@ -225,7 +224,7 @@ internal class PhotoStationsControllerTest {
             .andExpect(jsonPath("$.stations[0].photos[0].path").value("/ab/3_2.jpg"))
             .andExpect(jsonPath("$.stations[0].photos[0].license").value("CC0_10"))
             .andExpect(
-                jsonPath("$.stations[0].photos[0].createdAt").value(CREATED_AT.toEpochMilli())
+                jsonPath("$.stations[0].photos[0].createdAt").value(createdAt.toEpochMilli())
             )
             .andExpect(jsonPath("$.stations[0].photos[0].outdated").value(true))
             .andExpect(jsonPath("$.stations[0].photos[1].id").value(1L))
@@ -233,7 +232,7 @@ internal class PhotoStationsControllerTest {
             .andExpect(jsonPath("$.stations[0].photos[1].path").value("/ab/3_1.jpg"))
             .andExpect(jsonPath("$.stations[0].photos[1].license").value("CC_BY_NC_40_INT"))
             .andExpect(
-                jsonPath("$.stations[0].photos[1].createdAt").value(CREATED_AT.toEpochMilli())
+                jsonPath("$.stations[0].photos[1].createdAt").value(createdAt.toEpochMilli())
             )
             .andExpect(jsonPath("$.stations[0].photos[1].outdated").doesNotExist())
             .andExpect(jsonPath("$.stations[0].photos[2]").doesNotExist())
@@ -242,7 +241,7 @@ internal class PhotoStationsControllerTest {
 
     @Test
     fun getPhotoStationByIdWithNonExistingId() {
-        every { photoStationsService.findByCountryAndId(any(), any()) } returns null
+        every { photoStationsService.findByKey(any()) } returns null
         mvc.perform(get("/photoStationById/ab/not_existing_id"))
             .andExpect(status().isNotFound())
             .andExpect(validOpenApiResponse())
@@ -250,8 +249,8 @@ internal class PhotoStationsControllerTest {
 
     @Test
     fun getPhotoStationsByPhotographerWithCountryFilter() {
-        val stationXY5 = createStationXY5().copy(
-            photos = listOf(createPhotoXY5())
+        val stationXY5 = stationXY5.copy(
+            photos = listOf(photoXY5)
         )
         every { photoStationsService.findByPhotographer("Jim Knopf", "xy") } returns setOf(stationXY5)
 
@@ -281,7 +280,7 @@ internal class PhotoStationsControllerTest {
             .andExpect(jsonPath("$.stations[0].photos[0].path").value("/xy/5.jpg"))
             .andExpect(jsonPath("$.stations[0].photos[0].license").value("CC0_10"))
             .andExpect(
-                jsonPath("$.stations[0].photos[0].createdAt").value(CREATED_AT.toEpochMilli())
+                jsonPath("$.stations[0].photos[0].createdAt").value(createdAt.toEpochMilli())
             )
             .andExpect(jsonPath("$.stations[0].photos[0].outdated").doesNotExist())
             .andExpect(jsonPath("$.stations[0].photos[1]").doesNotExist())
@@ -290,11 +289,11 @@ internal class PhotoStationsControllerTest {
 
     @Test
     fun getPhotoStationsByPhotographer() {
-        val stationAB3 = createStationAB3().copy(
-            photos = listOf(createPhotoAB3_2())
+        val stationAB3 = stationAB3.copy(
+            photos = listOf(photoAB3_2)
         )
-        val stationXY5 = createStationXY5().copy(
-            photos = listOf(createPhotoXY5())
+        val stationXY5 = stationXY5.copy(
+            photos = listOf(photoXY5)
         )
         every { photoStationsService.findByPhotographer("Jim Knopf", null) } returns setOf(stationAB3, stationXY5)
 
@@ -332,7 +331,7 @@ internal class PhotoStationsControllerTest {
             )
             .andExpect(
                 jsonPath("$.stations[?(@.id == '5')].photos[0].createdAt")
-                    .value(CREATED_AT.toEpochMilli())
+                    .value(createdAt.toEpochMilli())
             )
             .andExpect(
                 jsonPath("$.stations[?(@.id == '5')].photos[0].outdated").doesNotExist()
@@ -358,7 +357,7 @@ internal class PhotoStationsControllerTest {
             )
             .andExpect(
                 jsonPath("$.stations[?(@.id == '3')].photos[0].createdAt")
-                    .value(CREATED_AT.toEpochMilli())
+                    .value(createdAt.toEpochMilli())
             )
             .andExpect(jsonPath("$.stations[?(@.id == '3')].photos[0].outdated").value(true))
             .andExpect(jsonPath("$.stations[?(@.id == '3')].photos[1]").doesNotExist())
@@ -367,8 +366,8 @@ internal class PhotoStationsControllerTest {
 
     @Test
     fun getPhotoStationsByRecentPhotoImportsWithDefaultSinceHours() {
-        val stationXY5 = createStationXY5().copy(
-            photos = listOf(createPhotoXY5())
+        val stationXY5 = stationXY5.copy(
+            photos = listOf(photoXY5)
         )
         every { photoStationsService.findRecentImports(10) } returns setOf(stationXY5)
 
@@ -385,8 +384,8 @@ internal class PhotoStationsControllerTest {
 
     @Test
     fun getPhotoStationsByRecentPhotoImportsWithSinceHours() {
-        val stationAB3 = createStationAB3().copy(
-            photos = listOf(createPhotoAB3_1())
+        val stationAB3 = stationAB3.copy(
+            photos = listOf(photoAB3_1)
         )
         every { photoStationsService.findRecentImports(100) } returns setOf(stationAB3)
 
@@ -401,69 +400,57 @@ internal class PhotoStationsControllerTest {
             .andExpect(jsonPath("$.stations[0].photos[0].id").value(1L))
     }
 
-    private fun createPhotoAB3_2(): Photo {
-        return PhotoTestFixtures.createPhoto(KEY_AB_3, PHOTOGRAPHER_JIM_KNOPF).copy(
-            id = 2L,
-            primary = true,
-            createdAt = CREATED_AT,
-            license = License.CC0_10,
-            outdated = true,
-            urlPath = "/${KEY_AB_3.country}/${KEY_AB_3.id}_2.jpg",
-        )
-    }
-
-    private fun createPhotoAB3_1(): Photo {
-        return PhotoTestFixtures.createPhoto(KEY_AB_3, PHOTOGRAPHER_PETER_PAN).copy(
-            id = 1L,
-            createdAt = CREATED_AT,
-            license = License.CC_BY_NC_40_INT,
-            urlPath = "/${KEY_AB_3.country}/${KEY_AB_3.id}_1.jpg",
-        )
-    }
-
-    private fun createStationAB3(): Station {
-        return createStation(KEY_AB_3, Coordinates(40.0, 6.0), null).copy(
-            title = "Nimmerland",
-            ds100 = "ABC",
-        )
-    }
-
-    private fun createPhotoXY5(): Photo {
-        return PhotoTestFixtures.createPhoto(KEY_XY_5, PHOTOGRAPHER_JIM_KNOPF).copy(
-            createdAt = CREATED_AT,
-        )
-    }
-
-    private fun createStationXY5(): Station {
-        return createStation(KEY_XY_5, Coordinates(50.0, 9.0), null).copy(
-            title = "Lummerland",
-            ds100 = "XYZ",
-        )
-    }
-
-    private fun createStationXY1(): Station {
-        return createStation(KEY_XY_1, Coordinates(50.1, 9.1), null).copy(
-            title = "Lummerland Ost",
-            ds100 = "XYY",
-            active = false,
-        )
-    }
 
 }
 
-private val KEY_XY_1: Station.Key = Station.Key("xy", "1")
-private val KEY_XY_5: Station.Key = Station.Key("xy", "5")
-private val PHOTOGRAPHER_JIM_KNOPF: User = UserTestFixtures.someUser.copy(
+private val keyXY1: Station.Key = Station.Key("xy", "1")
+private val keyXY5: Station.Key = Station.Key("xy", "5")
+private val photographerJimKnopf: User = UserTestFixtures.someUser.copy(
     name = "Jim Knopf",
     url = "photographerUrlJim",
     license = License.CC0_10,
 )
-private val KEY_AB_3: Station.Key = Station.Key("ab", "3")
-private val CREATED_AT: Instant = Instant.now()
-private val PHOTOGRAPHER_PETER_PAN: User =
+private val keyAB3: Station.Key = Station.Key("ab", "3")
+private val createdAt: Instant = Instant.now()
+private val photographerPeterPan: User =
     UserTestFixtures.someUser.copy(
         name = "Peter Pan",
         url = "photographerUrlPeter",
         license = License.CC_BY_NC_SA_30_DE,
     )
 
+private val photoAB3_2 = PhotoTestFixtures.createPhoto(keyAB3, photographerJimKnopf).copy(
+    id = 2L,
+    primary = true,
+    createdAt = createdAt,
+    license = License.CC0_10,
+    outdated = true,
+    urlPath = "/${keyAB3.country}/${keyAB3.id}_2.jpg",
+)
+
+private val photoAB3_1 = PhotoTestFixtures.createPhoto(keyAB3, photographerPeterPan).copy(
+    id = 1L,
+    createdAt = createdAt,
+    license = License.CC_BY_NC_40_INT,
+    urlPath = "/${keyAB3.country}/${keyAB3.id}_1.jpg",
+)
+
+private val stationAB3 = createStation(keyAB3, Coordinates(40.0, 6.0), null).copy(
+    title = "Nimmerland",
+    ds100 = "ABC",
+)
+
+private val photoXY5 = PhotoTestFixtures.createPhoto(keyXY5, photographerJimKnopf).copy(
+    createdAt = createdAt,
+)
+
+private val stationXY5 = createStation(keyXY5, Coordinates(50.0, 9.0), null).copy(
+    title = "Lummerland",
+    ds100 = "XYZ",
+)
+
+private val stationXY1 = createStation(keyXY1, Coordinates(50.1, 9.1), null).copy(
+    title = "Lummerland Ost",
+    ds100 = "XYY",
+    active = false,
+)

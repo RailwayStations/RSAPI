@@ -104,11 +104,11 @@ internal class InboxControllerIntegrationTest {
 
         val key0815 = Station.Key("ch", "0815")
         val station0815 = createStation(key0815, Coordinates(40.1, 7.0), createPhoto(key0815, userJimKnopf))
-        every { stationAdapter.findByKey(key0815.country, key0815.id) } returns station0815
+        every { stationAdapter.findByKey(key0815) } returns station0815
 
         val key1234 = Station.Key("de", "1234")
         val station1234 = createStation(key1234, Coordinates(40.1, 7.0), createPhoto(key1234, userJimKnopf))
-        every { stationAdapter.findByKey(key1234.country, key1234.id) } returns station1234
+        every { stationAdapter.findByKey(key1234) } returns station1234
 
         monitor.reset()
     }

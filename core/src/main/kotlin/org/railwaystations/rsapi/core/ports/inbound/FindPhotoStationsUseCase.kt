@@ -12,7 +12,7 @@ interface FindPhotoStationsUseCase {
 
     fun findByCountry(countries: Set<String>, hasPhoto: Boolean?, active: Boolean?): Set<Station>
 
-    fun findByCountryAndId(country: String?, stationId: String?): Station?
+    fun findByKey(key: Station.Key): Station?
 
     fun findRecentImports(sinceHours: Long): Set<Station>
 

@@ -7,7 +7,7 @@ import java.time.Instant
 
 interface StationPort {
     fun findByCountryCodes(countryCodes: Set<String>, hasPhoto: Boolean?, active: Boolean?): Set<Station>
-    fun findByKey(countryCode: String, id: String): Station?
+    fun findByKey(key: Station.Key): Station?
     fun findByPhotographer(photographer: String, countryCode: String?): Set<Station>
     fun findRecentImports(since: Instant): Set<Station>
     fun getStatistic(countryCode: String?): Statistic

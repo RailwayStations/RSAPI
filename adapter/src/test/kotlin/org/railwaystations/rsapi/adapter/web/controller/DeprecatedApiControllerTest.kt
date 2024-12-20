@@ -85,7 +85,7 @@ internal class DeprecatedApiControllerTest {
     @Test
     fun countryStationId() {
         every {
-            findPhotoStationsUseCase.findByCountryAndId(stationDe5WithPhoto.key.country, stationDe5WithPhoto.key.id)
+            findPhotoStationsUseCase.findByKey(stationDe5WithPhoto.key)
         } returns stationDe5WithPhoto
 
         val request = mvc.perform(get("/de/stations/5"))
@@ -95,7 +95,7 @@ internal class DeprecatedApiControllerTest {
 
     @Test
     fun getCountryStationIdNotFound() {
-        every { findPhotoStationsUseCase.findByCountryAndId("de", "00") } returns null
+        every { findPhotoStationsUseCase.findByKey(Station.Key("de", "00")) } returns null
 
         mvc.perform(get("/de/stations/00"))
             .andExpect(status().isNotFound())

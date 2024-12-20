@@ -107,7 +107,7 @@ internal class InboxServiceTest {
         every { monitorPort.sendMessage(any()) } returns Unit
         every { photoPort.setAllPhotosForStationSecondary(any()) } returns Unit
         every { photoPort.update(any()) } returns Unit
-        every { stationPort.findByKey(any(), any()) } returns null
+        every { stationPort.findByKey(any()) } returns null
         every { stationPort.countNearbyCoordinates(any()) } returns 0
         every { stationPort.insert(any()) } returns Unit
         every { stationPort.updateLocation(any(), any()) } returns Unit
@@ -136,7 +136,7 @@ internal class InboxServiceTest {
             val inboxEntry = createInboxEntry1()
             every { inboxPort.findById(INBOX_ENTRY1_ID) } returns inboxEntry
             val station = createStationDe1()
-            every { stationPort.findByKey(STATION_KEY_DE_1.country, STATION_KEY_DE_1.id) } returns station
+            every { stationPort.findByKey(STATION_KEY_DE_1) } returns station
             every { photoPort.insert(capture(photoCaptor)) } returns IMPORTED_PHOTO_ID
             every { photoStoragePort.importPhoto(inboxEntry, station) } returns IMPORTED_PHOTO_URL_PATH
 
@@ -277,7 +277,7 @@ internal class InboxServiceTest {
                     inboxEntry.stationId!!
                 )
             } returns 1
-            every { stationPort.findByKey(STATION_KEY_DE_1.country, STATION_KEY_DE_1.id) } returns createStationDe1()
+            every { stationPort.findByKey(STATION_KEY_DE_1) } returns createStationDe1()
 
             assertThatThrownBy { inboxService.importPhoto(command) }.isInstanceOf(
                 IllegalArgumentException::class.java
@@ -298,7 +298,7 @@ internal class InboxServiceTest {
                     inboxEntry.stationId!!
                 )
             } returns 1
-            every { stationPort.findByKey(STATION_KEY_DE_1.country, STATION_KEY_DE_1.id) } returns createStationDe1()
+            every { stationPort.findByKey(STATION_KEY_DE_1) } returns createStationDe1()
 
             assertThatThrownBy { inboxService.importPhoto(command) }.isInstanceOf(
                 IllegalArgumentException::class.java
@@ -338,11 +338,11 @@ internal class InboxServiceTest {
                 )
             )
         )
-        every { stationPort.findByKey(STATION_KEY_DE_1.country, STATION_KEY_DE_1.id) } returns stationDe1
+        every { stationPort.findByKey(STATION_KEY_DE_1) } returns stationDe1
     }
 
     private fun whenStation1Exists() {
-        every { stationPort.findByKey(STATION_KEY_DE_1.country, STATION_KEY_DE_1.id) } returns createStationDe1()
+        every { stationPort.findByKey(STATION_KEY_DE_1) } returns createStationDe1()
     }
 
     private fun createNewStationByCommand(command: InboxCommand, stationId: String): Station {
@@ -390,7 +390,7 @@ internal class InboxServiceTest {
                 stationId = null
             )
             every { inboxPort.findById(INBOX_ENTRY1_ID) } returns inboxEntry
-            every { stationPort.findByKey(STATION_KEY_DE_1.country, command.stationId!!) } returns null
+            every { stationPort.findByKey(Station.Key(STATION_KEY_DE_1.country, command.stationId!!)) } returns null
             every { stationPort.maxZ() } returns 1024
             val newStation = createNewStationByCommand(command, "Z1025")
             every { photoPort.insert(capture(photoCaptor)) } returns IMPORTED_PHOTO_ID
@@ -421,7 +421,7 @@ internal class InboxServiceTest {
                 extension = null,
             )
             every { inboxPort.findById(INBOX_ENTRY1_ID) } returns inboxEntry
-            every { stationPort.findByKey(STATION_KEY_DE_1.country, command.stationId!!) } returns null
+            every { stationPort.findByKey(Station.Key(STATION_KEY_DE_1.country, command.stationId!!)) } returns null
             every { stationPort.maxZ() } returns 4711
             val newStation = createNewStationByCommand(command, "Z4712")
 
@@ -566,7 +566,7 @@ internal class InboxServiceTest {
                     inboxEntry.stationId!!
                 )
             } returns 1
-            every { stationPort.findByKey(STATION_KEY_DE_1.country, STATION_KEY_DE_1.id) } returns createStationDe1()
+            every { stationPort.findByKey(STATION_KEY_DE_1) } returns createStationDe1()
 
             assertThatThrownBy { inboxService.importMissingStation(command) }.isInstanceOf(
                 IllegalArgumentException::class.java
@@ -806,10 +806,7 @@ internal class InboxServiceTest {
             )
             every { inboxPort.findById(inboxEntry1.id) } returns inboxEntry1
             every {
-                stationPort.findByKey(
-                    inboxEntry1.countryCode!!,
-                    inboxEntry1.stationId!!
-                )
+                stationPort.findByKey(Station.Key(inboxEntry1.countryCode!!, inboxEntry1.stationId!!))
             } returns createStationDe1()
             val inboxEntry2 = InboxEntry(
                 id = 2,
