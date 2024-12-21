@@ -39,7 +39,11 @@ class StationAdapter(private val dsl: DSLContext) : StationPort {
         selectStationWithPrimaryPhoto()
             .where(StationTable.countrycode.`in`(countryCodes))
             .and(value(active).isNull.or(StationTable.active.eq(active)))
-            .and(value(hasPhoto).isNull.or(PhotoTable.urlpath.isNull.and(value(hasPhoto).isNull)))
+            .and(
+                value(hasPhoto).isNull
+                    .or(PhotoTable.urlpath.isNull.and(value(hasPhoto).isTrue))
+                    .or(PhotoTable.urlpath.isNotNull.and(value(hasPhoto).isFalse))
+            )
             .map { it.toPhotoStation() }
             .toSet()
 
@@ -152,10 +156,10 @@ class StationAdapter(private val dsl: DSLContext) : StationPort {
         )
             .from(StationTable)
 
-    override fun getStatistic(countryCode: String?): Statistic {
-        return dsl.select(
-            StationTable.countrycode,
-            count(),
+    override fun getStatistic(countryCode: String?) =
+        dsl.select(
+            value(countryCode),
+            count(StationTable.asterisk()),
             count(PhotoTable.urlpath),
             countDistinct(PhotoTable.photographerid)
         )
@@ -165,15 +169,13 @@ class StationAdapter(private val dsl: DSLContext) : StationPort {
                     .and(PhotoTable.stationid.eq(StationTable.id).and(PhotoTable.primary.eq(true)))
             )
             .where(StationTable.countrycode.eq(countryCode).or(value(countryCode).isNull))
-            .groupBy(StationTable.countrycode)
             .fetchSingle().toStatistic()
-    }
 
     private fun Record4<String?, Int?, Int?, Int?>.toStatistic() = Statistic(
         countryCode = value1(),
-        total = value2()?.toLong() ?: 0,
-        withPhoto = value3()?.toLong() ?: 0,
-        photographers = value4()?.toLong() ?: 0
+        total = value2() ?: 0,
+        withPhoto = value3() ?: 0,
+        photographers = value4() ?: 0
     )
 
     override fun getPhotographerMap(countryCode: String?): Map<String, Int> =

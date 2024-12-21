@@ -42,7 +42,7 @@ jooq {
                     name = "org.jooq.codegen.KotlinGenerator"
                     database.apply {
                         name = "org.jooq.meta.postgres.PostgresDatabase"
-                        inputSchema = "public"
+                        inputSchema = "rsapi"
                         recordVersionFields = "version"
                         forcedTypes.apply {
                             add(
@@ -153,6 +153,7 @@ fun flywayMigrate(container: JdbcDatabaseContainer<*>, migrationsLocation: Strin
 
     val configuration: FluentConfiguration = Flyway.configure()
         .dataSource(container.jdbcUrl, container.username, container.password)
+        .defaultSchema("rsapi")
         .locations(withPrefix)
     val flyway: Flyway = configuration.load()
     flyway.migrate()

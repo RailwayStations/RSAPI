@@ -9,6 +9,16 @@ object UserTestFixtures {
     const val USER_EMAIL = "existing@example.com"
     const val EXISTING_USER_ID = 42L
 
+    val user2 = User(
+        id = 3,
+        name = "@user2",
+        url = "http://www.example.com/user2",
+        license = License.CC0_10,
+        ownPhotos = true,
+        sendNotifications = true,
+        locale = Locale.ENGLISH,
+    )
+
     val user10 = User(
         id = 11,
         name = "@user10",

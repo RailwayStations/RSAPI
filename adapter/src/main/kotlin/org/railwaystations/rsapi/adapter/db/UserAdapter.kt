@@ -5,6 +5,7 @@ import org.railwaystations.rsapi.adapter.db.jooq.tables.records.BlockedUsernameR
 import org.railwaystations.rsapi.adapter.db.jooq.tables.records.UserRecord
 import org.railwaystations.rsapi.adapter.db.jooq.tables.references.BlockedUsernameTable
 import org.railwaystations.rsapi.adapter.db.jooq.tables.references.UserTable
+import org.railwaystations.rsapi.core.model.License
 import org.railwaystations.rsapi.core.model.User
 import org.railwaystations.rsapi.core.model.nameToLicense
 import org.railwaystations.rsapi.core.ports.outbound.UserPort
@@ -35,8 +36,8 @@ class UserAdapter(private val dsl: DSLContext) : UserPort {
             admin = admin,
             emailVerification = emailverification,
             newPassword = null,
-            sendNotifications = sendnotifications == true,
-            locale = if (locale != null) Locale.forLanguageTag(locale) else Locale.ENGLISH
+            sendNotifications = sendnotifications,
+            locale = Locale.forLanguageTag(locale),
         )
 
     override fun findById(id: Long): User? {
@@ -118,7 +119,7 @@ class UserAdapter(private val dsl: DSLContext) : UserPort {
             .setNull(UserTable.email)
             .setNull(UserTable.emailverification)
             .set(UserTable.ownphotos, false)
-            .setNull(UserTable.license)
+            .set(UserTable.license, License.UNKNOWN.name)
             .setNull(UserTable.key)
             .set(UserTable.sendnotifications, false)
             .set(UserTable.admin, false)

@@ -1,6 +1,8 @@
 package org.railwaystations.rsapi.core.model
 
 import org.railwaystations.rsapi.core.model.PhotoTestFixtures.createPhoto
+import org.railwaystations.rsapi.core.model.UserTestFixtures.user2
+import java.time.Instant
 
 object StationTestFixtures {
     val keyDe8000 = Station.Key("de", "8000")
@@ -27,7 +29,25 @@ object StationTestFixtures {
         photos = listOf(createPhoto(keyDe5, UserTestFixtures.userJimKnopf))
     )
 
-    fun createStation(key: Station.Key, coordinates: Coordinates, photo: Photo?): Station =
+    val keyCh8503001 = Station.Key("ch", "8503001")
+
+    val stationCh8503001 = createStationWithKey(
+        key = keyCh8503001,
+        title = "Zürich Altstetten",
+        coordinates = Coordinates(lat = 47.3914808361, lon = 8.4889402654),
+    ).copy(
+        ds100 = "ZAS",
+        photos = listOf(
+            createPhoto(keyCh8503001, user2).copy(
+                id = 1,
+                urlPath = "/ch/8503001%20-%20Z%C3%BCrich%20Altstetten.jpg",
+                createdAt = Instant.parse("2018-04-06T17:52:47Z"),
+                license = License.CC0_10,
+            )
+        )
+    )
+
+    fun createStation(key: Station.Key, coordinates: Coordinates, photo: Photo? = null): Station =
         createStationWithKey(key = key, coordinates = coordinates).copy(
             ds100 = "LAL",
             photos = if (photo != null) listOf(photo) else listOf()

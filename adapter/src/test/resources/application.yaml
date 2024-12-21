@@ -10,6 +10,8 @@ spring:
       max-request-size: 20MB
   jackson:
     default-property-inclusion: non_null
+  flyway:
+    schemas: rsapi
 
 # application
 workDir: /var/rsapi
