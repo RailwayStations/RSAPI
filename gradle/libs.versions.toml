@@ -4,7 +4,6 @@ springDependency = "1.1.7"
 springOauth2AuthorizationServer = "1.4.1"
 openapiGenerator = "7.10.0"
 kotlin = "2.1.0"
-jdbi = "3.47.0"
 swaggerRequestValidator = "2.44.1"
 lazysodium = "5.1.4"
 jna = "5.15.0"
@@ -16,11 +15,13 @@ wiremock = "3.0.1"
 mockk = "1.13.14"
 springMockk = "4.0.2"
 greenmail = "2.1.2"
+flyway = "10.15.0"
+testcontainers = "1.19.8"
+jooq = "3.19.10"
+jooqPlugin = "9.0"
+postgresql = "42.7.4"
 
 [libraries]
-jdbi3-spring5 = { group = "org.jdbi", name = "jdbi3-spring5", version.ref = "jdbi" }
-jdbi3-kotlin = { group = "org.jdbi", name = "jdbi3-kotlin", version.ref = "jdbi" }
-jdbi3-kotlin-sqlobject = { group = "org.jdbi", name = "jdbi3-kotlin-sqlobject", version.ref = "jdbi" }
 swagger-request-validator-core = { group = "com.atlassian.oai", name = "swagger-request-validator-core", version.ref = "swaggerRequestValidator" }
 swagger-request-validator-spring-webmvc = { group = "com.atlassian.oai", name = "swagger-request-validator-spring-webmvc", version.ref = "swaggerRequestValidator" }
 swagger-request-validator-mockmvc = { group = "com.atlassian.oai", name = "swagger-request-validator-mockmvc", version.ref = "swaggerRequestValidator" }
@@ -35,6 +36,11 @@ wiremock-jre8-standalone = { group = "com.github.tomakehurst", name = "wiremock-
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 springmockk = { group = "com.ninja-squad", name = "springmockk", version.ref = "springMockk" }
 greenmail = { group = "com.icegreen", name = "greenmail", version.ref = "greenmail" }
+flyway-postgresql = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flyway" }
+jooq-codegen = { module = "org.jooq:jooq-codegen", version.ref = "jooq" }
+jooq-core = { module = "org.jooq:jooq", version.ref = "jooq" }
+postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+testcontainers-postgresql = { module = "org.testcontainers:postgresql", version.ref = "testcontainers" }
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
@@ -43,3 +49,5 @@ openapi-generator = { id = "org.openapi.generator", version.ref = "openapiGenera
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+flyway = { id = "org.flywaydb.flyway", version.ref = "flyway" }
+jooq-plugin = { id = "nu.studer.jooq", version.ref = "jooqPlugin" }

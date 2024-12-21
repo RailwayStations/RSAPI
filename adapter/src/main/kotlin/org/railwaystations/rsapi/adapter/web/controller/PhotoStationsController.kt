@@ -23,12 +23,9 @@ class PhotoStationsController(
     @Value("\${photoBaseUrl}") private val photoBaseUrl: String,
 ) : PhotoStationsApi {
 
-    override fun getPhotoStationById(
-        country: String,
-        id: String
-    ): ResponseEntity<PhotoStationsDto> {
+    override fun getPhotoStationById(country: String, id: String): ResponseEntity<PhotoStationsDto> {
         val stations = setOf(
-            findPhotoStationsUseCase.findByCountryAndId(country, id)
+            findPhotoStationsUseCase.findByKey(Station.Key(country, id))
                 ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         )
         return ResponseEntity.ok(stations.toDto(photoBaseUrl))

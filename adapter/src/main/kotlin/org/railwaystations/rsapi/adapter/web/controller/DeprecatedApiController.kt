@@ -58,7 +58,7 @@ class DeprecatedApiController(
         @PathVariable("country") country: @Size(min = 2, max = 2) String,
         @PathVariable("id") id: String
     ): ResponseEntity<StationDto> {
-        val station = findPhotoStationsUseCase.findByCountryAndId(country, id)
+        val station = findPhotoStationsUseCase.findByKey(Station.Key(country, id))
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         return ResponseEntity.ok()
             .headers(createDeprecationHeader())

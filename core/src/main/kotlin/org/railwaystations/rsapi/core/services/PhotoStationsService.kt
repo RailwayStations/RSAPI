@@ -9,13 +9,8 @@ import java.time.temporal.ChronoUnit
 
 @Service
 class PhotoStationsService(private val stationPort: StationPort) : FindPhotoStationsUseCase {
-    override fun findByCountryAndId(country: String?, stationId: String?): Station? {
-        if (stationId.isNullOrBlank() || country.isNullOrBlank()) {
-            return null
-        }
-
-        val key = Station.Key(country, stationId)
-        return stationPort.findByKey(key.country, key.id)
+    override fun findByKey(key: Station.Key): Station? {
+        return stationPort.findByKey(key)
     }
 
     override fun findRecentImports(sinceHours: Long): Set<Station> {

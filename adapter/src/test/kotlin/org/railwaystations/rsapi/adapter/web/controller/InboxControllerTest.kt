@@ -12,8 +12,17 @@ import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
 import org.railwaystations.rsapi.adapter.web.OpenApiValidatorUtil.validOpenApiResponse
 import org.railwaystations.rsapi.adapter.web.RequestUtil
 import org.railwaystations.rsapi.adapter.web.auth.AuthUser
-import org.railwaystations.rsapi.core.model.*
+import org.railwaystations.rsapi.core.model.Coordinates
+import org.railwaystations.rsapi.core.model.InboxEntry
+import org.railwaystations.rsapi.core.model.InboxResponse
+import org.railwaystations.rsapi.core.model.InboxStateQuery
 import org.railwaystations.rsapi.core.model.InboxStateQuery.InboxState
+import org.railwaystations.rsapi.core.model.ProblemReport
+import org.railwaystations.rsapi.core.model.ProblemReportType
+import org.railwaystations.rsapi.core.model.PublicInboxEntry
+import org.railwaystations.rsapi.core.model.ROLE_ADMIN
+import org.railwaystations.rsapi.core.model.ROLE_USER
+import org.railwaystations.rsapi.core.model.UserTestFixtures
 import org.railwaystations.rsapi.core.ports.inbound.ManageInboxUseCase
 import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,7 +37,9 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActions
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.web.servlet.LocaleResolver
 import java.time.Instant
@@ -55,7 +66,7 @@ internal class InboxControllerTest {
     @MockkBean
     private lateinit var localeResolver: LocaleResolver
 
-    private val userNickname = UserTestFixtures.createUserNickname()
+    private val userNickname = UserTestFixtures.userNickname
 
     @BeforeEach
     fun setUp() {

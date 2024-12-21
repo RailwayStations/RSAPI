@@ -11,6 +11,7 @@ abstract class AbstractPostgreSqlTest {
             PostgreSQLContainer(DockerImageName.parse("postgres:17"))
 
         init {
+            postgresql.withUrlParam("currentSchema", "rsapi")
             postgresql.start()
         }
 

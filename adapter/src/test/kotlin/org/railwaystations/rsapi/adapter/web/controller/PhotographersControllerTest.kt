@@ -6,8 +6,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
-import org.railwaystations.rsapi.adapter.db.CountryDao
-import org.railwaystations.rsapi.adapter.db.StationDao
+import org.railwaystations.rsapi.adapter.db.CountryAdapter
+import org.railwaystations.rsapi.adapter.db.StationAdapter
 import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
 import org.railwaystations.rsapi.adapter.web.OpenApiValidatorUtil.validOpenApiResponse
 import org.railwaystations.rsapi.core.model.CountryTestFixtures
@@ -30,14 +30,14 @@ internal class PhotographersControllerTest {
     private lateinit var mvc: MockMvc
 
     @MockkBean
-    private lateinit var stationDao: StationDao
+    private lateinit var stationAdapter: StationAdapter
 
     @MockkBean
-    private lateinit var countryDao: CountryDao
+    private lateinit var countryAdapter: CountryAdapter
 
     @BeforeEach
     fun setup() {
-        every { countryDao.findById("de") } returns CountryTestFixtures.createCountry("de")
+        every { countryAdapter.findById("de") } returns CountryTestFixtures.createCountry("de")
     }
 
     @ParameterizedTest
@@ -50,7 +50,7 @@ internal class PhotographersControllerTest {
 
     @Test
     fun getPhotographersOfCountryDe() {
-        every { stationDao.getPhotographerMap("de") } returns createPhotographersResponse()
+        every { stationAdapter.getPhotographerMap("de") } returns createPhotographersResponse()
 
         mvc.perform(get("/photographers?country=de"))
             .andExpect(status().isOk())
@@ -63,7 +63,7 @@ internal class PhotographersControllerTest {
 
     @Test
     fun getPhotographersOfAllCountries() {
-        every { stationDao.getPhotographerMap(null) } returns createPhotographersResponse()
+        every { stationAdapter.getPhotographerMap(null) } returns createPhotographersResponse()
 
         mvc.perform(get("/photographers"))
             .andExpect(status().isOk())
@@ -74,7 +74,8 @@ internal class PhotographersControllerTest {
             .andExpect(validOpenApiResponse())
     }
 
-    private fun createPhotographersResponse(): Map<String, Long> {
-        return mapOf("@user27" to 31L, "@user8" to 29L, "@user10" to 15L, "@user0" to 9L)
+    private fun createPhotographersResponse(): Map<String, Int> {
+        return mapOf("@user27" to 31, "@user8" to 29, "@user10" to 15, "@user0" to 9)
     }
+    
 }

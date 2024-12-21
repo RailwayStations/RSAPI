@@ -7,8 +7,8 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.railwaystations.rsapi.core.model.InboxEntry
 import org.railwaystations.rsapi.core.model.Station
-import org.railwaystations.rsapi.core.model.StationTestFixtures.stationDe0815
-import org.railwaystations.rsapi.core.model.StationTestFixtures.stationDe4711
+import org.railwaystations.rsapi.core.model.StationTestFixtures.stationDe8000
+import org.railwaystations.rsapi.core.model.StationTestFixtures.stationDe8001
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.attribute.FileTime
@@ -66,15 +66,15 @@ internal class PhotoFileStorageTest {
 
     @Test
     fun importPhoto() {
-        val inboxEntry = createInboxEntryWithId(1, stationDe4711.key)
+        val inboxEntry = createInboxEntryWithId(1, stationDe8000.key)
         val filename = inboxEntry.filename!!
         createFile(workDir.inboxDir, filename)
         createFile(workDir.inboxProcessedDir, filename)
 
-        val urlPath = storage.importPhoto(inboxEntry, stationDe4711)
+        val urlPath = storage.importPhoto(inboxEntry, stationDe8000)
 
-        assertThat(urlPath).isEqualTo("/de/4711_1.jpg")
-        assertThat(workDir.photosDir.resolve("de").resolve("4711_1.jpg")).exists()
+        assertThat(urlPath).isEqualTo("/de/8000_1.jpg")
+        assertThat(workDir.photosDir.resolve("de").resolve("8000_1.jpg")).exists()
         assertThat(workDir.inboxDoneDir.resolve(filename)).exists()
         assertThat(workDir.inboxDir.resolve(filename)).doesNotExist()
         assertThat(workDir.inboxProcessedDir.resolve(filename)).doesNotExist()
@@ -82,16 +82,16 @@ internal class PhotoFileStorageTest {
 
     @Test
     fun importSecondPhoto() {
-        val inboxEntry = createInboxEntryWithId(2, stationDe0815.key)
+        val inboxEntry = createInboxEntryWithId(2, stationDe8001.key)
         val filename = inboxEntry.filename!!
         createFile(workDir.inboxDir, filename)
         createFile(workDir.inboxProcessedDir, filename)
-        createFile(workDir.photosDir.resolve("de"), "0815_1.jpg")
+        createFile(workDir.photosDir.resolve("de"), "8001_1.jpg")
 
-        val urlPath = storage.importPhoto(inboxEntry, stationDe0815)
+        val urlPath = storage.importPhoto(inboxEntry, stationDe8001)
 
-        assertThat(urlPath).isEqualTo("/de/0815_2.jpg")
-        assertThat(workDir.photosDir.resolve("de").resolve("0815_2.jpg")).exists()
+        assertThat(urlPath).isEqualTo("/de/8001_2.jpg")
+        assertThat(workDir.photosDir.resolve("de").resolve("8001_2.jpg")).exists()
         assertThat(workDir.inboxDoneDir.resolve(filename)).exists()
         assertThat(workDir.inboxDir.resolve(filename)).doesNotExist()
         assertThat(workDir.inboxProcessedDir.resolve(filename)).doesNotExist()

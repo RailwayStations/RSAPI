@@ -2,11 +2,11 @@ package org.railwaystations.rsapi.core.model
 
 data class Statistic(
     val countryCode: String?,
-    val total: Long,
-    val withPhoto: Long,
-    val photographers: Long
+    val total: Int,
+    val withPhoto: Int,
+    val photographers: Int
 ) {
-    val withoutPhoto: Long
+    val withoutPhoto: Int
         get() = total - withPhoto
-    
+
 }

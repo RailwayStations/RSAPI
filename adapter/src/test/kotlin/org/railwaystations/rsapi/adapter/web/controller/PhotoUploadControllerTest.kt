@@ -10,7 +10,11 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import org.railwaystations.rsapi.adapter.db.*
+import org.railwaystations.rsapi.adapter.db.CountryAdapter
+import org.railwaystations.rsapi.adapter.db.InboxAdapter
+import org.railwaystations.rsapi.adapter.db.PhotoAdapter
+import org.railwaystations.rsapi.adapter.db.StationAdapter
+import org.railwaystations.rsapi.adapter.db.UserAdapter
 import org.railwaystations.rsapi.adapter.monitoring.FakeMonitor
 import org.railwaystations.rsapi.adapter.photostorage.PhotoFileStorage
 import org.railwaystations.rsapi.adapter.photostorage.WorkDir
@@ -22,12 +26,16 @@ import org.railwaystations.rsapi.adapter.web.auth.RSAuthenticationProvider
 import org.railwaystations.rsapi.adapter.web.auth.RSUserDetailsService
 import org.railwaystations.rsapi.adapter.web.auth.WebSecurityConfig
 import org.railwaystations.rsapi.app.ClockTestConfiguration
-import org.railwaystations.rsapi.core.model.*
+import org.railwaystations.rsapi.core.model.Coordinates
+import org.railwaystations.rsapi.core.model.EMAIL_VERIFIED
+import org.railwaystations.rsapi.core.model.InboxEntry
+import org.railwaystations.rsapi.core.model.Photo
 import org.railwaystations.rsapi.core.model.PhotoTestFixtures.createPhoto
+import org.railwaystations.rsapi.core.model.Station
 import org.railwaystations.rsapi.core.model.StationTestFixtures.createStation
-import org.railwaystations.rsapi.core.model.UserTestFixtures.createSomeUser
-import org.railwaystations.rsapi.core.model.UserTestFixtures.createUserJimKnopf
-import org.railwaystations.rsapi.core.model.UserTestFixtures.createUserNickname
+import org.railwaystations.rsapi.core.model.UserTestFixtures.someUser
+import org.railwaystations.rsapi.core.model.UserTestFixtures.userJimKnopf
+import org.railwaystations.rsapi.core.model.UserTestFixtures.userNickname
 import org.railwaystations.rsapi.core.ports.inbound.ManageProfileUseCase
 import org.railwaystations.rsapi.core.services.InboxService
 import org.springframework.beans.factory.annotation.Autowired
@@ -79,42 +87,42 @@ internal class PhotoUploadControllerTest {
     private lateinit var workDir: WorkDir
 
     @MockkBean(relaxed = true)
-    private lateinit var inboxDao: InboxDao
+    private lateinit var inboxAdapter: InboxAdapter
 
     @MockkBean
-    private lateinit var stationDao: StationDao
+    private lateinit var stationAdapter: StationAdapter
 
     @MockkBean(relaxed = true)
     private lateinit var authenticator: RSAuthenticationProvider
 
     @MockkBean(relaxed = true)
-    private lateinit var userDao: UserDao
+    private lateinit var userAdapter: UserAdapter
 
     @MockkBean
-    private lateinit var countryDao: CountryDao
+    private lateinit var countryAdapter: CountryAdapter
 
     @MockkBean(relaxed = true)
-    private lateinit var photoDao: PhotoDao
+    private lateinit var photoAdapter: PhotoAdapter
 
     @MockkBean(relaxed = true)
     private lateinit var manageProfileUseCase: ManageProfileUseCase
 
     @BeforeEach
     fun setUp() {
-        val userNickname = createUserNickname()
-        every { userDao.findByEmail(userNickname.email!!) } returns userNickname
-        val userSomeuser = createSomeUser()
-        every { userDao.findByEmail(userSomeuser.email!!) } returns userSomeuser
+        val userNickname = userNickname
+        every { userAdapter.findByEmail(userNickname.email!!) } returns userNickname
+        val userSomeuser = someUser
+        every { userAdapter.findByEmail(userSomeuser.email!!) } returns userSomeuser
 
         val key4711 = Station.Key("de", "4711")
         val station4711 = createStationWithDs100(key4711, Coordinates(50.0, 9.0), "XYZ", null)
         val key1234 = Station.Key("de", "1234")
         val station1234 =
-            createStationWithDs100(key1234, Coordinates(40.1, 7.0), "LAL", createPhoto(key1234, createUserJimKnopf()))
+            createStationWithDs100(key1234, Coordinates(40.1, 7.0), "LAL", createPhoto(key1234, userJimKnopf))
 
-        every { stationDao.findByKey(key4711.country, key4711.id) } returns station4711
-        every { stationDao.findByKey(key1234.country, key1234.id) } returns station1234
-        every { stationDao.countNearbyCoordinates(any()) } returns 0
+        every { stationAdapter.findByKey(key4711) } returns station4711
+        every { stationAdapter.findByKey(key1234) } returns station1234
+        every { stationAdapter.countNearbyCoordinates(any()) } returns 0
 
         monitor.reset()
     }
@@ -133,7 +141,7 @@ internal class PhotoUploadControllerTest {
 
     private fun whenPostImage(
         nickname: String,
-        userId: Int,
+        userId: Long,
         email: String,
         stationId: String?,
         country: String?,
@@ -163,7 +171,7 @@ internal class PhotoUploadControllerTest {
 
     private fun whenPostPhotoUpload(
         nickname: String,
-        userId: Int,
+        userId: Long,
         email: String,
         stationId: String?,
         country: String?,
@@ -204,7 +212,7 @@ internal class PhotoUploadControllerTest {
                 .with(
                     user(
                         AuthUser(
-                            createUserNickname().copy(
+                            userNickname.copy(
                                 name = nickname,
                                 id = userId,
                                 email = email,
@@ -225,24 +233,24 @@ internal class PhotoUploadControllerTest {
                 UsernamePasswordAuthenticationToken("someuser@example.com", "secretUploadToken")
             )
         } returns UsernamePasswordAuthenticationToken("", "", listOf())
-        every { inboxDao.insert(any()) } returns 1L
+        every { inboxAdapter.insert(any()) } returns 1L
         val response = whenPostImageMultipartFormdata("someuser@example.com", "some_verification_token")
 
         assertThat(response).contains("UNAUTHORIZED")
         assertThat(response).contains("Profile incomplete, not allowed to upload photos")
-        verify(exactly = 0) { inboxDao.insert(any()) }
+        verify(exactly = 0) { inboxAdapter.insert(any()) }
         assertThat(monitor.getMessages().size).isEqualTo(0)
     }
 
     @Test
     fun postPhotoForExistingStationViaMultipartFormdata() {
         val uploadCaptor = slot<InboxEntry>()
-        every { inboxDao.insert(any()) } returns 1L
+        every { inboxAdapter.insert(any()) } returns 1L
         val response = whenPostImageMultipartFormdata("nickname@example.com", EMAIL_VERIFIED)
 
         assertThat(response).contains("REVIEW")
         assertFileWithContentExistsInInbox("image-content", "1.jpg")
-        verify { inboxDao.insert(capture(uploadCaptor)) }
+        verify { inboxAdapter.insert(capture(uploadCaptor)) }
         assertUpload(uploadCaptor.captured, "de", "4711", null, null)
 
         assertThat(monitor.getMessages()[0]).isEqualTo(
@@ -273,7 +281,7 @@ internal class PhotoUploadControllerTest {
                 .with(
                     user(
                         AuthUser(
-                            createUserNickname().copy(
+                            userNickname.copy(
                                 email = email,
                                 emailVerification = emailVerified,
                             ), listOf()
@@ -294,11 +302,11 @@ internal class PhotoUploadControllerTest {
     @Test
     fun repostMissingStationWithoutPhotoViaMultipartFormdata() {
         val uploadCaptor = slot<InboxEntry>()
-        every { inboxDao.insert(any()) } returns 1L
+        every { inboxAdapter.insert(any()) } returns 1L
         val response = mvc.perform(
             multipart("/photoUploadMultipartFormdata")
                 .file(MockMultipartFile("file", null, "application/octet-stream", null as ByteArray?))
-                .with(user(AuthUser(createUserNickname(), listOf())))
+                .with(user(AuthUser(userNickname, listOf())))
                 .param("stationTitle", "Missing Station")
                 .param("latitude", "10")
                 .param("longitude", "20")
@@ -313,7 +321,7 @@ internal class PhotoUploadControllerTest {
             .andReturn().response.contentAsString
 
         assertThat(response).contains("REVIEW")
-        verify { inboxDao.insert(capture(uploadCaptor)) }
+        verify { inboxAdapter.insert(capture(uploadCaptor)) }
         assertUpload(uploadCaptor.captured, "de", null, "Missing Station", Coordinates(10.0, 20.0))
 
         assertThat(monitor.getMessages()[0]).isEqualTo(
@@ -329,7 +337,7 @@ internal class PhotoUploadControllerTest {
     @Test
     fun uploadPhoto() {
         val uploadCaptor = slot<InboxEntry>()
-        every { inboxDao.insert(any()) } returns 1L
+        every { inboxAdapter.insert(any()) } returns 1L
 
         whenPostImage("@nick name", 42, "nickname@example.com", "4711", "de", null, null, null, "Some Comment")
             .andExpect(status().isAccepted())
@@ -339,7 +347,7 @@ internal class PhotoUploadControllerTest {
 
 
         assertFileWithContentExistsInInbox("image-content", "1.jpg")
-        verify { inboxDao.insert(capture(uploadCaptor)) }
+        verify { inboxAdapter.insert(capture(uploadCaptor)) }
         assertUpload(uploadCaptor.captured, "de", "4711", null, null)
         assertThat(monitor.getMessages()[0]).isEqualTo(
             """
@@ -375,9 +383,8 @@ internal class PhotoUploadControllerTest {
 
     @Test
     fun postMissingStation() {
-        every { inboxDao.insert(any()) } returns 4L
+        every { inboxAdapter.insert(any()) } returns 4L
         val uploadCaptor = slot<InboxEntry>()
-        val userNickname = createUserNickname()
 
         whenPostImage(
             nickname = userNickname.name,
@@ -396,7 +403,7 @@ internal class PhotoUploadControllerTest {
             .andExpect(jsonPath("$.filename").value("4.jpg"))
 
         assertFileWithContentExistsInInbox(IMAGE_CONTENT, "4.jpg")
-        verify { inboxDao.insert(capture(uploadCaptor)) }
+        verify { inboxAdapter.insert(capture(uploadCaptor)) }
         assertUpload(uploadCaptor.captured, null, null, "Missing Station", Coordinates(50.9876, 9.1234))
 
         assertThat(monitor.getMessages()[0]).isEqualTo(
@@ -412,9 +419,8 @@ internal class PhotoUploadControllerTest {
 
     @Test
     fun postMissingStationWithoutPhoto() {
-        every { inboxDao.insert(any()) } returns 4L
+        every { inboxAdapter.insert(any()) } returns 4L
         val uploadCaptor = slot<InboxEntry>()
-        val userNickname = createUserNickname()
 
         whenPostPhotoUpload(
             nickname = userNickname.name,
@@ -435,7 +441,7 @@ internal class PhotoUploadControllerTest {
             .andExpect(jsonPath("$.id").value(4))
             .andExpect(jsonPath("$.filename").doesNotExist())
 
-        verify { inboxDao.insert(capture(uploadCaptor)) }
+        verify { inboxAdapter.insert(capture(uploadCaptor)) }
         assertUpload(uploadCaptor.captured, "de", null, "Missing Station", Coordinates(50.9876, 9.1234))
 
         assertThat(monitor.getMessages()[0]).isEqualTo(
@@ -453,7 +459,6 @@ internal class PhotoUploadControllerTest {
         "-91d, 9.1234d", "91d, 9.1234d", "50.9876d, -181d", "50.9876d, 181d"
     )
     fun postMissingStationLatLonOutOfRange(latitude: Double?, longitude: Double?) {
-        val userNickname = createUserNickname()
         whenPostImage(
             nickname = userNickname.name,
             userId = userNickname.id,
@@ -473,7 +478,7 @@ internal class PhotoUploadControllerTest {
 
     @Test
     fun postPhotoWithSomeUserWithTokenSalt() {
-        every { inboxDao.insert(any()) } returns 3L
+        every { inboxAdapter.insert(any()) } returns 3L
         whenPostImage("@someuser", 11, "someuser@example.com", "4711", "de", null, null, null, null)
             .andExpect(status().isAccepted())
             .andExpect(jsonPath("$.state").value("REVIEW"))
@@ -494,8 +499,8 @@ internal class PhotoUploadControllerTest {
 
     @Test
     fun postDuplicateInbox() {
-        every { inboxDao.insert(any()) } returns 2L
-        every { inboxDao.countPendingInboxEntriesForStation(null, "de", "4711") } returns 1
+        every { inboxAdapter.insert(any()) } returns 2L
+        every { inboxAdapter.countPendingInboxEntriesForStation(null, "de", "4711") } returns 1
 
         whenPostImage("@nick name", 42, "nickname@example.com", "4711", "de", null, null, null, null)
             .andExpect(status().isAccepted())
@@ -527,7 +532,7 @@ internal class PhotoUploadControllerTest {
 
     @Test
     fun postDuplicate() {
-        every { inboxDao.insert(any()) } returns 5L
+        every { inboxAdapter.insert(any()) } returns 5L
         whenPostImage("@nick name", 42, "nickname@example.com", "1234", "de", null, null, null, null)
             .andExpect(status().isAccepted())
             .andExpect(jsonPath("$.state").value("REVIEW"))
@@ -557,7 +562,7 @@ internal class PhotoUploadControllerTest {
 
     @Test
     fun postInvalidCountry() {
-        every { stationDao.findByKey(eq("xy"), any()) } returns null
+        every { stationAdapter.findByKey(any()) } returns null
 
         whenPostImage("nickname", 42, "nickname@example.com", "4711", "xy", null, null, null, null)
             .andExpect(status().isBadRequest())

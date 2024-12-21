@@ -1,12 +1,12 @@
 plugins {
     alias(libs.plugins.kotlin.spring)
-    alias(libs.plugins.kotlin.kapt)
     id("java-library")
     id("java-test-fixtures")
 }
 
 dependencies {
     implementation(project("::openapi"))
+    implementation(project("::db-migration"))
     implementation(project("::core"))
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-security")
@@ -14,14 +14,13 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-jooq")
     implementation(libs.swagger.annotations)
     implementation("jakarta.validation:jakarta.validation-api")
     implementation(libs.spring.security.oauth2.authorization.server)
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")
-    implementation(libs.jdbi3.spring5)
-    implementation(libs.jdbi3.kotlin)
-    implementation(libs.jdbi3.kotlin.sqlobject)
+    implementation(libs.jooq.core)
     implementation(libs.lazysodium.java)
     implementation(libs.jna)
     implementation("commons-codec:commons-codec")
@@ -29,8 +28,6 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation(libs.bootstrap)
-
-    kapt("org.springframework.boot:spring-boot-configuration-processor")
 
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("org.webjars:webjars-locator-lite")

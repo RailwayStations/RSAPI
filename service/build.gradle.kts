@@ -17,9 +17,11 @@ tasks {
 dependencies {
     implementation(project("::core"))
     implementation(project("::openapi"))
+    implementation(project("::db-migration"))
     implementation(project("::adapter"))
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    implementation("org.springframework.boot:spring-boot-starter-jooq")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation(libs.spring.security.oauth2.authorization.server)
@@ -27,6 +29,7 @@ dependencies {
     implementation("org.flywaydb:flyway-database-postgresql")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation(libs.jooq.core)
 
     kapt("org.springframework.boot:spring-boot-configuration-processor")
 
