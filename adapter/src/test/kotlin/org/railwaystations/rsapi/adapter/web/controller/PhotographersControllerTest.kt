@@ -18,7 +18,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(controllers = [PhotographersController::class])
@@ -50,32 +50,26 @@ internal class PhotographersControllerTest {
 
     @Test
     fun getPhotographersOfCountryDe() {
-        every { stationAdapter.getPhotographerMap("de") } returns createPhotographersResponse()
+        every { stationAdapter.getPhotographerMap("de") } returns photographersMap
 
         mvc.perform(get("/photographers?country=de"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.@user27").value(31))
-            .andExpect(jsonPath("$.@user8").value(29))
-            .andExpect(jsonPath("$.@user10").value(15))
-            .andExpect(jsonPath("$.@user0").value(9))
+            .andExpect(content().string(photographersResponse)) // use string comparison because of ordering
             .andExpect(validOpenApiResponse())
     }
 
     @Test
     fun getPhotographersOfAllCountries() {
-        every { stationAdapter.getPhotographerMap(null) } returns createPhotographersResponse()
+        every { stationAdapter.getPhotographerMap(null) } returns photographersMap
 
         mvc.perform(get("/photographers"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.@user27").value(31))
-            .andExpect(jsonPath("$.@user8").value(29))
-            .andExpect(jsonPath("$.@user10").value(15))
-            .andExpect(jsonPath("$.@user0").value(9))
+            .andExpect(content().string(photographersResponse)) // use string comparison because of ordering
             .andExpect(validOpenApiResponse())
     }
 
-    private fun createPhotographersResponse(): Map<String, Int> {
-        return mapOf("@user27" to 31, "@user8" to 29, "@user10" to 15, "@user0" to 9)
-    }
-    
 }
+
+private val photographersMap = mapOf("@user8" to 29, "@user0" to 9, "@user10" to 15, "@user27" to 31)
+
+private const val photographersResponse = """{"@user27":31,"@user8":29,"@user10":15,"@user0":9}"""

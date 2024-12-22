@@ -110,18 +110,26 @@ class StationAdapterTest : AbstractPostgreSqlTest() {
 
         assertThat(photographers).isEqualTo(
             mapOf<String, Int>(
-                "@user0" to 10, "@user10" to 17, "@user2" to 6, "@user27" to 31, "@user4" to 1, "@user8" to 29
+                "@user27" to 31,
+                "@user8" to 29,
+                "@user10" to 17,
+                "@user0" to 10,
+                "@user2" to 6,
+                "@user4" to 1,
             )
         )
     }
 
     @Test
-    fun getPhotographerMapAllDe() {
+    fun getPhotographerMapDe() {
         val photographers = sut.getPhotographerMap("de")
 
         assertThat(photographers).isEqualTo(
             mapOf<String, Int>(
-                "@user0" to 9, "@user10" to 16, "@user27" to 31, "@user8" to 29
+                "@user27" to 31,
+                "@user8" to 29,
+                "@user10" to 16,
+                "@user0" to 9,
             )
         )
     }

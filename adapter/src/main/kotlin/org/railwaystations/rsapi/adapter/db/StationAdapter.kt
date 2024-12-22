@@ -186,7 +186,6 @@ class StationAdapter(private val dsl: DSLContext) : StationPort {
             .join(UserTable).on(UserTable.id.eq(PhotoTable.photographerid))
             .where(value(countryCode).isNull.or(StationTable.countrycode.eq(countryCode)))
             .groupBy(UserTable.name)
-            .orderBy(count())
             .fetch { it.value1()!! to it.value2() }.toMap()
 
     @Transactional

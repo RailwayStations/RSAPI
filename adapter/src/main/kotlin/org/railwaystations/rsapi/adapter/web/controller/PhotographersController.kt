@@ -8,7 +8,10 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class PhotographersController(private val loadPhotographersUseCase: LoadPhotographersUseCase) : PhotographersApi {
     override fun getPhotographers(country: String?): ResponseEntity<Any> {
-        return ResponseEntity.ok(loadPhotographersUseCase.getPhotographersPhotocountMap(country))
+        return ResponseEntity.ok(
+            loadPhotographersUseCase.getPhotographersPhotocountMap(country)
+                .entries.sortedByDescending { it.value }.associate { it.toPair() }
+        )
     }
 
 }
