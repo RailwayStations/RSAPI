@@ -6,10 +6,11 @@ spring:
     driver-class-name: org.postgresql.Driver
     username: rsapi
     password: rsapi
-    url: jdbc:postgresql://localhost:5432/rsapi
+    url: jdbc:postgresql://localhost:5432/rsapi?currentSchema=rsapi
   flyway:
     baseline-on-migrate: true
     baseline-version: 1
+    schemas: rsapi
   servlet:
     multipart:
       max-file-size: 20MB

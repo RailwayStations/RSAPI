@@ -3,17 +3,16 @@ package org.railwaystations.rsapi.core.ports.outbound
 import org.railwaystations.rsapi.core.model.User
 
 interface UserPort {
-    fun list(): List<User>
     fun findByName(name: String): User?
-    fun findById(id: Int): User?
+    fun findById(id: Long): User?
     fun findByEmail(email: String): User?
-    fun updateCredentials(id: Int, key: String)
-    fun insert(user: User, key: String?, emailVerification: String?): Int
-    fun update(id: Int, user: User)
+    fun updateCredentials(id: Long, key: String)
+    fun insert(user: User, key: String?, emailVerification: String?): Long
+    fun update(id: Long, user: User)
     fun findByEmailVerification(emailVerification: String): User?
-    fun updateEmailVerification(id: Int, emailVerification: String?)
-    fun anonymizeUser(id: Int)
+    fun updateEmailVerification(id: Long, emailVerification: String?)
+    fun anonymizeUser(id: Long)
     fun addUsernameToBlocklist(name: String)
     fun countBlockedUsername(name: String): Int
-    fun updateLocale(id: Int, locallocaleLanguageTage: String)
+    fun updateLocale(id: Long, localeLanguageTag: String)
 }

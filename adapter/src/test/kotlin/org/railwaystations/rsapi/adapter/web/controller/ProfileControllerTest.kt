@@ -5,7 +5,7 @@ import io.mockk.every
 import io.mockk.verify
 import net.javacrumbs.jsonunit.spring.JsonUnitResultMatchers.json
 import org.junit.jupiter.api.Test
-import org.railwaystations.rsapi.adapter.db.UserDao
+import org.railwaystations.rsapi.adapter.db.UserAdapter
 import org.railwaystations.rsapi.adapter.web.ErrorHandlingControllerAdvice
 import org.railwaystations.rsapi.adapter.web.OpenApiValidatorUtil.validOpenApiResponse
 import org.railwaystations.rsapi.adapter.web.RequestUtil
@@ -31,7 +31,9 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActions
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.request.RequestPostProcessor
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -59,7 +61,7 @@ class ProfileControllerTest {
     private lateinit var profileService: ProfileService
 
     @MockkBean
-    private lateinit var userDao: UserDao
+    private lateinit var userAdapter: UserAdapter
 
     @Test
     fun getMyProfile() {
@@ -96,13 +98,13 @@ class ProfileControllerTest {
     private fun givenExistingUser(): User {
         val key =
             "246172676F6E32696424763D3139246D3D36353533362C743D322C703D3124426D4F637165757646794E44754132726B566A6A3177246A7568362F6E6C2F49437A4B475570446E6B674171754A304F7A486A62694F587442542F2B62584D49476300000000000000000000000000000000000000000000000000000000000000"
-        val user = UserTestFixtures.createUserNickname().copy(
+        val user = UserTestFixtures.userNickname.copy(
             id = EXISTING_USER_ID,
             email = USER_EMAIL,
             key = key
         )
-        every { userDao.findByEmail(user.email!!) } returns user
-        every { userDao.findByName(user.name) } returns user
+        every { userAdapter.findByEmail(user.email!!) } returns user
+        every { userAdapter.findByName(user.name) } returns user
         return user
     }
 
@@ -224,7 +226,7 @@ class ProfileControllerTest {
     @Test
     fun verifyEmailSuccess() {
         val token = "verification"
-        val user = UserTestFixtures.createUserNickname().copy(
+        val user = UserTestFixtures.userNickname.copy(
             id = EXISTING_USER_ID,
             emailVerification = token,
         )

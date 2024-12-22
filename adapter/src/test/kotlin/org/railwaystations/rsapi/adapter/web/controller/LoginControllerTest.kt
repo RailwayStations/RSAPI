@@ -231,7 +231,7 @@ internal class LoginControllerTest {
     }
 
     private fun createValidUser(): User {
-        return UserTestFixtures.createUserNickname().copy(
+        return UserTestFixtures.userNickname.copy(
             newPassword = "very_secret",
             locale = Locale.GERMAN,
         )

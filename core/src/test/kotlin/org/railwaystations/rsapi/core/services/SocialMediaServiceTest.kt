@@ -1,10 +1,17 @@
 package org.railwaystations.rsapi.core.services
 
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.jupiter.api.Test
-import org.railwaystations.rsapi.core.model.*
+import org.railwaystations.rsapi.core.model.InboxEntry
 import org.railwaystations.rsapi.core.model.StationTestFixtures.stationDe5WithPhoto
-import org.railwaystations.rsapi.core.ports.outbound.*
+import org.railwaystations.rsapi.core.model.UserTestFixtures
+import org.railwaystations.rsapi.core.ports.outbound.InboxPort
+import org.railwaystations.rsapi.core.ports.outbound.MastodonPort
+import org.railwaystations.rsapi.core.ports.outbound.PhotoPort
+import org.railwaystations.rsapi.core.ports.outbound.StationPort
+import org.railwaystations.rsapi.core.ports.outbound.UserPort
 
 
 internal class SocialMediaServiceTest {
@@ -24,7 +31,6 @@ internal class SocialMediaServiceTest {
 
     @Test
     fun postNewPhotoToMastodon() {
-        val user = UserTestFixtures.createSomeUser()
         val inboxEntry = InboxEntry(
             countryCode = "de",
             stationId = "1234",
@@ -32,7 +38,7 @@ internal class SocialMediaServiceTest {
             title = "title",
             comment = "comment",
         )
-        every { userPort.findById(0) } returns user
+        every { userPort.findById(0) } returns UserTestFixtures.someUser
         every { inboxPort.findOldestImportedPhotoNotYetPosted() } returns inboxEntry
         every { inboxPort.updatePosted(any()) } returns Unit
 

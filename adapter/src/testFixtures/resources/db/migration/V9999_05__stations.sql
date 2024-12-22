@@ -1,4 +1,4 @@
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('ch','8500013',8500013,NULL,'BSRB','Basel SBB RB',47.5363531811,7.64637599135,true),
 	 ('ch','8500018',8500018,NULL,'BSBH','Birsfelden Hafen',47.5436592309,7.65456008393,true),
 	 ('ch','8500020',8500020,NULL,'MU','Muttenz',47.5335803903,7.64787914262,true),
@@ -9,7 +9,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('ch','8500103',8500103,NULL,'SOR','Sorvilier',47.2392372997,7.30576524542,true),
 	 ('ch','8500126',8500126,NULL,'POR','Porrentruy',47.420909698,7.08007451034,true),
 	 ('ch','8500159',8500159,NULL,'GN','Grenchen Nord',47.1918033634,7.38946302189,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('ch','8500164',8500164,NULL,'TRCH','Tramelan-Chalet',47.2234556821,7.09244154101,true),
 	 ('ch','8500200',8500200,NULL,'PIE','Pieterlen',47.1714342219,7.34019009864,true),
 	 ('ch','8500210',8500210,NULL,'WAA','Wangen an der Aare',47.2319515056,7.6562236042,true),
@@ -20,7 +20,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('ch','8500307',8500307,NULL,'EFG','Effingen',47.476556836,8.10066965497,true),
 	 ('ch','8500313',8500313,NULL,'RFAU','Rheinfelden Augarten',47.5458662882,7.76802232018,true),
 	 ('ch','8501014',8501014,NULL,'MIES','Mies',46.2998757136,6.1695702204,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('ch','8501015',8501015,NULL,'TAN','Tannay',46.3076341414,6.18112481111,true),
 	 ('ch','8501031',8501031,NULL,'GLA','Gland',46.419975355,6.26913801937,true),
 	 ('ch','8501051',8501051,NULL,'GECT','Genève CT',46.1830988518,6.1256902838,true),
@@ -31,7 +31,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('ch','8501105',8501105,NULL,'BRT','Bretonnières',46.7150454119,6.47473141459,true),
 	 ('ch','8501107',8501107,NULL,'AX','Arnex',46.6980662731,6.51890326658,true),
 	 ('ch','8501108',8501108,NULL,'LSA','La Sarraz',46.6587767613,6.51736524915,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('ch','8501124',8501124,NULL,'CU','Cully',46.488550014,6.72714757327,true),
 	 ('ch','8501127',8501127,NULL,'STSA','St-Saphorin',46.4725855624,6.7970306112,true),
 	 ('ch','8501146',8501146,NULL,'DAIL','Daillens',46.6322769799,6.5424870787,true),
@@ -42,7 +42,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('ch','8501198',8501198,NULL,'PALZ','Château-d''Oex La Palaz',46.4762626898,7.14169746113,true),
 	 ('ch','8501200',8501200,NULL,'VV','Vevey',46.4629974303,6.84345000982,true),
 	 ('ch','8501374',8501374,NULL,'FON','Fontanivent',46.4527214847,6.90234172937,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('ch','8501388',8501388,NULL,'COMS','Les Combes',46.4774712498,7.17183521402,true),
 	 ('ch','8501397',8501397,NULL,'ROU','Rougemont',46.4886174199,7.20896362395,true),
 	 ('ch','8501400',8501400,NULL,'AIG','Aigle',46.3168441199,6.9636800936,true),
@@ -53,7 +53,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('ch','8501498',8501498,NULL,'BOUQ','Bouquetins',46.3163944087,7.07235034848,true),
 	 ('ch','8501502',8501502,NULL,'SAX','Saxon',46.149376272,7.17343442478,true),
 	 ('ch','8501507',8501507,NULL,'SL','St-Léonard',46.2514824986,7.41957042997,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('ch','8501561',8501561,NULL,'VEMC','Vernayaz MC',46.1301269722,7.04493371044,true),
 	 ('ch','8501576',8501576,NULL,'SEMB','Sembrancher',46.0771013189,7.14629384096,true),
 	 ('ch','8501604',8501604,NULL,'RAR','Raron',46.3062732767,7.80150766492,true),
@@ -64,7 +64,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('ch','8502113',8502113,NULL,'AA','Aarau',47.3913553369,8.05125354274,true),
 	 ('ch','8502161',8502161,NULL,'TEU','Teufenthal AG',47.3294078788,8.11446902971,true),
 	 ('ch','8502166',8502166,NULL,'LEIM','Leimbach AG',47.2727123979,8.16785753252,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('ch','8502167',8502167,NULL,'REIN','Reinach AG Nord',47.2572622736,8.1814533182,true),
 	 ('ch','8502168',8502168,NULL,'REI','Reinach AG',47.2500828777,8.1844579633,true),
 	 ('ch','8502180',8502180,NULL,'MUHN','Muhen Nord',47.3435959852,8.05262416228,true),
@@ -75,7 +75,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('ch','8502239',8502239,NULL,'DOTU','Dottikon Umspannanlage',47.3629190442,8.24916930628,true),
 	 ('ch','8502277',8502277,NULL,'RUD','Rudolfstetten',47.3695000211,8.38118075797,true),
 	 ('ch','8503000',8503000,NULL,'ZUE','Zürich HB',47.3781765756,8.54019221036,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('ch','8503001',8503001,NULL,'ZAS','Zürich Altstetten',47.3914808361,8.4889402654,true),
 	 ('ch','8503006',8503006,NULL,'ZOER','Zürich Oerlikon',47.4115288802,8.54411523121,true),
 	 ('ch','8503007',8503007,NULL,'ZSEB','Zürich Seebach',47.4187469105,8.54463614173,true),
@@ -86,7 +86,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('ch','8503087',8503087,NULL,'ZSAA','Zürich Saalsporthalle',47.3574066029,8.52214389055,true),
 	 ('ch','8503094',8503094,NULL,'ZLE','Zürich Leimbach',47.3346006314,8.51960324631,true),
 	 ('ch','8503098',8503098,NULL,'SIW','Sihlwald',47.2682765216,8.55749769881,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('ch','8503100',8503100,NULL,'ZK','Zollikon',47.3373317337,8.569717612,true),
 	 ('ch','8503109',8503109,NULL,'FB','Feldbach',47.2391975436,8.78348281363,true),
 	 ('ch','8503110',8503110,NULL,'RW','Rapperswil',47.2248877672,8.81673057998,true),
@@ -97,7 +97,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('ch','8503205',8503205,NULL,'AU','Au ZH',47.2468165268,8.6437080619,true),
 	 ('ch','8503230',8503230,NULL,'GL','Glarus',47.0399200317,9.0715516467,true),
 	 ('ch','8503233',8503233,NULL,'SCHD','Schwanden',46.9968482066,9.07744743355,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('ch','8503235',8503235,NULL,'LGB','Leuggelbach',46.9757415966,9.04692465402,true),
 	 ('ch','8503281',8503281,NULL,'SAT','Sattel-Aegeri',47.0798546452,8.62723255539,true),
 	 ('ch','8503295',8503295,NULL,'WILN','Wilen bei Wollerau',47.1975794035,8.73431410161,true),
@@ -108,7 +108,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('ch','8503409',8503409,NULL,'ZZ','Bad Zurzach',47.5883101087,8.29556465398,true),
 	 ('ch','8503426',8503426,NULL,'LAN','Langwiesen',47.6834480371,8.66229616245,true),
 	 ('ch','8503461',8503461,NULL,'THA','Thayngen',47.7455202803,8.70323014905,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('ch','8503462',8503462,NULL,'HERB','Herblingen',47.7172096623,8.66428930544,true),
 	 ('ch','8503464',8503464,NULL,'BERB','Beringen Bad Bf',47.6948880279,8.5746740103,true),
 	 ('ch','8503466',8503466,NULL,'WIHA','Wilchingen-Hallau',47.6794939072,8.4640170693,true),
@@ -119,7 +119,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('ch','8504028',8504028,NULL,'ROS','Rosé',46.7826234886,7.06196897192,true),
 	 ('ch','8504038',8504038,NULL,'BOMO','Bossy Moulins (embr)',46.823297431,6.97112719515,true),
 	 ('ch','8504125',8504125,NULL,'DOM','Domdidier',46.8685046705,7.01138032832,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('ch','8504134',8504134,NULL,'PAY','Payerne',46.8196387484,6.93987910663,true),
 	 ('ch','8504139',8504139,NULL,'BF','Belfaux CFF',46.8169170976,7.10622789234,true),
 	 ('ch','8504181',8504181,NULL,'GIV','Givisiez',46.8167103996,7.12533398287,true),
@@ -130,7 +130,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('ch','8504296',8504296,NULL,'SIXF','Six-Fontaines',46.7740634606,6.49885385763,true),
 	 ('ch','8504298',8504298,NULL,'STCR','Ste-Croix',46.819667331,6.50031077908,true),
 	 ('ch','8504310',8504310,NULL,'STI','St-Imier',47.151698154,7.00121493749,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('ch','8504319',8504319,NULL,'LOCF','Le Locle-Frontière',47.0502257746,6.71695602606,true),
 	 ('ch','8504382',8504382,NULL,'REYM','Le Reymond',47.0870449944,6.84407585566,true),
 	 ('ch','8504386',8504386,NULL,'COEU','Les Coeudres',47.0228289999,6.78017609399,true),
@@ -141,7 +141,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('ch','8504472',8504472,NULL,'SUTZ','Sutz',47.101870975,7.21941610659,true),
 	 ('ch','8504486',8504486,NULL,'GMM','Gümmenen',46.9421730828,7.23440009719,true),
 	 ('ch','8504487',8504487,NULL,'ROSS','Rosshäusern',46.9343342218,7.29685984085,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('ch','8504489',8504489,NULL,'BNBZ','Bern Bümpliz Nord',46.9458272511,7.38974518517,true),
 	 ('ch','8504490',8504490,NULL,'ZBR','Zihlbrücke',47.0092706005,7.03057399743,true),
 	 ('ch','8505009',8505009,NULL,'LZGB','Luzern Cargo',47.0476016286,8.31311665368,true),
@@ -152,7 +152,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('ch','8505206',8505206,NULL,'GIO','Giornico',46.4026513909,8.87212788076,true),
 	 ('ch','8505213',8505213,NULL,'BEL','Bellinzona',46.195436816,9.02950898687,true),
 	 ('ch','8505301',8505301,NULL,'LGP','Lugano-Paradiso',45.9889500461,8.94627572854,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('ch','8505392',8505392,NULL,'MAGP','Magliaso Paese',45.9834116357,8.89057611812,true),
 	 ('ch','8505400',8505400,NULL,'LO','Locarno',46.1724273965,8.80135894865,true),
 	 ('ch','8505405',8505405,NULL,'QUA','Quartino',46.1513026375,8.88731923749,true),
@@ -163,7 +163,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('ch','8506016',8506016,NULL,'OWT','Oberwinterthur',47.5079184546,8.76037093131,true),
 	 ('ch','8506121',8506121,NULL,'RH','Romanshorn',47.5655269844,9.37936259732,true),
 	 ('ch','8506125',8506125,NULL,'ALN','Altnau',47.6213657537,9.26589677408,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('ch','8506127',8506127,NULL,'BOT','Bottighofen',47.6407078714,9.21308178053,true),
 	 ('ch','8506168',8506168,NULL,'TAEN','Tägerschen',47.5093655501,9.02478054512,true),
 	 ('ch','8506173',8506173,NULL,'WEBM','Weberei Matzingen',47.5272231149,8.92219880826,true),
@@ -174,7 +174,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('ch','8506203',8506203,NULL,'BUET','Bütschwil',47.3595914091,9.07513534617,true),
 	 ('ch','8506204',8506204,NULL,'LUET','Lütisburg',47.3838273619,9.07067425759,true),
 	 ('ch','8506210',8506210,NULL,'GSS','Gossau SG',47.4118296551,9.25303263655,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('ch','8506217',8506217,NULL,'SLG','Sulgen',47.5387993681,9.18367857671,true),
 	 ('ch','8506223',8506223,NULL,'BAZZ','Bazenheid ZAB (Agl)',47.4187928897,9.07275345589,true),
 	 ('ch','8506282',8506282,NULL,'ZUEM','Zürchersmühle',47.3303299425,9.29257922862,true),
@@ -185,7 +185,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('ch','8506322',8506322,NULL,'RSST','Rorschach Stadt',47.4754476463,9.48971870021,true),
 	 ('ch','8506336',8506336,NULL,'SGCT','St. Gallen CT',47.4183047522,9.36382812989,true),
 	 ('ch','8506350',8506350,NULL,'WALZ','Walzenhausen',47.45174123,9.60126132858,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('ch','8506353',8506353,NULL,'WITO','Wienacht-Tobel',47.4662112913,9.54063003948,true),
 	 ('ch','8506365',8506365,NULL,'SGAR','Schützengarten',47.4128999701,9.43733940966,true),
 	 ('ch','8506368',8506368,NULL,'GFEL','Gfeld',47.404993276,9.45587433744,true),
@@ -196,7 +196,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('ch','8507068',8507068,NULL,'BOLI','Bolligen',46.9695437407,7.49741070619,true),
 	 ('ch','8507271',8507271,NULL,'SCR','Schönried',46.5045418942,7.29110122969,true),
 	 ('ch','8507274',8507274,NULL,'BLB','Blankenburg',46.5411031578,7.38532055303,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('ch','8507288',8507288,NULL,'EIF','Eifeld',46.6839200004,7.64227217644,true),
 	 ('ch','8507299',8507299,NULL,'LAT','Lattigen bei Spiez',46.6911822815,7.65058766913,true),
 	 ('ch','8507471',8507471,NULL,'EB','Eggerberg',46.3067196577,7.88100325138,true),
@@ -207,7 +207,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('ch','8508060',8508060,NULL,'GRRI','Grafenried',47.0801208449,7.51160644661,true),
 	 ('ch','8508063',8508063,NULL,'SCN','Schalunen',47.1101643118,7.524163279,true),
 	 ('ch','8508064',8508064,NULL,'BKI','Bätterkinden',47.1300169994,7.53439602439,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('ch','8508066',8508066,NULL,'LOLU','Lohn-Lüterkofen',47.1629889082,7.52695040748,true),
 	 ('ch','8508088',8508088,NULL,'GLF','Gerlafingen',47.1697445507,7.56518564422,true),
 	 ('ch','8508155',8508155,NULL,'BAN','Bannwil',47.2443819331,7.74035841864,true),
@@ -218,7 +218,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('ch','8508395',8508395,NULL,'INNP','Innertkirchen Grimseltor',46.7055781543,8.22958535272,true),
 	 ('ch','8509054',8509054,NULL,'ZIZ','Zizers',46.9348427166,9.5595893726,true),
 	 ('ch','8509063',8509063,NULL,'FID','Fideris',46.922367674,9.73375699397,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('ch','8509156',8509156,NULL,'LITZ','Litzirüti',46.797951013,9.70326831526,true),
 	 ('ch','8509173',8509173,NULL,'RUEU','Rueun',46.7746975042,9.14561460428,true),
 	 ('ch','8509181',8509181,NULL,'DE','Domat/Ems',46.8331408741,9.45316475001,true),
@@ -229,7 +229,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('ch','8515444',8515444,NULL,'ALRH','Altenrhein',47.4827491242,9.54749533526,true),
 	 ('ch','8516270',8516270,NULL,'ARBS','Arbon Seemoosriet',47.5215190263,9.42429272006,true),
 	 ('ch','8516740',8516740,NULL,'SUHM','Suhr Migros',47.3798308077,8.0895768139,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('ch','8517102',8517102,NULL,'BUZE','Buchs SG Zement',47.1684499467,9.47987147734,true),
 	 ('ch','8517280',8517280,NULL,'SHNO','Schaffhausen Nord',47.7153565256,8.65747606498,true),
 	 ('ch','8517419',8517419,NULL,'GETG','Gettnau Güteranlage',47.1403681479,7.98434083792,true),
@@ -240,7 +240,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('ch','8530066',8530066,NULL,'GMOU','Grand-Moulin',46.252615433,7.02323187517,true),
 	 ('ch','8530225',8530225,NULL,'STD','Le Stand',47.0051287464,6.74558607693,true),
 	 ('ch','8530261',8530261,NULL,'BCHX','Bois-de-Chexbres',46.4732731469,6.90153894513,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('ch','8530303',8530303,NULL,'FUM','Les Fumeaux',46.1204927795,7.05276514532,true),
 	 ('ch','8530813',8530813,NULL,'ZUEK','Zürich Kreuzplatz',47.3648743419,8.55408358421,true),
 	 ('ch','8578241',8578241,NULL,'','Oberdorf BL, Winkelweg',47.3965629232,7.74920561685,true),
@@ -251,7 +251,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','5005',NULL,5005,'NPOE','Pösing',49.2291838706692,12.5426085607721,true),
 	 ('de','5006',NULL,5006,'MPH','Possenhofen',47.9618491160948,11.3063493057301,true),
 	 ('de','5007',NULL,5007,'UPS','Pößneck ob Bf',50.6903914886634,11.5879400522495,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','5008',NULL,5008,'UPSU','Pößneck unt Bf',50.7004761356672,11.606850028038,true),
 	 ('de','5009',NULL,5009,'NPOH','Postbauer-Heng',49.308423292103,11.3588598387155,true),
 	 ('de','5010',NULL,5010,'BPDC','Potsdam Charlottenhof',52.3928053362819,13.0366194248199,true),
@@ -262,7 +262,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','5015',NULL,5015,'BWP','Potsdam Park Sanssouci',52.3945673444395,13.0136484596376,true),
 	 ('de','5016',NULL,5016,'BPOF','Berlin Potsdamer Platz',52.5095071060745,13.3760999864148,true),
 	 ('de','5017',NULL,5017,'EPRA','Praest',51.8218302895556,6.34564518928528,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','5018',NULL,5018,'LPT','Pratau',51.8427759058211,12.6349636128074,true),
 	 ('de','5020',NULL,5020,'APZ','Preetz',54.2337692725559,10.2759397029877,true),
 	 ('de','5021',NULL,5021,'LPZH','Premnitz Nord',52.5359707914784,12.3335149727385,true),
@@ -273,7 +273,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','5027',NULL,5027,'NPS','Pressath',49.7640087316021,11.9391006231308,true),
 	 ('de','5028',NULL,5028,'NPR','Pressig-Rothenkirchen',50.3488562421698,11.3108110427856,true),
 	 ('de','5029',NULL,5029,'NPRE','Pretzfeld',49.7571941768927,11.1699137091637,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','503',NULL,503,'BBFE','Bergfelde (b Berlin)',52.6701486971792,13.3204239606857,true),
 	 ('de','5030',NULL,5030,'LPRZ','Pretzier (Altm)',52.836364406677,11.2647414207459,true),
 	 ('de','5032',NULL,5032,'EPRN','Preußen',51.5881547964165,7.53963888179527,true),
@@ -284,7 +284,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','5038',NULL,5038,'BPOT','Priort',52.5164493745414,12.9714417457581,true),
 	 ('de','5039',NULL,5039,'APD','Prisdorf',53.6752711201783,9.76017773151398,true),
 	 ('de','504',NULL,504,'EBGA','Berghausen',51.0330166352177,8.35004112937233,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','5041',NULL,5041,'UPZ','Prittitz',51.1583751907754,11.9373321533203,true),
 	 ('de','5042',NULL,5042,'LPI','Pritzerbe',52.499891544188,12.4585268558082,true),
 	 ('de','5043',NULL,5043,'WPRZ','Pritzier',53.3649663026512,11.0833214898163,true),
@@ -295,7 +295,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','5048',NULL,5048,'WPRA','Prora',54.4442255768543,13.5642957687378,true),
 	 ('de','5049',NULL,5049,'WPRO','Prora Ost',54.4290916931849,13.5752824544907,true),
 	 ('de','5050',NULL,5050,'DPRO','Prösen',51.4348856226978,13.4881905819241,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','5051',NULL,5051,'DPRW','Prösen West',51.4247413689035,13.4699249267578,true),
 	 ('de','5052',NULL,5052,'BPW','Prösen Ost',51.4258394143447,13.5008546885322,true),
 	 ('de','5054',NULL,5054,'MPM','Puchheim',48.1720496112781,11.3530662885079,true),
@@ -306,7 +306,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','506',NULL,506,'RBGP','Berghausen (Pfalz)',49.2952971525565,8.40612433695276,true),
 	 ('de','5060',NULL,5060,'NPU','Puschendorf',49.5207649603291,10.8282029628754,true),
 	 ('de','5063',NULL,5063,'APU','Puttgarden',54.4997217960304,11.2259479330367,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','5064',NULL,5064,'DPT','Putzkau',51.1029378459713,14.2355673164962,true),
 	 ('de','5065',NULL,5065,'KQ','Quadrath-Ichendorf',50.9377052909814,6.68670600460419,true),
 	 ('de','5066',NULL,5066,'HQ','Quakenbrück',52.6739460819204,7.94778227806091,true),
@@ -317,7 +317,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','5073',NULL,5073,'SQS','Quierschied',49.3246045292761,7.05925226211549,true),
 	 ('de','5074',NULL,5074,'SQI','Quint',49.825887828829,6.70456767082214,true),
 	 ('de','5080',NULL,5080,'LRK','Rackwitz (B Leipzig)',51.4406359006132,12.3749213084512,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','5081',NULL,5081,'ARH','Radbruch',53.3179968675149,10.2891737222671,true),
 	 ('de','5082',NULL,5082,'BRAD','Raddusch',51.8159720865066,14.0325299722958,true),
 	 ('de','5083',NULL,5083,'DRAG','Radeberg',51.1116300921215,13.9132332801819,true),
@@ -328,7 +328,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','5088',NULL,5088,'DRBZ','Radebeul-Zitzschewig',51.1145198189389,13.6067430737992,true),
 	 ('de','5090',NULL,5090,'WRDN','Wustrau-Radensleben',52.8573379147889,12.8970626864895,true),
 	 ('de','5091',NULL,5091,'MRDD','Radersdorf',48.5144953582438,11.1622059345245,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','5093',NULL,5093,'LRA','Radis',51.7546939099066,12.5041803717613,true),
 	 ('de','5094',NULL,5094,'NRA','Radldorf (Niederbay)',48.8746571068069,12.4442794919014,true),
 	 ('de','5095',NULL,5095,'RRZ','Radolfzell',47.7357599191892,8.96934247077305,true),
@@ -339,7 +339,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','6716',NULL,6716,'TWS','Westerstetten',48.5198477154827,9.9494041999181,true),
 	 ('de','6717',NULL,6717,'DWES','Westewitz-Hochweitzschen',51.1375598068236,13.0279734730721,true),
 	 ('de','6718',NULL,6718,'TWX','Westhausen',48.881509090406,10.1834100340573,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','6719',NULL,6719,'MWHS','Westheim (Schwab)',48.3860809462235,10.8185503021934,true),
 	 ('de','672',NULL,672,'MBI','Bischofswiesen',47.6517723877162,12.9602623383683,true),
 	 ('de','6720',NULL,6720,'EWSM','Westheim (Westf)',51.4943099312753,8.9094078540802,true),
@@ -350,7 +350,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','6728',NULL,6728,'EWET','Wetter (Ruhr)',51.3865048782342,7.38576435668716,true),
 	 ('de','6729',NULL,6729,'LWZE','Wetterzeube',51.0084411468424,12.0128566026687,true),
 	 ('de','6730',NULL,6730,'FWR','Wetzlar',50.5656217066498,8.50371390581131,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','6731',NULL,6731,'EWIC','Wickede (Ruhr)',51.4932545278315,7.86997675895691,true),
 	 ('de','6732',NULL,6732,'NWK','Wicklesgreuth',49.3106519902296,10.7112944126129,true),
 	 ('de','6733',NULL,6733,'KWIC','Wickrath',51.1327800600184,6.41156095170545,true),
@@ -361,7 +361,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','6741',NULL,6741,'HWRN','Wieren',52.8925859123245,10.6557161224132,true),
 	 ('de','6743',NULL,6743,'NWU','Wiesau (Oberpf)',49.910735423068,12.1912431716919,true),
 	 ('de','6744',NULL,6744,'FW','Wiesbaden Hbf',50.0699318332051,8.24410915374756,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','6745',NULL,6745,'FWO','Wiesbaden Ost',50.0412773071902,8.25656175613405,true),
 	 ('de','6746',NULL,6746,'FWB','Wiesbaden-Biebrich',50.0487432307069,8.23656284356419,true),
 	 ('de','6747',NULL,6747,'FWE','Wiesbaden-Erbenheim',50.0547092050314,8.29561219044732,true),
@@ -372,7 +372,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','6753',NULL,6753,'DWSB','Wiesenburg (Sachs)',50.6525579045044,12.5668179988861,true),
 	 ('de','6754',NULL,6754,'FWIF','Wiesenfeld',51.007575080185,8.74935647998038,true),
 	 ('de','6755',NULL,6755,'NWDC','Wiesenfeld (b Coburg)',50.3015878738585,10.9117458368603,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','6756',NULL,6756,'RWI','Wiesental',49.2256754407423,8.50241482257843,true),
 	 ('de','6757',NULL,6757,'NWIE','Wiesenthau',49.7134874351084,11.1269391775131,true),
 	 ('de','6759',NULL,6759,'RWS','Wiesloch-Walldorf',49.2911328258961,8.66423961441606,true),
@@ -383,7 +383,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','6765',NULL,6765,'TWIB','Wildberg (Württ)',48.6252621023387,8.74296426773072,true),
 	 ('de','6766',NULL,6766,'HWIH','Wildeshausen',52.8979084919646,8.43149900436402,true),
 	 ('de','6768',NULL,6768,'KMAH','Marienheide',51.0811962370328,7.53213467439676,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','6769',NULL,6769,'TWL','Wilferdingen-Singen',48.9537302545833,8.57280437148478,true),
 	 ('de','6770',NULL,6770,'RWSW','Wilgartswiesen',49.2094368443987,7.88383483886719,true),
 	 ('de','6771',NULL,6771,'BWIG','Wilhelmshagen',52.4384574054115,13.7223192172892,true),
@@ -394,7 +394,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','6776',NULL,6776,'DWL','Wilischthal',50.7247131575353,13.056596150991,true),
 	 ('de','6777',NULL,6777,'DWI','Wilkau-Haßlau',50.6753763834715,12.5136440992355,true),
 	 ('de','6778',NULL,6778,'FWLN','Willingen',51.2933286579108,8.60366463661194,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','6779',NULL,6779,'FWLM','Willmenrod',50.5394465601194,7.98551645460009,true),
 	 ('de','678',NULL,678,'SED','Bitburg-Erdorf',49.9987245211634,6.57111148576478,true),
 	 ('de','6780',NULL,6780,'NWIG','Willmering',49.2466108327209,12.6701688766479,true),
@@ -405,7 +405,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','6786',NULL,6786,'AWIR','Wilster',53.9262495549818,9.3836921453476,true),
 	 ('de','6787',NULL,6787,'DWT','Wilthen',51.0929165800785,14.3919411920151,true),
 	 ('de','6788',NULL,6788,'SWIG','Wiltingen (Saar)',49.6625913111747,6.59045308828355,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','679',NULL,679,'TBIT','Bittelbronn',48.4443445061693,8.58904312054316,true),
 	 ('de','6790',NULL,6790,'SWIN','Wincheringen',49.6084493124215,6.40649020671844,true),
 	 ('de','6791',NULL,6791,'FWIN','Nidderau-Windecken',50.2249700277551,8.87596696615219,true),
@@ -416,7 +416,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','6797',NULL,6797,'UWIR','Wingerode',51.3901125851962,10.2394384145736,true),
 	 ('de','6798',NULL,6798,'AWG','Wingst',53.7457711874136,9.09780979156493,true),
 	 ('de','6799',NULL,6799,'NWKH','Winkelhaid',49.3928938936631,11.3010066747666,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','680',NULL,680,'LBT','Bitterfeld',51.6225406382936,12.3167542089899,true),
 	 ('de','6801',NULL,6801,'TWI','Winnenden',48.8795605406284,9.39219484458099,true),
 	 ('de','6802',NULL,6802,'SWI','Winningen (Mosel)',50.3157265466022,7.52330710490547,true),
@@ -427,7 +427,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','6807',NULL,6807,'EWTB','Winterberg (Westf)',51.1990818095532,8.53240307776891,true),
 	 ('de','6808',NULL,6808,'NWN','Winterhausen',49.7080588548588,10.0121944706614,true),
 	 ('de','6809',NULL,6809,'AWIM','Wintermoor',53.1860582765147,9.82858300209045,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','681',NULL,681,'NBLA','Blaibach (Oberpf)',49.1640554441482,12.8078126907348,true),
 	 ('de','6812',NULL,6812,'UWIP','Wipperdorf',51.4530957498171,10.660468850817,true),
 	 ('de','6815',NULL,6815,'LWIP','Wippra',51.5764217543438,11.281417285,true),
@@ -438,7 +438,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','682',NULL,682,'MBLH','Blaichach (Allgäu)',47.5436380251428,10.2588549256325,true),
 	 ('de','6820',NULL,6820,'HWIS','Wissingen',52.2583756051301,8.20486128330231,true),
 	 ('de','6821',NULL,6821,'EWIK','Wittbräucke',51.4201669341258,7.44590789079665,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','6822',NULL,6822,'EWIT','Witten Hbf',51.4355582943146,7.32932817935943,true),
 	 ('de','6823',NULL,6823,'EWIA','Witten-Annen Nord',51.4478824938629,7.37562417984009,true),
 	 ('de','6824',NULL,6824,'BWIN','Wittenau (Wilhelmsruher Damm)',52.5966027530015,13.3350741863251,true),
@@ -449,7 +449,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','683',NULL,683,'WBL','Blankenberg (Meckl)',53.7721776478778,11.7156637281699,true),
 	 ('de','6830',NULL,6830,'DWIO','Wittgensdorf ob Bf',50.8829728818259,12.8413305075272,true),
 	 ('de','6832',NULL,6832,'TWIT','Wittighausen',49.6183357346227,9.84622478485107,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','6833',NULL,6833,'HWTT','Wittingen',52.7274300161698,10.7232570648193,true),
 	 ('de','6834',NULL,6834,'SWIH','Wittlich Hbf',49.9729835768243,6.94311261177063,true),
 	 ('de','6836',NULL,6836,'HWTM','Wittmund',53.5797693657504,7.78902411460876,true),
@@ -460,7 +460,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','6840',NULL,6840,'BMN','Messe Nord / ICC (Witzleben)',52.5076877898203,13.2835257053375,true),
 	 ('de','6841',NULL,6841,'DWIT','Witzschdorf',50.7751939176774,13.0884611606598,true),
 	 ('de','6842',NULL,6842,'AWRT','Witzwort',54.3858012040046,8.99831082139696,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','6843',NULL,6843,'FWX','Darmstadt-Wixhausen',49.9309105521228,8.64799976348876,true),
 	 ('de','6844',NULL,6844,'UWOF','Woffleben',51.5558991150512,10.7213830947876,true),
 	 ('de','6845',NULL,6845,'AWLF','Wohltorf',53.5206625173867,10.2780176975109,true),
@@ -471,7 +471,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','6850',NULL,6850,'HWOH','Wolfenbüttel',52.1592701111772,10.5322046717208,true),
 	 ('de','6851',NULL,6851,'LWOR','Wolferode',51.51223270545,11.5086767695686,true),
 	 ('de','6853',NULL,6853,'FWON','Felsberg-Wolfershausen',51.1866152565289,9.44953858852387,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','6854',NULL,6854,'UWLH','Wölfershausen',50.491615309112,10.4366217314571,true),
 	 ('de','6855',NULL,6855,'FWOE','Wölfersheim-Södel',50.3972391195768,8.81631658962477,true),
 	 ('de','6856',NULL,6856,'FWFG','Wolfgang (Kr Hanau)',50.1235544820385,8.95834470281795,true),
@@ -482,7 +482,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','6862',NULL,6862,'NWM','Wolfsmünster',50.0944311645525,9.73513472611736,true),
 	 ('de','6863',NULL,6863,'RKLN','Brigachtal Klengen',48.0074240975216,8.46577547549199,true),
 	 ('de','6864',NULL,6864,'SWFS','Wolfstein',49.5841055915374,7.61130684715967,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','6867',NULL,6867,'USTA','Steinach Süd',50.4230759383273,11.1664947867393,true),
 	 ('de','6869',NULL,6869,'DWO','Wolkenstein',50.6527447636373,13.0650425434112,true),
 	 ('de','6870',NULL,6870,'UWK','Wolkramshausen',51.4398568834312,10.7455426454544,true),
@@ -493,7 +493,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','6877',NULL,6877,'BWOL','Woltersdorf (b Luckenwalde)',52.1172043255482,13.1951612234116,true),
 	 ('de','6879',NULL,6879,'HWWI','Woltwiesche',52.2006870721189,10.2784844613094,true),
 	 ('de','688',NULL,688,'BBF','Blankenfelde (Kr Teltow-Fläming)',52.3372991936045,13.4160125255585,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','6887',NULL,6887,'FWOR','Worms Hbf',49.6348928161858,8.35645053100887,true),
 	 ('de','6888',NULL,6888,'MWNS','Wörnitzstein',48.7320602773959,10.7143705699086,true),
 	 ('de','6889',NULL,6889,'FWRR','Wörrstadt',49.8460546176444,8.11394691467285,true),
@@ -504,7 +504,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','6893',NULL,6893,'RWRT','Wörth (Rhein)',49.0457072202884,8.27310562133789,true),
 	 ('de','6895',NULL,6895,'AWRE','Wremen',53.646979535667,8.52136019492307,true),
 	 ('de','6896',NULL,6896,'BWRZ','Wriezen',52.7157003659627,14.1403461888779,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','6897',NULL,6897,'AWST','Wrist',53.9320941564461,9.74784206040957,true),
 	 ('de','6899',NULL,6899,'BWHH','Wuhlheide',52.4685471744522,13.5543394088745,true),
 	 ('de','690',NULL,690,'KBLH','Blankenheim (Wald)',50.4411762669806,6.59239053726197,true),
@@ -515,7 +515,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','6908',NULL,6908,'UWF','Wünschendorf (Elster)',50.7974543402449,12.0976209640503,true),
 	 ('de','6909',NULL,6909,'UWFN','Wünschendorf (Elster) Nord',50.8173747066877,12.0779523253441,true),
 	 ('de','6910',NULL,6910,'BWUE','Wünsdorf Waldstadt',52.1655265106846,13.4680938720703,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','6912',NULL,6912,'NHOB','Wunsiedel-Holenbrunn',50.0511594777841,12.0337843894958,true),
 	 ('de','6913',NULL,6913,'HWUN','Wunstorf',52.4222888625512,9.45113217945455,true),
 	 ('de','6914',NULL,6914,'KW','Wuppertal Hbf',51.2543117840239,7.14955216104334,true),
@@ -526,7 +526,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','692',NULL,692,'RBAN','Blankenloch',49.0669167643834,8.46479773521423,true),
 	 ('de','6923',NULL,6923,'KWLP','Wuppertal-Langerfeld',51.2777804803123,7.24212795495987,true),
 	 ('de','6927',NULL,6927,'RDOG','Donaueschingen Grüningen',47.9832177543091,8.47162635095658,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','6928',NULL,6928,'KWO','Wuppertal-Oberbarmen',51.2739009665495,7.22138059766669,true),
 	 ('de','693',NULL,693,'WBLS','Blankensee (Meckl)',53.4082229147222,13.2630801200867,true),
 	 ('de','6932',NULL,6932,'KWRO','Wuppertal-Ronsdorf',51.2263901893817,7.21557766199112,true),
@@ -537,7 +537,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','6939',NULL,6939,'EWGD','Würgendorf',50.760083442592,8.14176589250564,true),
 	 ('de','694',NULL,694,'UBN','Blankenstein (Saale)',50.4012133874771,11.6980774879275,true),
 	 ('de','6940',NULL,6940,'EWGT','Würgendorf Ort',50.7569523933259,8.12694668769837,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','6941',NULL,6941,'NWLZ','Wurlitz',50.2531271523174,11.9894126057625,true),
 	 ('de','6943',NULL,6943,'SWB','Würzbach (Saar)',49.2444498855526,7.19252831771457,true),
 	 ('de','6944',NULL,6944,'UWCH','Wurzbach (Thür)',50.4664957550057,11.5433894390085,true),
@@ -548,7 +548,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','6950',NULL,6950,'LWZ','Wurzen',51.3645311785261,12.7387132331333,true),
 	 ('de','6951',NULL,6951,'LWZW','Bennewitz',51.3559288056075,12.7085816860199,true),
 	 ('de','6952',NULL,6952,'DWD','Wüstenbrand',50.8055009556565,12.7565009224004,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','6954',NULL,6954,'WWSF','Wüstenfelde',54.2302032745035,13.1394425918611,true),
 	 ('de','6955',NULL,6955,'NWBZ','Wüstenselbitz',50.2184972802642,11.7095296382468,true),
 	 ('de','6957',NULL,6957,'BWUS','Wustermark',52.5519522171824,12.9385086028807,true),
@@ -559,7 +559,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','6963',NULL,6963,'UWU','Wutha',50.9570275285132,10.3967871913945,true),
 	 ('de','6965',NULL,6965,'RWY','Wyhlen',47.5463117157444,7.69122111046383,true),
 	 ('de','6966',NULL,6966,'KX','Xanten',51.6596778645775,6.44533294041279,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','6967',NULL,6967,'BYOR','Yorckstraße',52.4908879943577,13.3721423149109,true),
 	 ('de','6968',NULL,6968,'DZT','Zabeltitz',51.3486129934275,13.515704870224,true),
 	 ('de','697',NULL,697,'TBLF','Blaufelden',49.2968680840031,9.9672567844391,true),
@@ -570,7 +570,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','6979',NULL,6979,'BZS','Zeesen',52.2649006334566,13.6350997655016,true),
 	 ('de','698',NULL,698,'TBLS','Blaustein',48.4146696520766,9.9192504449324,true),
 	 ('de','6980',NULL,6980,'WZE','Zehdenick (Mark)',52.9791614827097,13.3174089022782,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','6981',NULL,6981,'WZEN','Zehdenick-Neuhof',53.0057036581011,13.3457672777254,true),
 	 ('de','6983',NULL,6983,'NZ','Zeil',50.0051056643502,10.5986489054899,true),
 	 ('de','6985',NULL,6985,'DZNH','Zeithain',51.3301155648065,13.3445379137993,true),
@@ -581,7 +581,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','6990',NULL,6990,'FZR','Zell-Romrod',50.7274692016412,9.20002788305283,true),
 	 ('de','6992',NULL,6992,'UZL','Zella-Mehlis',50.6466773950674,10.6740946726583,true),
 	 ('de','6993',NULL,6993,'UZLW','Zella-Mehlis West',50.6585422776352,10.6495925015019,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','6994',NULL,6994,'LZD','Zellendorf',51.8941848027717,13.0668745814824,true),
 	 ('de','6995',NULL,6995,'FZH','Mainhausen Zellhausen',50.0161510141997,8.96998303835509,true),
 	 ('de','6997',NULL,6997,'FZE','Zennern',51.1121599576777,9.31724309921265,true),
@@ -592,7 +592,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','7002',NULL,7002,'LZE','Zerbst',51.9539542303416,12.0889715540227,true),
 	 ('de','7005',NULL,7005,'BZF','Zernsdorf',52.2994209144664,13.6933565139771,true),
 	 ('de','7006',NULL,7006,'WZIN','Zerrenthin',53.4994960885989,14.0976476669312,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','7009',NULL,7009,'UZU','Zeulenroda unt Bf',50.6594447402911,12.0113414525986,true),
 	 ('de','701',NULL,701,'FBLH','Bleichenbach (Oberhess)',50.320361825909,9.05150055885315,true),
 	 ('de','7010',NULL,7010,'BZN','Zeuthen',52.3484283935155,13.6276164650917,true),
@@ -603,7 +603,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','7021',NULL,7021,'KZI','Zieverich',50.9494363986625,6.62653898039175,true),
 	 ('de','7022',NULL,7022,'NZF','Zillendorf',49.3454387694782,12.6732505461587,true),
 	 ('de','7023',NULL,7023,'BZIL','Ziltendorf',52.1993248756856,14.6162622482324,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','7024',NULL,7024,'TZI','Zimmern',49.595305244734,9.7906592344907,true),
 	 ('de','7025',NULL,7025,'RZIM','Zimmern bei Seckach',49.430656612978,9.37126903085534,true),
 	 ('de','7026',NULL,7026,'FZM','Zimmersrode',51.0080000330331,9.22581732273102,true),
@@ -614,7 +614,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','7037',NULL,7037,'DZL','Zoblitz',51.1236501259237,14.7509684130154,true),
 	 ('de','7038',NULL,7038,'DZB','Zöblitz-Pobershau',50.6600375844609,13.2137775421143,true),
 	 ('de','7040',NULL,7040,'MZHP','Zollhaus-Petersthal',47.665648274103,10.4184126853943,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','7042',NULL,7042,'LZO','Zoo',51.5036842320307,11.9702842405865,true),
 	 ('de','7045',NULL,7045,'MZO','Zorneding',48.0895163074821,11.8325525111166,true),
 	 ('de','7046',NULL,7046,'LZGL','Zörnigall',51.8829271927615,12.7314208601048,true),
@@ -625,7 +625,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','7054',NULL,7054,'LHNZ','Zscherbener Straße',51.4731056963049,11.9210882449443,true),
 	 ('de','7055',NULL,7055,'DZP','Zschopau',50.7432334851788,13.0659171938896,true),
 	 ('de','7056',NULL,7056,'LZS','Zschortau',51.4833891127463,12.3614226361267,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','7058',NULL,7058,'KZU','Euskirchen Zuckerfabrik',50.6571367708711,6.81324005126953,true),
 	 ('de','7062',NULL,7062,'RZHN','Zusenhofen',48.5448904470563,8.01786368340799,true),
 	 ('de','7063',NULL,7063,'WZS','Züssow',53.972840685084,13.5493698881027,true),
@@ -636,7 +636,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','707',NULL,707,'SBKL','Blieskastel-Lautzkirchen',49.2491863980313,7.25801151852276,true),
 	 ('de','7070',NULL,7070,'DZWP','Zwickau-Pölbitz',50.7371277853822,12.479683606389,true),
 	 ('de','7071',NULL,7071,'DZWS','Zwickau-Schedewitz',50.7019080388157,12.4949154281876,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','7072',NULL,7072,'NZWL','Zwiesel (Bay)',49.0203716696716,13.2260785834094,true),
 	 ('de','7073',NULL,7073,'NZWU','Zwieselau',49.0065325041363,13.2770955562592,true),
 	 ('de','7074',NULL,7074,'RZW','Zwingenberg (Baden)',49.4157831030959,9.04302633122394,true),
@@ -647,7 +647,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','7079',NULL,7079,'DZA','Zwotental',50.362193034516,12.3639141461429,true),
 	 ('de','708',NULL,708,'MBLM','Blindheim',48.6437867350354,10.6153959035873,true),
 	 ('de','7081',NULL,7081,'RDOA','Donaueschingen Allmendshofen',47.940554402497,8.50174427032471,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','7083',NULL,7083,'RWD','Weidenthal',49.4175655335154,7.99447209007223,true),
 	 ('de','709',NULL,709,'LBD','Blönsdorf',51.9554536133164,12.8958034515381,true),
 	 ('de','71',NULL,71,'BARO','Alt Rosenthal',52.5502971604976,14.2782211303711,true),
@@ -658,7 +658,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','712',NULL,712,'LBLG','Blumenberg',52.0334589952065,11.4558577537537,true),
 	 ('de','7121',NULL,7121,'DWIS','Wiesa (Erzgeb)',50.6104996710811,13.0234909057617,true),
 	 ('de','713',NULL,713,'WBLK','Blumenhagen',53.5283310944805,13.8717412948608,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','714',NULL,714,'EBKP','Blumenkamp',51.6952444005791,6.61307282746706,true),
 	 ('de','7144',NULL,7144,'BLAK','Lankwitz',52.4387336799763,13.3419929941495,true),
 	 ('de','7146',NULL,7146,'BSDE','Südende',52.4482548378637,13.3536887168884,true),
@@ -669,7 +669,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','7152',NULL,7152,'TRNF','Rottweil Neufra',48.1267990755887,8.67034792900083,true),
 	 ('de','7153',NULL,7153,'RVLE','Villingen-Schwenningen Eisstadion',48.0527477397657,8.52858290076255,true),
 	 ('de','7154',NULL,7154,'RVLH','Villingen-Schwenningen Hammerstatt',48.0601436757818,8.54693586731014,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','7155',NULL,7155,'RVLZ','Zollhaus Villingen-Schwenningen',48.0409267082552,8.50594580173492,true),
 	 ('de','7156',NULL,7156,'RNBG','Neuenburg (Baden)',47.8114100771463,7.56292339582205,true),
 	 ('de','7157',NULL,7157,'SFIM','Friedrichsthal Mitte',49.3269348124969,7.0940226316452,true),
@@ -680,7 +680,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','7161',NULL,7161,'FDAL','Darmstadt-Lichtwiese',49.8608716030797,8.68758916854858,true),
 	 ('de','7162',NULL,7162,'RSZM','Sinzheim',48.7597617512172,8.15836429595947,true),
 	 ('de','7166',NULL,7166,'FDZ','Dietzenbach Bahnhof',50.0080125581858,8.78558959023267,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','7167',NULL,7167,'FHEU','Heusenstamm',50.0600463798685,8.80215484987605,true),
 	 ('de','7168',NULL,7168,'FMHD','Mühlheim-Dietesheim',50.1204645934781,8.85854959487915,true),
 	 ('de','7169',NULL,7169,'FOKL','Offenbach-Kaiserlei',50.1051734241434,8.73825073242187,true),
@@ -691,7 +691,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','7178',NULL,7178,'RSMM','Sinsheim Museum/Arena',49.2416597175338,8.89927248160045,true),
 	 ('de','7179',NULL,7179,'HLGM','Langenhagen-Mitte',52.4401221667493,9.72523183581725,true),
 	 ('de','7180',NULL,7180,'HLGF','Hannover-Flughafen',52.4585547160933,9.69878911972046,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','7181',NULL,7181,'HKWA','Hannover Karl-Wiechert-Allee',52.3744122959614,9.80884203987674,true),
 	 ('de','7183',NULL,7183,'HLEG','Hannover - Ledeburg',52.4084559136188,9.6907344407792,true),
 	 ('de','7184',NULL,7184,'RBZB','Bad Bergzabern',49.1032074332002,8.00331115722656,true),
@@ -702,7 +702,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','7200',NULL,7200,'RSAI','Schaidt (Pf)',49.0612487674533,8.07982627083273,true),
 	 ('de','7201',NULL,7201,'RAM','Albsheim (Eis)',49.580946104255,8.1790941953659,true),
 	 ('de','7202',NULL,7202,'RBOK','Bockenheim-Kindenheim',49.6068514005025,8.18796873092651,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','7203',NULL,7203,'RRN','Ramsen',49.5351552705906,8.02229869339499,true),
 	 ('de','7205',NULL,7205,'KASZ','Aachen Schanz',50.7699944112422,6.07366383075714,true),
 	 ('de','7213',NULL,7213,'FDZM','Dietzenbach-Mitte',50.0175514810848,8.78916334570125,true),
@@ -713,7 +713,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','7250',NULL,7250,'AY','Husby',54.7641902350377,9.57629139008728,true),
 	 ('de','7252',NULL,7252,'AKE','Kiel-Elmschenhagen',54.2870803737293,10.1804548501969,true),
 	 ('de','7255',NULL,7255,'AKHD','Kremperheide',53.8812062932582,9.48022842407227,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','7257',NULL,7257,'AKRH','Kronshagen',54.3310620233927,10.0832926979188,true),
 	 ('de','7267',NULL,7267,'AME','Melsdorf',54.3127955415507,10.0307048651484,true),
 	 ('de','7277',NULL,7277,'AKRU','Kiel-Russee',54.3100176694926,10.0702548027039,true),
@@ -724,7 +724,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','7434',NULL,7434,'TBIF','Bitzfeld',49.1872188329265,9.45327937602998,true),
 	 ('de','7435',NULL,7435,'TFF','Friedrichshafen-Fischbach',47.6725836916973,9.41716411574347,true),
 	 ('de','7436',NULL,7436,'TSEP','Scheppach',49.1616747816076,9.43425536155701,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','7459',NULL,7459,'TSUS','Sülzbach Schule',49.144888798788,9.35138187199755,true),
 	 ('de','7461',NULL,7461,'RSFL','Steinfeld (Pfalz)',49.0447218053078,8.03944398880048,true),
 	 ('de','7463',NULL,7463,'FAR','Bad Arolsen',51.381716907211,8.99789750576019,true),
@@ -735,7 +735,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','7494',NULL,7494,'FMGH','Mengeringhausen',51.3605774837256,8.98986233349206,true),
 	 ('de','7508',NULL,7508,'FSLM','Vöhl Schmittlotheim',51.156722739148,8.89996636421123,true),
 	 ('de','7511',NULL,7511,'FTW','Twiste',51.3362907418293,8.96385512977304,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','7512',NULL,7512,'FVI','Frankenberg (Eder) Viermünden',51.1008710717107,8.83308313405811,true),
 	 ('de','7527',NULL,7527,'MKAI','Kainzenbad',47.4830232419896,11.1163052916527,true),
 	 ('de','7531',NULL,7531,'FAZS','Alzey Süd',49.7380397499913,8.11876371502876,true),
@@ -746,7 +746,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','7562',NULL,7562,'TMAG','Magstadt',48.7362420808569,8.96536231040955,true),
 	 ('de','7590',NULL,7590,'HWBD','Willebadessen',51.6215964347361,9.01196122169494,true),
 	 ('de','7623',NULL,7623,'TTPS','Heilbronn Trappensee',49.1403044989393,9.25268411636353,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','7626',NULL,7626,'HDVD','Dörverden',52.8469426290407,9.2464542388916,true),
 	 ('de','7638',NULL,7638,'TWRW','Weinsberg West',49.1512223657819,9.27389323711395,true),
 	 ('de','7651',NULL,7651,'KKBL','Köln-Blumenberg',51.0374456882592,6.88181750914631,true),
@@ -757,7 +757,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','7712',NULL,7712,'THBH','Horb-Heiligenfeld',48.4677238190907,8.660169839859,true),
 	 ('de','7713',NULL,7713,'TELI','Weinsberg/Ellhofen Gewerbegebiet',49.1487394076972,9.30544859170913,true),
 	 ('de','7715',NULL,7715,'FHSU','Hohensülzen',49.6213398897155,8.2140456604975,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','7719',NULL,7719,'BARF','Alt-Reinickendorf',52.5777360152643,13.3512822819632,true),
 	 ('de','7720',NULL,7720,'BLIH','Berlin-Lichterfelde Ost',52.4297709311585,13.3286495475162,true),
 	 ('de','7721',NULL,7721,'BTG','Berlin-Tegel',52.5881668467864,13.2897055149078,true),
@@ -768,7 +768,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','7728',NULL,7728,'BHST','Heerstraße',52.5082122466258,13.2590619411349,true),
 	 ('de','7729',NULL,7729,'BHLS','Heiligensee',52.6247338684935,13.2289731502533,true),
 	 ('de','7730',NULL,7730,'BLIS','Lichterfelde Süd',52.4096790880467,13.3083421941151,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','7731',NULL,7731,'BOLS','Olympiastadion',52.511383594499,13.2427172581876,true),
 	 ('de','7732',NULL,7732,'BPIC','Pichelsberg',52.5102039315973,13.2275805993058,true),
 	 ('de','7734',NULL,7734,'BSZF','Schulzendorf (b Tegel)',52.6132831284011,13.2455434584517,true),
@@ -779,7 +779,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','7748',NULL,7748,'BFPN','Frankfurt (Oder)-Neuberesinchen',52.3224621352589,14.5463342594461,true),
 	 ('de','7751',NULL,7751,'RBRP','Bruchsal Sportzentrum',49.1355454558817,8.58961701393127,true),
 	 ('de','7755',NULL,7755,'BGGS','Yorckstraße (Großgörschenstraße)',52.4923390161326,13.3679881602971,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','7756',NULL,7756,'BWED','Wedding',52.5427810682522,13.3670210838318,true),
 	 ('de','7759',NULL,7759,'BJLB','Julius-Leber-Brücke',52.4863967192342,13.3610395038159,true),
 	 ('de','7760',NULL,7760,'BWH','Westhafen',52.5362502007629,13.3441695570946,true),
@@ -790,7 +790,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','7766',NULL,7766,'TRBG','Rosenberg (Baden)',49.45744774745,9.47121233587532,true),
 	 ('de','7769',NULL,7769,'KMCP','Meckenheim Industriepark',50.6437838036061,7.02719181776046,true),
 	 ('de','7772',NULL,7772,'EHWS','Halle (Westf)-Gerry-Weber-Stadion',52.0616021798886,8.34377533922634,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','7774',NULL,7774,'EOLT','Oldentrup',52.010340213258,8.59070985444956,true),
 	 ('de','7848',NULL,7848,'LNW','Leipzig Messe',51.3963139191042,12.3890590667725,true),
 	 ('de','7851',NULL,7851,'NZIK','Zirndorf Kneippallee',49.4502865985787,10.9448476938101,true),
@@ -801,7 +801,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','7872',NULL,7872,'SNO','Nohfelden',49.5859288714237,7.13955044746398,true),
 	 ('de','7875',NULL,7875,'RNFL','Neidenfels',49.3864239342015,8.04525837892654,true),
 	 ('de','7884',NULL,7884,'HWUE','Wüsting',53.1181323427885,8.33724975585938,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','7889',NULL,7889,'TPW','Pforzheim-Weißenstein',48.8652238489259,8.67632320403572,true),
 	 ('de','7890',NULL,7890,'RRZB','Radolfzell Haselbrunn',47.7446717091979,8.97523409128188,true),
 	 ('de','7891',NULL,7891,'TAEW','Albstadt Ebingen West',48.21136195245,8.99706602096557,true),
@@ -812,7 +812,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','7910',NULL,7910,'BBRF','Bernau-Friedenstal',52.6683627648285,13.5645961761474,true),
 	 ('de','7947',NULL,7947,'TNAI','Nagold-Iselshausen',48.5315264577321,8.72593402862549,true),
 	 ('de','7956',NULL,7956,'RHGB','Hagenbach',49.0163786228012,8.25323402881623,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','7957',NULL,7957,'FWED','Dreieich-Weibelfeld',50.007254802887,8.70073840385532,true),
 	 ('de','7958',NULL,7958,'HWEH','Wehrden (Weser)',51.7100389780955,9.3815803527832,true),
 	 ('de','7960',NULL,7960,'TALD','Aldingen',48.0957883208843,8.71304154396057,true),
@@ -823,7 +823,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','7965',NULL,7965,'LVTT','Vatteröder Teich',51.5981452419974,11.4121136069298,true),
 	 ('de','7966',NULL,7966,'EHOH','Attendorn Hohen-Hagen',51.0901525152748,7.85530507564545,true),
 	 ('de','7968',NULL,7968,'FGOG','Gießen Oswaldsgarten',50.5880642383409,8.6689281463623,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','7969',NULL,7969,'FOUS','Oberursel-Stierstadt',50.1851558705383,8.58476484044989,true),
 	 ('de','7971',NULL,7971,'LMHR','Magdeburg-Herrenkrug',52.1452170453073,11.6770210415238,true),
 	 ('de','7973',NULL,7973,'LTMW','Tangermünde West',52.5477136484075,11.9604328340665,true),
@@ -834,7 +834,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','7980',NULL,7980,'FFME','Frankfurt am Main Messe',50.1119110244626,8.64344750271469,true),
 	 ('de','7981',NULL,7981,'KBPS','Boppard Süd',50.2301067649472,7.59577954552837,true),
 	 ('de','7982',NULL,7982,'FFLF','Frankfurt am Main Flughafen Fernbahnhof',50.0529456722016,8.56986387454731,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','7983',NULL,7983,'WTIW','Tessin West',54.0343613709732,12.4422866106033,true),
 	 ('de','7984',NULL,7984,'WRTF','Rostock Thierfelder Straße',54.0779764903219,12.1002833250502,true),
 	 ('de','7985',NULL,7985,'WKAR','Kalsow',53.925776197122,11.5787294932774,true),
@@ -845,7 +845,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','7992',NULL,7992,'RFMU','Freiburg Messe/Universität',48.0128560880564,7.83278986574714,true),
 	 ('de','7993',NULL,7993,'TTUN','Tuttlingen Nord',47.9925391652491,8.82372756799062,true),
 	 ('de','7994',NULL,7994,'TBOX','Boxberg-Wölchingen',49.4854286111985,9.6395813480137,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','7995',NULL,7995,'NHEN','Heroldsberg Nord',49.5449549136114,11.1467456817627,true),
 	 ('de','7996',NULL,7996,'MAGM','Augsburg Messe',48.3386990679735,10.8861011266708,true),
 	 ('de','7997',NULL,7997,'UWOL','Wolfsgefärth',50.8166750471278,12.0736208328834,true),
@@ -856,7 +856,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','8002',NULL,8002,'RUEM','Überlingen',47.7690751219607,9.16285783052445,true),
 	 ('de','8003',NULL,8003,'TWHF','Wackershofen-Freilandmuseum',49.1372558626989,9.69714760780335,true),
 	 ('de','8004',NULL,8004,'RDUN','Durmersheim Nord',48.937754110544,8.28053018557891,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','8005',NULL,8005,'RSIS','Singen-Landesgartenschau',47.760917561559,8.82707762541941,true),
 	 ('de','8006',NULL,8006,'TWVH','Warthausen',48.1298389702487,9.80161249637604,true),
 	 ('de','8007',NULL,8007,'TSIH','Sigmaringendorf',48.0689101002142,9.26074147224425,true),
@@ -867,7 +867,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','8012',NULL,8012,'FZBR','Zierenberg-Rosental',51.3675885834164,9.29152071475983,true),
 	 ('de','8013',NULL,8013,'WNRW','Neuruppin West',52.9263599545071,12.7940940856934,true),
 	 ('de','8014',NULL,8014,'WSRB','Stralsund-Grünhufe',54.3042414199415,13.0439937114716,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','8015',NULL,8015,'LFLU','Flughafen Leipzig/Halle',51.4232784916033,12.2236919403076,true),
 	 ('de','8016',NULL,8016,'DKTF','Dresden Flughafen',51.1245855890878,13.7659728527069,true),
 	 ('de','8017',NULL,8017,'DSCF','Schöneck (Vogtl) Ferienpark',50.3897244229187,12.3471693017266,true),
@@ -878,7 +878,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','8023',NULL,8023,'FLGF','Langen-Flugsicherung',50.0053945715418,8.65849256515503,true),
 	 ('de','8024',NULL,8024,'HLTT','Lutten',52.7680356195963,8.34378608466067,true),
 	 ('de','8025',NULL,8025,'RMSU','Malsch Süd',48.8875567723244,8.3160831297145,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','8026',NULL,8026,'RMU B','Muggensturm-Badesee',48.8799961344862,8.28678826491035,true),
 	 ('de','8027',NULL,8027,'TNA M','Nagold Stadtmitte',48.5512760693146,8.72852723116011,true),
 	 ('de','8030',NULL,8030,'TGRW','Grüntal/Wittlensweiler',48.4753795717776,8.4602133384565,true),
@@ -889,7 +889,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','8036',NULL,8036,'TMHR','Möhringen Rathaus',47.9571309582826,8.76284301280975,true),
 	 ('de','8037',NULL,8037,'TSPM','Spaichingen Mitte',48.0784438083992,8.7305247121387,true),
 	 ('de','8038',NULL,8038,'TTUS','Tuttlingen Schulen',47.9873873666813,8.80108204327132,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','8039',NULL,8039,'TTUG','Tuttlingen Gänsäcker',47.9646452770826,8.78119826316833,true),
 	 ('de','8040',NULL,8040,'TWLH','Weilheim',48.0247953892195,8.77594274357831,true),
 	 ('de','8041',NULL,8041,'TWUM','Wurmlingen Mitte',48.0014556827084,8.77803862094879,true),
@@ -900,7 +900,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','8046',NULL,8046,'RSCW','Schopfheim West',47.6455551945598,7.801733314991,true),
 	 ('de','8047',NULL,8047,'RKOF','Konstanz Fürstenberg',47.6774896487691,9.16279532692649,true),
 	 ('de','8048',NULL,8048,'RLAC','Lauchringen West',47.6327464113642,8.30829313823156,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','8050',NULL,8050,'RHBF','HD-Weststadt/Südstadt',49.3983787811584,8.68898391723633,true),
 	 ('de','8051',NULL,8051,'RHBO','Heidelberg-Orthopädie',49.4100143723822,8.77491333858756,true),
 	 ('de','8052',NULL,8052,'RMOW','Mosbach West',49.3466477921908,9.13394488918949,true),
@@ -911,7 +911,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','8057',NULL,8057,'NCN','Coburg Nord',50.2714671096946,10.9648861885071,true),
 	 ('de','8058',NULL,8058,'FFZH','Frankfurt-Zeilsheim',50.0901740477464,8.50640487566125,true),
 	 ('de','8059',NULL,8059,'RHFM','Hüfingen Mitte',47.9293495870561,8.4902587193563,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','8060',NULL,8060,'TDLM','Deißlingen Mitte',48.1083569905767,8.61155948218175,true),
 	 ('de','8063',NULL,8063,'ANSW','Neumünster Stadtwald',54.0834049542114,9.96285080909729,true),
 	 ('de','8064',NULL,8064,'HBSK','Bad Salzdetfurth-Solebad',52.0700352917617,10.0185499650187,true),
@@ -922,7 +922,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','8086',NULL,8086,'HOTM','Osterode am Harz Mitte',51.7260455718577,10.245482902373,true),
 	 ('de','8087',NULL,8087,'HOTL','Osterode am Harz Leege',51.7169889776672,10.2730356760386,true),
 	 ('de','8091',NULL,8091,'DHFR','Dresden Freiberger Straße',51.048089232313,13.7198343873024,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','8094',NULL,8094,'LSEL','Leipzig-Olbrichtstraße',51.3698715113397,12.3535072803497,true),
 	 ('de','8095',NULL,8095,'LSDW','Schkeuditz West',51.4030030086157,12.1952310204506,true),
 	 ('de','8096',NULL,8096,'LSVS','Leipzig-Slevogtstraße',51.3729557950398,12.3444163799286,true),
@@ -933,7 +933,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','8109',NULL,8109,'TMIN','Maichingen Nord',48.7274514656348,8.97942048679922,true),
 	 ('de','811',NULL,811,'EBWE','Brackwede',51.9972054795561,8.4983994279589,true),
 	 ('de','8110',NULL,8110,'TMAI','Maichingen',48.7216357886643,8.96961539983749,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','8111',NULL,8111,'TRXS','Renningen Süd',48.7626555558764,8.93197417259216,true),
 	 ('de','8112',NULL,8112,'AFIB','Fischbek',53.4747588082275,9.81944752805815,true),
 	 ('de','8113',NULL,8113,'DSRB','Plauen (Vogtl)-Straßberg',50.4801155948601,12.0921671390534,true),
@@ -944,7 +944,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','813',NULL,813,'WBRH','Brahlstorf',53.3643522251632,10.9520179544532,true),
 	 ('de','8130',NULL,8130,'SRAM','Miesenbach',49.456309142121,7.54879653453827,true),
 	 ('de','8131',NULL,8131,'KKWW','Köln-Weiden West',50.9408544904191,6.81496471166611,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','8133',NULL,8133,'FMBB','Melsungen-Bartenwetzerbrücke',51.1322050674238,9.54872846603394,true),
 	 ('de','8134',NULL,8134,'FVOE','Vellmar-Osterberg/EKZ',51.3542760744887,9.46073643391645,true),
 	 ('de','8135',NULL,8135,'FKKD','Kassel-Kirchditmold',51.3245715539511,9.45210868849244,true),
@@ -955,7 +955,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','8141',NULL,8141,'WGMW','Graal-Müritz-Koppelweg',54.2458450378084,12.2369205951691,true),
 	 ('de','8142',NULL,8142,'NAHF','Aschaffenburg Hochschule',49.9739373866439,9.1601912838867,true),
 	 ('de','8147',NULL,8147,'TRCB','Reichenberg',49.7310948064864,9.91288793196372,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','815',NULL,815,'HBKE','Brake (Unterweser)',53.3286111863404,8.48113059997559,true),
 	 ('de','8152',NULL,8152,'NALW','Altenstadt (Waldnaab)',49.7155031009043,12.1648582831934,true),
 	 ('de','8154',NULL,8154,'MMHG','München-Hirschgarten',48.1435657432128,11.5194522569245,true),
@@ -966,7 +966,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','8162',NULL,8162,'WUMH','Ueckermünde Stadthafen',53.7362213753434,14.0522309374137,true),
 	 ('de','8163',NULL,8163,'RESN','Eschelbronn',49.3238726146127,8.86785507202148,true),
 	 ('de','8164',NULL,8164,'RNST','Neidenstein',49.3202222026194,8.89024257659912,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','8165',NULL,8165,'RWB','Waibstadt',49.3008793629413,8.91936779022216,true),
 	 ('de','8166',NULL,8166,'RNHF','Neckarbischofsheim Nord',49.3069936029972,8.94261360168457,true),
 	 ('de','8167',NULL,8167,'RHM','Helmstadt (Baden)',49.3199417129369,8.97483282259426,true),
@@ -977,7 +977,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','8194',NULL,8194,'NHAP','Happurg',49.5000379543495,11.4683939860417,true),
 	 ('de','8195',NULL,8195,'NNAM','Neustadt (Aisch) Mitte',49.5742440504185,10.6094026816027,true),
 	 ('de','8197',NULL,8197,'FSLN','Schwalbach Nord',50.1597845007794,8.53458987593968,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','8198',NULL,8198,'SSTB','Stambach',49.2391553493315,7.45663676572882,true),
 	 ('de','8199',NULL,8199,'RND','Neustadt Süd',49.3411675989078,8.15694987773896,true),
 	 ('de','8200',NULL,8200,'SHAM','Hauenstein Mitte',49.199164571602,7.84956205974925,true),
@@ -988,7 +988,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','8205',NULL,8205,'RWRG','Wörth Zügelstraße',49.0529733870338,8.26200306415558,true),
 	 ('de','8206',NULL,8206,'RGES','Germersheim Süd/Nolte',49.2083694864028,8.37379403114317,true),
 	 ('de','8209',NULL,8209,'MEFM','Eggenfelden Mitte',48.4061402313299,12.767624258995,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','8210',NULL,8210,'RFTS','Frankenthal-Süd',49.5226036499836,8.34952354431152,true),
 	 ('de','8212',NULL,8212,'NKGM','Kleingemünden',50.0629841743865,9.68775987625122,true),
 	 ('de','8216',NULL,8216,'DAUS','Aue (Sachs) Erzgebirgsstadion',50.5966272129463,12.7094542980194,true),
@@ -999,7 +999,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','8221',NULL,8221,'DFLP','Flöha-Plaue',50.8443871864845,13.0849820762796,true),
 	 ('de','8222',NULL,8222,'MJUL','Julbach',48.250963969071,12.9583257436752,true),
 	 ('de','8223',NULL,8223,'ENL','Bad Laasphe-Niederlaasphe',50.9243148551329,8.44199895858765,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','8224',NULL,8224,'DNZW','Niederzwönitz',50.6462024148463,12.8218433260918,true),
 	 ('de','8225',NULL,8225,'DOLW','Olbernhau West',50.6602208772145,13.3211572766304,true),
 	 ('de','8226',NULL,8226,'DSTM','Pockau Strobelmühle',50.6785140203176,13.2150042057037,true),
@@ -1010,7 +1010,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','8240',NULL,8240,'BSTH','Ludwigsfelde-Struveshof',52.3171366034566,13.2320022583008,true),
 	 ('de','8242',NULL,8242,'RANS','Annweiler-Sarnstall',49.2089311849686,7.93712956564766,true),
 	 ('de','8243',NULL,8243,'BAHH','Blumberg-Rehhahn',52.5967765377545,13.5920780897141,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','8244',NULL,8244,'RGEM','Germersheim Mitte/Rhein',49.2201093906166,8.37923347949982,true),
 	 ('de','8245',NULL,8245,'MFLH','Freilassing-Hofham',47.8318192865327,12.9678084509713,true),
 	 ('de','8246',NULL,8246,'FLSR','Lahntal-Sarnau',50.871143453964,8.75600874423981,true),
@@ -1021,7 +1021,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','8252',NULL,8252,'FDHM','Dienheim',49.8413417297459,8.35704935224432,true),
 	 ('de','8253',NULL,8253,'NGFA','Grafling-Arzting',48.889852620279,12.9732611775398,true),
 	 ('de','8258',NULL,8258,'KKSM','Koblenz Stadtmitte',50.3582093168618,7.5901151158196,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','8259',NULL,8259,'MROS','Rosenheim Hochschule',47.8663720768848,12.1042249149196,true),
 	 ('de','8263',NULL,8263,'FATC','Ahnatal-Casselbreite',51.362856659307,9.43399644815002,true),
 	 ('de','8264',NULL,8264,'FPU','Pfungstadt',49.8062573292585,8.60725045204163,true),
@@ -1032,7 +1032,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','8271',NULL,8271,'TN  M','Neckarsulm Mitte',49.1932382145579,9.22285519178633,true),
 	 ('de','8273',NULL,8273,'TBWT','Bad Wimpfen im Tal',49.2298190657313,9.18709688292349,true),
 	 ('de','8274',NULL,8274,'RBPK','Bad Rappenau Kurpark',49.240349008878,9.11352038383484,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','8275',NULL,8275,'LLN','Leipzig Nord',51.3642828806862,12.4010360240936,true),
 	 ('de','8277',NULL,8277,'DMEA','Meißen Altstadt',51.1590604020501,13.4730684757233,true),
 	 ('de','8278',NULL,8278,'MGRL','Graben (Lechfeld) Gewerbepark',48.1991027220609,10.852295702154,true),
@@ -1043,7 +1043,7 @@ INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) 
 	 ('de','8285',NULL,8285,'URDN','Reinsdorf (b Nebra)',51.298060566517,11.6012835502625,true),
 	 ('de','8292',NULL,8292,'DPM','Plauen (Vogtl) Mitte',50.4928552358645,12.1476531028747,true),
 	 ('de','8295',NULL,8295,'ABRB','Bredenbek',54.3150597971543,9.86709904212218,true);
-INSERT INTO stations (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
+INSERT INTO station (countryCode,id,uicibnr,dbibnr,DS100,title,lat,lon,active) VALUES
 	 ('de','8297',NULL,8297,'LMAN','Markkleeberg Nord',51.2878952112556,12.3720957363238,true),
 	 ('de','8300',NULL,8300,'ALD','Lübeck Dänischburg IKEA',53.9110165320888,10.7340721289316,true),
 	 ('de','8302',NULL,8302,'FFRG','Frankenberg (Eder) Goßberg',51.0650264497401,8.79926741123199,true),

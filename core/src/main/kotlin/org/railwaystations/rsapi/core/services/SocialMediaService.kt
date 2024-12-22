@@ -1,11 +1,15 @@
 package org.railwaystations.rsapi.core.services
 
-import org.railwaystations.rsapi.core.model.*
+import org.railwaystations.rsapi.core.model.ANONYM
 import org.railwaystations.rsapi.core.ports.inbound.SocialMediaUseCase
-import org.railwaystations.rsapi.core.ports.outbound.*
+import org.railwaystations.rsapi.core.ports.outbound.InboxPort
+import org.railwaystations.rsapi.core.ports.outbound.MastodonPort
+import org.railwaystations.rsapi.core.ports.outbound.PhotoPort
+import org.railwaystations.rsapi.core.ports.outbound.StationPort
+import org.railwaystations.rsapi.core.ports.outbound.UserPort
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import java.util.Random
+import java.util.*
 
 @Service
 class SocialMediaService(

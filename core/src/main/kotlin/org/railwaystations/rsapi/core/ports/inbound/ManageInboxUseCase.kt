@@ -20,7 +20,7 @@ interface ManageInboxUseCase {
 
     fun listAdminInbox(user: User): List<InboxEntry>
 
-    fun countPendingInboxEntries(): Long
+    fun countPendingInboxEntries(): Int
 
     fun uploadPhoto(
         clientInfo: String?, body: InputStream?, stationId: String?,

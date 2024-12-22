@@ -17,9 +17,9 @@ class StatisticController(private val getStatisticUseCase: GetStatisticUseCase) 
 }
 
 private fun Statistic.toDto() = StatisticDto(
-    total = total,
-    withPhoto = withPhoto,
-    withoutPhoto = withoutPhoto,
-    photographers = photographers,
+    total = total.toLong(),
+    withPhoto = withPhoto.toLong(),
+    withoutPhoto = withoutPhoto.toLong(),
+    photographers = photographers.toLong(),
     countryCode = countryCode
 )

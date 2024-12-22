@@ -50,7 +50,7 @@ class InboxController(
 
     @PreAuthorize("hasRole('ADMIN')")
     override fun getAdminInboxCount(): ResponseEntity<InboxCountResponseDto> {
-        return ResponseEntity.ok(InboxCountResponseDto(manageInboxUseCase.countPendingInboxEntries()))
+        return ResponseEntity.ok(InboxCountResponseDto(manageInboxUseCase.countPendingInboxEntries().toLong()))
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -244,7 +244,7 @@ private fun InboxEntry.toDto() =
         id = id,
         photographerNickname = photographerNickname!!,
         comment = comment ?: "",
-        createdAt = createdAt!!.toEpochMilli(),
+        createdAt = createdAt.toEpochMilli(),
         done = done,
         hasPhoto = hasPhoto,
         countryCode = countryCode,
