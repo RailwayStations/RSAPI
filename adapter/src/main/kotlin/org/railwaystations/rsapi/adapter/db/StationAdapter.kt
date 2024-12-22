@@ -66,7 +66,7 @@ class StationAdapter(private val dsl: DSLContext) : StationPort {
                 photographer = User(
                     id = value8()!!,
                     name = value9()!!,
-                    url = value10()!!,
+                    url = value10(),
                     license = value11()!!.nameToLicense(),
                     email = null,
                     ownPhotos = true,

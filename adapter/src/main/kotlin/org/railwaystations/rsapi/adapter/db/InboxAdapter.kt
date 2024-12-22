@@ -121,7 +121,7 @@ class InboxAdapter(private val dsl: DSLContext) : InboxPort {
         PublicInboxEntry(
             countryCode = countrycode,
             stationId = stationid,
-            title = stationRecord?.title ?: title!!,
+            title = stationRecord?.title ?: title ?: "",
             coordinates = stationRecord?.let { Coordinates(it.lat, it.lon) } ?: Coordinates(lat ?: 0.0, lon ?: 0.0)
         )
 
