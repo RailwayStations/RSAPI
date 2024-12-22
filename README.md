@@ -139,6 +139,16 @@ Account registration via API Endpoint.
 Admin Endpoints to import or reject uploaded photos:
 https://github.com/RailwayStations/RSAPI/commit/d0fea732d24b0362f10f0992e63e301c42a0d04c
 
+### July 2020
+
+Post newly imported photos to Mastodon:
+https://github.com/RailwayStations/RSAPI/commit/b8691320557af0853bff6b14a3c681624f2bd1ad
+
+### January 2021
+
+Migrate from Slack to Matrix:
+https://github.com/RailwayStations/RSAPI/commit/07ff10cec162a442684b2b528d767e93992dec96
+
 ### December 2021
 
 Migration from Dropwizard to Springboot:
@@ -179,3 +189,8 @@ https://github.com/RailwayStations/RSAPI/commit/7c94f5464fe3fe21cba3eefe58a73e98
 ### November 2024
 
 Migration from MariaDB 10.3 to PostgreSQL 17
+
+### December 2024
+
+Migration from JDBI to jOOQ:
+https://github.com/RailwayStations/RSAPI/commit/9e6e1da4eb68d1b4b9bfeea1b4e0b433b65a0ee8
