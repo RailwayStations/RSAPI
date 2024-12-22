@@ -182,7 +182,10 @@ class StationAdapter(private val dsl: DSLContext) : StationPort {
         dsl.select(UserTable.name, count())
             .from(StationTable)
             .join(PhotoTable)
-            .on(PhotoTable.countrycode.eq(StationTable.countrycode).and(PhotoTable.stationid.eq(StationTable.id)))
+            .on(
+                PhotoTable.countrycode.eq(StationTable.countrycode).and(PhotoTable.stationid.eq(StationTable.id))
+                    .and(PhotoTable.primary.eq(true))
+            )
             .join(UserTable).on(UserTable.id.eq(PhotoTable.photographerid))
             .where(value(countryCode).isNull.or(StationTable.countrycode.eq(countryCode)))
             .groupBy(UserTable.name)

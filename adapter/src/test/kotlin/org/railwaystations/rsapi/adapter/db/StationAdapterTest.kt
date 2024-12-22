@@ -112,8 +112,8 @@ class StationAdapterTest : AbstractPostgreSqlTest() {
             mapOf<String, Int>(
                 "@user27" to 31,
                 "@user8" to 29,
-                "@user10" to 17,
-                "@user0" to 10,
+                "@user10" to 15,
+                "@user0" to 9,
                 "@user2" to 6,
                 "@user4" to 1,
             )
@@ -128,7 +128,7 @@ class StationAdapterTest : AbstractPostgreSqlTest() {
             mapOf<String, Int>(
                 "@user27" to 31,
                 "@user8" to 29,
-                "@user10" to 16,
+                "@user10" to 15,
                 "@user0" to 9,
             )
         )
