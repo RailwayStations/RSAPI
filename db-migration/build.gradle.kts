@@ -111,7 +111,7 @@ dependencies {
     jooqGenerator(libs.postgresql)
     implementation(libs.jooq.codegen)
     implementation("org.springframework.boot:spring-boot-starter-jooq")
-    jooqGenerator("org.slf4j:slf4j-simple:2.0.9")
+    jooqGenerator("org.slf4j:slf4j-simple:2.0.16")
 }
 
 tasks.named<JooqGenerate>("generateJooq") {
