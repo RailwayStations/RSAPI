@@ -7,7 +7,6 @@ import org.jooq.impl.DSL.power
 import org.jooq.impl.DSL.sqrt
 import org.jooq.impl.DSL.value
 import org.railwaystations.rsapi.adapter.db.jooq.tables.records.InboxRecord
-import org.railwaystations.rsapi.adapter.db.jooq.tables.records.StationRecord
 import org.railwaystations.rsapi.adapter.db.jooq.tables.references.InboxTable
 import org.railwaystations.rsapi.adapter.db.jooq.tables.references.PhotoTable
 import org.railwaystations.rsapi.adapter.db.jooq.tables.references.StationTable
@@ -107,22 +106,25 @@ class InboxAdapter(private val dsl: DSLContext) : InboxPort {
             .fetchOne()?.toInboxEntry()
 
     override fun findPublicInboxEntries(): List<PublicInboxEntry> {
-        val result = dsl.select(InboxTable, StationTable)
+        val result = dsl.select(InboxTable, StationTable.title, StationTable.lat, StationTable.lon)
             .from(InboxTable)
             .leftJoin(StationTable)
             .on(StationTable.countrycode.eq(InboxTable.countrycode).and(StationTable.id.eq(InboxTable.stationid)))
             .where(InboxTable.done.eq(false).and(InboxTable.problemreporttype.isNull))
             .fetch()
 
-        return result.map { it.value1().toPublicInboxEntry(it.value2()) }
+        return result.map { it.value1().toPublicInboxEntry(it.value2(), it.value3(), it.value4()) }
     }
 
-    private fun InboxRecord.toPublicInboxEntry(stationRecord: StationRecord?) =
+    private fun InboxRecord.toPublicInboxEntry(stationTitle: String?, stationLat: Double?, stationLon: Double?) =
         PublicInboxEntry(
             countryCode = countrycode,
             stationId = stationid,
-            title = stationRecord?.title ?: title ?: "",
-            coordinates = stationRecord?.let { Coordinates(it.lat, it.lon) } ?: Coordinates(lat ?: 0.0, lon ?: 0.0)
+            title = stationTitle ?: title ?: "",
+            coordinates = if (stationLat != null && stationLon != null) Coordinates(
+                stationLat,
+                stationLon
+            ) else Coordinates(lat ?: 0.0, lon ?: 0.0)
         )
 
     @Transactional

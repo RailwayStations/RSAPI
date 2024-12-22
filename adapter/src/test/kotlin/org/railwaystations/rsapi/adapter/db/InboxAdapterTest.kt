@@ -74,15 +74,22 @@ class InboxAdapterTest : AbstractPostgreSqlTest() {
         sut.insert(photoUploadDe8000)
         sut.insert(photoUploadDe8000.copy(done = true, stationId = stationDe8001.key.id))
         sut.insert(problemReportDe8000)
+        sut.insert(photoUploadMissingStation)
 
         val publicInboxEntries = sut.findPublicInboxEntries()
 
-        assertThat(publicInboxEntries).containsExactly(
+        assertThat(publicInboxEntries).containsExactlyInAnyOrder(
             PublicInboxEntry(
                 countryCode = photoUploadDe8000.countryCode,
                 stationId = photoUploadDe8000.stationId,
                 title = stationDe8000.title,
                 coordinates = stationDe8000.coordinates,
+            ),
+            PublicInboxEntry(
+                countryCode = null,
+                stationId = null,
+                title = "Missing Station",
+                coordinates = Coordinates(lat = 50.1, lon = 9.7)
             )
         )
     }
