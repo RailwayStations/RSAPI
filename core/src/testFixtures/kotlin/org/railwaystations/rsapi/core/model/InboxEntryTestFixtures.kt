@@ -25,7 +25,7 @@ object InboxEntryTestFixtures {
         photographerId = user10.id,
         existingPhotoUrlPath = "de/4711.jpg",
         photoId = 4711,
-        createdAt = now(),
+        createdAt = now().truncatedTo(ChronoUnit.SECONDS),
         comment = "Photo outdated",
         problemReportType = ProblemReportType.PHOTO_OUTDATED,
     )
@@ -59,7 +59,7 @@ object InboxEntryTestFixtures {
             photographerNickname = user.name,
             extension = "jpg",
             rejectReason = rejectReason,
-            createdAt = now(),
+            createdAt = now().truncatedTo(ChronoUnit.SECONDS),
             done = done,
         )
     }

@@ -15,6 +15,7 @@ import org.railwaystations.rsapi.core.model.Coordinates
 import org.railwaystations.rsapi.core.model.InboxEntry
 import org.railwaystations.rsapi.core.model.ProblemReportType
 import org.railwaystations.rsapi.core.model.PublicInboxEntry
+import org.railwaystations.rsapi.core.model.ZERO
 import org.railwaystations.rsapi.core.ports.outbound.InboxPort
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -82,9 +83,7 @@ class InboxAdapter(private val dsl: DSLContext) : InboxPort {
         )
 
     private fun createCoordinates(lat: Double?, lon: Double?): Coordinates? {
-        if (lat == null || lon == null) return null
-
-        return Coordinates(lat, lon)
+        return Coordinates(lat ?: ZERO, lon ?: ZERO)
     }
 
     override fun findPendingInboxEntries() =
@@ -124,7 +123,7 @@ class InboxAdapter(private val dsl: DSLContext) : InboxPort {
             coordinates = if (stationLat != null && stationLon != null) Coordinates(
                 stationLat,
                 stationLon
-            ) else Coordinates(lat ?: 0.0, lon ?: 0.0)
+            ) else Coordinates(lat ?: ZERO, lon ?: ZERO)
         )
 
     @Transactional

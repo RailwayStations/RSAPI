@@ -42,18 +42,48 @@ class InboxAdapterTest : AbstractPostgreSqlTest() {
                 coordinates = stationDe8000.coordinates,
                 photographerNickname = user10.name,
                 photographerEmail = user10.email,
+                newCoordinates = Coordinates(),
             )
         )
     }
 
     @Test
     fun findPendingInboxEntries() {
-        val idPending = sut.insert(photoUploadDe8000.copy(done = false))
+        val idPending1 = sut.insert(photoUploadDe8000.copy(done = false))
         sut.insert(photoUploadDe8000.copy(done = true))
+        val idPending2 = sut.insert(problemReportDe8000.copy(done = false))
+        val idPending3 = sut.insert(photoUploadMissingStation.copy(done = false))
 
         val pendingEntries = sut.findPendingInboxEntries()
 
-        assertThat(pendingEntries.map { it.id }).containsExactly(idPending)
+        assertThat(pendingEntries).containsExactlyInAnyOrder(
+            photoUploadDe8000.copy(
+                id = idPending1,
+                title = "Offenburg Kreisschulzentrum",
+                coordinates = Coordinates(lat = 48.459376429721, lon = 7.95547485351562),
+                newCoordinates = Coordinates(),
+                photographerNickname = "@user10",
+                photographerEmail = "user10@example.com",
+            ),
+            problemReportDe8000.copy(
+                id = idPending2,
+                title = "Offenburg Kreisschulzentrum",
+                coordinates = Coordinates(lat = 48.459376429721, lon = 7.95547485351562),
+                newCoordinates = Coordinates(),
+                photographerNickname = "@user10",
+                photographerEmail = "user10@example.com",
+                existingPhotoUrlPath = null, // not in test db
+            ),
+            photoUploadMissingStation.copy(
+                id = idPending3,
+                photographerNickname = "@user10",
+                photographerEmail = "user10@example.com",
+                title = null,
+                newTitle = photoUploadMissingStation.title,
+                coordinates = Coordinates(),
+                newCoordinates = photoUploadMissingStation.coordinates,
+            ),
+        )
     }
 
     @Test
