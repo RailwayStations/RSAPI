@@ -117,6 +117,11 @@ https://github.com/RailwayStations/RSAPI/commit/f102eb475e8bc29751cfb85e2773376c
 
 The app serves the railway-station data as Json for the Android app.
 
+### Januar 2017
+
+Integrated Slack for Monitoring:
+https://github.com/RailwayStations/RSAPI/commit/3dea8ae4d0f812b74818294e35edac91e412c770
+
 ### May 2017
 
 Photos could be uploaded via API Endpoint:
