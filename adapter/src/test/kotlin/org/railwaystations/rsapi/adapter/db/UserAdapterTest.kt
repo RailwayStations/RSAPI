@@ -72,6 +72,7 @@ class UserAdapterTest : AbstractPostgreSqlTest() {
             name = "updatedName",
             url = "updatedUrl",
             email = "updatedEmail",
+            license = License.CC_BY_NC_SA_30_DE,
             ownPhotos = !originalUser.ownPhotos,
             anonymous = !originalUser.anonymous,
             sendNotifications = !originalUser.sendNotifications,

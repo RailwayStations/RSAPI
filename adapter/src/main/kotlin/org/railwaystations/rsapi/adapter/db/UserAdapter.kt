@@ -89,6 +89,7 @@ class UserAdapter(private val dsl: DSLContext) : UserPort {
             .set(UserTable.url, user.url)
             .set(UserTable.email, user.email)
             .set(UserTable.ownphotos, user.ownPhotos)
+            .set(UserTable.license, user.license.name)
             .set(UserTable.anonymous, user.anonymous)
             .set(UserTable.sendnotifications, user.sendNotifications)
             .set(UserTable.locale, user.localeLanguageTag)
