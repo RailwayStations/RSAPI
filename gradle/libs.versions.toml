@@ -17,7 +17,7 @@ springMockk = "4.0.2"
 greenmail = "2.1.2"
 flyway = "11.1.1"
 testcontainers = "1.20.4"
-jooq = "3.19.17"
+jooq = "3.19.18"
 jooqPlugin = "9.0"
 postgresql = "42.7.4"
 
