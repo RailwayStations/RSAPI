@@ -1,7 +1,7 @@
 [versions]
 springBoot = "3.4.2"
 springDependency = "1.1.7"
-springOauth2AuthorizationServer = "1.4.1"
+springOauth2AuthorizationServer = "1.4.2"
 openapiGenerator = "7.11.0"
 kotlin = "2.1.10"
 swaggerRequestValidator = "2.44.1"
