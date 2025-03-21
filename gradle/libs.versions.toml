@@ -1,5 +1,5 @@
 [versions]
-springBoot = "3.4.3"
+springBoot = "3.4.4"
 springDependency = "1.1.7"
 springOauth2AuthorizationServer = "1.4.2"
 openapiGenerator = "7.12.0"
