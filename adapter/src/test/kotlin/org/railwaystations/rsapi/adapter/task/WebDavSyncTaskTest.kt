@@ -26,7 +26,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder
 import io.mockk.every
 import io.mockk.mockk
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.railwaystations.rsapi.adapter.db.InboxAdapter
@@ -99,7 +99,7 @@ internal class WebDavSyncTaskTest {
     }
 
     @Test
-    fun shouldUploadToProcessFile(wmRuntimeInfo: WireMockRuntimeInfo) {
+    fun shouldUploadToProcessFileCreated(wmRuntimeInfo: WireMockRuntimeInfo) {
         val task = createWebDavSyncTask(wmRuntimeInfo)
         val toProcessPath1 = createFile(tempdir)
         every { photoStoragePort.getInboxToProcessFile(FILENAME) } returns toProcessPath1
@@ -115,7 +115,27 @@ internal class WebDavSyncTaskTest {
                 .withRequestBody(binaryEqualTo(FILENAME.toByteArray(StandardCharsets.UTF_8)))
         )
 
-        Assertions.assertThat(Files.exists(toProcessPath1)).isFalse()
+        assertThat(Files.exists(toProcessPath1)).isFalse()
+    }
+
+    @Test
+    fun shouldUploadToProcessFileNoContent(wmRuntimeInfo: WireMockRuntimeInfo) {
+        val task = createWebDavSyncTask(wmRuntimeInfo)
+        val toProcessPath1 = createFile(tempdir)
+        every { photoStoragePort.getInboxToProcessFile(FILENAME) } returns toProcessPath1
+        every { photoStoragePort.getInboxProcessedFile(FILENAME) } returns tempdir.resolve(FILENAME)
+
+        stubFor(put(TO_PROCESS_PATH_FILE).willReturn(noContent()))
+        stubPropfindEmpty()
+
+        task.syncWebDav()
+
+        verify(
+            putRequestedFor(urlEqualTo(TO_PROCESS_PATH_FILE))
+                .withRequestBody(binaryEqualTo(FILENAME.toByteArray(StandardCharsets.UTF_8)))
+        )
+
+        assertThat(Files.exists(toProcessPath1)).isFalse()
     }
 
     @Test
@@ -139,7 +159,7 @@ internal class WebDavSyncTaskTest {
                 )
         )
 
-        Assertions.assertThat(Files.exists(toProcessPath)).isTrue()
+        assertThat(Files.exists(toProcessPath)).isTrue()
     }
 
     @Test
@@ -159,7 +179,7 @@ internal class WebDavSyncTaskTest {
         verify(getRequestedFor(urlEqualTo(PROCESSED_PATH_FILE)))
         verify(deleteRequestedFor(urlEqualTo(PROCESSED_PATH_FILE)))
 
-        Assertions.assertThat(Files.exists(processedPath)).isTrue()
+        assertThat(Files.exists(processedPath)).isTrue()
     }
 
     private fun verifyPropfindRequest() {
@@ -245,7 +265,7 @@ internal class WebDavSyncTaskTest {
         verify(getRequestedFor(urlEqualTo(PROCESSED_PATH_FILE)))
         verify(0, deleteRequestedFor(urlEqualTo(PROCESSED_PATH_FILE)))
 
-        Assertions.assertThat(Files.exists(processedPath)).isFalse()
+        assertThat(Files.exists(processedPath)).isFalse()
     }
 
     private fun createWebDavSyncTask(wmRuntimeInfo: WireMockRuntimeInfo): WebDavSyncTask {

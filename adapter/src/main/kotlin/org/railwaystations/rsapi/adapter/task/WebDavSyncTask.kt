@@ -155,6 +155,8 @@ class WebDavSyncTask(
         }
     }
 
+    private val positiveUploadStatusCodes = listOf(HttpStatus.CREATED.value(), HttpStatus.NO_CONTENT.value())
+
     @Throws(IOException::class, InterruptedException::class)
     private fun uploadToProcess(toProcessPath: Path) {
         log.info("Uploading $toProcessPath")
@@ -165,7 +167,7 @@ class WebDavSyncTask(
             .build()
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
         log.info("Upload response " + response.statusCode())
-        if (response.statusCode() != HttpStatus.CREATED.value()) {
+        if (!positiveUploadStatusCodes.contains(response.statusCode())) {
             throw RuntimeException("Failed Upload, statusCode=" + response.statusCode())
         }
     }
